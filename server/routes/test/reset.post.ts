@@ -1,11 +1,17 @@
 export default defineEventHandler(async () => {
   for (const name of [
+    'books',
+    'book-images',
+    'series',
+    'series-books',
+    'reviews',
+    'suggestions',
+    'scan-cache',
     'migration-meta',
-    // Add your domain storage namespaces here
   ]) {
     const storage = useStorage(name)
     const keys = await storage.getKeys()
     for (const key of keys) await storage.removeItem(key)
   }
-  return { status: 200, message: 'Database reset' }
+  return { status: 200, data: 'Database reset' } as const
 })

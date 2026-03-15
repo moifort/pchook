@@ -1,3 +1,3 @@
 export default defineEventHandler(() => {
-  return { status: 'ok' }
+  return { status: 200, data: 'ok' } as const
 })
