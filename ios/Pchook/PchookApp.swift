@@ -2,7 +2,7 @@ import Sentry
 import SwiftUI
 
 @main
-struct MyAppApp: App {
+struct PchookApp: App {
     init() {
         UserDefaults.standard.register(defaults: [APIClient.serverURLKey: APIClient.defaultURL])
         startSentry()

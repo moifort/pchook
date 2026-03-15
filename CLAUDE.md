@@ -6,7 +6,7 @@
 - **Regenerate types** (if routes changed): `bunx nitro prepare` (run before `bun tsc`)
 - **iOS build**:
   ```
-  DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project ios/MyApp.xcodeproj -scheme MyApp -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build
+  DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project ios/Pchook.xcodeproj -scheme Pchook -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build
   ```
 - **Unit tests**: `bun test`
 - **Test coverage**: `bun test --coverage`
@@ -71,8 +71,8 @@ See [docs/migrations.md](docs/migrations.md) for full guide.
 
 - Target: iOS 26.0, Swift 6 (strict concurrency)
 - `@MainActor` on ViewModels, `Sendable` on model types
-- Feature structure: `ios/MyApp/Features/{Feature}/` with `atoms/`, `molecules/`, `organisms/`, `pages/` subdirectories
-- Shared atoms: `ios/MyApp/Shared/Components/` — cross-feature reusable views (badges, ratings, labeled rows)
+- Feature structure: `ios/Pchook/Features/{Feature}/` with `atoms/`, `molecules/`, `organisms/`, `pages/` subdirectories
+- Shared atoms: `ios/Pchook/Shared/Components/` — cross-feature reusable views (badges, ratings, labeled rows)
 - **Primitive-first views**: leaf views receive only primitives (`String`, `Int`, `Bool`, `Date?`, simple enums, closures) — never domain structs. Use nested `Item` structs for 5+ parameters
 - **Previews as Storybook**: every component must be previewable in isolation without a running server. Pages (coordinators) are the exception
 - Xcode uses `fileSystemSynchronizedGroups` (no need to manually add files)
@@ -100,7 +100,7 @@ See [docs/code-style.md](docs/code-style.md) for full rules with examples.
 
 The API token is used for authentication when `NITRO_API_TOKEN` is set. To rotate the token, update it in:
 - `.env` (`NITRO_API_TOKEN=...`)
-- `ios/MyApp/Shared/Secrets.swift` (gitignored)
-- `ios/MyAppUITests/Support/TestSecrets.swift` (gitignored)
+- `ios/Pchook/Shared/Secrets.swift` (gitignored)
+- `ios/PchookUITests/Support/TestSecrets.swift` (gitignored)
 
 See `.example` files next to the Secrets files for the expected format.

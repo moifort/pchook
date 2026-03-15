@@ -1,0 +1,92 @@
+import SwiftUI
+
+struct ScanConfirmationView: View {
+    let title: String
+    let authors: String
+    let genre: String?
+    let onScanAnother: () -> Void
+    let onDone: () -> Void
+
+    @State private var scale = 0.5
+    @State private var opacity = 0.0
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 80))
+                .foregroundStyle(.green)
+                .scaleEffect(scale)
+                .opacity(opacity)
+
+            Text("Livre ajout\u{00E9} !")
+                .font(.title)
+                .fontWeight(.bold)
+
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+
+                Text(authors)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                if let genre {
+                    Text(genre)
+                        .font(.caption)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(.capsule)
+                }
+            }
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                Button {
+                    onScanAnother()
+                } label: {
+                    Label("Scanner un autre", systemImage: "camera")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .accessibilityIdentifier("scan-another-button")
+
+                Button {
+                    onDone()
+                } label: {
+                    Text("Termin\u{00E9}")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .accessibilityIdentifier("done-button")
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+        .navigationBarBackButtonHidden()
+        .onAppear {
+            withAnimation(.spring(duration: 0.5, bounce: 0.3)) {
+                scale = 1.0
+                opacity = 1.0
+            }
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ScanConfirmationView(
+            title: "L'\u{00C9}tranger",
+            authors: "Albert Camus",
+            genre: "Roman",
+            onScanAnother: {},
+            onDone: {}
+        )
+    }
+}

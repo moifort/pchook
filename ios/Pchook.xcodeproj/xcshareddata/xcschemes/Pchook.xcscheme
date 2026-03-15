@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E10000060000000000000001"
-               BuildableName = "MyApp.app"
-               BlueprintName = "MyApp"
-               ReferencedContainer = "container:MyApp.xcodeproj">
+               BuildableName = "Pchook.app"
+               BlueprintName = "Pchook"
+               ReferencedContainer = "container:Pchook.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:MyApp.xctestplan"
+            reference = "container:Pchook.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -41,9 +41,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E20000060000000000000001"
-               BuildableName = "MyAppUITests.xctest"
-               BlueprintName = "MyAppUITests"
-               ReferencedContainer = "container:MyApp.xcodeproj">
+               BuildableName = "PchookUITests.xctest"
+               BlueprintName = "PchookUITests"
+               ReferencedContainer = "container:Pchook.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -63,9 +63,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E10000060000000000000001"
-            BuildableName = "MyApp.app"
-            BlueprintName = "MyApp"
-            ReferencedContainer = "container:MyApp.xcodeproj">
+            BuildableName = "Pchook.app"
+            BlueprintName = "Pchook"
+            ReferencedContainer = "container:Pchook.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -80,9 +80,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E10000060000000000000001"
-            BuildableName = "MyApp.app"
-            BlueprintName = "MyApp"
-            ReferencedContainer = "container:MyApp.xcodeproj">
+            BuildableName = "Pchook.app"
+            BlueprintName = "Pchook"
+            ReferencedContainer = "container:Pchook.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -11,18 +11,18 @@
   "defaultOptions" : {
     "performanceAntipatternCheckerEnabled" : true,
     "targetForVariableExpansion" : {
-      "containerPath" : "container:MyApp.xcodeproj",
+      "containerPath" : "container:Pchook.xcodeproj",
       "identifier" : "E10000060000000000000001",
-      "name" : "MyApp"
+      "name" : "Pchook"
     }
   },
   "testTargets" : [
     {
       "parallelizable" : false,
       "target" : {
-        "containerPath" : "container:MyApp.xcodeproj",
+        "containerPath" : "container:Pchook.xcodeproj",
         "identifier" : "E20000060000000000000001",
-        "name" : "MyAppUITests"
+        "name" : "PchookUITests"
       }
     }
   ],

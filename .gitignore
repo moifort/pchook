@@ -16,9 +16,9 @@ output
 *.xcworkspace
 xcuserdata/
 
-# iOS secrets (contains API tokens) — uncomment after running init.sh
-# ios/MyApp/Shared/Secrets.swift
-# ios/MyAppUITests/Support/TestSecrets.swift
+# iOS secrets (contains API tokens)
+ios/Pchook/Shared/Secrets.swift
+ios/PchookUITests/Support/TestSecrets.swift
 
 # IDE
 .idea/

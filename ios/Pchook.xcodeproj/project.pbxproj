@@ -17,19 +17,19 @@
 			containerPortal = E10000090000000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = E10000060000000000000001;
-			remoteInfo = MyApp;
+			remoteInfo = Pchook;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		BF9400C32F45AA6500EDF17A /* MyApp.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MyApp.xctestplan; sourceTree = "<group>"; };
-		E10000030000000000000001 /* MyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E20000030000000000000001 /* MyAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF9400C32F45AA6500EDF17A /* Pchook.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Pchook.xctestplan; sourceTree = "<group>"; };
+		E10000030000000000000001 /* Pchook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pchook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E20000030000000000000001 /* PchookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PchookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E10000050000000000000002 /* MyApp */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MyApp; sourceTree = "<group>"; };
-		E20000050000000000000001 /* MyAppUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = MyAppUITests; sourceTree = "<group>"; };
+		E10000050000000000000002 /* Pchook */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Pchook; sourceTree = "<group>"; };
+		E20000050000000000000001 /* PchookUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PchookUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,9 +55,9 @@
 		E10000050000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				BF9400C32F45AA6500EDF17A /* MyApp.xctestplan */,
-				E10000050000000000000002 /* MyApp */,
-				E20000050000000000000001 /* MyAppUITests */,
+				BF9400C32F45AA6500EDF17A /* Pchook.xctestplan */,
+				E10000050000000000000002 /* Pchook */,
+				E20000050000000000000001 /* PchookUITests */,
 				E10000050000000000000009 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,8 +65,8 @@
 		E10000050000000000000009 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E10000030000000000000001 /* MyApp.app */,
-				E20000030000000000000001 /* MyAppUITests.xctest */,
+				E10000030000000000000001 /* Pchook.app */,
+				E20000030000000000000001 /* PchookUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,9 +74,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E10000060000000000000001 /* MyApp */ = {
+		E10000060000000000000001 /* Pchook */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E10000080000000000000001 /* Build configuration list for PBXNativeTarget "MyApp" */;
+			buildConfigurationList = E10000080000000000000001 /* Build configuration list for PBXNativeTarget "Pchook" */;
 			buildPhases = (
 				E10000070000000000000001 /* Sources */,
 				E10000040000000000000001 /* Frameworks */,
@@ -87,20 +87,20 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E10000050000000000000002 /* MyApp */,
+				E10000050000000000000002 /* Pchook */,
 			);
-			name = MyApp;
+			name = Pchook;
 			packageProductDependencies = (
 				BF0E01222F5072C10074B393 /* Sentry */,
 				BF0E01242F5072C10074B393 /* SentrySwiftUI */,
 			);
-			productName = MyApp;
-			productReference = E10000030000000000000001 /* MyApp.app */;
+			productName = Pchook;
+			productReference = E10000030000000000000001 /* Pchook.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E20000060000000000000001 /* MyAppUITests */ = {
+		E20000060000000000000001 /* PchookUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E20000080000000000000001 /* Build configuration list for PBXNativeTarget "MyAppUITests" */;
+			buildConfigurationList = E20000080000000000000001 /* Build configuration list for PBXNativeTarget "PchookUITests" */;
 			buildPhases = (
 				E20000070000000000000001 /* Sources */,
 				E20000040000000000000001 /* Frameworks */,
@@ -112,11 +112,11 @@
 				E20000090000000000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E20000050000000000000001 /* MyAppUITests */,
+				E20000050000000000000001 /* PchookUITests */,
 			);
-			name = MyAppUITests;
-			productName = MyAppUITests;
-			productReference = E20000030000000000000001 /* MyAppUITests.xctest */;
+			name = PchookUITests;
+			productName = PchookUITests;
+			productReference = E20000030000000000000001 /* PchookUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -138,7 +138,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E10000080000000000000002 /* Build configuration list for PBXProject "MyApp" */;
+			buildConfigurationList = E10000080000000000000002 /* Build configuration list for PBXProject "Pchook" */;
 			compatibilityVersion = "Xcode 16.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -154,8 +154,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E10000060000000000000001 /* MyApp */,
-				E20000060000000000000001 /* MyAppUITests */,
+				E10000060000000000000001 /* Pchook */,
+				E20000060000000000000001 /* PchookUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -197,7 +197,7 @@
 /* Begin PBXTargetDependency section */
 		E20000090000000000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E10000060000000000000001 /* MyApp */;
+			target = E10000060000000000000001 /* Pchook */;
 			targetProxy = E20000010000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -340,7 +340,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.myapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -372,7 +372,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.myapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -392,7 +392,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.myapp.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -401,7 +401,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = MyApp;
+				TEST_TARGET_NAME = Pchook;
 			};
 			name = Debug;
 		};
@@ -413,7 +413,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.myapp.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook.uitests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -422,14 +422,14 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
-				TEST_TARGET_NAME = MyApp;
+				TEST_TARGET_NAME = Pchook;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E10000080000000000000001 /* Build configuration list for PBXNativeTarget "MyApp" */ = {
+		E10000080000000000000001 /* Build configuration list for PBXNativeTarget "Pchook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E1000000A000000000000003 /* Debug */,
@@ -438,7 +438,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E10000080000000000000002 /* Build configuration list for PBXProject "MyApp" */ = {
+		E10000080000000000000002 /* Build configuration list for PBXProject "Pchook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E1000000A000000000000001 /* Debug */,
@@ -447,7 +447,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E20000080000000000000001 /* Build configuration list for PBXNativeTarget "MyAppUITests" */ = {
+		E20000080000000000000001 /* Build configuration list for PBXNativeTarget "PchookUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E2000000A000000000000001 /* Debug */,
