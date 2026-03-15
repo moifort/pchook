@@ -24,7 +24,7 @@
 ## Commit Strategy
 
 - **Conventional Commits**: `type(scope): description` — types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
-- **Scopes**: domain name for business changes (`feat(cellar): ...`), technical name otherwise (`fix(migration): ...`, `chore(deps): ...`). Omit scope if too broad
+- **Scopes**: domain name for business changes (`feat(book): ...`, `feat(review): ...`), technical name otherwise (`fix(migration): ...`, `chore(deps): ...`). Omit scope if too broad
 - **Commit after each verified task**: all checks pass (build + tests + lint) before committing
 - **Fine granularity, functional coherence**: each commit = one logical change. Small enough to identify bugs via `git bisect` or commit history, but coherent enough to stand on its own
 
@@ -96,7 +96,7 @@ See [docs/ios-guide.md](docs/ios-guide.md) for full iOS guide.
 
 See [docs/code-style.md](docs/code-style.md) for full rules with examples.
 
-## API Token
+## API Keys & Token
 
 The API token is used for authentication when `NITRO_API_TOKEN` is set. To rotate the token, update it in:
 - `.env` (`NITRO_API_TOKEN=...`)
@@ -104,3 +104,7 @@ The API token is used for authentication when `NITRO_API_TOKEN` is set. To rotat
 - `ios/PchookUITests/Support/TestSecrets.swift` (gitignored)
 
 See `.example` files next to the Secrets files for the expected format.
+
+External API keys required for book scanning and suggestion generation:
+- `NITRO_ANTHROPIC_API_KEY` — Claude API key for cover image analysis (vision)
+- `NITRO_GOOGLE_API_KEY` — Gemini API key for book data enrichment and suggestion generation
