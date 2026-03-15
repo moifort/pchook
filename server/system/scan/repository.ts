@@ -1,0 +1,10 @@
+import type { CachedScanResult, ImageHash } from '~/system/scan/types'
+
+const storage = () => useStorage('scan-cache')
+
+export const findBy = (imageHash: ImageHash) => storage().getItem<CachedScanResult>(imageHash)
+
+export const save = async (entry: CachedScanResult) => {
+  await storage().setItem(entry.imageHash, entry)
+  return entry
+}

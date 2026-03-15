@@ -1,0 +1,28 @@
+import type { Brand } from 'ts-brand'
+
+export type ImageHash = Brand<string, 'ImageHash'>
+
+export type ScanResult = {
+  title: string
+  authors: string[]
+  publisher?: string
+  publishedDate?: string
+  pageCount?: number
+  genre?: string
+  synopsis?: string
+  isbn?: string
+  language?: string
+  format?: string
+  series?: string
+  seriesNumber?: number
+  translator?: string
+  estimatedPrice?: number
+  awards: { name: string; year?: number }[]
+  publicRatings: { source: string; score: number; maxScore: number; voterCount: number }[]
+}
+
+export type CachedScanResult = {
+  imageHash: ImageHash
+  result: ScanResult
+  cachedAt: Date
+}
