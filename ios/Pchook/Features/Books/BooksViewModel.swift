@@ -79,14 +79,23 @@ final class BooksViewModel {
     var sort: BookSort = .createdAt
     var sortDescending = true
     var statusFilter: BookStatusFilter = .all
+    var genreFilter: String?
     var mode: BookListMode = .all
 
+    var availableGenres: [String] {
+        Array(Set(books.compactMap(\.genre))).sorted()
+    }
+
     var displayedBooks: [BookListItem] {
-        switch mode {
+        var result = switch mode {
         case .all: books
         case .series: books.filter { $0.seriesName != nil }
         case .favorites: books.filter { $0.rating == 5 }
         }
+        if let genreFilter {
+            result = result.filter { $0.genre == genreFilter }
+        }
+        return result
     }
 
     var filterKey: String {

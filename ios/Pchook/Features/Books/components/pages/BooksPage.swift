@@ -74,6 +74,18 @@ struct BooksPage: View {
                                 Label(filter.label, systemImage: filter.icon).tag(filter)
                             }
                         }
+
+                        Divider()
+
+                        Picker("Cat\u{00E9}gorie", selection: Binding(
+                            get: { viewModel.genreFilter ?? "" },
+                            set: { viewModel.genreFilter = $0.isEmpty ? nil : $0 }
+                        )) {
+                            Label("Toutes", systemImage: "books.vertical").tag("")
+                            ForEach(viewModel.availableGenres, id: \.self) { genre in
+                                Text(genre).tag(genre)
+                            }
+                        }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                     }
