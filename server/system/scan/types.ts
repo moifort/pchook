@@ -1,6 +1,7 @@
 import type { Brand } from 'ts-brand'
 
 export type ImageHash = Brand<string, 'ImageHash'>
+export type UrlHash = Brand<string, 'UrlHash'>
 
 export type ScanResult = {
   title: string
@@ -23,6 +24,12 @@ export type ScanResult = {
 
 export type CachedScanResult = {
   imageHash: ImageHash
+  result: ScanResult
+  cachedAt: Date
+}
+
+export type CachedUrlImportResult = {
+  urlHash: UrlHash
   result: ScanResult
   cachedAt: Date
 }

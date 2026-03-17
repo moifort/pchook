@@ -141,14 +141,16 @@ const scanWithClaude = async (imageBase64: string) => {
   } satisfies ScanResult
 }
 
-type OpenLibraryData = {
+export type OpenLibraryData = {
   publisher?: string
   pageCount?: number
   publishedDate?: string
   synopsis?: string
 }
 
-const lookupByIsbn = async (isbn: string | undefined): Promise<OpenLibraryData | undefined> => {
+export const lookupByIsbn = async (
+  isbn: string | undefined,
+): Promise<OpenLibraryData | undefined> => {
   if (!isbn) return undefined
   const cleanIsbn = isbn.replace(/[-\s]/g, '')
 

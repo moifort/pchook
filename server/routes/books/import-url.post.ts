@@ -1,16 +1,16 @@
+import { z } from 'zod'
 import { BookUseCase } from '~/domain/book/use-case'
-import { BookScanner } from '~/system/scan/index'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
+import { UrlImporter } from '~/system/scan/url-import'
+
+const bodySchema = z.object({ url: z.string().url() })
 
 export default defineEventHandler(async (event) => {
-  const rawBody = await readRawBody(event, false)
-  if (!rawBody) throw createError({ statusCode: 400, statusMessage: 'No image data provided' })
+  const body = await readBody(event)
+  const { url } = bodySchema.parse(body)
 
-  const imageBuffer = Buffer.from(rawBody)
-  const scanResult = await BookScanner.scan(imageBuffer)
-
+  const { scanResult, coverImageBase64 } = await UrlImporter.importFromUrl(url)
   const { title, data, seriesInfo } = scanResultToBookData(scanResult)
-  const coverImageBase64 = imageBuffer.toString('base64')
   const result = await BookUseCase.addFromScan(title, data, seriesInfo, coverImageBase64)
 
   if (result.tag === 'duplicate') {
