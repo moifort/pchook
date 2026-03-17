@@ -83,7 +83,10 @@ final class BooksViewModel {
     var mode: BookListMode = .all
 
     var availableGenres: [String] {
-        Array(Set(books.compactMap(\.genre))).sorted()
+        let allGenres = books
+            .compactMap(\.genre)
+            .flatMap { $0.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) } }
+        return Array(Set(allGenres)).sorted()
     }
 
     var displayedBooks: [BookListItem] {
@@ -93,7 +96,12 @@ final class BooksViewModel {
         case .favorites: books.filter { $0.rating == 5 }
         }
         if let genreFilter {
-            result = result.filter { $0.genre == genreFilter }
+            result = result.filter { book in
+                guard let genre = book.genre else { return false }
+                return genre.split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .contains(genreFilter)
+            }
         }
         return result
     }

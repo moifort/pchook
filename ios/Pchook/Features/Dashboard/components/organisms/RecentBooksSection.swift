@@ -41,7 +41,9 @@ struct RecentBooksSection: View {
                             }
                             Spacer()
                             if let genre = item.genre {
-                                GenreBadge(genre: genre)
+                                ForEach(genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }, id: \.self) { subGenre in
+                                    GenreBadge(genre: subGenre)
+                                }
                             }
                             Text(item.createdAt.formatted(.dateTime.day(.twoDigits).month(.twoDigits)))
                                 .font(.caption)

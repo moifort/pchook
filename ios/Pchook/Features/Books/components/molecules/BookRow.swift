@@ -20,7 +20,9 @@ struct BookRow: View {
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     if let genre {
-                        GenreBadge(genre: genre)
+                        ForEach(genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }, id: \.self) { subGenre in
+                            GenreBadge(genre: subGenre)
+                        }
                     }
                     if awardCount > 0 {
                         AwardBadge(count: awardCount)
