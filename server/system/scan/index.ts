@@ -113,30 +113,81 @@ const scanWithClaude = async (imageBase64: string) => {
   } satisfies ScanResult
 }
 
+type OpenLibraryData = {
+  publisher?: string
+  pageCount?: number
+  publishedDate?: string
+  synopsis?: string
+}
+
+const lookupByIsbn = async (isbn: string | undefined): Promise<OpenLibraryData | undefined> => {
+  if (!isbn) return undefined
+  const cleanIsbn = isbn.replace(/[-\s]/g, '')
+
+  try {
+    log.info('Looking up ISBN on Open Library...', cleanIsbn)
+    const edition = await $fetch<Record<string, unknown>>(
+      `https://openlibrary.org/isbn/${cleanIsbn}.json`,
+    )
+
+    let synopsis: string | undefined
+    const works = edition.works as { key: string }[] | undefined
+    if (works?.[0]?.key) {
+      try {
+        const work = await $fetch<Record<string, unknown>>(
+          `https://openlibrary.org${works[0].key}.json`,
+        )
+        const desc = work.description
+        synopsis = typeof desc === 'string' ? desc : (desc as { value?: string })?.value
+      } catch {
+        /* best-effort */
+      }
+    }
+
+    const publishers = edition.publishers as string[] | undefined
+    return {
+      publisher: publishers?.[0],
+      pageCount: edition.number_of_pages as number | undefined,
+      publishedDate: edition.publish_date as string | undefined,
+      synopsis,
+    }
+  } catch {
+    log.info('Open Library lookup failed, skipping')
+    return undefined
+  }
+}
+
 const enrichWithGemini = async (scanResult: ScanResult) => {
   const { googleApiKey } = config()
 
-  const bookDescription = [scanResult.title, scanResult.authors.join(', ')].join(' par ')
+  const bookDescription = [
+    scanResult.title,
+    scanResult.authors.join(', '),
+    scanResult.isbn ? `ISBN: ${scanResult.isbn}` : undefined,
+  ]
+    .filter(Boolean)
+    .join(' - ')
 
-  const prompt = `Pour le livre "${bookDescription}", recherche et complète les informations suivantes au format JSON strict (sans markdown) :
+  const prompt = `Pour le livre "${bookDescription}", recherche et complète les informations suivantes au format JSON strict (sans markdown, sans backticks) :
 
 {
-  "estimatedPrice": number ou null (prix en euros),
+  "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
   "pageCount": number ou null,
-  "synopsis": string ou null (2-3 phrases en français),
-  "isbn": string ou null,
-  "language": string ou null,
-  "genre": string ou null,
-  "series": string ou null (nom de la série),
-  "seriesNumber": number ou null (position dans la série),
-  "publisher": string ou null,
-  "publishedDate": string ou null,
-  "translator": string ou null,
-  "awards": [{"name": string, "year": number}] (prix littéraires, tableau vide si aucun),
-  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (notes Goodreads, Babelio, etc.)
+  "synopsis": string ou null (résumé de 3-5 phrases en français, pas la 4ème de couverture mais un vrai résumé du contenu),
+  "isbn": string ou null (ISBN-13 de préférence),
+  "language": string ou null (langue originale du texte),
+  "genre": string ou null (sous-genres séparés par des virgules, ex: "LitRPG, Science Fantasy" ou "Thriller, Policier" — sois précis et spécifique),
+  "series": string ou null (nom de la série ou du cycle),
+  "seriesNumber": number ou null (numéro du tome dans la série),
+  "publisher": string ou null (maison d'édition de cette édition),
+  "publishedDate": string ou null (date de première publication, format YYYY-MM-DD ou YYYY),
+  "format": string ou null ("pocket", "paperback" ou "hardcover"),
+  "translator": string ou null (traducteur si c'est une traduction),
+  "awards": [{"name": string, "year": number}] (tous les prix littéraires reçus, tableau vide si aucun — cherche sur Wikipedia et les sites de prix),
+  "publicRatings": [{"source": "Babelio", "score": number, "maxScore": number, "voterCount": number}, {"source": "Goodreads", "score": number, "maxScore": number, "voterCount": number}] (notes sur Babelio sur 5 et Goodreads sur 5, avec le nombre de votants — cherche les notes actuelles)
 }
 
-Données les plus récentes et précises. Toutes les valeurs textuelles en français.`
+Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`
 
   try {
     const response = await $fetch<{
@@ -203,8 +254,19 @@ export namespace BookScanner {
     log.info('Scanning book cover with Claude Vision...')
     const scanResult = await scanWithClaude(imageBase64)
 
-    log.info('Enriching with Gemini...', scanResult.title)
-    const enrichedResult = await enrichWithGemini(scanResult)
+    const isbnData = await lookupByIsbn(scanResult.isbn)
+    const withIsbn: ScanResult = isbnData
+      ? {
+          ...scanResult,
+          publisher: isbnData.publisher ?? scanResult.publisher,
+          pageCount: isbnData.pageCount ?? scanResult.pageCount,
+          publishedDate: isbnData.publishedDate ?? scanResult.publishedDate,
+          synopsis: scanResult.synopsis ?? isbnData.synopsis,
+        }
+      : scanResult
+
+    log.info('Enriching with Gemini...', withIsbn.title)
+    const enrichedResult = await enrichWithGemini(withIsbn)
 
     await repository.save({
       imageHash,
