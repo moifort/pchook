@@ -59,7 +59,7 @@ export const Note = (value: unknown) => {
     .preprocess((v) => {
       const n = typeof v === 'string' ? Number(v) : v
       return typeof n === 'number' ? Math.round(n) : n
-    }, z.number().int().min(0).max(5))
+    }, z.number().int().min(0).max(10))
     .parse(value)
   return make<NoteType>()(v)
 }

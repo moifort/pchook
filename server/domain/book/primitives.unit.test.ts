@@ -148,8 +148,12 @@ describe('Note', () => {
     expect(() => Note(-1)).toThrow()
   })
 
-  test('rejects a number greater than 5', () => {
-    expect(() => Note(6)).toThrow()
+  test('accepts 10', () => {
+    expect(Note(10)).toBe(Note(10))
+  })
+
+  test('rejects a number greater than 10', () => {
+    expect(() => Note(11)).toThrow()
   })
 
   test('rounds a float to the nearest integer', () => {

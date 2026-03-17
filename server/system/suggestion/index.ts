@@ -82,7 +82,7 @@ Toutes les valeurs en français. Données les plus récentes.`
         awards: item.awards ?? [],
         publicRatings: (item.publicRatings ?? []).map((rating) => ({
           source: rating.source,
-          score: Note(Math.min(rating.score, 5)),
+          score: Note(Math.min(rating.score, rating.maxScore)),
           maxScore: Note(rating.maxScore),
           voterCount: rating.voterCount,
         })),

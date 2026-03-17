@@ -214,7 +214,7 @@ const enrichWithGemini = async (scanResult: ScanResult) => {
   "format": string ou null ("pocket", "paperback" ou "hardcover"),
   "translator": string ou null (traducteur si c'est une traduction),
   "awards": [{"name": string, "year": number}] (tous les prix littéraires reçus, tableau vide si aucun — cherche sur Wikipedia et les sites de prix),
-  "publicRatings": [{"source": "Babelio", "score": number, "maxScore": number, "voterCount": number}, {"source": "Goodreads", "score": number, "maxScore": number, "voterCount": number}] (notes sur Babelio sur 5 et Goodreads sur 5, avec le nombre de votants — cherche les notes actuelles)
+  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants)
 }
 
 Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`

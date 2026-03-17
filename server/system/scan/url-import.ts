@@ -61,7 +61,7 @@ Identifie le livre référencé et retourne toutes les informations au format JS
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
   "awards": [{"name": string, "year": number}] (tous les prix littéraires reçus, tableau vide si aucun — cherche sur Wikipedia et les sites de prix),
-  "publicRatings": [{"source": "Babelio", "score": number, "maxScore": number, "voterCount": number}, {"source": "Goodreads", "score": number, "maxScore": number, "voterCount": number}] (notes sur Babelio sur 5 et Goodreads sur 5, avec le nombre de votants — cherche les notes actuelles),
+  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants),
   "coverImageUrl": string ou null (URL de l'image de couverture du livre, haute résolution de préférence)
 }
 
