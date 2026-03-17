@@ -1,26 +1,26 @@
 import Foundation
 
 enum BookListMode: String, CaseIterable, Identifiable {
-    case all, series, favorites
+    case all, toRead, favorites
     var id: String { rawValue }
     var label: String {
         switch self {
         case .all: "Tous"
-        case .series: "S\u{00E9}ries"
+        case .toRead: "\u{00C0} lire"
         case .favorites: "Favoris"
         }
     }
     var icon: String {
         switch self {
         case .all: "books.vertical"
-        case .series: "text.justify.leading"
+        case .toRead: "bookmark"
         case .favorites: "heart.fill"
         }
     }
     var title: String {
         switch self {
         case .all: "Mes Livres"
-        case .series: "S\u{00E9}ries"
+        case .toRead: "\u{00C0} lire"
         case .favorites: "Favoris"
         }
     }
@@ -98,27 +98,58 @@ final class BooksViewModel {
     var displayedBooks: [BookListItem] {
         switch mode {
         case .all: books
-        case .series: books.filter { $0.seriesName != nil }
+        case .toRead: books.filter { $0.status == "to-read" }
         case .favorites: books.filter { $0.rating == 5 }
         }
     }
 
     var usesGrouping: Bool {
-        sort == .genre || sort == .publicRating || sort == .awards
+        sort != .title
     }
 
     var groupedBooks: [BookSection] {
         let items = displayedBooks
         switch sort {
+        case .createdAt:
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMMM yyyy"
+            formatter.locale = Locale(identifier: "fr_FR")
+            var dict: [String: [BookListItem]] = [:]
+            var order: [String] = []
+            for book in items {
+                let key = formatter.string(from: book.createdAt).capitalized
+                if dict[key] == nil { order.append(key) }
+                dict[key, default: []].append(book)
+            }
+            return order.map { key in
+                BookSection(
+                    title: key,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
+                )
+            }
+
+        case .author:
+            var dict: [String: [BookListItem]] = [:]
+            for book in items {
+                let author = book.authors.first ?? "Auteur inconnu"
+                dict[author, default: []].append(book)
+            }
+            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
+            return keys.map { key in
+                BookSection(
+                    title: key,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
+                )
+            }
+
         case .genre:
             var dict: [String: [BookListItem]] = [:]
             for book in items {
-                let genres = book.genre?
+                let firstGenre = book.genre?
                     .split(separator: ",")
-                    .map { $0.trimmingCharacters(in: .whitespaces) } ?? ["Sans genre"]
-                for genre in genres {
-                    dict[genre, default: []].append(book)
-                }
+                    .first
+                    .map { $0.trimmingCharacters(in: .whitespaces) } ?? "Sans genre"
+                dict[firstGenre, default: []].append(book)
             }
             let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
             return keys.map { key in
@@ -143,20 +174,25 @@ final class BooksViewModel {
             }
 
         case .awards:
-            var dict: [Int: [BookListItem]] = [:]
+            var dict: [String: [BookListItem]] = [:]
             for book in items {
-                dict[book.awards.count, default: []].append(book)
+                if book.awards.isEmpty {
+                    dict["Aucun prix", default: []].append(book)
+                } else {
+                    for award in book.awards {
+                        dict[award.name, default: []].append(book)
+                    }
+                }
             }
             let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
             return keys.map { key in
-                let label = key == 0 ? "Aucun prix" : "\(key) prix"
-                return BookSection(
-                    title: label,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: label, book: $0) }
+                BookSection(
+                    title: key,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
                 )
             }
 
-        default:
+        case .title:
             return []
         }
     }

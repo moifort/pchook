@@ -99,6 +99,7 @@ struct BooksPage: View {
             BookRow(
                 title: book.title,
                 authors: book.authors.joined(separator: ", "),
+                genre: book.genre,
                 rating: book.rating,
                 status: book.status,
                 awardCount: book.awards.count
