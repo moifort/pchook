@@ -1,12 +1,13 @@
 import Foundation
 
 enum BookListMode: String, CaseIterable, Identifiable {
-    case all, toRead, favorites
+    case all, toRead, read, favorites
     var id: String { rawValue }
     var label: String {
         switch self {
         case .all: "Tous"
         case .toRead: "\u{00C0} lire"
+        case .read: "Lus"
         case .favorites: "Favoris"
         }
     }
@@ -14,6 +15,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
         switch self {
         case .all: "books.vertical"
         case .toRead: "bookmark"
+        case .read: "checkmark.circle"
         case .favorites: "heart.fill"
         }
     }
@@ -21,13 +23,14 @@ enum BookListMode: String, CaseIterable, Identifiable {
         switch self {
         case .all: "Mes Livres"
         case .toRead: "\u{00C0} lire"
+        case .read: "Lus"
         case .favorites: "Favoris"
         }
     }
 }
 
 enum BookSort: String, CaseIterable, Identifiable {
-    case createdAt, title, author, genre, publicRating, awards
+    case createdAt, title, author, genre, myRating, awards
     var id: String { rawValue }
     var label: String {
         switch self {
@@ -35,7 +38,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .title: "Titre"
         case .author: "Auteur"
         case .genre: "Genre"
-        case .publicRating: "Note publique"
+        case .myRating: "Ma note"
         case .awards: "Prix litt\u{00E9}raires"
         }
     }
@@ -45,29 +48,8 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .title: "textformat"
         case .author: "person"
         case .genre: "tag"
-        case .publicRating: "star"
+        case .myRating: "star"
         case .awards: "medal"
-        }
-    }
-}
-
-enum BookStatusFilter: String, CaseIterable, Identifiable {
-    case all
-    case toRead = "to-read"
-    case read
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .all: "Tous"
-        case .toRead: "\u{00C0} lire"
-        case .read: "Lus"
-        }
-    }
-    var icon: String {
-        switch self {
-        case .all: "tray.full"
-        case .toRead: "bookmark"
-        case .read: "checkmark.circle"
         }
     }
 }
@@ -92,13 +74,13 @@ final class BooksViewModel {
     var error: String?
     var sort: BookSort = .createdAt
     var sortDescending = true
-    var statusFilter: BookStatusFilter = .all
     var mode: BookListMode = .all
 
     var displayedBooks: [BookListItem] {
         switch mode {
         case .all: books
         case .toRead: books.filter { $0.status == "to-read" }
+        case .read: books.filter { $0.status == "read" }
         case .favorites: books.filter { $0.rating == 5 }
         }
     }
@@ -159,14 +141,14 @@ final class BooksViewModel {
                 )
             }
 
-        case .publicRating:
+        case .myRating:
             var dict: [Int: [BookListItem]] = [:]
             for book in items {
-                dict[averageNormalizedRating(book.publicRatings), default: []].append(book)
+                dict[book.rating ?? 0, default: []].append(book)
             }
             let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
             return keys.map { key in
-                let label = key == 0 ? "Aucune note" : "\(key) \u{00E9}toile\(key > 1 ? "s" : "")"
+                let label = key == 0 ? "Aucune note" : String(repeating: "\u{2605}", count: key)
                 return BookSection(
                     title: label,
                     items: dict[key]!.map { SectionedBook(sectionTitle: label, book: $0) }
@@ -198,17 +180,16 @@ final class BooksViewModel {
     }
 
     var filterKey: String {
-        "\(mode.rawValue)-\(sort.rawValue)-\(sortDescending)-\(statusFilter.rawValue)"
+        "\(mode.rawValue)-\(sort.rawValue)-\(sortDescending)"
     }
 
     func load() async {
         isLoading = true
         error = nil
         do {
-            let status: String? = statusFilter == .all ? nil : statusFilter.rawValue
-            let apiSort = sort.rawValue
+            let apiSort = sort == .myRating ? "createdAt" : sort.rawValue
             books = try await BooksAPI.list(
-                status: status,
+                status: nil,
                 sort: apiSort,
                 order: sortDescending ? "desc" : "asc"
             )
@@ -217,14 +198,5 @@ final class BooksViewModel {
             self.error = reportError(error)
         }
         isLoading = false
-    }
-
-    private func averageNormalizedRating(_ ratings: [PublicRating]) -> Int {
-        guard !ratings.isEmpty else { return 0 }
-        let sum = ratings.reduce(0.0) { acc, rating in
-            guard rating.maxScore > 0 else { return acc }
-            return acc + (Double(rating.score) / Double(rating.maxScore) * 5.0)
-        }
-        return Int((sum / Double(ratings.count)).rounded())
     }
 }

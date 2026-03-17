@@ -6,11 +6,10 @@ struct BookSynopsisSection: View {
     var body: some View {
         if let synopsis {
             Section("Synopsis") {
-                Label {
-                    Text(synopsis)
-                } icon: {
+                HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "text.quote")
                         .foregroundStyle(.secondary)
+                    Text(synopsis)
                 }
             }
         }

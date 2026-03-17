@@ -11,29 +11,27 @@ struct BookRow: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .lineLimit(2)
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(title)
-                        .font(.headline)
-                        .lineLimit(2)
+                    Text(authors)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                     if status == "to-read" {
-                        Text("\u{00C0} lire")
+                        Image(systemName: "bookmark.fill")
                             .font(.caption2)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.orange.opacity(0.15))
                             .foregroundStyle(.orange)
-                            .clipShape(.capsule)
+                    } else if status == "read" {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.green)
                     }
                 }
-                Text(authors)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
                 HStack(spacing: 6) {
-                    if let genre {
-                        ForEach(genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }, id: \.self) { subGenre in
-                            GenreBadge(genre: subGenre)
-                        }
+                    if let genre, let first = genre.split(separator: ",").first {
+                        GenreBadge(genre: first.trimmingCharacters(in: .whitespaces))
                     }
                     if awardCount > 0 {
                         AwardBadge(count: awardCount)

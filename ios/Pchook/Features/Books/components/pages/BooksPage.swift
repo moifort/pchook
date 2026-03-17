@@ -11,12 +11,8 @@ struct BooksPage: View {
             Group {
                 if !viewModel.hasBooks && viewModel.isLoading {
                     ProgressView("Chargement...")
-                } else if viewModel.displayedBooks.isEmpty && !viewModel.hasBooks {
-                    ContentUnavailableView(
-                        "Aucun livre",
-                        systemImage: "books.vertical",
-                        description: Text("Ajoutez des livres en scannant une couverture")
-                    )
+                } else if viewModel.displayedBooks.isEmpty {
+                    emptyState
                 } else {
                     List {
                         if viewModel.usesGrouping {
@@ -64,30 +60,51 @@ struct BooksPage: View {
                             }
                         }
                         Toggle(viewModel.sortDescending ? "D\u{00E9}croissant" : "Croissant", isOn: $viewModel.sortDescending)
-
-                        Divider()
-
-                        Picker("Statut", selection: $viewModel.statusFilter) {
-                            ForEach(BookStatusFilter.allCases) { filter in
-                                Label(filter.label, systemImage: filter.icon).tag(filter)
-                            }
-                        }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                     }
                     .accessibilityIdentifier("booklist-sort-menu")
                 }
             }
-            .sheet(item: Binding(
-                get: { selectedBookId.map { BookIdWrapper(id: $0) } },
-                set: { selectedBookId = $0?.id }
-            )) { wrapper in
-                BookDetailPage(
-                    bookId: wrapper.id,
-                    onDeleted: { Task { await viewModel.load() } },
-                    onUpdated: { Task { await viewModel.load() } }
-                )
+            .sheet(
+                item: Binding(
+                    get: { selectedBookId.map { BookIdWrapper(id: $0) } },
+                    set: { selectedBookId = $0?.id }
+                ),
+                onDismiss: { Task { await viewModel.load() } }
+            ) { wrapper in
+                BookDetailPage(bookId: wrapper.id)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var emptyState: some View {
+        switch viewModel.mode {
+        case .all:
+            ContentUnavailableView(
+                "Aucun livre",
+                systemImage: "books.vertical",
+                description: Text("Ajoutez des livres en scannant une couverture")
+            )
+        case .toRead:
+            ContentUnavailableView(
+                "Aucun livre \u{00E0} lire",
+                systemImage: "bookmark",
+                description: Text("Les livres \u{00E0} lire appara\u{00EE}tront ici")
+            )
+        case .read:
+            ContentUnavailableView(
+                "Aucun livre lu",
+                systemImage: "checkmark.circle",
+                description: Text("Les livres lus appara\u{00EE}tront ici")
+            )
+        case .favorites:
+            ContentUnavailableView(
+                "Aucun favori",
+                systemImage: "heart",
+                description: Text("Les livres not\u{00E9}s 5 \u{00E9}toiles appara\u{00EE}tront ici")
+            )
         }
     }
 
