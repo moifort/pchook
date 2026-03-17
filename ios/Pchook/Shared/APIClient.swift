@@ -4,17 +4,16 @@ import Sentry
 final class APIClient: Sendable {
     static let shared = APIClient()
 
-    static let defaultURL = "http://localhost:3000"
-    static let serverURLKey = "serverURL"
     private static let apiToken = Secrets.apiToken
 
     var baseURL: URL {
         get {
-            let stored = UserDefaults.standard.string(forKey: Self.serverURLKey) ?? Self.defaultURL
-            return URL(string: stored) ?? URL(string: Self.defaultURL)!
+            let stored = SharedConfig.sharedDefaults.string(forKey: SharedConfig.serverURLKey)
+                ?? SharedConfig.defaultURL
+            return URL(string: stored) ?? URL(string: SharedConfig.defaultURL)!
         }
         set {
-            UserDefaults.standard.set(newValue.absoluteString, forKey: Self.serverURLKey)
+            SharedConfig.sharedDefaults.set(newValue.absoluteString, forKey: SharedConfig.serverURLKey)
         }
     }
 
