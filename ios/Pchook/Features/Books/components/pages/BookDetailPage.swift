@@ -34,7 +34,16 @@ struct BookDetailPage: View {
                     } else {
                         BookDetailContent(
                             detail: detail,
-                            onAddReview: { showReviewSheet = true }
+                            onAddReview: { showReviewSheet = true },
+                            onRatingChanged: { rating in
+                                let request = CreateReviewRequest(
+                                    rating: rating,
+                                    readDate: ISO8601DateFormatter().string(from: Date())
+                                )
+                                try? await BooksAPI.addReview(id: bookId, request)
+                                await loadDetail()
+                                onUpdated()
+                            }
                         )
                         .refreshable { await loadDetail() }
                     }
@@ -44,7 +53,6 @@ struct BookDetailPage: View {
                     ProgressView("Chargement...")
                 }
             }
-            .navigationTitle(detail?.book.title ?? "Livre")
             .navigationBarTitleDisplayMode(.inline)
             .sentryTrace("Book Detail")
             .toolbar {
@@ -84,6 +92,9 @@ struct BookDetailPage: View {
                 Menu {
                     Button("Modifier", systemImage: "pencil") {
                         isEditing = true
+                    }
+                    Button("Ajouter un avis", systemImage: "star.bubble") {
+                        showReviewSheet = true
                     }
                     Button("Supprimer", systemImage: "trash", role: .destructive) {
                         showDeleteConfirmation = true

@@ -9,13 +9,10 @@ struct PublicRatingsSection: View {
                 HStack {
                     Text(rating.source)
                     Spacer()
-                    Text("\(rating.score)/\(rating.maxScore)")
-                        .fontWeight(.semibold)
-                    if rating.voterCount > 0 {
-                        Text("(\(formattedVoterCount(rating.voterCount)))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    StarRatingView(rating: rating.normalizedScore, font: .body)
+                    Text("(\(formattedVoterCount(rating.voterCount)))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -37,6 +34,11 @@ extension PublicRatingsSection {
         let voterCount: Int
 
         var id: String { source }
+
+        var normalizedScore: Int {
+            guard maxScore > 0 else { return 0 }
+            return Int((Double(score) / Double(maxScore) * 5.0).rounded())
+        }
     }
 }
 

@@ -3,17 +3,19 @@ import SwiftUI
 struct BookDetailContent: View {
     let detail: BookDetailData
     let onAddReview: () -> Void
+    let onRatingChanged: (Int) async -> Void
+
+    @State private var userRating: Int
+
+    init(detail: BookDetailData, onAddReview: @escaping () -> Void, onRatingChanged: @escaping (Int) async -> Void) {
+        self.detail = detail
+        self.onAddReview = onAddReview
+        self.onRatingChanged = onRatingChanged
+        _userRating = State(initialValue: detail.review?.rating ?? 0)
+    }
 
     var body: some View {
         List {
-            if let coverBase64 = detail.coverImageBase64 {
-                Section {
-                    CoverImageView(base64String: coverBase64)
-                        .frame(maxWidth: .infinity)
-                }
-                .listRowBackground(Color.clear)
-            }
-
             BookDetailHeader(
                 title: detail.book.title,
                 authors: detail.book.authors.joined(separator: ", "),
@@ -23,10 +25,31 @@ struct BookDetailContent: View {
                 status: detail.book.status
             )
 
+            if !detail.book.publicRatings.isEmpty {
+                PublicRatingsSection(
+                    ratings: detail.book.publicRatings.map {
+                        .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
+                    }
+                )
+            }
+
+            if let series = detail.series {
+                SeriesSection(
+                    name: series.name,
+                    currentPosition: series.position,
+                    items: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) }
+                )
+            }
+
+            if !detail.book.awards.isEmpty {
+                AwardsSection(
+                    awards: detail.book.awards.map { .init(name: $0.name, year: $0.year) }
+                )
+            }
+
             BookInfoSection(
                 publisher: detail.book.publisher,
                 pageCount: detail.book.pageCount,
-                isbn: detail.book.isbn,
                 language: detail.book.language,
                 format: detail.book.format,
                 translator: detail.book.translator,
@@ -39,34 +62,12 @@ struct BookDetailContent: View {
                 personalNotes: detail.book.personalNotes
             )
 
-            if let series = detail.series {
-                SeriesSection(
-                    name: series.name,
-                    position: series.position,
-                    books: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) }
-                )
-            }
-
             ReviewSection(
                 review: detail.review.map {
                     .init(rating: $0.rating, readDate: $0.readDate, reviewNotes: $0.reviewNotes)
                 },
                 onAddReview: onAddReview
             )
-
-            if !detail.book.publicRatings.isEmpty {
-                PublicRatingsSection(
-                    ratings: detail.book.publicRatings.map {
-                        .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
-                    }
-                )
-            }
-
-            if !detail.book.awards.isEmpty {
-                AwardsSection(
-                    awards: detail.book.awards.map { .init(name: $0.name, year: $0.year) }
-                )
-            }
 
             if !detail.suggestions.isEmpty {
                 SuggestionsSection(
@@ -81,6 +82,14 @@ struct BookDetailContent: View {
                     }
                 )
             }
+
+            Section("Ma note") {
+                InteractiveStarRating(rating: $userRating)
+            }
+        }
+        .onChange(of: userRating) { _, newValue in
+            guard newValue > 0 else { return }
+            Task { await onRatingChanged(newValue) }
         }
     }
 }

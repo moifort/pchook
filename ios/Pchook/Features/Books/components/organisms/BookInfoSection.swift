@@ -3,7 +3,6 @@ import SwiftUI
 struct BookInfoSection: View {
     let publisher: String?
     let pageCount: Int?
-    let isbn: String?
     let language: String?
     let format: String?
     let translator: String?
@@ -18,9 +17,6 @@ struct BookInfoSection: View {
                 }
                 if let pageCount {
                     LabeledInfoRow(title: "Pages", value: "\(pageCount)", icon: "doc.text")
-                }
-                if let isbn {
-                    LabeledInfoRow(title: "ISBN", value: isbn, icon: "barcode")
                 }
                 if let language {
                     LabeledInfoRow(title: "Langue", value: language, icon: "globe")
@@ -50,7 +46,7 @@ struct BookInfoSection: View {
     }
 
     private var hasContent: Bool {
-        publisher != nil || pageCount != nil || isbn != nil || language != nil
+        publisher != nil || pageCount != nil || language != nil
             || format != nil || translator != nil || estimatedPrice != nil || publishedDate != nil
     }
 }
@@ -60,7 +56,6 @@ struct BookInfoSection: View {
         BookInfoSection(
             publisher: "Gallimard",
             pageCount: 320,
-            isbn: "978-2-07-036822-8",
             language: "Fran\u{00E7}ais",
             format: "pocket",
             translator: nil,

@@ -8,26 +8,24 @@ struct BookDetailHeader: View {
 
     var body: some View {
         Section {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(title)
-                    .font(.headline)
-                Text(authors)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                HStack(spacing: 6) {
-                    ForEach(genres, id: \.self) { genre in
-                        GenreBadge(genre: genre)
+            LabeledInfoRow(title: "Titre", value: title, icon: "book")
+            LabeledInfoRow(title: "Auteurs", value: authors, icon: "person.2")
+            if !genres.isEmpty {
+                Label {
+                    LabeledContent("Genre") {
+                        HStack(spacing: 6) {
+                            ForEach(genres, id: \.self) { genre in
+                                GenreBadge(genre: genre)
+                            }
+                        }
                     }
-                    if status == "to-read" {
-                        Text("\u{00C0} lire")
-                            .font(.caption2)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.orange.opacity(0.15))
-                            .foregroundStyle(.orange)
-                            .clipShape(.capsule)
-                    }
+                } icon: {
+                    Image(systemName: "tag")
+                        .foregroundStyle(.secondary)
                 }
+            }
+            if status == "to-read" {
+                LabeledInfoRow(title: "Statut", value: "\u{00C0} lire", icon: "bookmark")
             }
         }
     }

@@ -2,20 +2,33 @@ import SwiftUI
 
 struct SeriesSection: View {
     let name: String
-    let position: Int
-    let books: [Item]
+    let currentPosition: Int
+    let items: [Item]
 
     var body: some View {
-        Section("S\u{00E9}rie : \(name) \u{2014} Tome \(position)") {
-            ForEach(books) { book in
-                HStack {
-                    Text("Tome \(book.position)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 60, alignment: .leading)
-                    Text(book.title)
-                        .lineLimit(1)
-                }
+        Section("S\u{00E9}rie : \(name)") {
+            ForEach(items) { (book: Item) in
+                seriesRow(book)
+            }
+        }
+    }
+
+    private func seriesRow(_ book: Item) -> some View {
+        HStack {
+            Text("\(book.position)")
+                .font(.subheadline.monospaced())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color(uiColor: .systemGray5))
+                .clipShape(.rect(cornerRadius: 6))
+            Text(book.title)
+                .lineLimit(1)
+            Spacer()
+            if book.position == currentPosition {
+                Image(systemName: "checkmark")
+                    .foregroundStyle(Color.accentColor)
+                    .font(.caption)
             }
         }
     }
@@ -33,8 +46,8 @@ extension SeriesSection {
     List {
         SeriesSection(
             name: "Les Rougon-Macquart",
-            position: 7,
-            books: [
+            currentPosition: 7,
+            items: [
                 .init(id: "1", title: "La Fortune des Rougon", position: 1),
                 .init(id: "2", title: "La Cur\u{00E9}e", position: 2),
                 .init(id: "3", title: "L'Assommoir", position: 7),
