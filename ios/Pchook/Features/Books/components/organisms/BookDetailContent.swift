@@ -13,7 +13,8 @@ struct BookDetailContent: View {
                 genres: detail.book.genre?
                     .split(separator: ",")
                     .map { $0.trimmingCharacters(in: .whitespaces) } ?? [],
-                status: detail.book.status
+                status: detail.book.status,
+                seriesPosition: detail.series?.position
             )
 
             if !detail.book.publicRatings.isEmpty || detail.review?.rating != nil {
@@ -70,7 +71,8 @@ struct BookDetailContent: View {
                             title: $0.title,
                             authors: $0.authors.joined(separator: ", "),
                             genre: $0.genre,
-                            awardCount: $0.awards.count
+                            awardCount: $0.awards.count,
+                            seriesPosition: nil
                         )
                     }
                 )
