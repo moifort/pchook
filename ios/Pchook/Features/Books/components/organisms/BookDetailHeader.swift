@@ -11,18 +11,7 @@ struct BookDetailHeader: View {
             LabeledInfoRow(title: "Titre", value: title, icon: "book")
             LabeledInfoRow(title: "Auteurs", value: authors, icon: "person.2")
             if !genres.isEmpty {
-                Label {
-                    LabeledContent("Genre") {
-                        HStack(spacing: 6) {
-                            ForEach(genres, id: \.self) { genre in
-                                GenreBadge(genre: genre)
-                            }
-                        }
-                    }
-                } icon: {
-                    Image(systemName: "tag")
-                        .foregroundStyle(.secondary)
-                }
+                LabeledInfoRow(title: "Genre", value: genres.joined(separator: " \u{2022} "), icon: "tag")
             }
             if status == "to-read" {
                 LabeledInfoRow(title: "Statut", value: "\u{00C0} lire", icon: "bookmark")
