@@ -46,7 +46,7 @@ const extractFromUrl = async (url: string) => {
 Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :
 
 {
-  "title": string (titre du livre),
+  "title": string (titre du livre uniquement, sans préfixe de série ni numéro de tome — ex: "Le Nom du Vent" et non "Tome 1 : Le Nom du Vent"),
   "authors": string[] (liste des auteurs),
   "publisher": string ou null (maison d'édition),
   "publishedDate": string ou null (date de première publication, format YYYY-MM-DD ou YYYY),

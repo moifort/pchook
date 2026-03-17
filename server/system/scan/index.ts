@@ -104,7 +104,7 @@ const scanWithClaude = async (imageBase64: string) => {
             },
             {
               type: 'text',
-              text: "Analyse cette couverture de livre et extrais toutes les informations visibles. Toutes les valeurs textuelles doivent être en français. Utilise l'outil extract_book_info pour retourner les données.",
+              text: 'Analyse cette couverture de livre et extrais toutes les informations visibles. Le titre doit être uniquement le titre du livre, sans préfixe de série ni numéro de tome (ex: "Le Nom du Vent" et non "Les Chroniques du Tueur de Roi, Tome 1 : Le Nom du Vent"). Si le livre fait partie d\'une série, utilise les champs series et seriesNumber. Toutes les valeurs textuelles doivent être en français. Utilise l\'outil extract_book_info pour retourner les données.',
             },
           ],
         },
