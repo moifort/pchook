@@ -1,0 +1,11 @@
+- fix dashboard
+- ajouter les suggestions
+  - suggestion sur les livres non lu de la série
+  - suggestion livre popuplaire de l'auteur(s) 
+  - suggestion de livre qui pourrait m'interesser série proche, recommander par la communauté redit ?
+  - Notification Audible
+- Notification
+  - quand il y a un nouveau livre d'une série qui apparait audible ou hardbook
+  - quand il y a un livre qui a recu un nouveau prix 
+  - quand une série ou livre devient populaire
+- Rajouter comme cave a vin
