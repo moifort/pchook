@@ -8,12 +8,12 @@ final class APIClient: Sendable {
 
     var baseURL: URL {
         get {
-            let stored = SharedConfig.sharedDefaults.string(forKey: SharedConfig.serverURLKey)
+            let stored = UserDefaults.standard.string(forKey: SharedConfig.serverURLKey)
                 ?? SharedConfig.defaultURL
             return URL(string: stored) ?? URL(string: SharedConfig.defaultURL)!
         }
         set {
-            SharedConfig.sharedDefaults.set(newValue.absoluteString, forKey: SharedConfig.serverURLKey)
+            UserDefaults.standard.set(newValue.absoluteString, forKey: SharedConfig.serverURLKey)
         }
     }
 

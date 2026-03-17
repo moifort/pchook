@@ -39,6 +39,7 @@ extension SuggestionsSection {
         let authors: String
         let genre: String?
         let awardCount: Int
+        let seriesPosition: Int?
     }
 }
 
@@ -46,8 +47,8 @@ extension SuggestionsSection {
     List {
         SuggestionsSection(
             suggestions: [
-                .init(id: "1", title: "La Peste", authors: "Albert Camus", genre: "Roman", awardCount: 1),
-                .init(id: "2", title: "Les Fleurs du Mal", authors: "Charles Baudelaire", genre: "Po\u{00E9}sie", awardCount: 0),
+                .init(id: "1", title: "La Peste", authors: "Albert Camus", genre: "Roman", awardCount: 1, seriesPosition: nil),
+                .init(id: "2", title: "Les Fleurs du Mal", authors: "Charles Baudelaire", genre: "Poésie", awardCount: 0, seriesPosition: nil),
             ]
         )
     }

@@ -8,21 +8,40 @@ class ShareViewController: UIViewController {
         super.viewDidLoad()
 
         guard let item = extensionContext?.inputItems.first as? NSExtensionItem,
-              let provider = item.attachments?.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) })
+              let attachments = item.attachments, !attachments.isEmpty
         else {
             close()
             return
         }
 
-        provider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
-            guard let url = item as? URL else {
-                Task { @MainActor in self?.close() }
-                return
-            }
+        // Essayer d'abord les URLs
+        if let urlProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }) {
+            urlProvider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
+                guard let url = item as? URL else {
+                    Task { @MainActor in self?.close() }
+                    return
+                }
 
-            Task { @MainActor in
-                self?.showShareView(url: url)
+                Task { @MainActor in
+                    self?.showShareView(url: url)
+                }
             }
+        }
+        // Sinon, essayer le texte
+        else if let textProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.text.identifier) }) {
+            textProvider.loadItem(forTypeIdentifier: UTType.text.identifier) { [weak self] item, _ in
+                guard let text = item as? String, let url = URL(string: text) else {
+                    Task { @MainActor in self?.close() }
+                    return
+                }
+
+                Task { @MainActor in
+                    self?.showShareView(url: url)
+                }
+            }
+        }
+        else {
+            close()
         }
     }
 

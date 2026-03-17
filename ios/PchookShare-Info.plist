@@ -4,15 +4,12 @@
 <dict>
 	<key>NSExtension</key>
 	<dict>
+		<key>NSExtensionActivationRule</key>
+		<string>TRUEPREDICATE</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 		<key>NSExtensionPrincipalClass</key>
 		<string>ShareViewController</string>
-		<key>NSExtensionActivationRule</key>
-		<dict>
-			<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-			<integer>1</integer>
-		</dict>
 	</dict>
 </dict>
 </plist>
