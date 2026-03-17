@@ -1,4 +1,4 @@
-import type { Book, BookId } from '~/domain/book/types'
+import type { Book, BookId, ISBN } from '~/domain/book/types'
 
 const storage = () => useStorage('books')
 const imageStorage = () => useStorage('book-images')
@@ -10,6 +10,26 @@ export const findAll = async () => {
 }
 
 export const findBy = (id: BookId) => storage().getItem<Book>(id)
+
+export const findByISBN = async (isbn: ISBN) => {
+  const books = await findAll()
+  return books.find((book) => book.isbn === isbn)
+}
+
+export const findByTitleAndAuthors = async (title: string, authors: string[]) => {
+  const normalize = (s: string) => s.toLowerCase().trim()
+  const normalizedTitle = normalize(title)
+  const normalizedAuthors = authors.map(normalize).sort()
+  const books = await findAll()
+  return books.find((book) => {
+    const bookAuthors = book.authors.map((a) => normalize(String(a))).sort()
+    return (
+      normalize(String(book.title)) === normalizedTitle &&
+      bookAuthors.length === normalizedAuthors.length &&
+      bookAuthors.every((a, i) => a === normalizedAuthors[i])
+    )
+  })
+}
 
 export const findImageBy = (id: BookId) => imageStorage().getItem<string>(id)
 

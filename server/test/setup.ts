@@ -59,6 +59,9 @@ globalThis.getQuery = (_event: MockEvent) => _event.__query ?? {}
 // @ts-expect-error — global mock for h3's getRouterParam
 globalThis.getRouterParam = (_event: MockEvent, name: string) => _event.__params?.[name]
 
+// @ts-expect-error — global mock for h3's setResponseStatus
+globalThis.setResponseStatus = (_event: MockEvent, _status: number) => {}
+
 type MockEvent = {
   __body?: unknown
   __query?: Record<string, string>

@@ -96,6 +96,16 @@ struct ScanFlowView: View {
                         }
                     )
                 }
+
+            case .duplicate(_, let title, let authors):
+                NavigationStack {
+                    ScanDuplicateView(
+                        title: title,
+                        authors: authors.joined(separator: ", "),
+                        onScanAnother: { viewModel.reset() },
+                        onDismiss: { dismiss() }
+                    )
+                }
             }
         }
         .sentryTrace("Scan Flow")

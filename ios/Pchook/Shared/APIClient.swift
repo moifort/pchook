@@ -71,6 +71,21 @@ final class APIClient: Sendable {
         return try decoder.decode(T.self, from: data)
     }
 
+    func postRawWithStatus<T: Decodable & Sendable>(
+        _ path: String, data bodyData: Data, contentType: String, allowedStatuses: Set<Int>
+    ) async throws -> (Int, T) {
+        var request = authenticatedRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
+        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
+        request.httpBody = bodyData
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+        if !allowedStatuses.contains(http.statusCode) {
+            try validateResponse(response, for: request)
+        }
+        return (http.statusCode, try decoder.decode(T.self, from: data))
+    }
+
     func put<T: Decodable & Sendable>(_ path: String, body: some Encodable & Sendable) async throws -> T {
         var request = authenticatedRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "PUT"

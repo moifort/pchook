@@ -62,4 +62,22 @@ feature('POST /books/scan', () => {
     expect(books).toHaveLength(1)
     expect(books[0].title).toBe('Les Misérables')
   })
+
+  scenario('rejects a duplicate book by ISBN', async () => {
+    given('a book already exists with the same ISBN')
+    const firstEvent = mockEvent()
+    await scanHandler(firstEvent as never)
+
+    when('POST /books/scan is called again with the same data')
+    const secondEvent = mockEvent()
+    const result = await scanHandler(secondEvent as never)
+
+    then('the scan returns a 409 with the existing book')
+    expect(result.status).toBe(409)
+    expect(String(result.data.title)).toBe('Les Misérables')
+
+    and('no duplicate is created')
+    const books = await BookListReadModel.all({})
+    expect(books).toHaveLength(1)
+  })
 })

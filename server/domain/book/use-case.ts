@@ -1,4 +1,5 @@
 import { BookCommand } from '~/domain/book/command'
+import { BookQuery } from '~/domain/book/query'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
 import { ReviewCommand } from '~/domain/review/command'
 import { SeriesCommand } from '~/domain/series/command'
@@ -16,6 +17,12 @@ export namespace BookUseCase {
     seriesInfo?: { name: string; number?: number },
     coverImageBase64?: string,
   ) => {
+    const existing =
+      (data.isbn ? await BookQuery.findByISBN(data.isbn) : undefined) ??
+      (await BookQuery.findByTitleAndAuthors(String(title), (data.authors ?? []).map(String)))
+
+    if (existing) return { tag: 'duplicate', book: existing } as const
+
     const book = await BookCommand.add(title, data)
 
     if (coverImageBase64) {
@@ -30,7 +37,7 @@ export namespace BookUseCase {
     // Generate suggestions in background
     void generateSuggestionsInBackground(book)
 
-    return book
+    return { tag: 'created', book } as const
   }
 
   export const removeCompletely = async (id: BookId) => {

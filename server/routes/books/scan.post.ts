@@ -51,7 +51,12 @@ export default defineEventHandler(async (event) => {
     : undefined
 
   const coverImageBase64 = imageBuffer.toString('base64')
-  const book = await BookUseCase.addFromScan(title, data, seriesInfo, coverImageBase64)
+  const result = await BookUseCase.addFromScan(title, data, seriesInfo, coverImageBase64)
 
-  return { status: 201, data: book } as const
+  if (result.tag === 'duplicate') {
+    setResponseStatus(event, 409)
+    return { status: 409, data: result.book } as const
+  }
+
+  return { status: 201, data: result.book } as const
 })
