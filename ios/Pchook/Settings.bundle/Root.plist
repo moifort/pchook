@@ -12,7 +12,7 @@
 			<key>Key</key>
 			<string>serverURL</string>
 			<key>DefaultValue</key>
-			<string>http://localhost:3000</string>
+			<string>http://172.20.10.2:3000</string>
 			<key>IsSecure</key>
 			<false/>
 			<key>KeyboardType</key>
