@@ -54,9 +54,10 @@ struct BookDetailContent: View {
 
             ReviewSection(
                 review: detail.review.map {
-                    .init(rating: $0.rating, readDate: $0.readDate, reviewNotes: $0.reviewNotes)
+                    .init(rating: $0.rating, readDate: $0.readDate)
                 },
                 personalNotes: detail.book.personalNotes,
+                status: detail.book.status,
                 onAddReview: onAddReview
             )
 

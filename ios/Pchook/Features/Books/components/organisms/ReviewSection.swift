@@ -3,10 +3,17 @@ import SwiftUI
 struct ReviewSection: View {
     let review: Item?
     let personalNotes: String?
+    let status: String
     let onAddReview: () -> Void
 
     var body: some View {
-        Section("Mon avis") {
+        Section {
+            if status == "to-read" {
+                LabeledInfoRow(title: "Statut", value: "\u{00C0} lire", icon: "bookmark")
+            } else {
+                LabeledInfoRow(title: "Statut", value: "Lu", icon: "checkmark.circle")
+            }
+
             if let personalNotes {
                 Label {
                     Text(personalNotes)
@@ -17,8 +24,6 @@ struct ReviewSection: View {
             }
 
             if let review {
-                StarRatingView(rating: review.rating, font: .body)
-
                 if let readDate = review.readDate {
                     LabeledInfoRow(
                         title: "Lu le",
@@ -26,20 +31,13 @@ struct ReviewSection: View {
                         icon: "calendar"
                     )
                 }
+            }
 
-                if let notes = review.reviewNotes {
-                    Label {
-                        Text(notes)
-                    } icon: {
-                        Image(systemName: "text.quote")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            } else {
+            if review == nil {
                 Button {
                     onAddReview()
                 } label: {
-                    Label("Rajouter mon avis", systemImage: "plus.circle")
+                    Label("Donner mon avis", systemImage: "plus.circle")
                 }
                 .accessibilityIdentifier("add-review-button")
             }
@@ -51,15 +49,15 @@ extension ReviewSection {
     struct Item {
         let rating: Int
         let readDate: Date?
-        let reviewNotes: String?
     }
 }
 
 #Preview("Avec avis") {
     List {
         ReviewSection(
-            review: .init(rating: 4, readDate: Date(), reviewNotes: "Excellent roman, tr\u{00E8}s bien \u{00E9}crit."),
+            review: .init(rating: 4, readDate: Date()),
             personalNotes: "Excellent roman fondateur du cyberpunk.",
+            status: "read",
             onAddReview: {}
         )
     }
@@ -67,6 +65,6 @@ extension ReviewSection {
 
 #Preview("Sans avis") {
     List {
-        ReviewSection(review: nil, personalNotes: nil, onAddReview: {})
+        ReviewSection(review: nil, personalNotes: nil, status: "to-read", onAddReview: {})
     }
 }
