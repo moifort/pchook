@@ -33,14 +33,6 @@ struct BookDetailContent: View {
                 )
             }
 
-            if let series = detail.series {
-                SeriesSection(
-                    name: series.name,
-                    currentPosition: series.position,
-                    items: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) }
-                )
-            }
-
             if !detail.book.awards.isEmpty {
                 AwardsSection(
                     awards: detail.book.awards.map { .init(name: $0.name, year: $0.year) }
