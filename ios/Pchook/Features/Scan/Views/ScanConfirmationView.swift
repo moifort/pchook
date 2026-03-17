@@ -1,50 +1,62 @@
 import SwiftUI
 
 struct ScanConfirmationView: View {
-    let title: String
-    let authors: String
-    let genre: String?
+    let preview: Item
     let onScanAnother: () -> Void
-    let onStatusChosen: (String) async -> Void
+    let onConfirm: (String) async -> Void
 
-    @State private var scale = 0.5
-    @State private var opacity = 0.0
+    @State private var isConfirming = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(.green)
-                .scaleEffect(scale)
-                .opacity(opacity)
-
-            Text("Livre ajout\u{00E9} !")
-                .font(.title)
-                .fontWeight(.bold)
-
-            VStack(spacing: 8) {
-                Text(title)
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
-
-                Text(authors)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                if let genre {
-                    Text(genre)
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(Color.accentColor.opacity(0.15))
-                        .clipShape(.capsule)
+        List {
+            Section {
+                LabeledInfoRow(title: "Titre", value: preview.title, icon: "book")
+                LabeledInfoRow(title: "Auteurs", value: preview.authors, icon: "person.2")
+                if let series = preview.series {
+                    HStack {
+                        LabeledInfoRow(
+                            title: "Série",
+                            value: preview.seriesNumber.map { "\(series) — Tome \($0)" } ?? series,
+                            icon: "books.vertical"
+                        )
+                    }
+                }
+                if !preview.genres.isEmpty {
+                    HStack(spacing: 6) {
+                        ForEach(preview.genres, id: \.self) { genre in
+                            GenreBadge(genre: genre)
+                        }
+                    }
                 }
             }
 
-            Spacer()
+            if !preview.ratings.isEmpty {
+                PublicRatingsSection(
+                    ratings: preview.ratings,
+                    userRating: nil
+                )
+            }
 
+            if !preview.awards.isEmpty {
+                AwardsSection(awards: preview.awards)
+            }
+
+            BookInfoSection(
+                publisher: preview.publisher,
+                pageCount: preview.pageCount,
+                language: preview.language,
+                format: preview.format,
+                translator: preview.translator,
+                estimatedPrice: preview.estimatedPrice,
+                publishedDate: nil
+            )
+
+            BookSynopsisSection(synopsis: preview.synopsis)
+        }
+        .navigationTitle("Aperçu")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 Button {
                     onScanAnother()
@@ -58,47 +70,84 @@ struct ScanConfirmationView: View {
 
                 HStack(spacing: 12) {
                     Button {
-                        Task { await onStatusChosen("to-read") }
+                        isConfirming = true
+                        Task {
+                            await onConfirm("to-read")
+                            isConfirming = false
+                        }
                     } label: {
-                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
+                        Label("À lire", systemImage: "bookmark.fill")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.large)
+                    .disabled(isConfirming)
                     .accessibilityIdentifier("status-to-read-button")
 
                     Button {
-                        Task { await onStatusChosen("read") }
+                        isConfirming = true
+                        Task {
+                            await onConfirm("read")
+                            isConfirming = false
+                        }
                     } label: {
                         Label("Lu", systemImage: "checkmark.circle.fill")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
+                    .disabled(isConfirming)
                     .accessibilityIdentifier("status-read-button")
                 }
             }
-            .padding(.horizontal)
+            .padding()
+            .background(.bar)
         }
-        .padding()
-        .navigationBarBackButtonHidden()
-        .onAppear {
-            withAnimation(.spring(duration: 0.5, bounce: 0.3)) {
-                scale = 1.0
-                opacity = 1.0
-            }
-        }
+    }
+}
+
+extension ScanConfirmationView {
+    struct Item: Sendable {
+        let previewId: String
+        let title: String
+        let authors: String
+        let genres: [String]
+        let synopsis: String?
+        let pageCount: Int?
+        let language: String?
+        let format: String?
+        let publisher: String?
+        let translator: String?
+        let estimatedPrice: Double?
+        let awards: [AwardsSection.Item]
+        let ratings: [PublicRatingsSection.Item]
+        let series: String?
+        let seriesNumber: Int?
     }
 }
 
 #Preview {
     NavigationStack {
         ScanConfirmationView(
-            title: "L'\u{00C9}tranger",
-            authors: "Albert Camus",
-            genre: "Roman",
+            preview: .init(
+                previewId: "preview-1",
+                title: "L'Étranger",
+                authors: "Albert Camus",
+                genres: ["Roman", "Philosophie"],
+                synopsis: "Meursault, un employé de bureau à Alger, apprend la mort de sa mère. Il assiste aux funérailles sans montrer d'émotion apparente.",
+                pageCount: 185,
+                language: "Français",
+                format: "pocket",
+                publisher: "Gallimard",
+                translator: nil,
+                estimatedPrice: 6.90,
+                awards: [.init(name: "Prix Nobel", year: 1957)],
+                ratings: [.init(source: "Goodreads", score: 4, maxScore: 5, voterCount: 125_000)],
+                series: nil,
+                seriesNumber: nil
+            ),
             onScanAnother: {},
-            onStatusChosen: { _ in }
+            onConfirm: { _ in }
         )
     }
 }

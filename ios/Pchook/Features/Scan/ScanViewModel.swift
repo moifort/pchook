@@ -3,13 +3,13 @@ import Foundation
 enum ScanStep: Equatable {
     case camera
     case scanning
-    case confirmed(bookId: String, title: String, authors: [String], genre: String?)
+    case preview(BookPreview)
     case duplicate(bookId: String, title: String, authors: [String])
 
     static func == (lhs: ScanStep, rhs: ScanStep) -> Bool {
         switch (lhs, rhs) {
         case (.camera, .camera), (.scanning, .scanning): return true
-        case (.confirmed, .confirmed), (.duplicate, .duplicate): return true
+        case (.preview, .preview), (.duplicate, .duplicate): return true
         default: return false
         }
     }
@@ -26,26 +26,21 @@ final class ScanViewModel {
 
         Task {
             do {
-                let result = try await ScanAPI.scan(imageData: imageData)
-                switch result {
-                case .created(let book):
-                    self.step = .confirmed(
-                        bookId: book.id,
-                        title: book.title,
-                        authors: book.authors,
-                        genre: book.genre
-                    )
-                case .duplicate(let book):
-                    self.step = .duplicate(
-                        bookId: book.id,
-                        title: book.title,
-                        authors: book.authors
-                    )
-                }
+                let preview = try await ScanAPI.analyze(imageData: imageData)
+                self.step = .preview(preview)
             } catch {
                 self.error = reportError(error)
                 self.step = .camera
             }
+        }
+    }
+
+    func confirm(previewId: String, status: String) async -> ConfirmResult? {
+        do {
+            return try await ScanAPI.confirm(previewId: previewId, status: status)
+        } catch {
+            self.error = reportError(error)
+            return nil
         }
     }
 

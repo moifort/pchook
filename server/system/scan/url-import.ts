@@ -38,12 +38,24 @@ const hashUrl = (url: string) => {
   return UrlHash(hash)
 }
 
-const extractFromUrl = async (url: string) => {
+const extractFromUrl = async (url: string, description?: string) => {
   const { googleApiKey } = config()
 
-  const prompt = `Visite et analyse cette URL : ${url}
+  const sourceBlock = description
+    ? `Analyse ces informations sur un livre :
 
-Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :
+Description partagée (source principale) :
+${description}
+
+URL de référence (source secondaire) : ${url}
+
+Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks).
+Si la description et l'URL fournissent des informations contradictoires, privilégie la description.`
+    : `Visite et analyse cette URL : ${url}
+
+Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :`
+
+  const prompt = `${sourceBlock}
 
 {
   "title": string (titre du livre uniquement, sans préfixe de série ni numéro de tome — ex: "Le Nom du Vent" et non "Tome 1 : Le Nom du Vent"),
@@ -134,7 +146,7 @@ const fetchCoverImage = async (coverImageUrl: string | undefined) => {
 }
 
 export namespace UrlImporter {
-  export const importFromUrl = async (url: string) => {
+  export const importFromUrl = async (url: string, description?: string) => {
     const urlHash = hashUrl(url)
 
     const cached = await repository.findBy(urlHash)
@@ -144,7 +156,7 @@ export namespace UrlImporter {
     }
 
     log.info('Extracting book info from URL...', url)
-    const { scanResult: extracted, coverImageUrl } = await extractFromUrl(url)
+    const { scanResult: extracted, coverImageUrl } = await extractFromUrl(url, description)
 
     const isbnData = await lookupByIsbn(extracted.isbn)
     const withIsbn: ScanResult = isbnData

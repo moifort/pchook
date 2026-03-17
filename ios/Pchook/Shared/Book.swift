@@ -150,6 +150,28 @@ struct RecentAward: Decodable, Sendable, Identifiable {
     var id: String { "\(bookTitle)-\(awardName)-\(awardYear)" }
 }
 
+// MARK: - Book Preview
+
+struct BookPreview: Codable, Sendable {
+    let previewId: String
+    let title: String
+    let authors: [String]
+    var publisher: String?
+    var pageCount: Int?
+    var genre: String?
+    var synopsis: String?
+    var isbn: String?
+    var language: String?
+    var format: String?
+    var series: String?
+    var seriesNumber: Int?
+    var translator: String?
+    var estimatedPrice: Double?
+    var awards: [Award]
+    var publicRatings: [PublicRating]
+    var coverImageBase64: String?
+}
+
 // MARK: - Requests
 
 struct UpdateBookRequest: Encodable, Sendable {
@@ -168,6 +190,11 @@ struct UpdateBookRequest: Encodable, Sendable {
     var personalNotes: String?
     var status: String?
     var readDate: String?
+}
+
+struct ConfirmBookRequest: Encodable, Sendable {
+    let previewId: String
+    let status: String
 }
 
 struct CreateReviewRequest: Encodable, Sendable {

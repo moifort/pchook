@@ -80,19 +80,25 @@ struct ScanFlowView: View {
                 AnalyzingView()
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
 
-            case .confirmed(let bookId, let title, let authors, let genre):
+            case .preview(let preview):
                 NavigationStack {
                     ScanConfirmationView(
-                        title: title,
-                        authors: authors.joined(separator: ", "),
-                        genre: genre,
+                        preview: mapPreview(preview),
                         onScanAnother: { viewModel.reset() },
-                        onStatusChosen: { status in
-                            if status == "read" {
-                                _ = try? await BooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))
+                        onConfirm: { status in
+                            guard let result = await viewModel.confirm(
+                                previewId: preview.previewId, status: status
+                            ) else { return }
+
+                            switch result {
+                            case .created:
+                                viewModel.reset()
+                                onFlowCompleted()
+                            case .duplicate(let book):
+                                viewModel.step = .duplicate(
+                                    bookId: book.id, title: book.title, authors: book.authors
+                                )
                             }
-                            viewModel.reset()
-                            onFlowCompleted()
                         }
                     )
                 }
@@ -132,5 +138,31 @@ struct ScanFlowView: View {
         } message: {
             Text(viewModel.error ?? "")
         }
+    }
+
+    private func mapPreview(_ preview: BookPreview) -> ScanConfirmationView.Item {
+        let genres = preview.genre?
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) } ?? []
+
+        return .init(
+            previewId: preview.previewId,
+            title: preview.title,
+            authors: preview.authors.joined(separator: ", "),
+            genres: genres,
+            synopsis: preview.synopsis,
+            pageCount: preview.pageCount,
+            language: preview.language,
+            format: preview.format,
+            publisher: preview.publisher,
+            translator: preview.translator,
+            estimatedPrice: preview.estimatedPrice,
+            awards: preview.awards.map { .init(name: $0.name, year: $0.year) },
+            ratings: preview.publicRatings.map {
+                .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
+            },
+            series: preview.series,
+            seriesNumber: preview.seriesNumber
+        )
     }
 }

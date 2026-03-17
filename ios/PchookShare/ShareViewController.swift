@@ -13,13 +13,15 @@ class ShareViewController: UIViewController {
             return
         }
 
+        let description = item.attributedContentText?.string
+
         if let urlProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }) {
             urlProvider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
                 guard let url = item as? URL else {
                     Task { @MainActor in self?.close() }
                     return
                 }
-                Task { @MainActor in self?.showShareView(url: url) }
+                Task { @MainActor in self?.showShareView(url: url, description: description) }
             }
         } else if let textProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.text.identifier) }) {
             textProvider.loadItem(forTypeIdentifier: UTType.text.identifier) { [weak self] item, _ in
@@ -27,7 +29,7 @@ class ShareViewController: UIViewController {
                     Task { @MainActor in self?.close() }
                     return
                 }
-                Task { @MainActor in self?.showShareView(url: url) }
+                Task { @MainActor in self?.showShareView(url: url, description: description) }
             }
         } else {
             close()
@@ -35,8 +37,8 @@ class ShareViewController: UIViewController {
     }
 
     @MainActor
-    private func showShareView(url: URL) {
-        let viewModel = ShareViewModel(url: url) { [weak self] in
+    private func showShareView(url: URL, description: String?) {
+        let viewModel = ShareViewModel(url: url, description: description) { [weak self] in
             self?.close()
         }
 

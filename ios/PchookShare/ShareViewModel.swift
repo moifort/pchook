@@ -2,13 +2,13 @@ import Foundation
 
 enum ShareStep: Equatable {
     case analyzing
-    case success(title: String, authors: String, genre: String?)
+    case preview(ShareBookPreview)
     case error(message: String)
 
     static func == (lhs: ShareStep, rhs: ShareStep) -> Bool {
         switch (lhs, rhs) {
         case (.analyzing, .analyzing): true
-        case (.success, .success): true
+        case (.preview, .preview): true
         case (.error, .error): true
         default: false
         }
@@ -18,12 +18,15 @@ enum ShareStep: Equatable {
 @MainActor @Observable
 final class ShareViewModel {
     var step: ShareStep = .analyzing
+    var isConfirming = false
 
     private let url: URL
+    private let description: String?
     private let onDismiss: () -> Void
 
-    init(url: URL, onDismiss: @escaping () -> Void) {
+    init(url: URL, description: String?, onDismiss: @escaping () -> Void) {
         self.url = url
+        self.description = description
         self.onDismiss = onDismiss
     }
 
@@ -31,13 +34,22 @@ final class ShareViewModel {
         step = .analyzing
         Task {
             do {
-                let book = try await ShareAPIClient.importUrl(url)
-                step = .success(
-                    title: book.title,
-                    authors: book.authors.joined(separator: ", "),
-                    genre: book.genre
-                )
+                let preview = try await ShareAPIClient.analyzeUrl(url, description: description)
+                step = .preview(preview)
             } catch {
+                step = .error(message: error.localizedDescription)
+            }
+        }
+    }
+
+    func confirm(previewId: String, status: String) {
+        isConfirming = true
+        Task {
+            do {
+                try await ShareAPIClient.confirm(previewId: previewId, status: status)
+                onDismiss()
+            } catch {
+                isConfirming = false
                 step = .error(message: error.localizedDescription)
             }
         }

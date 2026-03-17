@@ -9,8 +9,8 @@ struct ShareView: View {
             case .analyzing:
                 analyzingContent
 
-            case .success(let title, let authors, let genre):
-                successContent(title: title, authors: authors, genre: genre)
+            case .preview(let preview):
+                previewContent(preview)
 
             case .error(let message):
                 errorContent(message: message)
@@ -45,61 +45,167 @@ struct ShareView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    @State private var checkmarkScale = 0.5
-    @State private var checkmarkOpacity = 0.0
+    private func previewContent(_ preview: ShareBookPreview) -> some View {
+        VStack(spacing: 0) {
+            List {
+                // Header
+                Section {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(preview.title)
+                            .font(.headline)
+                        Text(preview.authors.joined(separator: ", "))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        if let genre = preview.genre {
+                            HStack(spacing: 6) {
+                                ForEach(
+                                    genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) },
+                                    id: \.self
+                                ) { g in
+                                    Text(g)
+                                        .font(.caption2)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 2)
+                                        .background(Color.accentColor.opacity(0.15))
+                                        .foregroundStyle(Color.accentColor)
+                                        .clipShape(.capsule)
+                                }
+                            }
+                        }
+                    }
 
-    private func successContent(title: String, authors: String, genre: String?) -> some View {
-        VStack(spacing: 24) {
-            Spacer()
+                    if let series = preview.series {
+                        HStack(spacing: 8) {
+                            Image(systemName: "books.vertical")
+                                .foregroundStyle(.secondary)
+                            Text(preview.seriesNumber.map { "\(series) — Tome \($0)" } ?? series)
+                        }
+                    }
+                }
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(.green)
-                .scaleEffect(checkmarkScale)
-                .opacity(checkmarkOpacity)
+                // Ratings
+                if !preview.publicRatings.isEmpty {
+                    Section("Notes") {
+                        ForEach(preview.publicRatings) { rating in
+                            HStack {
+                                Text(rating.source)
+                                Text("(\(formattedVoterCount(rating.voterCount)))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text("\(rating.score)/\(rating.maxScore)")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
 
-            Text("Livre ajout\u{00E9} !")
-                .font(.title)
-                .fontWeight(.bold)
+                // Awards
+                if !preview.awards.isEmpty {
+                    Section("Prix littéraires") {
+                        ForEach(preview.awards) { award in
+                            HStack {
+                                Image(systemName: "medal.fill")
+                                    .foregroundStyle(.orange)
+                                Text(award.name)
+                                Spacer()
+                                if let year = award.year {
+                                    Text("\(year)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
 
-            VStack(spacing: 8) {
-                Text(title)
-                    .font(.headline)
-                    .multilineTextAlignment(.center)
+                // Info
+                if preview.pageCount != nil || preview.format != nil || preview.language != nil {
+                    Section("Informations") {
+                        if let pageCount = preview.pageCount {
+                            infoRow(icon: "doc.text", title: "Pages", value: "\(pageCount)")
+                        }
+                        if let format = preview.format {
+                            infoRow(icon: "doc", title: "Format", value: format)
+                        }
+                        if let language = preview.language {
+                            infoRow(icon: "globe", title: "Langue", value: language)
+                        }
+                        if let publisher = preview.publisher {
+                            infoRow(icon: "building.2", title: "Éditeur", value: publisher)
+                        }
+                        if let estimatedPrice = preview.estimatedPrice {
+                            infoRow(
+                                icon: "eurosign.circle",
+                                title: "Prix estimé",
+                                value: String(format: "%.2f €", estimatedPrice)
+                            )
+                        }
+                    }
+                }
 
-                Text(authors)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                if let genre {
-                    Text(genre)
-                        .font(.caption)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(Color.accentColor.opacity(0.15))
-                        .clipShape(.capsule)
+                // Synopsis
+                if let synopsis = preview.synopsis {
+                    Section("Synopsis") {
+                        Text(synopsis)
+                            .font(.subheadline)
+                            .lineLimit(5)
+                    }
                 }
             }
 
-            Spacer()
+            // CTAs
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    Button {
+                        viewModel.confirm(previewId: preview.previewId, status: "to-read")
+                    } label: {
+                        Label("À lire", systemImage: "bookmark.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .disabled(viewModel.isConfirming)
 
-            Button {
-                viewModel.dismiss()
-            } label: {
-                Text("Termin\u{00E9}")
-                    .frame(maxWidth: .infinity)
+                    Button {
+                        viewModel.confirm(previewId: preview.previewId, status: "read")
+                    } label: {
+                        Label("Lu", systemImage: "checkmark.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(viewModel.isConfirming)
+                }
+
+                Button {
+                    viewModel.dismiss()
+                } label: {
+                    Text("Fermer")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .padding(.horizontal)
+            .padding()
+            .background(.bar)
         }
-        .padding()
-        .onAppear {
-            withAnimation(.spring(duration: 0.5, bounce: 0.3)) {
-                checkmarkScale = 1.0
-                checkmarkOpacity = 1.0
-            }
+    }
+
+    private func infoRow(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(.secondary)
+            LabeledContent(title, value: value)
         }
+    }
+
+    private func formattedVoterCount(_ count: Int) -> String {
+        if count >= 1000 {
+            return String(format: "%.1fk", Double(count) / 1000.0)
+        }
+        return "\(count)"
     }
 
     private func errorContent(message: String) -> some View {
@@ -127,7 +233,7 @@ struct ShareView: View {
                 Button {
                     viewModel.retry()
                 } label: {
-                    Label("R\u{00E9}essayer", systemImage: "arrow.clockwise")
+                    Label("Réessayer", systemImage: "arrow.clockwise")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)

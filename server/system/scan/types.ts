@@ -33,3 +33,10 @@ export type CachedUrlImportResult = {
   result: ScanResult
   cachedAt: Date
 }
+
+export type BookPreviewData = {
+  previewId: string
+  scanResult: ScanResult
+  coverImageBase64?: string
+  createdAt: Date
+}
