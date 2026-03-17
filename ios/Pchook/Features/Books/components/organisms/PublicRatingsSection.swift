@@ -16,11 +16,11 @@ struct PublicRatingsSection: View {
             ForEach(ratings) { rating in
                 HStack {
                     Text(rating.source)
-                    Spacer()
-                    StarRatingView(rating: rating.normalizedScore, font: .body)
                     Text("(\(formattedVoterCount(rating.voterCount)))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Spacer()
+                    StarRatingView(rating: rating.normalizedScore, font: .body)
                 }
             }
         }
