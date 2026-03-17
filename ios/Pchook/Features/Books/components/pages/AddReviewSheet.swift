@@ -33,10 +33,10 @@ struct AddReviewSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Annuler") { dismiss() }
+                    Button("Fermer", systemImage: "xmark") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Enregistrer") {
+                    Button("Enregistrer", systemImage: "checkmark") {
                         Task { await save() }
                     }
                     .disabled(rating == 0 || isSaving)
