@@ -36,12 +36,14 @@ export default defineEventHandler(async (event) => {
     translator: scanResult.translator ? PersonName(scanResult.translator) : undefined,
     estimatedPrice: scanResult.estimatedPrice ? Eur(scanResult.estimatedPrice) : undefined,
     awards: scanResult.awards as Award[],
-    publicRatings: scanResult.publicRatings.map(({ source, score, maxScore, voterCount }) => ({
-      source,
-      score: Note(score),
-      maxScore: Note(maxScore),
-      voterCount,
-    })) as PublicRating[],
+    publicRatings: scanResult.publicRatings
+      .filter(({ score, maxScore }) => score != null && maxScore != null)
+      .map(({ source, score, maxScore, voterCount }) => ({
+        source,
+        score: Note(score),
+        maxScore: Note(maxScore),
+        voterCount,
+      })) as PublicRating[],
   }
 
   const seriesInfo = scanResult.series
