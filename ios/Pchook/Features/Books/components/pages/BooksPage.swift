@@ -3,6 +3,8 @@ import SentrySwiftUI
 import SwiftUI
 
 struct BooksPage: View {
+    var refreshTrigger: Int = 0
+
     @State private var viewModel = BooksViewModel()
     @State private var selectedBookId: String?
 
@@ -35,7 +37,7 @@ struct BooksPage: View {
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
-            .task(id: viewModel.filterKey) {
+            .task(id: "\(viewModel.filterKey)-\(refreshTrigger)") {
                 await viewModel.load()
                 SentrySDK.reportFullyDisplayed()
             }

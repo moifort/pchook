@@ -3,6 +3,8 @@ import SentrySwiftUI
 import SwiftUI
 
 struct DashboardPage: View {
+    var refreshTrigger: Int = 0
+
     @State private var viewModel = DashboardViewModel()
 
     var body: some View {
@@ -65,7 +67,7 @@ struct DashboardPage: View {
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Dashboard", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
-            .task {
+            .task(id: refreshTrigger) {
                 await viewModel.load()
                 SentrySDK.reportFullyDisplayed()
             }

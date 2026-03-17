@@ -22,15 +22,16 @@ enum TabSelection: Int, CaseIterable, Identifiable {
 struct ContentView: View {
     @State private var selectedTab: TabSelection = .home
     @State private var showScanner = false
+    @State private var refreshTrigger = 0
 
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab(TabSelection.home.label, systemImage: TabSelection.home.icon, value: .home) {
-                DashboardPage()
+                DashboardPage(refreshTrigger: refreshTrigger)
             }
             .accessibilityIdentifier("tab-home")
             Tab(TabSelection.books.label, systemImage: TabSelection.books.icon, value: .books) {
-                BooksPage()
+                BooksPage(refreshTrigger: refreshTrigger)
             }
             .accessibilityIdentifier("tab-books")
             Tab(value: .scan, role: .search) {
@@ -46,7 +47,7 @@ struct ContentView: View {
                 showScanner = true
             }
         }
-        .fullScreenCover(isPresented: $showScanner) {
+        .fullScreenCover(isPresented: $showScanner, onDismiss: { refreshTrigger += 1 }) {
             ScanFlowView {
                 showScanner = false
                 selectedTab = .books
