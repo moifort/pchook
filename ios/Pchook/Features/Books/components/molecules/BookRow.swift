@@ -10,25 +10,23 @@ struct BookRow: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
+            if status == "to-read" {
+                Image(systemName: "bookmark.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
+            } else {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.caption2)
+                    .foregroundStyle(.green)
+            }
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.headline)
                     .lineLimit(2)
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(authors)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                    if status == "to-read" {
-                        Image(systemName: "bookmark.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.orange)
-                    } else if status == "read" {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.green)
-                    }
-                }
+                Text(authors)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
                 HStack(spacing: 6) {
                     if let genre, let first = genre.split(separator: ",").first {
                         GenreBadge(genre: first.trimmingCharacters(in: .whitespaces))
