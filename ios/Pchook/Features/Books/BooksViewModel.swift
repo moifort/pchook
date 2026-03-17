@@ -27,13 +27,14 @@ enum BookListMode: String, CaseIterable, Identifiable {
 }
 
 enum BookSort: String, CaseIterable, Identifiable {
-    case createdAt, title, author, publicRating, awards
+    case createdAt, title, author, genre, publicRating, awards
     var id: String { rawValue }
     var label: String {
         switch self {
         case .createdAt: "Date d'ajout"
         case .title: "Titre"
         case .author: "Auteur"
+        case .genre: "Genre"
         case .publicRating: "Note publique"
         case .awards: "Prix litt\u{00E9}raires"
         }
@@ -43,6 +44,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .createdAt: "clock"
         case .title: "textformat"
         case .author: "person"
+        case .genre: "tag"
         case .publicRating: "star"
         case .awards: "medal"
         }
@@ -70,6 +72,18 @@ enum BookStatusFilter: String, CaseIterable, Identifiable {
     }
 }
 
+struct BookSection: Identifiable {
+    let title: String
+    let items: [SectionedBook]
+    var id: String { title }
+}
+
+struct SectionedBook: Identifiable {
+    let sectionTitle: String
+    let book: BookListItem
+    var id: String { "\(sectionTitle)|\(book.id)" }
+}
+
 @MainActor @Observable
 final class BooksViewModel {
     var books: [BookListItem] = []
@@ -79,31 +93,72 @@ final class BooksViewModel {
     var sort: BookSort = .createdAt
     var sortDescending = true
     var statusFilter: BookStatusFilter = .all
-    var genreFilter: String?
     var mode: BookListMode = .all
 
-    var availableGenres: [String] {
-        let allGenres = books
-            .compactMap(\.genre)
-            .flatMap { $0.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) } }
-        return Array(Set(allGenres)).sorted()
-    }
-
     var displayedBooks: [BookListItem] {
-        var result = switch mode {
+        switch mode {
         case .all: books
         case .series: books.filter { $0.seriesName != nil }
         case .favorites: books.filter { $0.rating == 5 }
         }
-        if let genreFilter {
-            result = result.filter { book in
-                guard let genre = book.genre else { return false }
-                return genre.split(separator: ",")
-                    .map { $0.trimmingCharacters(in: .whitespaces) }
-                    .contains(genreFilter)
+    }
+
+    var usesGrouping: Bool {
+        sort == .genre || sort == .publicRating || sort == .awards
+    }
+
+    var groupedBooks: [BookSection] {
+        let items = displayedBooks
+        switch sort {
+        case .genre:
+            var dict: [String: [BookListItem]] = [:]
+            for book in items {
+                let genres = book.genre?
+                    .split(separator: ",")
+                    .map { $0.trimmingCharacters(in: .whitespaces) } ?? ["Sans genre"]
+                for genre in genres {
+                    dict[genre, default: []].append(book)
+                }
             }
+            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
+            return keys.map { key in
+                BookSection(
+                    title: key,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
+                )
+            }
+
+        case .publicRating:
+            var dict: [Int: [BookListItem]] = [:]
+            for book in items {
+                dict[averageNormalizedRating(book.publicRatings), default: []].append(book)
+            }
+            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
+            return keys.map { key in
+                let label = key == 0 ? "Aucune note" : "\(key) \u{00E9}toile\(key > 1 ? "s" : "")"
+                return BookSection(
+                    title: label,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: label, book: $0) }
+                )
+            }
+
+        case .awards:
+            var dict: [Int: [BookListItem]] = [:]
+            for book in items {
+                dict[book.awards.count, default: []].append(book)
+            }
+            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
+            return keys.map { key in
+                let label = key == 0 ? "Aucun prix" : "\(key) prix"
+                return BookSection(
+                    title: label,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: label, book: $0) }
+                )
+            }
+
+        default:
+            return []
         }
-        return result
     }
 
     var filterKey: String {
@@ -126,5 +181,14 @@ final class BooksViewModel {
             self.error = reportError(error)
         }
         isLoading = false
+    }
+
+    private func averageNormalizedRating(_ ratings: [PublicRating]) -> Int {
+        guard !ratings.isEmpty else { return 0 }
+        let sum = ratings.reduce(0.0) { acc, rating in
+            guard rating.maxScore > 0 else { return acc }
+            return acc + (Double(rating.score) / Double(rating.maxScore) * 5.0)
+        }
+        return Int((sum / Double(ratings.count)).rounded())
     }
 }

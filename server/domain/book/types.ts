@@ -12,7 +12,7 @@ export type Note = Brand<number, 'Note'>
 
 export type BookFormat = 'pocket' | 'paperback' | 'hardcover'
 export type BookStatus = 'to-read' | 'read'
-export type BookSort = 'createdAt' | 'title' | 'author' | 'publicRating' | 'awards'
+export type BookSort = 'createdAt' | 'title' | 'author' | 'publicRating' | 'awards' | 'genre'
 export type SortOrder = 'asc' | 'desc'
 
 export type Award = {

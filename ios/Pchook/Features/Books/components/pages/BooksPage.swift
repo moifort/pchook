@@ -19,20 +19,18 @@ struct BooksPage: View {
                     )
                 } else {
                     List {
-                        ForEach(viewModel.displayedBooks) { book in
-                            Button {
-                                selectedBookId = book.id
-                            } label: {
-                                BookRow(
-                                    title: book.title,
-                                    authors: book.authors.joined(separator: ", "),
-                                    genre: book.genre,
-                                    rating: book.rating,
-                                    status: book.status,
-                                    awardCount: book.awards.count
-                                )
+                        if viewModel.usesGrouping {
+                            ForEach(viewModel.groupedBooks) { section in
+                                Section(section.title) {
+                                    ForEach(section.items) { item in
+                                        bookButton(item.book)
+                                    }
+                                }
                             }
-                            .tint(.primary)
+                        } else {
+                            ForEach(viewModel.displayedBooks) { book in
+                                bookButton(book)
+                            }
                         }
                     }
                 }
@@ -74,18 +72,6 @@ struct BooksPage: View {
                                 Label(filter.label, systemImage: filter.icon).tag(filter)
                             }
                         }
-
-                        Divider()
-
-                        Picker("Cat\u{00E9}gorie", selection: Binding(
-                            get: { viewModel.genreFilter ?? "" },
-                            set: { viewModel.genreFilter = $0.isEmpty ? nil : $0 }
-                        )) {
-                            Label("Toutes", systemImage: "books.vertical").tag("")
-                            ForEach(viewModel.availableGenres, id: \.self) { genre in
-                                Text(genre).tag(genre)
-                            }
-                        }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                     }
@@ -103,6 +89,22 @@ struct BooksPage: View {
                 )
             }
         }
+    }
+
+    @ViewBuilder
+    private func bookButton(_ book: BookListItem) -> some View {
+        Button {
+            selectedBookId = book.id
+        } label: {
+            BookRow(
+                title: book.title,
+                authors: book.authors.joined(separator: ", "),
+                rating: book.rating,
+                status: book.status,
+                awardCount: book.awards.count
+            )
+        }
+        .tint(.primary)
     }
 }
 

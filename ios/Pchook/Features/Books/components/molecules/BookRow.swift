@@ -3,7 +3,6 @@ import SwiftUI
 struct BookRow: View {
     let title: String
     let authors: String
-    let genre: String?
     let rating: Int?
     let status: String
     let awardCount: Int
@@ -19,11 +18,6 @@ struct BookRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                 HStack(spacing: 6) {
-                    if let genre {
-                        ForEach(genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }, id: \.self) { subGenre in
-                            GenreBadge(genre: subGenre)
-                        }
-                    }
                     if awardCount > 0 {
                         AwardBadge(count: awardCount)
                     }
@@ -40,7 +34,12 @@ struct BookRow: View {
             }
             Spacer()
             if let rating {
-                StarRatingView(rating: rating)
+                if rating == 5 {
+                    Image(systemName: "heart.fill")
+                        .foregroundStyle(.red)
+                } else {
+                    StarRatingView(rating: rating)
+                }
             }
         }
         .padding(.vertical, 2)
@@ -52,7 +51,6 @@ struct BookRow: View {
         BookRow(
             title: "L'\u{00C9}tranger",
             authors: "Albert Camus",
-            genre: "Roman",
             rating: 4,
             status: "read",
             awardCount: 1
@@ -60,10 +58,16 @@ struct BookRow: View {
         BookRow(
             title: "Le Petit Prince",
             authors: "Antoine de Saint-Exup\u{00E9}ry",
-            genre: "Conte",
             rating: nil,
             status: "to-read",
             awardCount: 0
+        )
+        BookRow(
+            title: "Neuromancien",
+            authors: "William Gibson",
+            rating: 5,
+            status: "read",
+            awardCount: 2
         )
     }
 }

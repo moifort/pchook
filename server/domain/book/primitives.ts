@@ -71,6 +71,8 @@ export const BookStatus = (value: unknown) =>
   z.enum(['to-read', 'read']).parse(value) as BookStatusType
 
 export const BookSort = (value: unknown) =>
-  z.enum(['createdAt', 'title', 'author', 'publicRating', 'awards']).parse(value) as BookSortType
+  z
+    .enum(['createdAt', 'title', 'author', 'publicRating', 'awards', 'genre'])
+    .parse(value) as BookSortType
 
 export const SortOrder = (value: unknown) => z.enum(['asc', 'desc']).parse(value) as SortOrderType
