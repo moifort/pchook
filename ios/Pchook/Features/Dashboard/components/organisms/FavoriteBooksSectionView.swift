@@ -40,7 +40,7 @@ struct FavoriteBooksSectionView: View {
                                     .lineLimit(1)
                             }
                             Spacer()
-                            StarRatingView(rating: item.rating)
+                            StarRatingView(rating: Double(item.rating))
                             if let price = item.estimatedPrice {
                                 Text(String(format: "%.0f \u{20AC}", price))
                                     .font(.subheadline)

@@ -42,7 +42,7 @@ struct BookRow: View {
                     Image(systemName: "heart.fill")
                         .foregroundStyle(.red)
                 } else {
-                    StarRatingView(rating: rating)
+                    StarRatingView(rating: Double(rating))
                 }
             }
         }

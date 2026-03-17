@@ -93,7 +93,7 @@ struct ShareView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                 Spacer()
-                                Text("\(rating.score)/\(rating.maxScore)")
+                                Text(String(format: "%.1f/%g", rating.score, rating.maxScore))
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }

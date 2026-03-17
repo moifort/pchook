@@ -37,8 +37,8 @@ struct Award: Codable, Sendable {
 
 struct PublicRating: Codable, Sendable {
     let source: String
-    let score: Int
-    let maxScore: Int
+    let score: Double
+    let maxScore: Double
     let voterCount: Int
 }
 

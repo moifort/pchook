@@ -29,15 +29,15 @@ struct ShareAward: Codable, Sendable, Identifiable {
 
 struct SharePublicRating: Codable, Sendable, Identifiable {
     let source: String
-    let score: Int
-    let maxScore: Int
+    let score: Double
+    let maxScore: Double
     let voterCount: Int
 
     var id: String { source }
 
-    var normalizedScore: Int {
+    var normalizedScore: Double {
         guard maxScore > 0 else { return 0 }
-        return Int((Double(score) / Double(maxScore) * 5.0).rounded())
+        return (score / maxScore * 5.0 * 2).rounded() / 2
     }
 }
 

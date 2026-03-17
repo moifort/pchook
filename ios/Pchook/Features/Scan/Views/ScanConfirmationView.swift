@@ -142,7 +142,7 @@ extension ScanConfirmationView {
                 translator: nil,
                 estimatedPrice: 6.90,
                 awards: [.init(name: "Prix Nobel", year: 1957)],
-                ratings: [.init(source: "Goodreads", score: 4, maxScore: 5, voterCount: 125_000)],
+                ratings: [.init(source: "Goodreads", score: 4.18, maxScore: 5, voterCount: 125_000)],
                 series: nil,
                 seriesNumber: nil
             ),
