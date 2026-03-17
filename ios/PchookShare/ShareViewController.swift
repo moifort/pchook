@@ -14,6 +14,10 @@ class ShareViewController: UIViewController {
         }
 
         let description = item.attributedContentText?.string
+        let attachmentTypes = attachments.compactMap(\.registeredTypeIdentifiers.first)
+
+        print("[PchookShare] Description: \(description ?? "nil")")
+        print("[PchookShare] Attachment types: \(attachmentTypes)")
 
         if let urlProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }) {
             urlProvider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
@@ -21,7 +25,18 @@ class ShareViewController: UIViewController {
                     Task { @MainActor in self?.close() }
                     return
                 }
-                Task { @MainActor in self?.showShareView(url: url, description: description) }
+                print("[PchookShare] URL: \(url)")
+                self?.loadRawText(from: attachments) { rawText in
+                    print("[PchookShare] Raw text: \(rawText ?? "nil")")
+                    Task { @MainActor in
+                        self?.showShareView(
+                            url: url,
+                            description: description,
+                            rawText: rawText,
+                            attachmentTypes: attachmentTypes
+                        )
+                    }
+                }
             }
         } else if let textProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.text.identifier) }) {
             textProvider.loadItem(forTypeIdentifier: UTType.text.identifier) { [weak self] item, _ in
@@ -29,16 +44,39 @@ class ShareViewController: UIViewController {
                     Task { @MainActor in self?.close() }
                     return
                 }
-                Task { @MainActor in self?.showShareView(url: url, description: description) }
+                print("[PchookShare] URL (from text): \(url)")
+                Task { @MainActor in
+                    self?.showShareView(
+                        url: url,
+                        description: description,
+                        rawText: text,
+                        attachmentTypes: attachmentTypes
+                    )
+                }
             }
         } else {
             close()
         }
     }
 
+    private func loadRawText(from attachments: [NSItemProvider], completion: @escaping (String?) -> Void) {
+        guard let textProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.text.identifier) }) else {
+            completion(nil)
+            return
+        }
+        textProvider.loadItem(forTypeIdentifier: UTType.text.identifier) { item, _ in
+            completion(item as? String)
+        }
+    }
+
     @MainActor
-    private func showShareView(url: URL, description: String?) {
-        let viewModel = ShareViewModel(url: url, description: description) { [weak self] in
+    private func showShareView(url: URL, description: String?, rawText: String?, attachmentTypes: [String]) {
+        let viewModel = ShareViewModel(
+            url: url,
+            description: description,
+            rawText: rawText,
+            attachmentTypes: attachmentTypes
+        ) { [weak self] in
             self?.close()
         }
 

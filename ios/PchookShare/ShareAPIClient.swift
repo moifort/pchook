@@ -51,6 +51,8 @@ private struct ShareAPIResponse<T: Codable & Sendable>: Codable, Sendable {
 private struct AnalyzeURLRequest: Codable, Sendable {
     let url: String
     let description: String?
+    let rawText: String?
+    let attachmentTypes: [String]?
 }
 
 private struct ConfirmRequest: Codable, Sendable {
@@ -59,7 +61,7 @@ private struct ConfirmRequest: Codable, Sendable {
 }
 
 enum ShareAPIClient {
-    static func analyzeUrl(_ url: URL, description: String?) async throws -> ShareBookPreview {
+    static func analyzeUrl(_ url: URL, description: String?, rawText: String?, attachmentTypes: [String]) async throws -> ShareBookPreview {
         let serverURL = SharedConfig.sharedDefaults.string(forKey: SharedConfig.serverURLKey) ?? SharedConfig.defaultURL
         let baseURL = URL(string: serverURL)!
         let endpoint = baseURL.appendingPathComponent("/books/analyze-url")
@@ -69,7 +71,12 @@ enum ShareAPIClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(Secrets.apiToken)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(
-            AnalyzeURLRequest(url: url.absoluteString, description: description)
+            AnalyzeURLRequest(
+                url: url.absoluteString,
+                description: description,
+                rawText: rawText,
+                attachmentTypes: attachmentTypes.isEmpty ? nil : attachmentTypes
+            )
         )
 
         let (data, response) = try await URLSession.shared.data(for: request)

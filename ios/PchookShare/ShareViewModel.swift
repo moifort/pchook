@@ -22,11 +22,15 @@ final class ShareViewModel {
 
     private let url: URL
     private let description: String?
+    private let rawText: String?
+    private let attachmentTypes: [String]
     private let onDismiss: () -> Void
 
-    init(url: URL, description: String?, onDismiss: @escaping () -> Void) {
+    init(url: URL, description: String?, rawText: String?, attachmentTypes: [String], onDismiss: @escaping () -> Void) {
         self.url = url
         self.description = description
+        self.rawText = rawText
+        self.attachmentTypes = attachmentTypes
         self.onDismiss = onDismiss
     }
 
@@ -34,7 +38,12 @@ final class ShareViewModel {
         step = .analyzing
         Task {
             do {
-                let preview = try await ShareAPIClient.analyzeUrl(url, description: description)
+                let preview = try await ShareAPIClient.analyzeUrl(
+                    url,
+                    description: description,
+                    rawText: rawText,
+                    attachmentTypes: attachmentTypes
+                )
                 step = .preview(preview)
             } catch {
                 step = .error(message: error.localizedDescription)

@@ -7,7 +7,7 @@ import { UrlHash } from '~/system/scan/primitives'
 import type { ScanResult } from '~/system/scan/types'
 import * as repository from '~/system/scan/url-import-repository'
 
-const log = createLogger('url-import')
+const log = createLogger('share-import')
 
 const GEMINI_API_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
@@ -38,22 +38,44 @@ const hashUrl = (url: string) => {
   return UrlHash(hash)
 }
 
-const extractFromUrl = async (url: string, description?: string) => {
+export type ShareData = {
+  url: string
+  description?: string
+  rawText?: string
+  attachmentTypes?: string[]
+}
+
+const buildSourceBlock = ({ url, description, rawText }: ShareData) => {
+  const parts: string[] = []
+
+  if (description) {
+    parts.push(`Description partagée (source principale) :\n${description}`)
+  }
+
+  if (rawText && rawText !== description) {
+    parts.push(`Texte brut additionnel :\n${rawText}`)
+  }
+
+  parts.push(`URL de référence${description ? ' (source secondaire)' : ''} : ${url}`)
+
+  if (parts.length > 1) {
+    return `Analyse ces informations sur un livre :\n\n${parts.join('\n\n')}\n\nIdentifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks).\nSi la description et l'URL fournissent des informations contradictoires, privilégie la description.`
+  }
+
+  return `Visite et analyse cette URL : ${url}\n\nIdentifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :`
+}
+
+const extractFromShare = async (data: ShareData) => {
   const { googleApiKey } = config()
 
-  const sourceBlock = description
-    ? `Analyse ces informations sur un livre :
+  log.info('Share data received', {
+    url: data.url,
+    description: data.description,
+    rawText: data.rawText,
+    attachmentTypes: data.attachmentTypes,
+  })
 
-Description partagée (source principale) :
-${description}
-
-URL de référence (source secondaire) : ${url}
-
-Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks).
-Si la description et l'URL fournissent des informations contradictoires, privilégie la description.`
-    : `Visite et analyse cette URL : ${url}
-
-Identifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :`
+  const sourceBlock = buildSourceBlock(data)
 
   const prompt = `${sourceBlock}
 
@@ -73,8 +95,7 @@ Identifie le livre référencé et retourne toutes les informations au format JS
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
   "awards": [{"name": string, "year": number}] (tous les prix littéraires reçus, tableau vide si aucun — cherche sur Wikipedia et les sites de prix),
-  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants),
-  "coverImageUrl": string ou null (URL de l'image de couverture du livre, haute résolution de préférence)
+  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants)
 }
 
 Si l'URL est un lien Audible/Amazon, le format est probablement "audiobook".
@@ -94,72 +115,67 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
   const text = response.candidates?.[0]?.content?.parts?.find((part) => part.text)?.text
   if (!text) throw new Error('Gemini did not return any text')
 
+  log.info('Gemini raw response', text)
+
   const jsonMatch = text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('Gemini did not return valid JSON')
 
-  const data = JSON.parse(jsonMatch[0]) as Record<string, unknown>
+  const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>
 
-  const title = data.title as string | undefined
-  const authors = data.authors as string[] | undefined
-  if (!title || !authors?.length) throw new Error('Gemini could not identify the book from URL')
+  const title = parsed.title as string | undefined
+  const authors = parsed.authors as string[] | undefined
+  if (!title || !authors?.length)
+    throw new Error('Gemini could not identify the book from share data')
+
+  log.info('Gemini parsed result', {
+    title,
+    authors,
+    isbn: parsed.isbn,
+    format: parsed.format,
+  })
 
   return {
-    scanResult: {
-      title,
-      authors,
-      publisher: data.publisher as string | undefined,
-      publishedDate: data.publishedDate as string | undefined,
-      pageCount: data.pageCount as number | undefined,
-      genre: data.genre as string | undefined,
-      synopsis: data.synopsis as string | undefined,
-      isbn: data.isbn as string | undefined,
-      language: data.language as string | undefined,
-      format: normalizeBookFormat(data.format as string | undefined),
-      series: data.series as string | undefined,
-      seriesNumber: data.seriesNumber as number | undefined,
-      translator: data.translator as string | undefined,
-      estimatedPrice: data.estimatedPrice as number | undefined,
-      awards: (data.awards as { name: string; year?: number }[]) ?? [],
-      publicRatings:
-        (data.publicRatings as {
-          source: string
-          score: number
-          maxScore: number
-          voterCount: number
-        }[]) ?? [],
-    } satisfies ScanResult,
-    coverImageUrl: data.coverImageUrl as string | undefined,
-  }
+    title,
+    authors,
+    publisher: parsed.publisher as string | undefined,
+    publishedDate: parsed.publishedDate as string | undefined,
+    pageCount: parsed.pageCount as number | undefined,
+    genre: parsed.genre as string | undefined,
+    synopsis: parsed.synopsis as string | undefined,
+    isbn: parsed.isbn as string | undefined,
+    language: parsed.language as string | undefined,
+    format: normalizeBookFormat(parsed.format as string | undefined),
+    series: parsed.series as string | undefined,
+    seriesNumber: parsed.seriesNumber as number | undefined,
+    translator: parsed.translator as string | undefined,
+    estimatedPrice: parsed.estimatedPrice as number | undefined,
+    awards: (parsed.awards as { name: string; year?: number }[]) ?? [],
+    publicRatings:
+      (parsed.publicRatings as {
+        source: string
+        score: number
+        maxScore: number
+        voterCount: number
+      }[]) ?? [],
+  } satisfies ScanResult
 }
 
-const fetchCoverImage = async (coverImageUrl: string | undefined) => {
-  if (!coverImageUrl) return undefined
-
-  try {
-    log.info('Fetching cover image...', coverImageUrl)
-    const response = await $fetch<ArrayBuffer>(coverImageUrl, { responseType: 'arrayBuffer' })
-    return Buffer.from(response).toString('base64')
-  } catch (error) {
-    log.warn('Failed to fetch cover image, skipping', error)
-    return undefined
-  }
-}
-
-export namespace UrlImporter {
-  export const importFromUrl = async (url: string, description?: string) => {
-    const urlHash = hashUrl(url)
+export namespace ShareImporter {
+  export const importFromShare = async (data: ShareData) => {
+    const urlHash = hashUrl(data.url)
 
     const cached = await repository.findBy(urlHash)
     if (cached) {
       log.info('Cache hit for URL', urlHash)
-      return { scanResult: cached.result, coverImageBase64: undefined }
+      return cached.result
     }
 
-    log.info('Extracting book info from URL...', url)
-    const { scanResult: extracted, coverImageUrl } = await extractFromUrl(url, description)
+    const extracted = await extractFromShare(data)
 
     const isbnData = await lookupByIsbn(extracted.isbn)
-    const withIsbn: ScanResult = isbnData
+    log.info('ISBN lookup result', isbnData ?? 'no data')
+
+    const scanResult: ScanResult = isbnData
       ? {
           ...extracted,
           publisher: isbnData.publisher ?? extracted.publisher,
@@ -169,14 +185,12 @@ export namespace UrlImporter {
         }
       : extracted
 
-    const coverImageBase64 = await fetchCoverImage(coverImageUrl)
-
     await repository.save({
       urlHash,
-      result: withIsbn,
+      result: scanResult,
       cachedAt: new Date(),
     })
 
-    return { scanResult: withIsbn, coverImageBase64 }
+    return scanResult
   }
 }

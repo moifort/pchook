@@ -7,15 +7,13 @@ export default defineEventHandler(async (event) => {
 
   const imageBuffer = Buffer.from(rawBody)
   const scanResult = await BookScanner.scan(imageBuffer)
-  const coverImageBase64 = imageBuffer.toString('base64')
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
     previewId,
     scanResult,
-    coverImageBase64,
     createdAt: new Date(),
   })
 
-  return { status: 200, data: { previewId, ...scanResult, coverImageBase64 } } as const
+  return { status: 200, data: { previewId, ...scanResult } } as const
 })

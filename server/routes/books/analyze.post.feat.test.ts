@@ -55,7 +55,6 @@ feature('POST /books/analyze + POST /books/confirm', () => {
     expect(result.data.title).toBe('Les Misérables')
     expect(result.data.authors).toEqual(['Victor Hugo'])
     expect(result.data.genre).toBe('Roman historique')
-    expect(result.data.coverImageBase64).toBeString()
 
     and('no book is created yet')
     const books = await BookListReadModel.all({})
