@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BF0E01212F5072C10074B393 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = BF0E01222F5072C10074B393 /* Sentry */; };
 		BF0E01232F5072C10074B393 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = BF0E01242F5072C10074B393 /* SentrySwiftUI */; };
+		E30000020000000000000001 /* PchookShare.appex in Embed Extensions */ = {isa = PBXBuildFile; fileRef = E30000030000000000000001 /* PchookShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -19,17 +20,51 @@
 			remoteGlobalIDString = E10000060000000000000001;
 			remoteInfo = Pchook;
 		};
+		E30000010000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E10000090000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E30000060000000000000001;
+			remoteInfo = PchookShare;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E30000080000000000000001 /* Embed Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E30000020000000000000001 /* PchookShare.appex in Embed Extensions */,
+			);
+			name = "Embed Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BF9400C32F45AA6500EDF17A /* Pchook.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Pchook.xctestplan; sourceTree = "<group>"; };
 		E10000030000000000000001 /* Pchook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pchook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E20000030000000000000001 /* PchookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PchookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E30000030000000000000001 /* PchookShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PchookShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E3000000E000000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared/Secrets.swift,
+				Shared/SharedConfig.swift,
+			);
+			target = E30000060000000000000001 /* PchookShare */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E10000050000000000000002 /* Pchook */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Pchook; sourceTree = "<group>"; };
+		E10000050000000000000002 /* Pchook */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E3000000E000000000000001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Pchook; sourceTree = "<group>"; };
 		E20000050000000000000001 /* PchookUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PchookUITests; sourceTree = "<group>"; };
+		E30000050000000000000001 /* PchookShare */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PchookShare; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +84,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E30000040000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -57,6 +99,7 @@
 			children = (
 				BF9400C32F45AA6500EDF17A /* Pchook.xctestplan */,
 				E10000050000000000000002 /* Pchook */,
+				E30000050000000000000001 /* PchookShare */,
 				E20000050000000000000001 /* PchookUITests */,
 				E10000050000000000000009 /* Products */,
 			);
@@ -67,6 +110,7 @@
 			children = (
 				E10000030000000000000001 /* Pchook.app */,
 				E20000030000000000000001 /* PchookUITests.xctest */,
+				E30000030000000000000001 /* PchookShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -81,10 +125,12 @@
 				E10000070000000000000001 /* Sources */,
 				E10000040000000000000001 /* Frameworks */,
 				E10000070000000000000002 /* Resources */,
+				E30000080000000000000001 /* Embed Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E30000090000000000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E10000050000000000000002 /* Pchook */,
@@ -119,6 +165,26 @@
 			productReference = E20000030000000000000001 /* PchookUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		E30000060000000000000001 /* PchookShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E30000080000000000000002 /* Build configuration list for PBXNativeTarget "PchookShare" */;
+			buildPhases = (
+				E30000070000000000000001 /* Sources */,
+				E30000040000000000000001 /* Frameworks */,
+				E30000070000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E30000050000000000000001 /* PchookShare */,
+			);
+			name = PchookShare;
+			productName = PchookShare;
+			productReference = E30000030000000000000001 /* PchookShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -135,6 +201,9 @@
 					E20000060000000000000001 = {
 						CreatedOnToolsVersion = 16.0;
 						TestTargetID = E10000060000000000000001;
+					};
+					E30000060000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -155,6 +224,7 @@
 			projectRoot = "";
 			targets = (
 				E10000060000000000000001 /* Pchook */,
+				E30000060000000000000001 /* PchookShare */,
 				E20000060000000000000001 /* PchookUITests */,
 			);
 		};
@@ -169,6 +239,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E20000070000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E30000070000000000000002 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -192,6 +269,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E30000070000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -199,6 +283,11 @@
 			isa = PBXTargetDependency;
 			target = E10000060000000000000001 /* Pchook */;
 			targetProxy = E20000010000000000000001 /* PBXContainerItemProxy */;
+		};
+		E30000090000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E30000060000000000000001 /* PchookShare */;
+			targetProxy = E30000010000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -430,6 +519,66 @@
 			};
 			name = Release;
 		};
+		E3000000A000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PchookShare/PchookShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 46C337T7YN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PchookShare-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Pchook;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook.PchookShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		E3000000A000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = PchookShare/PchookShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 46C337T7YN;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PchookShare-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Pchook;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.pchook.PchookShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -456,6 +605,15 @@
 			buildConfigurations = (
 				E2000000A000000000000001 /* Debug */,
 				E2000000A000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E30000080000000000000002 /* Build configuration list for PBXNativeTarget "PchookShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3000000A000000000000001 /* Debug */,
+				E3000000A000000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
