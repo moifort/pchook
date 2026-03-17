@@ -1,135 +1,88 @@
-# nitro-ios-stack-template
+# Pchook
 
-A ready-to-use template to create a full-stack app: a backend server + an iOS app.
+A self-hosted book tracker with AI-powered cover scanning. Snap a photo of a book cover, and the app extracts all metadata automatically — title, authors, genre, synopsis, awards, public ratings, and more.
 
-## What's in the box
+Built with a **TypeScript backend** (Nitro + Bun) and a **SwiftUI iOS app**.
 
-- A **TypeScript backend** powered by [Nitro](https://nitro.build/) (HTTP server + file-based storage)
-- An **iOS app** in SwiftUI (iOS 26+, Swift 6)
-- A **data migration system** that runs automatically on server start
-- **Error monitoring** with [Sentry](https://sentry.io/) (optional — works without it)
-- A **Docker setup** ready for production deployment
+## Features
+
+- **Cover scanning** — point your camera at a book cover to add it to your library instantly (Claude Vision + Gemini enrichment + Open Library lookup)
+- **Library management** — filter by status (to-read / read), genre, sort by rating, title, date added, awards
+- **Reviews & ratings** — rate books 1-5 stars, write personal notes, track read dates
+- **Series tracking** — browse series with position tracking, navigate between books in a series
+- **Book suggestions** — AI-generated recommendations based on your reading history
+- **URL import** — share a book URL from Safari to add it via the iOS Share Extension
+- **Dashboard** — reading stats, recently added books, favorites, awards from your library
 
 ## Prerequisites
 
-| Tool | What it does | Install |
-|------|-------------|---------|
-| [Bun](https://bun.sh/) | Runs the backend server and manages dependencies | `curl -fsSL https://bun.sh/install \| bash` |
-| [Xcode](https://developer.apple.com/xcode/) | Builds and runs the iOS app | Mac App Store |
-| [Docker](https://www.docker.com/) | Deploys the server in production (optional) | [docker.com](https://www.docker.com/) |
+| Tool | Install |
+|------|---------|
+| [Bun](https://bun.sh/) | `curl -fsSL https://bun.sh/install \| bash` |
+| [Xcode](https://developer.apple.com/xcode/) | Mac App Store |
 
-## Installation
+## Setup
 
-1. **Create your repository** from this template on GitHub (click "Use this template"), then clone it:
-
-```bash
-git clone https://github.com/YOUR_USERNAME/your-project.git
-cd your-project
-```
-
-2. **Run the init script:**
+**1. Clone and install**
 
 ```bash
-./init.sh
+git clone https://github.com/moifort/pchook.git
+cd pchook
+bun install
 ```
 
-The script asks you two things:
-- A **project name** in PascalCase (e.g. `WineCellar`, `BookTracker`)
-- A **bundle ID prefix** (e.g. `com.yourcompany`) — press Enter to use `com.example`
+**2. Configure API keys**
 
-Then it takes care of everything: renames all files, installs dependencies, and creates a first git commit. Your project is ready.
-
-## Setting up keys
-
-Both keys below are **optional**. The app works without them — you can set them up later.
-
-### API token
-
-**What it does:** protects your server so only your iOS app can access it. Think of it as a password between your app and your server.
-
-**How to create one:** generate a random string. Run this in your terminal:
+Copy the example env file and fill in your keys:
 
 ```bash
-openssl rand -hex 32
+cp .env.example .env
 ```
 
-**Where to put it** (same value in both files):
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NITRO_ANTHROPIC_API_KEY` | Yes | Claude API — extracts book info from cover photos |
+| `NITRO_GOOGLE_API_KEY` | Yes | Gemini API — enriches metadata (awards, ratings, synopsis) |
+| `NITRO_API_TOKEN` | No | Protects the API with a bearer token |
+| `NITRO_SENTRY_DSN` | No | Error tracking via Sentry |
 
-| File | Variable |
-|------|----------|
-| `.env` | `NITRO_API_TOKEN=your-token-here` |
-| `ios/YourApp/Shared/Secrets.swift` | `static let apiToken = "your-token-here"` |
+Then create the iOS secrets file:
 
-### Sentry DSN
+```bash
+cp ios/Pchook/Shared/Secrets.swift.example ios/Pchook/Shared/Secrets.swift
+```
 
-**What it does:** sends your app's errors to [Sentry](https://sentry.io/) so you can see crashes and bugs in real time, without needing users to report them.
+Edit `ios/Pchook/Shared/Secrets.swift` with the same API token and your server URL.
 
-**How to get one:**
-1. Create a free account on [sentry.io](https://sentry.io/)
-2. Create a new project (choose "Bun" for the backend, "iOS" for the app)
-3. Copy the **DSN** (it looks like `https://abc123@o456.ingest.sentry.io/789`)
-
-**Where to put it:**
-
-| File | Variable |
-|------|----------|
-| `.env` | `NITRO_SENTRY_DSN=your-dsn-here` |
-| `ios/YourApp/Shared/Secrets.swift` | `static let sentryDsn = "your-dsn-here"` |
-
-## Running the project
-
-### Start the backend
+**3. Start the backend**
 
 ```bash
 bun run dev
 ```
 
-The server starts at `http://localhost:3000`. Check it's running by opening `http://localhost:3000/health` in your browser.
+Server runs at `http://localhost:3000`. Verify: `http://localhost:3000/health`
 
-### Run the iOS app
-
-1. Open the Xcode project:
+**4. Run the iOS app**
 
 ```bash
-open ios/YourApp.xcodeproj
+open ios/Pchook.xcodeproj
 ```
 
-2. Set your **Development Team** in Xcode (Signing & Capabilities)
-3. Pick a simulator and hit **Run**
+Set your Development Team in Signing & Capabilities, pick a simulator, and hit Run.
 
-The app connects to `localhost:3000` by default, which works out of the box with the iOS simulator.
-
-## Deployment
-
-### Run with Docker Compose
+## Deploy with Docker
 
 ```bash
 docker compose up -d
 ```
 
-The Docker image is built automatically by CI on every push to `main`. The `docker-compose.yml` file mounts a `./data` volume for persistent storage and exposes port 3000. Set your environment variables (`NITRO_API_TOKEN`, `NITRO_SENTRY_DSN`) in the compose file or via an `.env` file.
+The backend uses file-based storage, persisted in `./data`. Set your environment variables in a `.env` file next to the compose file.
 
-### CasaOS (home server)
+A [CasaOS](https://casaos.io/)-compatible compose file is also available (`docker-compose.casaos.yml`).
 
-A [CasaOS](https://casaos.io/)-compatible compose file is provided in `docker-compose.casaos.yml`. To use it:
+## Tech stack
 
-1. Update the `image` field with your Docker image (e.g. `ghcr.io/your-org/your-app:main`)
-2. Set your environment variables
-3. Update the `x-casaos` metadata (title, icon, author)
-4. Import the file in CasaOS
-
-## Documentation
-
-The `docs/` folder contains detailed guides for going further:
-
-| Guide | What it covers |
-|-------|---------------|
-| [Architecture](docs/architecture.md) | How the backend is organized, data flow between layers |
-| [Domain Guide](docs/domain-guide.md) | Step-by-step: adding a new feature to the backend |
-| [iOS Guide](docs/ios-guide.md) | How the iOS app is structured, adding new screens |
-| [API Patterns](docs/api-patterns.md) | Writing API endpoints (GET, POST, PUT, DELETE) |
-| [Migrations](docs/migrations.md) | Adding data migrations |
-| [Error Handling](docs/error-handling.md) | How errors are managed across the stack |
-| [Code Style](docs/code-style.md) | Coding rules and conventions |
-| [Branded Types](docs/branded-types.md) | Type safety patterns for IDs and values |
-| [README Guide](docs/readme-guide.md) | How to write your project's README |
+**Backend:** Nitro, Bun, TypeScript, Zod, ts-pattern, file-based storage, Sentry
+**iOS:** SwiftUI, iOS 26+, Swift 6, strict concurrency
+**AI:** Claude Vision (cover analysis), Gemini 2.0 Flash (metadata enrichment), Open Library (ISBN lookup)
+**Deploy:** Docker, GitHub Actions CI
