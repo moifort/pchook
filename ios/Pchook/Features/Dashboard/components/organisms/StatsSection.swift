@@ -6,8 +6,8 @@ struct StatsSection: View {
     let read: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
                 GradientWidget(
                     title: "Total",
                     value: "\(total)",
