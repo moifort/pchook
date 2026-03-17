@@ -15,9 +15,10 @@ struct BookDetailPage: View {
     @State private var showReviewSheet = false
     @State private var isDeleting = false
     @State private var isEditing = false
+    @State private var seriesBookPath: [String] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $seriesBookPath) {
             Group {
                 if let detail {
                     if isEditing {
@@ -34,7 +35,8 @@ struct BookDetailPage: View {
                     } else {
                         BookDetailContent(
                             detail: detail,
-                            onAddReview: { showReviewSheet = true }
+                            onAddReview: { showReviewSheet = true },
+                            onSelectBook: { seriesBookPath.append($0) }
                         )
                         .refreshable { await loadDetail() }
                     }
@@ -50,6 +52,12 @@ struct BookDetailPage: View {
                 if !isEditing {
                     readToolbar
                 }
+            }
+            .navigationDestination(for: String.self) { selectedBookId in
+                SeriesBookDetailView(bookId: selectedBookId, onUpdated: {
+                    Task { await loadDetail() }
+                    onUpdated()
+                })
             }
             .task { await loadDetail() }
             .sheet(isPresented: $showReviewSheet) {

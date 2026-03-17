@@ -3,6 +3,7 @@ import SwiftUI
 struct BookDetailContent: View {
     let detail: BookDetailData
     let onAddReview: () -> Void
+    let onSelectBook: (String) -> Void
 
     var body: some View {
         List {
@@ -28,7 +29,8 @@ struct BookDetailContent: View {
                 SeriesSection(
                     name: series.name,
                     currentPosition: series.position,
-                    items: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) }
+                    items: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) },
+                    onSelectBook: onSelectBook
                 )
             }
 

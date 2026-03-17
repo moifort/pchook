@@ -18,9 +18,7 @@ private struct ImportURLRequest: Codable, Sendable {
 
 enum ShareAPIClient {
     static func importUrl(_ url: URL) async throws -> ShareBookResult {
-        let serverURL = SharedConfig.sharedDefaults.string(forKey: SharedConfig.serverURLKey)
-            ?? SharedConfig.defaultURL
-        let baseURL = URL(string: serverURL) ?? URL(string: SharedConfig.defaultURL)!
+        let baseURL = URL(string: Secrets.serverURL)!
         let endpoint = baseURL.appendingPathComponent("/books/import-url")
 
         var request = URLRequest(url: endpoint)

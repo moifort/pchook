@@ -21,6 +21,20 @@
                ReferencedContainer = "container:Pchook.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E30000060000000000000001"
+               BuildableName = "PchookShare.appex"
+               BlueprintName = "PchookShare"
+               ReferencedContainer = "container:Pchook.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
