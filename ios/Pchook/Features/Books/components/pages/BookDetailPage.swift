@@ -69,6 +69,15 @@ struct BookDetailPage: View {
         ToolbarItem(placement: .cancellationAction) {
             Button("Fermer", systemImage: "xmark") { dismiss() }
         }
+        if let detail, detail.book.status == "to-read" {
+            ToolbarItemGroup {
+                AsyncToolbarButton(title: "Marquer comme lu", systemImage: "checkmark.circle") {
+                    _ = try? await BooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))
+                    await loadDetail()
+                    onUpdated()
+                }
+            }
+        }
         if let detail, detail.review?.rating != 5 {
             ToolbarItemGroup {
                 AsyncToolbarButton(title: "Ajouter aux favoris", systemImage: "heart") {
@@ -83,9 +92,6 @@ struct BookDetailPage: View {
                 Menu {
                     Button("Modifier", systemImage: "pencil") {
                         isEditing = true
-                    }
-                    Button("Ajouter un avis", systemImage: "star.bubble") {
-                        showReviewSheet = true
                     }
                     Button("Supprimer", systemImage: "trash", role: .destructive) {
                         showDeleteConfirmation = true
