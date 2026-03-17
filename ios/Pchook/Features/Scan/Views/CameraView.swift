@@ -40,6 +40,21 @@ final class CameraViewController: UIViewController {
     }
 
     private func setupCamera() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            configureSession()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted {
+                    Task { @MainActor in self.configureSession() }
+                }
+            }
+        default:
+            break
+        }
+    }
+
+    private func configureSession() {
         captureSession.sessionPreset = .photo
 
         guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
