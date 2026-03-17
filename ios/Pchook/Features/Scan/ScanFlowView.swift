@@ -80,14 +80,17 @@ struct ScanFlowView: View {
                 AnalyzingView()
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
 
-            case .confirmed(_, let title, let authors, let genre):
+            case .confirmed(let bookId, let title, let authors, let genre):
                 NavigationStack {
                     ScanConfirmationView(
                         title: title,
                         authors: authors.joined(separator: ", "),
                         genre: genre,
                         onScanAnother: { viewModel.reset() },
-                        onDone: {
+                        onStatusChosen: { status in
+                            if status == "read" {
+                                _ = try? await BooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))
+                            }
                             viewModel.reset()
                             onFlowCompleted()
                         }

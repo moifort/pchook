@@ -5,7 +5,7 @@ struct ScanConfirmationView: View {
     let authors: String
     let genre: String?
     let onScanAnother: () -> Void
-    let onDone: () -> Void
+    let onStatusChosen: (String) async -> Void
 
     @State private var scale = 0.5
     @State private var opacity = 0.0
@@ -56,15 +56,27 @@ struct ScanConfirmationView: View {
                 .controlSize(.large)
                 .accessibilityIdentifier("scan-another-button")
 
-                Button {
-                    onDone()
-                } label: {
-                    Text("Termin\u{00E9}")
-                        .frame(maxWidth: .infinity)
+                HStack(spacing: 12) {
+                    Button {
+                        Task { await onStatusChosen("to-read") }
+                    } label: {
+                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("status-to-read-button")
+
+                    Button {
+                        Task { await onStatusChosen("read") }
+                    } label: {
+                        Label("Lu", systemImage: "checkmark.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("status-read-button")
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .accessibilityIdentifier("done-button")
             }
             .padding(.horizontal)
         }
@@ -86,7 +98,7 @@ struct ScanConfirmationView: View {
             authors: "Albert Camus",
             genre: "Roman",
             onScanAnother: {},
-            onDone: {}
+            onStatusChosen: { _ in }
         )
     }
 }
