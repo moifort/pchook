@@ -5,38 +5,32 @@ struct ReviewSection: View {
     let onAddReview: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Mon avis", systemImage: "star.bubble")
-                .font(.headline)
-
+        Section("Mon avis") {
             if let review {
-                VStack(alignment: .leading, spacing: 8) {
-                    StarRatingView(rating: review.rating, font: .body)
+                StarRatingView(rating: review.rating, font: .body)
 
-                    if let readDate = review.readDate {
-                        Text("Lu le \(readDate.formatted(.dateTime.day(.twoDigits).month(.twoDigits).year()))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                if let readDate = review.readDate {
+                    LabeledInfoRow(
+                        title: "Lu le",
+                        value: readDate.formatted(.dateTime.day(.twoDigits).month(.twoDigits).year()),
+                        icon: "calendar"
+                    )
+                }
 
-                    if let notes = review.reviewNotes {
+                if let notes = review.reviewNotes {
+                    Label {
                         Text(notes)
-                            .font(.subheadline)
+                    } icon: {
+                        Image(systemName: "text.quote")
                             .foregroundStyle(.secondary)
                     }
                 }
-                .padding(14)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6))
-                .clipShape(.rect(cornerRadius: 12))
             } else {
                 Button {
                     onAddReview()
                 } label: {
                     Label("Ajouter un avis", systemImage: "plus.circle")
-                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
                 .accessibilityIdentifier("add-review-button")
             }
         }
@@ -52,14 +46,16 @@ extension ReviewSection {
 }
 
 #Preview("Avec avis") {
-    ReviewSection(
-        review: .init(rating: 4, readDate: Date(), reviewNotes: "Excellent roman, tr\u{00E8}s bien \u{00E9}crit."),
-        onAddReview: {}
-    )
-    .padding()
+    List {
+        ReviewSection(
+            review: .init(rating: 4, readDate: Date(), reviewNotes: "Excellent roman, tr\u{00E8}s bien \u{00E9}crit."),
+            onAddReview: {}
+        )
+    }
 }
 
 #Preview("Sans avis") {
-    ReviewSection(review: nil, onAddReview: {})
-        .padding()
+    List {
+        ReviewSection(review: nil, onAddReview: {})
+    }
 }

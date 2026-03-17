@@ -14,62 +14,29 @@ struct BookDetailPage: View {
     @State private var showDeleteConfirmation = false
     @State private var showReviewSheet = false
     @State private var isDeleting = false
+    @State private var isEditing = false
 
     var body: some View {
         NavigationStack {
             Group {
                 if let detail {
-                    ScrollView {
-                        VStack(spacing: 24) {
-                            coverSection(detail.coverImageBase64)
-                            bookInfoSection(detail.book)
-
-                            if let series = detail.series {
-                                SeriesSection(
-                                    name: series.name,
-                                    position: series.position,
-                                    books: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) }
-                                )
-                            }
-
-                            ReviewSection(
-                                review: detail.review.map {
-                                    .init(rating: $0.rating, readDate: $0.readDate, reviewNotes: $0.reviewNotes)
-                                },
-                                onAddReview: { showReviewSheet = true }
-                            )
-
-                            if !detail.book.publicRatings.isEmpty {
-                                PublicRatingsSection(
-                                    ratings: detail.book.publicRatings.map {
-                                        .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
-                                    }
-                                )
-                            }
-
-                            if !detail.book.awards.isEmpty {
-                                AwardsSection(
-                                    awards: detail.book.awards.map { .init(name: $0.name, year: $0.year) }
-                                )
-                            }
-
-                            if !detail.suggestions.isEmpty {
-                                SuggestionsSection(
-                                    suggestions: detail.suggestions.map {
-                                        .init(
-                                            id: $0.id,
-                                            title: $0.title,
-                                            authors: $0.authors.joined(separator: ", "),
-                                            genre: $0.genre,
-                                            awardCount: $0.awards.count
-                                        )
-                                    }
-                                )
-                            }
-
-                            actionsSection(detail.book)
-                        }
-                        .padding()
+                    if isEditing {
+                        BookEditForm(
+                            initial: editFields(from: detail),
+                            onSave: { request in
+                                _ = try await BooksAPI.update(id: bookId, request)
+                                self.detail = try await BooksAPI.getDetail(id: bookId)
+                                isEditing = false
+                                onUpdated()
+                            },
+                            onCancel: { isEditing = false }
+                        )
+                    } else {
+                        BookDetailContent(
+                            detail: detail,
+                            onAddReview: { showReviewSheet = true }
+                        )
+                        .refreshable { await loadDetail() }
                     }
                 } else if let error {
                     ContentUnavailableView("Erreur", systemImage: "exclamationmark.triangle", description: Text(error))
@@ -81,17 +48,11 @@ struct BookDetailPage: View {
             .navigationBarTitleDisplayMode(.inline)
             .sentryTrace("Book Detail")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Fermer") { dismiss() }
+                if !isEditing {
+                    readToolbar
                 }
             }
             .task { await loadDetail() }
-            .refreshable { await loadDetail() }
-            .confirmationDialog("Supprimer ce livre ?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-                Button("Supprimer", role: .destructive) {
-                    Task { await deleteBook() }
-                }
-            }
             .sheet(isPresented: $showReviewSheet) {
                 AddReviewSheet(bookId: bookId) {
                     showReviewSheet = false
@@ -102,96 +63,66 @@ struct BookDetailPage: View {
         }
     }
 
-    @ViewBuilder
-    private func coverSection(_ coverBase64: String?) -> some View {
-        CoverImageView(base64String: coverBase64)
-            .frame(maxWidth: .infinity)
-    }
+    // MARK: - Toolbar
 
-    @ViewBuilder
-    private func bookInfoSection(_ book: Book) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(book.title)
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Text(book.authors.joined(separator: ", "))
-                .font(.headline)
-                .foregroundStyle(.secondary)
-
-            if let publisher = book.publisher {
-                LabeledInfoRow(title: "\u{00C9}diteur", value: publisher, icon: "building.2")
-            }
-            if let pageCount = book.pageCount {
-                LabeledInfoRow(title: "Pages", value: "\(pageCount)", icon: "doc.text")
-            }
-            if let genre = book.genre {
-                LabeledInfoRow(title: "Genre", value: genre, icon: "tag")
-            }
-            if let isbn = book.isbn {
-                LabeledInfoRow(title: "ISBN", value: isbn, icon: "barcode")
-            }
-            if let language = book.language {
-                LabeledInfoRow(title: "Langue", value: language, icon: "globe")
-            }
-            if let format = book.format {
-                LabeledInfoRow(title: "Format", value: format, icon: "doc")
-            }
-            if let translator = book.translator {
-                LabeledInfoRow(title: "Traducteur", value: translator, icon: "person.2")
-            }
-            if let price = book.estimatedPrice {
-                LabeledInfoRow(title: "Prix estim\u{00E9}", value: String(format: "%.2f \u{20AC}", price), icon: "eurosign.circle")
-            }
-            if let synopsis = book.synopsis {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Synopsis")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text(synopsis)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            if let notes = book.personalNotes {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Notes personnelles")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text(notes)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+    @ToolbarContentBuilder
+    private var readToolbar: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Fermer", systemImage: "xmark") { dismiss() }
+        }
+        if let detail, detail.review?.rating != 5 {
+            ToolbarItemGroup {
+                AsyncToolbarButton(title: "Ajouter aux favoris", systemImage: "heart") {
+                    try? await BooksAPI.addToFavorites(id: bookId)
+                    await loadDetail()
+                    onUpdated()
                 }
             }
         }
-    }
-
-    @ViewBuilder
-    private func actionsSection(_ book: Book) -> some View {
-        VStack(spacing: 12) {
-            if book.status == "to-read" {
-                Button {
-                    Task { await markAsRead() }
+        if detail != nil {
+            ToolbarItemGroup {
+                Menu {
+                    Button("Modifier", systemImage: "pencil") {
+                        isEditing = true
+                    }
+                    Button("Supprimer", systemImage: "trash", role: .destructive) {
+                        showDeleteConfirmation = true
+                    }
+                    .accessibilityIdentifier("delete-book-button")
                 } label: {
-                    Label("Marquer comme lu", systemImage: "checkmark.circle")
-                        .frame(maxWidth: .infinity)
+                    Image(systemName: "ellipsis")
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .accessibilityIdentifier("mark-as-read-button")
+                .accessibilityIdentifier("book-detail-menu")
+                .confirmationDialog(
+                    "Supprimer ce livre ?",
+                    isPresented: $showDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button("Supprimer", role: .destructive) {
+                        Task { await deleteBook() }
+                    }
+                }
             }
-
-            Button(role: .destructive) {
-                showDeleteConfirmation = true
-            } label: {
-                Label("Supprimer", systemImage: "trash")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .disabled(isDeleting)
-            .accessibilityIdentifier("delete-button")
         }
+    }
+
+    // MARK: - Helpers
+
+    private func editFields(from detail: BookDetailData) -> BookEditForm.Fields {
+        BookEditForm.Fields(
+            title: detail.book.title,
+            authors: detail.book.authors.joined(separator: ", "),
+            genre: detail.book.genre ?? "",
+            publisher: detail.book.publisher ?? "",
+            pageCount: detail.book.pageCount.map(String.init) ?? "",
+            isbn: detail.book.isbn ?? "",
+            language: detail.book.language ?? "",
+            format: detail.book.format ?? "",
+            translator: detail.book.translator ?? "",
+            estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
+            synopsis: detail.book.synopsis ?? "",
+            personalNotes: detail.book.personalNotes ?? ""
+        )
     }
 
     private func loadDetail() async {
@@ -203,17 +134,6 @@ struct BookDetailPage: View {
             self.error = reportError(error)
         }
         isLoading = false
-    }
-
-    private func markAsRead() async {
-        do {
-            let formatter = ISO8601DateFormatter()
-            _ = try await BooksAPI.update(id: bookId, UpdateBookRequest(status: "read", readDate: formatter.string(from: Date())))
-            await loadDetail()
-            onUpdated()
-        } catch {
-            self.error = reportError(error)
-        }
     }
 
     private func deleteBook() async {
