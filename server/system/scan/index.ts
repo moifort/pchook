@@ -23,6 +23,9 @@ const formatAliases: Record<string, BookFormat> = {
   relié: 'hardcover',
   cartonné: 'hardcover',
   'couverture rigide': 'hardcover',
+  audiobook: 'audiobook',
+  'livre audio': 'audiobook',
+  audio: 'audiobook',
 }
 
 const normalizeBookFormat = (value: string | undefined): BookFormat | undefined => {
