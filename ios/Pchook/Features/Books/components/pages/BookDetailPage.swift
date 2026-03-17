@@ -34,16 +34,7 @@ struct BookDetailPage: View {
                     } else {
                         BookDetailContent(
                             detail: detail,
-                            onAddReview: { showReviewSheet = true },
-                            onRatingChanged: { rating in
-                                let request = CreateReviewRequest(
-                                    rating: rating,
-                                    readDate: ISO8601DateFormatter().string(from: Date())
-                                )
-                                try? await BooksAPI.addReview(id: bookId, request)
-                                await loadDetail()
-                                onUpdated()
-                            }
+                            onAddReview: { showReviewSheet = true }
                         )
                         .refreshable { await loadDetail() }
                     }

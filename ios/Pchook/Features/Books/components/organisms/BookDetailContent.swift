@@ -3,16 +3,6 @@ import SwiftUI
 struct BookDetailContent: View {
     let detail: BookDetailData
     let onAddReview: () -> Void
-    let onRatingChanged: (Int) async -> Void
-
-    @State private var userRating: Int
-
-    init(detail: BookDetailData, onAddReview: @escaping () -> Void, onRatingChanged: @escaping (Int) async -> Void) {
-        self.detail = detail
-        self.onAddReview = onAddReview
-        self.onRatingChanged = onRatingChanged
-        _userRating = State(initialValue: detail.review?.rating ?? 0)
-    }
 
     var body: some View {
         List {
@@ -25,11 +15,12 @@ struct BookDetailContent: View {
                 status: detail.book.status
             )
 
-            if !detail.book.publicRatings.isEmpty {
+            if !detail.book.publicRatings.isEmpty || detail.review?.rating != nil {
                 PublicRatingsSection(
                     ratings: detail.book.publicRatings.map {
                         .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
-                    }
+                    },
+                    userRating: detail.review?.rating
                 )
             }
 
@@ -58,14 +49,14 @@ struct BookDetailContent: View {
             )
 
             BookSynopsisSection(
-                synopsis: detail.book.synopsis,
-                personalNotes: detail.book.personalNotes
+                synopsis: detail.book.synopsis
             )
 
             ReviewSection(
                 review: detail.review.map {
                     .init(rating: $0.rating, readDate: $0.readDate, reviewNotes: $0.reviewNotes)
                 },
+                personalNotes: detail.book.personalNotes,
                 onAddReview: onAddReview
             )
 
@@ -82,14 +73,6 @@ struct BookDetailContent: View {
                     }
                 )
             }
-
-            Section("Ma note") {
-                InteractiveStarRating(rating: $userRating)
-            }
-        }
-        .onChange(of: userRating) { _, newValue in
-            guard newValue > 0 else { return }
-            Task { await onRatingChanged(newValue) }
         }
     }
 }

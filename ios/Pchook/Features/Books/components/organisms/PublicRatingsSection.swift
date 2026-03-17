@@ -2,9 +2,17 @@ import SwiftUI
 
 struct PublicRatingsSection: View {
     let ratings: [Item]
+    let userRating: Int?
 
     var body: some View {
-        Section("Notes publiques") {
+        Section("Notes") {
+            if let userRating {
+                HStack {
+                    Text("Moi")
+                    Spacer()
+                    StarRatingView(rating: userRating, font: .body)
+                }
+            }
             ForEach(ratings) { rating in
                 HStack {
                     Text(rating.source)
@@ -48,7 +56,8 @@ extension PublicRatingsSection {
             ratings: [
                 .init(source: "Goodreads", score: 4, maxScore: 5, voterCount: 125000),
                 .init(source: "Babelio", score: 8, maxScore: 10, voterCount: 3200),
-            ]
+            ],
+            userRating: 4
         )
     }
 }
