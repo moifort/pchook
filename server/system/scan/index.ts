@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import type { BookFormat } from '~/domain/book/types'
 import { config } from '~/system/config/index'
 import { createLogger } from '~/system/logger'
 import { ImageHash } from '~/system/scan/primitives'
@@ -6,6 +7,30 @@ import * as repository from '~/system/scan/repository'
 import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('scan')
+
+const formatAliases: Record<string, BookFormat> = {
+  pocket: 'pocket',
+  poche: 'pocket',
+  'format poche': 'pocket',
+  'livre de poche': 'pocket',
+  'mass market': 'pocket',
+  'mass market paperback': 'pocket',
+  paperback: 'paperback',
+  broché: 'paperback',
+  'grand format': 'paperback',
+  'trade paperback': 'paperback',
+  hardcover: 'hardcover',
+  relié: 'hardcover',
+  cartonné: 'hardcover',
+  'couverture rigide': 'hardcover',
+}
+
+const normalizeBookFormat = (value: string | undefined): BookFormat | undefined => {
+  if (!value) return undefined
+  const normalized = formatAliases[value.toLowerCase().trim()]
+  if (!normalized) log.warn('Unknown book format, discarding', value)
+  return normalized
+}
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const GEMINI_API_URL =
@@ -103,7 +128,7 @@ const scanWithClaude = async (imageBase64: string) => {
     synopsis: input.synopsis as string | undefined,
     isbn: input.isbn as string | undefined,
     language: input.language as string | undefined,
-    format: input.format as string | undefined,
+    format: normalizeBookFormat(input.format as string | undefined),
     series: input.series as string | undefined,
     seriesNumber: input.seriesNumber as number | undefined,
     translator: input.translator as string | undefined,
@@ -219,7 +244,7 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
       synopsis: (enriched.synopsis as string) ?? scanResult.synopsis,
       isbn: (enriched.isbn as string) ?? scanResult.isbn,
       language: (enriched.language as string) ?? scanResult.language,
-      format: scanResult.format,
+      format: normalizeBookFormat(enriched.format as string) ?? scanResult.format,
       series: (enriched.series as string) ?? scanResult.series,
       seriesNumber: (enriched.seriesNumber as number) ?? scanResult.seriesNumber,
       translator: (enriched.translator as string) ?? scanResult.translator,
