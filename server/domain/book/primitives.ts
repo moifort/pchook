@@ -56,7 +56,10 @@ export const PageCount = (value: unknown) => {
 
 export const Note = (value: unknown) => {
   const v = z
-    .preprocess((v) => (typeof v === 'string' ? Number(v) : v), z.number().int().min(0).max(5))
+    .preprocess((v) => {
+      const n = typeof v === 'string' ? Number(v) : v
+      return typeof n === 'number' ? Math.round(n) : n
+    }, z.number().int().min(0).max(5))
     .parse(value)
   return make<NoteType>()(v)
 }

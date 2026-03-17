@@ -152,8 +152,10 @@ describe('Note', () => {
     expect(() => Note(6)).toThrow()
   })
 
-  test('rejects a non-integer', () => {
-    expect(() => Note(2.5)).toThrow()
+  test('rounds a float to the nearest integer', () => {
+    expect(Note(2.5)).toBe(Note(3))
+    expect(Note(4.2)).toBe(Note(4))
+    expect(Note(3.7)).toBe(Note(4))
   })
 })
 
