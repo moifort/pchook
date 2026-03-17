@@ -57,7 +57,6 @@ struct BookDetailContent: View {
                     .init(rating: $0.rating, readDate: $0.readDate)
                 },
                 personalNotes: detail.book.personalNotes,
-                status: detail.book.status,
                 onAddReview: onAddReview
             )
 
