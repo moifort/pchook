@@ -21,7 +21,7 @@ struct SeriesSection: View {
 
     private func seriesRow(_ book: Item) -> some View {
         HStack {
-            Text("\(book.position)")
+            Text(verbatim: String(book.position))
                 .font(.subheadline.monospaced())
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)

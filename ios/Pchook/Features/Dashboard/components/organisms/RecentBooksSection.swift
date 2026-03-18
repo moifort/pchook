@@ -11,7 +11,7 @@ struct RecentBooksSection: View {
                     .foregroundStyle(.primary)
                 Spacer()
                 if !items.isEmpty {
-                    Text("\(items.count)")
+                    Text(verbatim: String(items.count))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

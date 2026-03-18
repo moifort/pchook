@@ -42,7 +42,7 @@ struct RecentAwardsSection: View {
                                 Text(item.awardName)
                                     .font(.caption)
                                     .lineLimit(1)
-                                Text("\(item.awardYear)")
+                                Text(verbatim: String(item.awardYear))
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             }

@@ -111,7 +111,7 @@ struct ShareView: View {
                                 Text(award.name)
                                 Spacer()
                                 if let year = award.year {
-                                    Text("\(year)")
+                                    Text(verbatim: String(year))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
