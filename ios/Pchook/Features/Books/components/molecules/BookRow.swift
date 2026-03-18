@@ -5,10 +5,18 @@ struct BookRow: View {
     let subtitle: String?
     let rating: Int?
     let status: String
+    var seriesPosition: Int? = nil
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            if status == "to-read" {
+            if let position = seriesPosition {
+                Text("T.\(position)")
+                    .font(.caption.weight(.bold).monospaced())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.tint, in: Capsule())
+            } else if status == "to-read" {
                 Image(systemName: "bookmark.fill")
                     .font(.caption2)
                     .foregroundStyle(.orange)
@@ -62,5 +70,22 @@ struct BookRow: View {
             rating: 5,
             status: "read"
         )
+
+        Section("S\u{00E9}ries") {
+            BookRow(
+                title: "Dune",
+                subtitle: "Frank Herbert",
+                rating: 5,
+                status: "read",
+                seriesPosition: 1
+            )
+            BookRow(
+                title: "Le Messie de Dune",
+                subtitle: "Frank Herbert",
+                rating: 4,
+                status: "read",
+                seriesPosition: 2
+            )
+        }
     }
 }
