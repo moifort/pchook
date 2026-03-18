@@ -241,6 +241,8 @@ struct UpdateBookRequest: Encodable, Sendable {
     var personalNotes: String?
     var status: String?
     var readDate: String?
+    var series: String?
+    var seriesNumber: Int?
 }
 
 struct AnalyzeBookRequest: Encodable, Sendable {

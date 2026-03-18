@@ -17,6 +17,8 @@ struct BookEditForm: View {
     @State private var duration: String
     @State private var narrators: String
     @State private var estimatedPrice: String
+    @State private var series: String
+    @State private var seriesNumber: String
     @State private var synopsis: String
     @State private var personalNotes: String
     @State private var isSaving = false
@@ -38,6 +40,8 @@ struct BookEditForm: View {
         _duration = State(initialValue: initial.duration)
         _narrators = State(initialValue: initial.narrators)
         _estimatedPrice = State(initialValue: initial.estimatedPrice)
+        _series = State(initialValue: initial.series)
+        _seriesNumber = State(initialValue: initial.seriesNumber)
         _synopsis = State(initialValue: initial.synopsis)
         _personalNotes = State(initialValue: initial.personalNotes)
     }
@@ -144,6 +148,23 @@ struct BookEditForm: View {
                 }
             }
 
+            Section("S\u{00E9}rie") {
+                LabeledContent {
+                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("S\u{00E9}rie", systemImage: "list.number")
+                }
+
+                LabeledContent {
+                    TextField("0", text: $seriesNumber)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Tome", systemImage: "number")
+                }
+            }
+
             Section("Synopsis & Notes") {
                 TextField("Synopsis", text: $synopsis, axis: .vertical)
                     .lineLimit(3...8)
@@ -205,7 +226,9 @@ struct BookEditForm: View {
             estimatedPrice: Double(estimatedPrice),
             duration: format == .audiobook && !duration.isEmpty ? duration : nil,
             narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
-            personalNotes: personalNotes.isEmpty ? nil : personalNotes
+            personalNotes: personalNotes.isEmpty ? nil : personalNotes,
+            series: series.isEmpty ? "" : series,
+            seriesNumber: Int(seriesNumber)
         )
 
         do {
@@ -231,6 +254,8 @@ extension BookEditForm {
         var estimatedPrice: String
         var duration: String
         var narrators: String
+        var series: String
+        var seriesNumber: String
         var synopsis: String
         var personalNotes: String
     }
@@ -252,6 +277,8 @@ extension BookEditForm {
                 estimatedPrice: "8.50",
                 duration: "",
                 narrators: "",
+                series: "Sprawl",
+                seriesNumber: "1",
                 synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission.",
                 personalNotes: "Excellent"
             ),

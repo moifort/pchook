@@ -12,6 +12,8 @@ import {
   Publisher,
 } from '~/domain/book/primitives'
 import type { Award, PublicRating } from '~/domain/book/types'
+import { SeriesCommand } from '~/domain/series/command'
+import { Position } from '~/domain/series/primitives'
 import { Eur, PersonName } from '~/domain/shared/primitives'
 
 export default defineEventHandler(async (event) => {
@@ -83,6 +85,14 @@ export default defineEventHandler(async (event) => {
 
   if (result === 'not-found') {
     throw createError({ statusCode: 404, statusMessage: 'Book not found' })
+  }
+
+  if (body.series !== undefined) {
+    await SeriesCommand.removeBook(id)
+    if (body.series) {
+      const series = await SeriesCommand.findOrCreate(body.series as string)
+      await SeriesCommand.addBook(series.id, id, Position(body.seriesNumber ?? 1))
+    }
   }
 
   return { status: 200, data: result } as const
