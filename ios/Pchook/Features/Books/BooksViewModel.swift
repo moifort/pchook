@@ -1,13 +1,12 @@
 import Foundation
 
 enum BookListMode: String, CaseIterable, Identifiable {
-    case all, toRead, read, series, favorites
+    case all, toRead, series, favorites
     var id: String { rawValue }
     var label: String {
         switch self {
         case .all: "Tous"
         case .toRead: "\u{00C0} lire"
-        case .read: "Lus"
         case .series: "S\u{00E9}ries"
         case .favorites: "Favoris"
         }
@@ -16,8 +15,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
         switch self {
         case .all: "books.vertical"
         case .toRead: "bookmark"
-        case .read: "checkmark.circle"
-        case .series: "books.vertical.circle"
+        case .series: "list.number"
         case .favorites: "heart.fill"
         }
     }
@@ -25,7 +23,6 @@ enum BookListMode: String, CaseIterable, Identifiable {
         switch self {
         case .all: "Mes Livres"
         case .toRead: "\u{00C0} lire"
-        case .read: "Lus"
         case .series: "S\u{00E9}ries"
         case .favorites: "Favoris"
         }
@@ -83,7 +80,6 @@ final class BooksViewModel {
         switch mode {
         case .all: books
         case .toRead: books.filter { $0.status == "to-read" }
-        case .read: books.filter { $0.status == "read" }
         case .series: books.filter { $0.seriesName != nil }
         case .favorites: books.filter { $0.rating == 5 }
         }

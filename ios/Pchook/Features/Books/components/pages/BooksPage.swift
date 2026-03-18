@@ -95,12 +95,6 @@ struct BooksPage: View {
                 systemImage: "bookmark",
                 description: Text("Les livres \u{00E0} lire appara\u{00EE}tront ici")
             )
-        case .read:
-            ContentUnavailableView(
-                "Aucun livre lu",
-                systemImage: "checkmark.circle",
-                description: Text("Les livres lus appara\u{00EE}tront ici")
-            )
         case .series:
             ContentUnavailableView(
                 "Aucune s\u{00E9}rie",
