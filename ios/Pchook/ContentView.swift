@@ -20,6 +20,7 @@ enum TabSelection: Int, CaseIterable, Identifiable {
 }
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var selectedTab: TabSelection = .home
     @State private var showScanner = false
     @State private var refreshTrigger = 0
@@ -51,6 +52,11 @@ struct ContentView: View {
             ScanFlowView {
                 showScanner = false
                 selectedTab = .books
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                refreshTrigger += 1
             }
         }
     }
