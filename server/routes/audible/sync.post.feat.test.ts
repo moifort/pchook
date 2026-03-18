@@ -57,6 +57,29 @@ mock.module('~/domain/audible/audible.api', () => ({
   registerDevice: async () => fakeCredentials,
 }))
 
+mock.module('~/system/scan/gemini', () => ({
+  callGemini: async () => ({
+    title: 'Gemini Title',
+    authors: ['Gemini Author'],
+    publisher: 'Gemini Publisher',
+    publishedDate: '2020-01-01',
+    pageCount: 300,
+    genre: 'Science-Fiction',
+    synopsis: 'Un résumé du livre.',
+    isbn: null,
+    language: 'FR',
+    format: 'paperback',
+    series: null,
+    seriesNumber: null,
+    translator: null,
+    estimatedPrice: 20,
+    awards: [],
+    publicRatings: [{ source: 'Goodreads', score: 4.2, maxScore: 5, voterCount: 10000 }],
+  }),
+  buildBookJsonSchema: () => '{}',
+  normalizeBookFormat: (value: string) => value,
+}))
+
 mock.module('~/system/suggestion/index', () => ({
   SuggestionGenerator: {
     generate: async () => [],
