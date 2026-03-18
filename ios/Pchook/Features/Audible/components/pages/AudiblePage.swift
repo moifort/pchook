@@ -51,6 +51,11 @@ struct AudiblePage: View {
             if viewModel.isConnected {
                 Label("Connecté", systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
+                Button(role: .destructive) {
+                    Task { await viewModel.disconnect() }
+                } label: {
+                    Label("Se déconnecter", systemImage: "person.slash")
+                }
             } else {
                 Button {
                     viewModel.showLogin = true

@@ -42,4 +42,17 @@ final class AudibleViewModel {
         showLogin = false
         await checkStatus()
     }
+
+    func disconnect() async {
+        do {
+            try await AudibleAPI.disconnect()
+            isConnected = false
+            libraryCount = 0
+            wishlistCount = 0
+            lastSyncAt = nil
+            lastSyncResult = nil
+        } catch {
+            self.error = reportError(error)
+        }
+    }
 }

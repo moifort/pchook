@@ -128,8 +128,8 @@ struct BooksPage: View {
     private func subtitle(for book: BookListItem) -> String? {
         if viewModel.mode == .series {
             let parts: [String?] = [
-                book.seriesPosition.map { "Tome \($0)" },
                 book.authors.first,
+                book.seriesPosition.map { "Tome \($0)" },
             ]
             let filtered = parts.compactMap { $0 }
             return filtered.isEmpty ? nil : filtered.joined(separator: " • ")

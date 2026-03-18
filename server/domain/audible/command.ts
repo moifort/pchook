@@ -13,6 +13,10 @@ export namespace AudibleCommand {
     return undefined
   }
 
+  export const removeCredentials = async () => {
+    await repository.removeCredentials()
+  }
+
   export const saveMapping = async (mapping: AsinBookMapping) => {
     await repository.saveMapping(mapping)
   }

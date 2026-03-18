@@ -219,15 +219,26 @@ const audibleFetch = async <T>(
   const config = AUDIBLE_LOCALES[credentials.locale]
   const fresh = await ensureValidToken(credentials)
 
-  const response = await $fetch<T>(`https://api.audible.${config.domain}/1.0${path}`, {
-    headers: {
-      Authorization: `Bearer ${fresh.accessToken}`,
-      'client-id': '0',
-    },
-    query,
-  })
+  try {
+    const response = await $fetch<T>(`https://api.audible.${config.domain}/1.0${path}`, {
+      headers: {
+        Authorization: `Bearer ${fresh.accessToken}`,
+        'client-id': toHexString(`${fresh.serial}#${DEVICE_TYPE}`),
+      },
+      query,
+    })
 
-  return { response, credentials: fresh }
+    return { response, credentials: fresh }
+  } catch (error: unknown) {
+    const fetchError = error as { data?: unknown; status?: number }
+    log.error('Audible API error', {
+      path,
+      status: fetchError.status,
+      data: fetchError.data,
+      query,
+    })
+    throw error
+  }
 }
 
 type AudibleProductResponse = {

@@ -62,4 +62,15 @@ enum AudibleAPI {
         let response: APIResponse<AudibleStatus> = try await APIClient.shared.get("/audible/status")
         return response.data
     }
+
+    static func disconnect() async throws {
+        struct Empty: Encodable, Sendable {}
+        struct Result: Decodable, Sendable {
+            let success: Bool
+        }
+        let _: APIResponse<Result> = try await APIClient.shared.post(
+            "/audible/disconnect",
+            body: Empty()
+        )
+    }
 }

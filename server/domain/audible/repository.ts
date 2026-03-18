@@ -10,6 +10,10 @@ export const saveCredentials = async (credentials: AudibleCredentials) => {
   await credentialsStorage().setItem('current', credentials)
 }
 
+export const removeCredentials = async () => {
+  await credentialsStorage().removeItem('current')
+}
+
 export const findMapping = async (asin: Asin) => mappingsStorage().getItem(asin)
 
 export const findAllMappings = async () => {
