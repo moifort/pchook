@@ -243,6 +243,11 @@ struct UpdateBookRequest: Encodable, Sendable {
     var readDate: String?
 }
 
+struct AnalyzeBookRequest: Encodable, Sendable {
+    let imageBase64: String
+    var ocrText: String?
+}
+
 struct ConfirmBookRequest: Encodable, Sendable {
     let previewId: String
     let status: String

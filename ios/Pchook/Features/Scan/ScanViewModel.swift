@@ -26,7 +26,8 @@ final class ScanViewModel {
 
         Task {
             do {
-                let preview = try await ScanAPI.analyze(imageData: imageData)
+                let ocrText = await TextRecognizer.recognizeText(from: imageData)
+                let preview = try await ScanAPI.analyze(imageData: imageData, ocrText: ocrText)
                 self.step = .preview(preview)
             } catch {
                 self.error = reportError(error)

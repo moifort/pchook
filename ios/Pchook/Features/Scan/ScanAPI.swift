@@ -6,9 +6,13 @@ enum ConfirmResult {
 }
 
 enum ScanAPI {
-    static func analyze(imageData: Data) async throws -> BookPreview {
-        let response: APIResponse<BookPreview> = try await APIClient.shared.postRaw(
-            "/books/analyze", data: imageData, contentType: "application/octet-stream"
+    static func analyze(imageData: Data, ocrText: String?) async throws -> BookPreview {
+        let request = AnalyzeBookRequest(
+            imageBase64: imageData.base64EncodedString(),
+            ocrText: ocrText
+        )
+        let response: APIResponse<BookPreview> = try await APIClient.shared.post(
+            "/books/analyze", body: request
         )
         return response.data
     }
