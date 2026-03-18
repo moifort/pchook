@@ -23,6 +23,8 @@ struct BookDetailHeader: View {
             }
             if status == "to-read" {
                 LabeledInfoRow(title: "Statut", value: "\u{00C0} lire", icon: "bookmark")
+            } else {
+                LabeledInfoRow(title: "Statut", value: "Lu", icon: "checkmark.circle")
             }
         }
     }
