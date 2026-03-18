@@ -1,4 +1,5 @@
 import type { Brand } from 'ts-brand'
+import type { ISBN } from '~/domain/book/types'
 
 export type ImageHash = Brand<string, 'ImageHash'>
 export type UrlHash = Brand<string, 'UrlHash'>
@@ -32,6 +33,12 @@ export type CachedScanResult = {
 
 export type CachedUrlImportResult = {
   urlHash: UrlHash
+  result: ScanResult
+  cachedAt: Date
+}
+
+export type CachedIsbnResult = {
+  isbn: ISBN
   result: ScanResult
   cachedAt: Date
 }
