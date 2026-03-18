@@ -50,13 +50,13 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
   "isbn": string ou null (ISBN-13 de préférence),
   "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
   "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
-  "series": string ou null (nom de la série ou du cycle),
+  "series": string ou null (nom de la série, du cycle, de la trilogie ou de la saga — recherche activement si ce livre fait partie d'une série même si ce n'est pas explicitement marqué),
   "seriesNumber": number ou null (numéro du tome dans la série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
   "duration": string ou null (durée totale, format "Xh Ymin" — uniquement si le format est audiobook),
   "narrators": string[] ou null (narrateurs/conteurs de l'audiobook — uniquement si le format est audiobook),
-  "awards": [{"name": string, "year": number}] (nom du prix principal uniquement, sans sous-catégorie — "Prix Hugo" et non "Prix Hugo du meilleur roman court", "Prix Nebula" et non "Prix Nebula du meilleur roman" — tableau vide si aucun),
+  "awards": [{"name": string, "year": number}] (IMPORTANT : nom COURT du prix uniquement, JAMAIS la sous-catégorie ou spécialité. Exemples corrects : "Prix Hugo", "Prix Nebula", "Grand Prix de l'Imaginaire", "Prix Goncourt". Exemples INCORRECTS : "Prix Hugo du meilleur roman", "Prix Nebula du meilleur roman court", "Grand Prix de l'Imaginaire du meilleur roman francophone". Tableau vide si aucun prix),
   "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants)
 }`
 }

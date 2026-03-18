@@ -30,7 +30,7 @@ Retourne toutes les informations au format JSON strict (sans markdown, sans back
   "seriesNumber": number ou null (numéro du tome dans la série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
-  "awards": [{"name": string, "year": number}] (nom du prix principal uniquement — tableau vide si aucun),
+  "awards": [{"name": string, "year": number}] (IMPORTANT : nom COURT du prix uniquement, JAMAIS la sous-catégorie ou spécialité. Exemples corrects : "Prix Hugo", "Prix Nebula", "Grand Prix de l'Imaginaire", "Prix Goncourt". Exemples INCORRECTS : "Prix Hugo du meilleur roman", "Prix Nebula du meilleur roman court". Tableau vide si aucun prix),
   "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc.)
 }
 Toutes les valeurs textuelles en français.`
