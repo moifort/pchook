@@ -10,7 +10,16 @@ struct ShareView: View {
                 analyzingContent
 
             case .preview(let preview):
-                previewContent(preview)
+                NavigationStack {
+                    SharePreviewForm(
+                        preview: preview,
+                        isConfirming: viewModel.isConfirming,
+                        onConfirm: { status, overrides in
+                            viewModel.confirm(previewId: preview.previewId, status: status, overrides: overrides)
+                        },
+                        onDismiss: { viewModel.dismiss() }
+                    )
+                }
 
             case .error(let message):
                 errorContent(message: message)
@@ -45,181 +54,6 @@ struct ShareView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func previewContent(_ preview: ShareBookPreview) -> some View {
-        VStack(spacing: 0) {
-            List {
-                // Header
-                Section {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(preview.title)
-                            .font(.headline)
-                        Text(preview.authors.joined(separator: ", "))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        if let genre = preview.genre {
-                            HStack(spacing: 6) {
-                                ForEach(
-                                    genre.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) },
-                                    id: \.self
-                                ) { g in
-                                    Text(g)
-                                        .font(.caption2)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 2)
-                                        .background(Color.accentColor.opacity(0.15))
-                                        .foregroundStyle(Color.accentColor)
-                                        .clipShape(.capsule)
-                                }
-                            }
-                        }
-                    }
-
-                    if let series = preview.series {
-                        HStack(spacing: 8) {
-                            Image(systemName: "books.vertical")
-                                .foregroundStyle(.secondary)
-                            Text(preview.seriesNumber.map { "\(series) — Tome \($0)" } ?? series)
-                        }
-                    }
-                }
-
-                // Ratings
-                if !preview.publicRatings.isEmpty {
-                    Section("Notes") {
-                        ForEach(preview.publicRatings) { rating in
-                            HStack {
-                                Text(rating.source)
-                                Text("(\(formattedVoterCount(rating.voterCount)))")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Spacer()
-                                Text(String(format: "%.1f/%g", rating.score, rating.maxScore))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-
-                // Awards
-                if !preview.awards.isEmpty {
-                    Section("Prix littéraires") {
-                        ForEach(preview.awards) { award in
-                            HStack {
-                                Image(systemName: "medal.fill")
-                                    .foregroundStyle(.orange)
-                                Text(award.name)
-                                Spacer()
-                                if let year = award.year {
-                                    Text(verbatim: String(year))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Info
-                if preview.pageCount != nil || preview.format != nil || preview.language != nil
-                    || preview.duration != nil
-                {
-                    Section("Informations") {
-                        if let pageCount = preview.pageCount {
-                            infoRow(icon: "doc.text", title: "Pages", value: "\(pageCount)")
-                        }
-                        if let duration = preview.duration {
-                            infoRow(icon: "clock", title: "Durée", value: duration)
-                        }
-                        if let narrators = preview.narrators, !narrators.isEmpty {
-                            infoRow(
-                                icon: "person.wave.2",
-                                title: "Narrateur(s)",
-                                value: narrators.joined(separator: ", ")
-                            )
-                        }
-                        if let format = preview.format {
-                            infoRow(icon: "doc", title: "Format", value: format)
-                        }
-                        if let language = preview.language {
-                            infoRow(icon: "globe", title: "Langue", value: language)
-                        }
-                        if let publisher = preview.publisher {
-                            infoRow(icon: "building.2", title: "Éditeur", value: publisher)
-                        }
-                        if let estimatedPrice = preview.estimatedPrice {
-                            infoRow(
-                                icon: "eurosign.circle",
-                                title: "Prix estimé",
-                                value: String(format: "%.2f €", estimatedPrice)
-                            )
-                        }
-                    }
-                }
-
-                // Synopsis
-                if let synopsis = preview.synopsis {
-                    Section("Synopsis") {
-                        Text(synopsis)
-                            .font(.subheadline)
-                            .lineLimit(5)
-                    }
-                }
-            }
-
-            // CTAs
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    Button {
-                        viewModel.confirm(previewId: preview.previewId, status: "to-read")
-                    } label: {
-                        Label("À lire", systemImage: "bookmark.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .disabled(viewModel.isConfirming)
-
-                    Button {
-                        viewModel.confirm(previewId: preview.previewId, status: "read")
-                    } label: {
-                        Label("Lu", systemImage: "checkmark.circle.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .disabled(viewModel.isConfirming)
-                }
-
-                Button {
-                    viewModel.dismiss()
-                } label: {
-                    Text("Fermer")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-            }
-            .padding()
-            .background(.bar)
-        }
-    }
-
-    private func infoRow(icon: String, title: String, value: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .foregroundStyle(.secondary)
-            LabeledContent(title, value: value)
-        }
-    }
-
-    private func formattedVoterCount(_ count: Int) -> String {
-        if count >= 1000 {
-            return String(format: "%.1fk", Double(count) / 1000.0)
-        }
-        return "\(count)"
-    }
-
     private func errorContent(message: String) -> some View {
         VStack(spacing: 24) {
             Spacer()
@@ -245,7 +79,7 @@ struct ShareView: View {
                 Button {
                     viewModel.retry()
                 } label: {
-                    Label("Réessayer", systemImage: "arrow.clockwise")
+                    Label("R\u{00E9}essayer", systemImage: "arrow.clockwise")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -263,5 +97,276 @@ struct ShareView: View {
             .padding(.horizontal)
         }
         .padding()
+    }
+}
+
+// MARK: - Editable Form
+
+private struct SharePreviewForm: View {
+    let preview: ShareBookPreview
+    let isConfirming: Bool
+    let onConfirm: (String, ShareConfirmOverrides?) -> Void
+    let onDismiss: () -> Void
+
+    @State private var title: String
+    @State private var authors: String
+    @State private var genre: String
+    @State private var series: String
+    @State private var seriesNumber: String
+    @State private var publisher: String
+    @State private var pageCount: String
+    @State private var language: String
+    @State private var format: String
+    @State private var translator: String
+    @State private var estimatedPrice: String
+    @State private var duration: String
+    @State private var narrators: String
+    @State private var synopsis: String
+
+    init(
+        preview: ShareBookPreview,
+        isConfirming: Bool,
+        onConfirm: @escaping (String, ShareConfirmOverrides?) -> Void,
+        onDismiss: @escaping () -> Void
+    ) {
+        self.preview = preview
+        self.isConfirming = isConfirming
+        self.onConfirm = onConfirm
+        self.onDismiss = onDismiss
+        _title = State(initialValue: preview.title)
+        _authors = State(initialValue: preview.authors.joined(separator: ", "))
+        _genre = State(initialValue: preview.genre ?? "")
+        _series = State(initialValue: preview.series ?? "")
+        _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
+        _publisher = State(initialValue: preview.publisher ?? "")
+        _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
+        _language = State(initialValue: preview.language ?? "")
+        _format = State(initialValue: preview.format ?? "")
+        _translator = State(initialValue: preview.translator ?? "")
+        _estimatedPrice = State(initialValue: preview.estimatedPrice.map { String($0) } ?? "")
+        _duration = State(initialValue: preview.duration ?? "")
+        _narrators = State(initialValue: preview.narrators?.joined(separator: ", ") ?? "")
+        _synopsis = State(initialValue: preview.synopsis ?? "")
+    }
+
+    var body: some View {
+        Form {
+            Section("Informations principales") {
+                LabeledContent {
+                    TextField("Titre", text: $title)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Titre", systemImage: "book")
+                }
+
+                LabeledContent {
+                    TextField("Auteurs", text: $authors)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Auteurs", systemImage: "person.2")
+                }
+
+                LabeledContent {
+                    TextField("Genre", text: $genre)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Genre", systemImage: "tag")
+                }
+            }
+
+            Section("S\u{00E9}rie") {
+                LabeledContent {
+                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("S\u{00E9}rie", systemImage: "books.vertical")
+                }
+
+                LabeledContent {
+                    TextField("Tome", text: $seriesNumber)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Tome", systemImage: "number")
+                }
+            }
+
+            if !preview.publicRatings.isEmpty {
+                Section("Notes") {
+                    ForEach(preview.publicRatings.sorted { $0.voterCount > $1.voterCount }) { rating in
+                        HStack {
+                            Text(rating.source)
+                            Text("(\(formattedVoterCount(rating.voterCount)))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text(String(format: "%.1f/%g", rating.score, rating.maxScore))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+
+            if !preview.awards.isEmpty {
+                Section("Prix litt\u{00E9}raires") {
+                    ForEach(preview.awards) { award in
+                        HStack {
+                            Image(systemName: "medal.fill")
+                                .foregroundStyle(.orange)
+                            Text(award.name)
+                            Spacer()
+                            if let year = award.year {
+                                Text(verbatim: String(year))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Section("D\u{00E9}tails") {
+                LabeledContent {
+                    TextField("\u{00C9}diteur", text: $publisher)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("\u{00C9}diteur", systemImage: "building.2")
+                }
+
+                LabeledContent {
+                    TextField("0", text: $pageCount)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Pages", systemImage: "doc.text")
+                }
+
+                LabeledContent {
+                    TextField("Dur\u{00E9}e", text: $duration)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Dur\u{00E9}e", systemImage: "clock")
+                }
+
+                LabeledContent {
+                    TextField("Narrateur(s)", text: $narrators)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Narrateur(s)", systemImage: "person.wave.2")
+                }
+
+                LabeledContent {
+                    TextField("Langue", text: $language)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Langue", systemImage: "globe")
+                }
+
+                LabeledContent {
+                    TextField("Format", text: $format)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Format", systemImage: "doc")
+                }
+
+                LabeledContent {
+                    TextField("Traducteur", text: $translator)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Traducteur", systemImage: "person.2")
+                }
+
+                LabeledContent {
+                    HStack(spacing: 4) {
+                        TextField("0", text: $estimatedPrice)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                        Text("\u{20AC}")
+                            .foregroundStyle(.secondary)
+                    }
+                } label: {
+                    Label("Prix", systemImage: "eurosign.circle")
+                }
+            }
+
+            Section("Synopsis") {
+                TextField("Synopsis", text: $synopsis, axis: .vertical)
+                    .lineLimit(3...8)
+            }
+        }
+        .navigationTitle("V\u{00E9}rifier le livre")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Fermer", systemImage: "xmark") {
+                    onDismiss()
+                }
+            }
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    onConfirm("to-read", buildOverrides())
+                } label: {
+                    if isConfirming {
+                        ProgressView()
+                    } else {
+                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
+                    }
+                }
+                .disabled(isConfirming)
+
+                Button {
+                    onConfirm("read", buildOverrides())
+                } label: {
+                    if isConfirming {
+                        ProgressView()
+                    } else {
+                        Label("Lu", systemImage: "checkmark.circle.fill")
+                    }
+                }
+                .disabled(isConfirming)
+            }
+        }
+    }
+
+    private func buildOverrides() -> ShareConfirmOverrides? {
+        let editedAuthors = authors
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        let editedGenre = genre.trimmingCharacters(in: .whitespaces)
+        let originalGenre = (preview.genre ?? "").trimmingCharacters(in: .whitespaces)
+
+        var overrides = ShareConfirmOverrides()
+        var hasChanges = false
+
+        if title != preview.title { overrides.title = title; hasChanges = true }
+        if editedAuthors != preview.authors { overrides.authors = editedAuthors; hasChanges = true }
+        if editedGenre != originalGenre { overrides.genre = editedGenre.isEmpty ? nil : editedGenre; hasChanges = true }
+        let pub = publisher.trimmingCharacters(in: .whitespaces)
+        if (pub.isEmpty ? nil : pub) != preview.publisher { overrides.publisher = pub.isEmpty ? nil : pub; hasChanges = true }
+        if Int(pageCount) != preview.pageCount { overrides.pageCount = Int(pageCount); hasChanges = true }
+        let syn = synopsis.trimmingCharacters(in: .whitespaces)
+        if (syn.isEmpty ? nil : syn) != preview.synopsis { overrides.synopsis = syn.isEmpty ? nil : syn; hasChanges = true }
+        let lang = language.trimmingCharacters(in: .whitespaces)
+        if (lang.isEmpty ? nil : lang) != preview.language { overrides.language = lang.isEmpty ? nil : lang; hasChanges = true }
+        let fmt = format.trimmingCharacters(in: .whitespaces)
+        if (fmt.isEmpty ? nil : fmt) != preview.format { overrides.format = fmt.isEmpty ? nil : fmt; hasChanges = true }
+        let trans = translator.trimmingCharacters(in: .whitespaces)
+        if (trans.isEmpty ? nil : trans) != preview.translator { overrides.translator = trans.isEmpty ? nil : trans; hasChanges = true }
+        if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }
+        let ser = series.trimmingCharacters(in: .whitespaces)
+        if (ser.isEmpty ? nil : ser) != preview.series { overrides.series = ser.isEmpty ? nil : ser; hasChanges = true }
+        if Int(seriesNumber) != preview.seriesNumber { overrides.seriesNumber = Int(seriesNumber); hasChanges = true }
+
+        return hasChanges ? overrides : nil
+    }
+
+    private func formattedVoterCount(_ count: Int) -> String {
+        if count >= 1000 {
+            return String(format: "%.1fk", Double(count) / 1000.0)
+        }
+        return "\(count)"
     }
 }

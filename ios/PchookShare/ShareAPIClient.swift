@@ -60,6 +60,22 @@ private struct AnalyzeURLRequest: Codable, Sendable {
 private struct ConfirmRequest: Codable, Sendable {
     let previewId: String
     let status: String
+    var overrides: ShareConfirmOverrides?
+}
+
+struct ShareConfirmOverrides: Codable, Sendable {
+    var title: String?
+    var authors: [String]?
+    var publisher: String?
+    var pageCount: Int?
+    var genre: String?
+    var synopsis: String?
+    var language: String?
+    var format: String?
+    var translator: String?
+    var estimatedPrice: Double?
+    var series: String?
+    var seriesNumber: Int?
 }
 
 enum ShareAPIClient {
@@ -93,7 +109,7 @@ enum ShareAPIClient {
         return apiResponse.data
     }
 
-    static func confirm(previewId: String, status: String) async throws {
+    static func confirm(previewId: String, status: String, overrides: ShareConfirmOverrides? = nil) async throws {
         let serverURL = SharedConfig.sharedDefaults.string(forKey: SharedConfig.serverURLKey) ?? SharedConfig.defaultURL
         let baseURL = URL(string: serverURL)!
         let endpoint = baseURL.appendingPathComponent("/books/confirm")
@@ -103,7 +119,7 @@ enum ShareAPIClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(Secrets.apiToken)", forHTTPHeaderField: "Authorization")
         request.httpBody = try JSONEncoder().encode(
-            ConfirmRequest(previewId: previewId, status: status)
+            ConfirmRequest(previewId: previewId, status: status, overrides: overrides)
         )
 
         let (_, response) = try await URLSession.shared.data(for: request)

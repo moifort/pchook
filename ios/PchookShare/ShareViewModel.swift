@@ -51,11 +51,11 @@ final class ShareViewModel {
         }
     }
 
-    func confirm(previewId: String, status: String) {
+    func confirm(previewId: String, status: String, overrides: ShareConfirmOverrides? = nil) {
         isConfirming = true
         Task {
             do {
-                try await ShareAPIClient.confirm(previewId: previewId, status: status)
+                try await ShareAPIClient.confirm(previewId: previewId, status: status, overrides: overrides)
                 onDismiss()
             } catch {
                 isConfirming = false
