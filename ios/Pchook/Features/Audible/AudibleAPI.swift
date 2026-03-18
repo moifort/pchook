@@ -26,6 +26,13 @@ struct AudibleStatus: Decodable, Sendable {
     let lastSyncAt: Date?
 }
 
+struct SyncProgressData: Decodable, Sendable {
+    let phase: String
+    let current: Int
+    let total: Int
+    let message: String
+}
+
 enum AudibleAPI {
     static func authStart(locale: String = "fr") async throws -> AuthStartResponse {
         let response: APIResponse<AuthStartResponse> = try await APIClient.shared.get(
@@ -60,6 +67,11 @@ enum AudibleAPI {
 
     static func status() async throws -> AudibleStatus {
         let response: APIResponse<AudibleStatus> = try await APIClient.shared.get("/audible/status")
+        return response.data
+    }
+
+    static func syncProgress() async throws -> SyncProgressData {
+        let response: APIResponse<SyncProgressData> = try await APIClient.shared.get("/audible/sync/progress")
         return response.data
     }
 

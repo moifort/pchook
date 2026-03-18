@@ -6,6 +6,7 @@ struct DashboardPage: View {
     var refreshTrigger: Int = 0
 
     @State private var viewModel = DashboardViewModel()
+    @State private var showSync = false
 
     var body: some View {
         NavigationStack {
@@ -70,6 +71,18 @@ struct DashboardPage: View {
             .task(id: refreshTrigger) {
                 await viewModel.load()
                 SentrySDK.reportFullyDisplayed()
+            }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showSync = true
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                }
+            }
+            .sheet(isPresented: $showSync, onDismiss: { Task { await viewModel.load() } }) {
+                SyncPage(refreshTrigger: refreshTrigger)
             }
         }
     }

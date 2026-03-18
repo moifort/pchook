@@ -12,4 +12,6 @@ export namespace AudibleQuery {
   export const getMapping = async (asin: Asin) => repository.findMapping(asin)
 
   export const getAllMappings = async () => repository.findAllMappings()
+
+  export const getSyncProgress = () => repository.getSyncProgress()
 }

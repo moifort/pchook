@@ -52,6 +52,15 @@ export type AuthSession = {
   createdAt: Date
 }
 
+export type SyncPhase = 'idle' | 'fetching' | 'syncing' | 'done'
+
+export type SyncProgress = {
+  phase: SyncPhase
+  current: number
+  total: number
+  message: string
+}
+
 export type LocaleConfig = {
   domain: string
   marketplaceId: string

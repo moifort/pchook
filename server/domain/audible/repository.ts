@@ -1,4 +1,10 @@
-import type { Asin, AsinBookMapping, AudibleCredentials, AuthSession } from '~/domain/audible/types'
+import type {
+  Asin,
+  AsinBookMapping,
+  AudibleCredentials,
+  AuthSession,
+  SyncProgress,
+} from '~/domain/audible/types'
 
 const credentialsStorage = () => useStorage<AudibleCredentials>('audible-credentials')
 const mappingsStorage = () => useStorage<AsinBookMapping>('audible-mappings')
@@ -34,4 +40,13 @@ export const saveAuthSession = async (sessionId: string, session: AuthSession) =
 
 export const removeAuthSession = async (sessionId: string) => {
   await authSessionsStorage().removeItem(sessionId)
+}
+
+// In-memory sync progress (not persisted)
+let syncProgress: SyncProgress = { phase: 'idle', current: 0, total: 0, message: '' }
+
+export const getSyncProgress = () => syncProgress
+
+export const setSyncProgress = (progress: SyncProgress) => {
+  syncProgress = progress
 }

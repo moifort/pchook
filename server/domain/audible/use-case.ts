@@ -89,6 +89,18 @@ const mergeAudibleDataIntoDuplicate = async (book: Book, data: Partial<Book>) =>
 }
 
 const syncItem = async (item: AudibleItem, source: 'library' | 'wishlist') => {
+  log.info('Audible item', {
+    asin: item.asin,
+    title: item.title,
+    authors: item.authors,
+    narrators: item.narrators,
+    durationMinutes: item.durationMinutes,
+    publisher: item.publisher,
+    language: item.language,
+    series: item.series,
+    source,
+  })
+
   const existingMapping = await AudibleQuery.getMapping(item.asin)
   if (existingMapping) return 'skipped' as const
 
@@ -122,8 +134,21 @@ export namespace AudibleUseCase {
     if (!credentials) return 'no-credentials' as const
 
     log.info('Starting Audible sync')
+    AudibleCommand.setSyncProgress({
+      phase: 'fetching',
+      current: 0,
+      total: 0,
+      message: 'Récupération de la bibliothèque...',
+    })
 
     const { items: libraryItems, credentials: afterLibrary } = await fetchLibrary(credentials)
+    AudibleCommand.setSyncProgress({
+      phase: 'fetching',
+      current: 0,
+      total: 0,
+      message: 'Récupération de la liste de souhaits...',
+    })
+
     const { items: wishlistItems } = await fetchWishlist(afterLibrary)
 
     log.info('Fetched items', {
@@ -131,20 +156,33 @@ export namespace AudibleUseCase {
       wishlist: wishlistItems.length,
     })
 
+    const allItems = [
+      ...libraryItems.map((item) => ({ item, source: 'library' as const })),
+      ...wishlistItems.map((item) => ({ item, source: 'wishlist' as const })),
+    ]
+    const total = allItems.length
     let newBooksAdded = 0
     let duplicatesSkipped = 0
 
-    for (const item of libraryItems) {
-      const result = await syncItem(item, 'library')
+    for (const [index, { item, source }] of allItems.entries()) {
+      AudibleCommand.setSyncProgress({
+        phase: 'syncing',
+        current: index + 1,
+        total,
+        message: `Import de "${item.title}"...`,
+      })
+
+      const result = await syncItem(item, source)
       if (result === 'created') newBooksAdded += 1
       else duplicatesSkipped += 1
     }
 
-    for (const item of wishlistItems) {
-      const result = await syncItem(item, 'wishlist')
-      if (result === 'created') newBooksAdded += 1
-      else duplicatesSkipped += 1
-    }
+    AudibleCommand.setSyncProgress({
+      phase: 'done',
+      current: total,
+      total,
+      message: `${newBooksAdded} livres ajoutés, ${duplicatesSkipped} doublons`,
+    })
 
     log.info('Sync completed', { newBooksAdded, duplicatesSkipped })
 

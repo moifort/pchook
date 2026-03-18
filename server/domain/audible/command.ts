@@ -1,5 +1,10 @@
 import * as repository from '~/domain/audible/repository'
-import type { AsinBookMapping, AudibleCredentials, AuthSession } from '~/domain/audible/types'
+import type {
+  AsinBookMapping,
+  AudibleCredentials,
+  AuthSession,
+  SyncProgress,
+} from '~/domain/audible/types'
 
 export namespace AudibleCommand {
   export const saveCredentials = async (credentials: AudibleCredentials) => {
@@ -15,6 +20,10 @@ export namespace AudibleCommand {
 
   export const removeCredentials = async () => {
     await repository.removeCredentials()
+  }
+
+  export const setSyncProgress = (progress: SyncProgress) => {
+    repository.setSyncProgress(progress)
   }
 
   export const saveMapping = async (mapping: AsinBookMapping) => {

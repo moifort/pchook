@@ -9,6 +9,7 @@ final class AudibleViewModel {
     private(set) var libraryCount = 0
     private(set) var wishlistCount = 0
     private(set) var lastSyncAt: Date?
+    private(set) var syncProgress: SyncProgressData?
     var error: String?
     var showLogin = false
     var showSyncConfirmation = false
@@ -34,12 +35,36 @@ final class AudibleViewModel {
     func confirmSync() async {
         isSyncing = true
         error = nil
-        defer { isSyncing = false }
+        syncProgress = nil
+
+        async let syncTask: Void = performSync()
+        async let pollingTask: Void = pollProgress()
+
+        _ = await (syncTask, pollingTask)
+    }
+
+    private func performSync() async {
+        defer {
+            isSyncing = false
+            syncProgress = nil
+        }
         do {
             lastSyncResult = try await AudibleAPI.sync()
             await checkStatus()
         } catch {
             self.error = reportError(error)
+        }
+    }
+
+    private func pollProgress() async {
+        while isSyncing {
+            try? await Task.sleep(for: .seconds(2))
+            guard isSyncing else { break }
+            do {
+                syncProgress = try await AudibleAPI.syncProgress()
+            } catch {
+                break
+            }
         }
     }
 
