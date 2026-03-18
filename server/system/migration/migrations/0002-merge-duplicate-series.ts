@@ -76,6 +76,29 @@ export const migration0002: Migration = {
     }
 
     log.info(`Merged ${transformed} duplicate series`)
-    return { ok: true, transformed }
+
+    // Fix publicRatings with null voterCount
+    const booksStorage = ctx.storage('books')
+    const bookKeys = await booksStorage.getKeys()
+    const bookItems = await booksStorage.getItems<Record<string, unknown>>(bookKeys)
+    let fixedBooks = 0
+
+    for (const { key, value: book } of bookItems) {
+      const ratings = book.publicRatings as { voterCount?: number | null }[] | undefined
+      if (!Array.isArray(ratings)) continue
+
+      const hasNull = ratings.some((r) => r.voterCount == null)
+      if (!hasNull) continue
+
+      const fixed = ratings.filter((r) => r.voterCount != null)
+      await booksStorage.setItem(key, { ...book, publicRatings: fixed })
+      fixedBooks++
+    }
+
+    if (fixedBooks > 0) {
+      log.info(`Fixed ${fixedBooks} books with null voterCount in publicRatings`)
+    }
+
+    return { ok: true, transformed: transformed + fixedBooks }
   },
 }

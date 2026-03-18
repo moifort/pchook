@@ -31,7 +31,10 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
     narrators: scanResult.narrators?.map((n) => PersonName(n)),
     awards: scanResult.awards as Award[],
     publicRatings: scanResult.publicRatings
-      .filter(({ score, maxScore }) => score != null && maxScore != null)
+      .filter(
+        ({ score, maxScore, voterCount }) =>
+          score != null && maxScore != null && voterCount != null,
+      )
       .map(({ source, score, maxScore, voterCount }) => ({
         source,
         score: Note(score),
