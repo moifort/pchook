@@ -260,23 +260,20 @@ const audibleFetch = async <T>(
   }
 }
 
-type AudibleProductResponse = {
-  items: {
-    asin: string
-    title: string
-    authors?: { name: string }[]
-    narrators?: { name: string }[]
-    runtime_length_min?: number
-    publisher_name?: string
-    language?: string
-    release_date?: string
-    product_images?: Record<string, string>
-    series?: { asin: string; title: string; sequence?: string }[]
-  }[]
-  total_results: number
+type AudibleRawItem = {
+  asin: string
+  title: string
+  authors?: { name: string }[]
+  narrators?: { name: string }[]
+  runtime_length_min?: number
+  publisher_name?: string
+  language?: string
+  release_date?: string
+  product_images?: Record<string, string>
+  series?: { asin: string; title: string; sequence?: string }[]
 }
 
-const parseItems = (items: AudibleProductResponse['items']): AudibleItem[] =>
+const parseItems = (items: AudibleRawItem[]): AudibleItem[] =>
   items.map((item) => ({
     asin: Asin(item.asin),
     title: item.title,
@@ -297,6 +294,19 @@ const parseItems = (items: AudibleProductResponse['items']): AudibleItem[] =>
 
 const RESPONSE_GROUPS = 'product_details,contributors,media,product_attrs'
 
+const extractItems = (response: Record<string, unknown>): AudibleRawItem[] => {
+  if (Array.isArray(response.items)) return response.items
+  if (Array.isArray(response.products)) return response.products
+  log.warn('Unknown response shape, keys:', Object.keys(response))
+  return []
+}
+
+const extractTotal = (response: Record<string, unknown>): number => {
+  if (typeof response.total_results === 'number') return response.total_results
+  if (typeof response.total === 'number') return response.total
+  return 0
+}
+
 const fetchPaginated = async (
   path: string,
   credentials: AudibleCredentials,
@@ -308,7 +318,7 @@ const fetchPaginated = async (
   let currentCredentials = credentials
 
   while (allItems.length < totalResults) {
-    const { response, credentials: updated } = await audibleFetch<AudibleProductResponse>(
+    const { response, credentials: updated } = await audibleFetch<Record<string, unknown>>(
       path,
       currentCredentials,
       {
@@ -319,11 +329,14 @@ const fetchPaginated = async (
     )
 
     currentCredentials = updated
-    totalResults = response.total_results
-    allItems.push(...parseItems(response.items))
+    const rawItems = extractItems(response)
+    totalResults = extractTotal(response) || rawItems.length
+    allItems.push(...parseItems(rawItems))
     page += 1
 
     log.info(`Fetched page ${page - 1}`, { path, count: allItems.length, total: totalResults })
+
+    if (rawItems.length === 0) break
   }
 
   return { items: allItems, credentials: currentCredentials }
