@@ -1,12 +1,13 @@
 import SwiftUI
 
 enum TabSelection: Int, CaseIterable, Identifiable {
-    case home, books, scan
+    case home, books, audible, scan
     var id: Int { rawValue }
     var label: String {
         switch self {
         case .home: "Accueil"
         case .books: "Livres"
+        case .audible: "Audible"
         case .scan: "Scanner"
         }
     }
@@ -14,6 +15,7 @@ enum TabSelection: Int, CaseIterable, Identifiable {
         switch self {
         case .home: "house"
         case .books: "books.vertical"
+        case .audible: "headphones"
         case .scan: "camera"
         }
     }
@@ -35,6 +37,10 @@ struct ContentView: View {
                 BooksPage(refreshTrigger: refreshTrigger)
             }
             .accessibilityIdentifier("tab-books")
+            Tab(TabSelection.audible.label, systemImage: TabSelection.audible.icon, value: .audible) {
+                AudiblePage(refreshTrigger: refreshTrigger)
+            }
+            .accessibilityIdentifier("tab-audible")
             Tab(value: .scan, role: .search) {
                 Color.clear
             } label: {
