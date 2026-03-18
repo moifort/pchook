@@ -57,6 +57,7 @@ struct BookListItem: Codable, Identifiable, Sendable {
     let publicRatings: [PublicRating]
     var rating: Int?
     var seriesName: String?
+    var seriesPosition: Int?
     let createdAt: Date
 }
 

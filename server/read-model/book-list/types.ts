@@ -12,5 +12,6 @@ export type BookListItem = {
   publicRatings: PublicRating[]
   rating?: Note
   seriesName?: string
+  seriesPosition?: number
   createdAt: Date
 }

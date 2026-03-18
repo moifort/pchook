@@ -21,14 +21,21 @@ export namespace BookListReadModel {
       Promise.all(
         (await BookQuery.findAll()).map(async ({ id }) => {
           const info = await SeriesQuery.getByBookId(id)
-          return { bookId: id, seriesName: info ? String(info.name) : undefined }
+          return {
+            bookId: id,
+            seriesName: info ? String(info.name) : undefined,
+            seriesPosition: info?.position,
+          }
         }),
       ),
     ])
 
     const reviewByBookId = new Map(reviews.map((review) => [review.bookId, review]))
     const seriesByBookId = new Map(
-      seriesInfos.map(({ bookId, seriesName }) => [bookId, seriesName]),
+      seriesInfos.map(({ bookId, seriesName, seriesPosition }) => [
+        bookId,
+        { seriesName, seriesPosition },
+      ]),
     )
 
     let items = books.map(
@@ -52,7 +59,8 @@ export namespace BookListReadModel {
         awards,
         publicRatings,
         rating: reviewByBookId.get(id)?.rating,
-        seriesName: seriesByBookId.get(id),
+        seriesName: seriesByBookId.get(id)?.seriesName,
+        seriesPosition: seriesByBookId.get(id)?.seriesPosition,
         createdAt,
       }),
     ) satisfies BookListItem[]
