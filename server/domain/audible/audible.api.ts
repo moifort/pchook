@@ -205,7 +205,7 @@ export const refreshAccessToken = async (credentials: AudibleCredentials) => {
 
 const ensureValidToken = async (credentials: AudibleCredentials) => {
   const fiveMinutes = 5 * 60 * 1000
-  if (credentials.expiresAt.getTime() - Date.now() < fiveMinutes) {
+  if (new Date(credentials.expiresAt).getTime() - Date.now() < fiveMinutes) {
     return await refreshAccessToken(credentials)
   }
   return credentials
