@@ -43,9 +43,53 @@ export type ShareData = {
   description?: string
   rawText?: string
   attachmentTypes?: string[]
+  metaTags?: Record<string, string>
 }
 
-const buildSourceBlock = ({ url, description, rawText }: ShareData) => {
+const META_TAG_PATTERNS = [
+  // Open Graph
+  /<meta\s+(?:property|name)=["']og:([^"']+)["']\s+content=["']([^"']*)["']/gi,
+  /<meta\s+content=["']([^"']*)["']\s+(?:property|name)=["']og:([^"']+)["']/gi,
+  // Standard meta
+  /<meta\s+name=["'](description|author|keywords)["']\s+content=["']([^"']*)["']/gi,
+  /<meta\s+content=["']([^"']*)["']\s+name=["'](description|author|keywords)["']/gi,
+  // Schema.org book/music
+  /<meta\s+(?:property|name)=["']((?:book|music):[^"']+)["']\s+content=["']([^"']*)["']/gi,
+  /<meta\s+content=["']([^"']*)["']\s+(?:property|name)=["']((?:book|music):[^"']+)["']/gi,
+]
+
+const fetchMetaTags = async (url: string): Promise<Record<string, string>> => {
+  try {
+    const html = await $fetch<string>(url, {
+      responseType: 'text',
+      timeout: 5000,
+      headers: { 'user-agent': 'Mozilla/5.0 (compatible; Pchook/1.0)' },
+    })
+
+    const tags: Record<string, string> = {}
+
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+    if (titleMatch) tags.title = titleMatch[1].trim()
+
+    for (const pattern of META_TAG_PATTERNS) {
+      const isReversed = pattern.source.startsWith('<meta\\s+content')
+      for (const match of html.matchAll(pattern)) {
+        const [, first, second] = match
+        const key = isReversed ? second : first
+        const value = isReversed ? first : second
+        if (value) tags[key] = value.trim()
+      }
+    }
+
+    log.info('Meta tags fetched', { url, tags })
+    return tags
+  } catch (error) {
+    log.warn('Failed to fetch meta tags', { url, error: String(error) })
+    return {}
+  }
+}
+
+const buildSourceBlock = ({ url, description, rawText, metaTags }: ShareData) => {
   const parts: string[] = []
 
   if (description) {
@@ -54,6 +98,13 @@ const buildSourceBlock = ({ url, description, rawText }: ShareData) => {
 
   if (rawText && rawText !== description) {
     parts.push(`Texte brut additionnel :\n${rawText}`)
+  }
+
+  if (metaTags && Object.keys(metaTags).length > 0) {
+    const tagLines = Object.entries(metaTags)
+      .map(([key, value]) => `${key}: "${value}"`)
+      .join('\n')
+    parts.push(`Meta tags de la page :\n${tagLines}`)
   }
 
   parts.push(`URL de référence${description ? ' (source secondaire)' : ''} : ${url}`)
@@ -170,7 +221,10 @@ export namespace ShareImporter {
       return cached.result
     }
 
-    const extracted = await extractFromShare(data)
+    const metaTags = await fetchMetaTags(data.url)
+    const enrichedData: ShareData = { ...data, metaTags }
+
+    const extracted = await extractFromShare(enrichedData)
 
     const isbnData = await lookupByIsbn(extracted.isbn)
     log.info('ISBN lookup result', isbnData ?? 'no data')
