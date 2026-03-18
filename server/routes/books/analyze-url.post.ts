@@ -13,19 +13,27 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { url, description, rawText, attachmentTypes } = bodySchema.parse(body)
 
-  const scanResult = await ShareImporter.importFromShare({
+  const result = await ShareImporter.importFromShare({
     url,
     description,
     rawText,
     attachmentTypes,
   })
+
+  if (result === 'extraction-failed') {
+    throw createError({
+      statusCode: 422,
+      statusMessage: "Impossible d'identifier le livre à partir de cette URL",
+    })
+  }
+
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
     previewId,
-    scanResult,
+    scanResult: result,
     createdAt: new Date(),
   })
 
-  return { status: 200, data: { previewId, ...scanResult } } as const
+  return { status: 200, data: { previewId, ...result } } as const
 })

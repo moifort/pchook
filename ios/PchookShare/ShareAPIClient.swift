@@ -83,6 +83,7 @@ enum ShareAPIClient {
 
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+            if statusCode == 422 { throw ShareError.extractionFailed }
             throw ShareError.serverError(statusCode)
         }
 
@@ -117,11 +118,14 @@ enum ShareAPIClient {
 enum ShareError: LocalizedError {
     case serverError(Int)
     case noURL
+    case extractionFailed
 
     var errorDescription: String? {
         switch self {
         case .serverError(let code): "Erreur serveur (\(code))"
         case .noURL: "Aucune URL partagée"
+        case .extractionFailed:
+            "Impossible d'identifier le livre à partir de ce lien. Essayez depuis une autre source."
         }
     }
 }

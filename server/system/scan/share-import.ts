@@ -149,7 +149,9 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
 }
 
 export namespace ShareImporter {
-  export const importFromShare = async (data: ShareData) => {
+  export const importFromShare = async (
+    data: ShareData,
+  ): Promise<ScanResult | 'extraction-failed'> => {
     const urlHash = hashUrl(data.url)
 
     const cached = await repository.findBy(urlHash)
@@ -161,7 +163,19 @@ export namespace ShareImporter {
     const metaTags = await fetchMetaTags(data.url)
     const enrichedData: ShareData = { ...data, metaTags }
 
-    const extracted = await extractFromShare(enrichedData)
+    const hasContext = !!data.description || !!data.rawText || Object.keys(metaTags).length > 0
+
+    if (!hasContext) {
+      log.warn('No context available for extraction, URL only', data.url)
+    }
+
+    let extracted: ScanResult
+    try {
+      extracted = await extractFromShare(enrichedData)
+    } catch (error) {
+      log.error('Extraction failed', { url: data.url, error: String(error) })
+      return 'extraction-failed' as const
+    }
 
     const isbnData = await lookupByIsbn(extracted.isbn)
     log.info('ISBN lookup result', isbnData ?? 'no data')
