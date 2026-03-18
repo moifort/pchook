@@ -33,8 +33,18 @@ struct BooksPage: View {
                     }
                 }
             }
-            .navigationTitle(viewModel.mode.title)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text(viewModel.mode.title)
+                            .font(.headline)
+                        Text("\(viewModel.count(for: viewModel.mode))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
             .task(id: "\(viewModel.filterKey)-\(refreshTrigger)") {
@@ -47,12 +57,7 @@ struct BooksPage: View {
                         Button {
                             viewModel.mode = mode
                         } label: {
-                            VStack(spacing: 2) {
-                                Image(systemName: mode.icon)
-                                Text("\(viewModel.count(for: mode))")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
+                            Label(mode.label, systemImage: mode.icon)
                         }
                         .tint(viewModel.mode == mode ? .accentColor : .primary)
                         .accessibilityIdentifier("booklist-mode-\(mode.rawValue)")
