@@ -2,11 +2,9 @@ import SwiftUI
 
 struct BookRow: View {
     let title: String
-    let authors: String
-    let genre: String?
+    let subtitle: String?
     let rating: Int?
     let status: String
-    let awardCount: Int
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -23,17 +21,11 @@ struct BookRow: View {
                 Text(title)
                     .font(.headline)
                     .lineLimit(2)
-                Text(authors)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                HStack(spacing: 6) {
-                    if let genre, let first = genre.split(separator: ",").first {
-                        GenreBadge(genre: first.trimmingCharacters(in: .whitespaces))
-                    }
-                    if awardCount > 0 {
-                        AwardBadge(count: awardCount)
-                    }
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
             }
             Spacer()
@@ -54,27 +46,21 @@ struct BookRow: View {
     List {
         BookRow(
             title: "L'\u{00C9}tranger",
-            authors: "Albert Camus",
-            genre: "Roman",
+            subtitle: "Albert Camus \u{2022} Roman \u{2022} 1 prix",
             rating: 4,
-            status: "read",
-            awardCount: 1
+            status: "read"
         )
         BookRow(
             title: "Le Petit Prince",
-            authors: "Antoine de Saint-Exup\u{00E9}ry",
-            genre: "Conte",
+            subtitle: "Antoine de Saint-Exup\u{00E9}ry \u{2022} Conte",
             rating: nil,
-            status: "to-read",
-            awardCount: 0
+            status: "to-read"
         )
         BookRow(
             title: "Neuromancien",
-            authors: "William Gibson",
-            genre: "Cyberpunk, Science-Fiction",
+            subtitle: "William Gibson \u{2022} Cyberpunk \u{2022} 2 prix",
             rating: 5,
-            status: "read",
-            awardCount: 2
+            status: "read"
         )
     }
 }

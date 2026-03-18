@@ -117,14 +117,22 @@ struct BooksPage: View {
         } label: {
             BookRow(
                 title: book.title,
-                authors: book.authors.joined(separator: ", "),
-                genre: book.genre,
+                subtitle: subtitle(for: book),
                 rating: book.rating,
-                status: book.status,
-                awardCount: book.awards.count
+                status: book.status
             )
         }
         .tint(.primary)
+    }
+
+    private func subtitle(for book: BookListItem) -> String? {
+        let parts: [String?] = [
+            book.authors.first,
+            book.genre?.split(separator: ",").first.map { $0.trimmingCharacters(in: .whitespaces) },
+            book.awards.isEmpty ? nil : "\(book.awards.count) prix",
+        ]
+        let filtered = parts.compactMap { $0 }
+        return filtered.isEmpty ? nil : filtered.joined(separator: " \u{2022} ")
     }
 }
 
