@@ -110,7 +110,7 @@ struct BooksPage: View {
         case .series:
             ContentUnavailableView(
                 "Aucune s\u{00E9}rie",
-                systemImage: "books.vertical.circle",
+                systemImage: "list.number",
                 description: Text("Les livres dans une s\u{00E9}rie appara\u{00EE}tront ici")
             )
         case .favorites:
