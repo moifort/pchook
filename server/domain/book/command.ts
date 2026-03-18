@@ -2,10 +2,14 @@ import { randomBookId } from '~/domain/book/primitives'
 import * as repository from '~/domain/book/repository'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
 
+const withoutUndefined = <T extends Record<string, unknown>>(obj: T) =>
+  Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>
+
 export namespace BookCommand {
   export const add = async (title: BookTitle, data: Partial<Book>) => {
+    const defined = withoutUndefined(data)
     const book: Book = {
-      ...data,
+      ...defined,
       id: randomBookId(),
       title,
       authors: data.authors ?? [],
@@ -21,7 +25,8 @@ export namespace BookCommand {
   export const update = async (id: BookId, data: Partial<Book>) => {
     const existing = await repository.findBy(id)
     if (!existing) return 'not-found' as const
-    return await repository.save({ ...existing, ...data, updatedAt: new Date() })
+    const defined = withoutUndefined(data)
+    return await repository.save({ ...existing, ...defined, updatedAt: new Date() })
   }
 
   export const remove = async (id: BookId) => {
