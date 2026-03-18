@@ -3,6 +3,7 @@ import SwiftUI
 struct ScanDuplicateView: View {
     let title: String
     let authors: String
+    let onReplace: () -> Void
     let onScanAnother: () -> Void
     let onDismiss: () -> Void
 
@@ -37,12 +38,22 @@ struct ScanDuplicateView: View {
 
             VStack(spacing: 12) {
                 Button {
+                    onReplace()
+                } label: {
+                    Label("Remplacer", systemImage: "arrow.triangle.2.circlepath")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+                .controlSize(.large)
+
+                Button {
                     onScanAnother()
                 } label: {
                     Label("Scanner un autre", systemImage: "camera")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.bordered)
                 .controlSize(.large)
 
                 Button {
@@ -72,6 +83,7 @@ struct ScanDuplicateView: View {
         ScanDuplicateView(
             title: "L'\u{00C9}tranger",
             authors: "Albert Camus",
+            onReplace: {},
             onScanAnother: {},
             onDismiss: {}
         )

@@ -252,6 +252,7 @@ struct ConfirmBookRequest: Encodable, Sendable {
     let previewId: String
     let status: String
     var overrides: ConfirmBookOverrides?
+    var replaceBookId: String?
 }
 
 struct ConfirmBookOverrides: Encodable, Sendable {

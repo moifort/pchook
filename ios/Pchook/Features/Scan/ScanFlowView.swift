@@ -96,20 +96,55 @@ struct ScanFlowView: View {
                                 onFlowCompleted()
                             case .duplicate(let book):
                                 viewModel.step = .duplicate(
-                                    bookId: book.id, title: book.title, authors: book.authors
+                                    existingBookId: book.id, preview: preview
                                 )
+                            case .replaced:
+                                viewModel.reset()
+                                onFlowCompleted()
                             }
                         }
                     )
                 }
 
-            case .duplicate(_, let title, let authors):
+            case .duplicate(_, let preview):
                 NavigationStack {
                     ScanDuplicateView(
-                        title: title,
-                        authors: authors.joined(separator: ", "),
+                        title: preview.title,
+                        authors: preview.authors.joined(separator: ", "),
+                        onReplace: {
+                            if case .duplicate(let existingBookId, let preview) = viewModel.step {
+                                viewModel.step = .replacePreview(
+                                    existingBookId: existingBookId, preview: preview
+                                )
+                            }
+                        },
                         onScanAnother: { viewModel.reset() },
                         onDismiss: { dismiss() }
+                    )
+                }
+
+            case .replacePreview(let existingBookId, let preview):
+                NavigationStack {
+                    ScanConfirmationView(
+                        preview: mapPreview(preview),
+                        onScanAnother: { viewModel.reset() },
+                        onConfirm: { status, overrides in
+                            guard let result = await viewModel.confirm(
+                                previewId: preview.previewId,
+                                status: status,
+                                overrides: overrides,
+                                replaceBookId: existingBookId
+                            ) else { return }
+
+                            switch result {
+                            case .replaced, .created:
+                                viewModel.reset()
+                                onFlowCompleted()
+                            case .duplicate:
+                                viewModel.reset()
+                                onFlowCompleted()
+                            }
+                        }
                     )
                 }
             }

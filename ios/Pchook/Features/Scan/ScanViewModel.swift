@@ -4,12 +4,13 @@ enum ScanStep: Equatable {
     case camera
     case scanning
     case preview(BookPreview)
-    case duplicate(bookId: String, title: String, authors: [String])
+    case duplicate(existingBookId: String, preview: BookPreview)
+    case replacePreview(existingBookId: String, preview: BookPreview)
 
     static func == (lhs: ScanStep, rhs: ScanStep) -> Bool {
         switch (lhs, rhs) {
         case (.camera, .camera), (.scanning, .scanning): return true
-        case (.preview, .preview), (.duplicate, .duplicate): return true
+        case (.preview, .preview), (.duplicate, .duplicate), (.replacePreview, .replacePreview): return true
         default: return false
         }
     }
@@ -36,9 +37,19 @@ final class ScanViewModel {
         }
     }
 
-    func confirm(previewId: String, status: String, overrides: ConfirmBookOverrides? = nil) async -> ConfirmResult? {
+    func confirm(
+        previewId: String,
+        status: String,
+        overrides: ConfirmBookOverrides? = nil,
+        replaceBookId: String? = nil
+    ) async -> ConfirmResult? {
         do {
-            return try await ScanAPI.confirm(previewId: previewId, status: status, overrides: overrides)
+            return try await ScanAPI.confirm(
+                previewId: previewId,
+                status: status,
+                overrides: overrides,
+                replaceBookId: replaceBookId
+            )
         } catch {
             self.error = reportError(error)
             return nil
