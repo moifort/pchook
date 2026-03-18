@@ -85,9 +85,10 @@ struct ScanFlowView: View {
                     ScanConfirmationView(
                         preview: mapPreview(preview),
                         onScanAnother: { viewModel.reset() },
-                        onConfirm: { status in
+                        onConfirm: { status, editedItem in
+                            let overrides = buildOverrides(original: preview, edited: editedItem)
                             guard let result = await viewModel.confirm(
-                                previewId: preview.previewId, status: status
+                                previewId: preview.previewId, status: status, overrides: overrides
                             ) else { return }
 
                             switch result {
@@ -138,6 +139,36 @@ struct ScanFlowView: View {
         } message: {
             Text(viewModel.error ?? "")
         }
+    }
+
+    private func buildOverrides(original: BookPreview, edited: ScanConfirmationView.Item) -> ConfirmBookOverrides? {
+        let originalItem = mapPreview(original)
+
+        let editedAuthors = edited.authors
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
+        var overrides = ConfirmBookOverrides()
+        var hasChanges = false
+
+        if edited.title != originalItem.title { overrides.title = edited.title; hasChanges = true }
+        if editedAuthors != original.authors { overrides.authors = editedAuthors; hasChanges = true }
+        if edited.publisher != originalItem.publisher { overrides.publisher = edited.publisher; hasChanges = true }
+        if edited.pageCount != originalItem.pageCount { overrides.pageCount = edited.pageCount; hasChanges = true }
+        if edited.genres.joined(separator: ", ") != originalItem.genres.joined(separator: ", ") {
+            overrides.genre = edited.genres.joined(separator: ", ")
+            hasChanges = true
+        }
+        if edited.synopsis != originalItem.synopsis { overrides.synopsis = edited.synopsis; hasChanges = true }
+        if edited.language != originalItem.language { overrides.language = edited.language; hasChanges = true }
+        if edited.format != originalItem.format { overrides.format = edited.format; hasChanges = true }
+        if edited.translator != originalItem.translator { overrides.translator = edited.translator; hasChanges = true }
+        if edited.estimatedPrice != originalItem.estimatedPrice { overrides.estimatedPrice = edited.estimatedPrice; hasChanges = true }
+        if edited.series != originalItem.series { overrides.series = edited.series; hasChanges = true }
+        if edited.seriesNumber != originalItem.seriesNumber { overrides.seriesNumber = edited.seriesNumber; hasChanges = true }
+
+        return hasChanges ? overrides : nil
     }
 
     private func mapPreview(_ preview: BookPreview) -> ScanConfirmationView.Item {

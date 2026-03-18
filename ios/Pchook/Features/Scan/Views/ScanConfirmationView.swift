@@ -3,59 +3,83 @@ import SwiftUI
 struct ScanConfirmationView: View {
     let preview: Item
     let onScanAnother: () -> Void
-    let onConfirm: (String) async -> Void
+    let onConfirm: (String, Item) async -> Void
 
+    @State private var editablePreview: Item
     @State private var isConfirming = false
+    @State private var isEditing = false
+
+    init(preview: Item, onScanAnother: @escaping () -> Void, onConfirm: @escaping (String, Item) async -> Void) {
+        self.preview = preview
+        self.onScanAnother = onScanAnother
+        self.onConfirm = onConfirm
+        _editablePreview = State(initialValue: preview)
+    }
 
     var body: some View {
         List {
             Section {
-                LabeledInfoRow(title: "Titre", value: preview.title, icon: "book")
-                LabeledInfoRow(title: "Auteurs", value: preview.authors, icon: "person.2")
-                if let series = preview.series {
-                    HStack {
-                        LabeledInfoRow(
-                            title: "Série",
-                            value: preview.seriesNumber.map { "\(series) — Tome \($0)" } ?? series,
-                            icon: "books.vertical"
-                        )
-                    }
+                LabeledInfoRow(title: "Titre", value: editablePreview.title, icon: "book")
+                LabeledInfoRow(title: "Auteurs", value: editablePreview.authors, icon: "person.2")
+                if let series = editablePreview.series {
+                    LabeledInfoRow(
+                        title: "S\u{00E9}rie",
+                        value: editablePreview.seriesNumber.map { "\(series) \u{2014} Tome \($0)" } ?? series,
+                        icon: "books.vertical"
+                    )
                 }
-                if !preview.genres.isEmpty {
+                if !editablePreview.genres.isEmpty {
                     HStack(spacing: 6) {
-                        ForEach(preview.genres, id: \.self) { genre in
+                        ForEach(editablePreview.genres, id: \.self) { genre in
                             GenreBadge(genre: genre)
                         }
                     }
                 }
             }
 
-            if !preview.ratings.isEmpty {
+            if !editablePreview.ratings.isEmpty {
                 PublicRatingsSection(
-                    ratings: preview.ratings,
+                    ratings: editablePreview.ratings,
                     userRating: nil
                 )
             }
 
-            if !preview.awards.isEmpty {
-                AwardsSection(awards: preview.awards)
+            if !editablePreview.awards.isEmpty {
+                AwardsSection(awards: editablePreview.awards)
             }
 
             BookInfoSection(
-                publisher: preview.publisher,
-                pageCount: preview.pageCount,
-                language: preview.language,
-                format: preview.format,
-                translator: preview.translator,
-                estimatedPrice: preview.estimatedPrice,
+                publisher: editablePreview.publisher,
+                pageCount: editablePreview.pageCount,
+                language: editablePreview.language,
+                format: editablePreview.format,
+                translator: editablePreview.translator,
+                estimatedPrice: editablePreview.estimatedPrice,
                 publishedDate: nil
             )
 
-            BookSynopsisSection(synopsis: preview.synopsis)
+            BookSynopsisSection(synopsis: editablePreview.synopsis)
         }
-        .navigationTitle("Aperçu")
+        .navigationTitle("Aper\u{00E7}u")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Modifier", systemImage: "pencil") {
+                    isEditing = true
+                }
+            }
+        }
+        .sheet(isPresented: $isEditing) {
+            PreviewEditForm(
+                initial: editablePreview,
+                onSave: { updated in
+                    editablePreview = updated
+                    isEditing = false
+                },
+                onCancel: { isEditing = false }
+            )
+        }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 Button {
@@ -72,11 +96,11 @@ struct ScanConfirmationView: View {
                     Button {
                         isConfirming = true
                         Task {
-                            await onConfirm("to-read")
+                            await onConfirm("to-read", editablePreview)
                             isConfirming = false
                         }
                     } label: {
-                        Label("À lire", systemImage: "bookmark.fill")
+                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
@@ -87,7 +111,7 @@ struct ScanConfirmationView: View {
                     Button {
                         isConfirming = true
                         Task {
-                            await onConfirm("read")
+                            await onConfirm("read", editablePreview)
                             isConfirming = false
                         }
                     } label: {
@@ -109,20 +133,20 @@ struct ScanConfirmationView: View {
 extension ScanConfirmationView {
     struct Item: Sendable {
         let previewId: String
-        let title: String
-        let authors: String
-        let genres: [String]
-        let synopsis: String?
-        let pageCount: Int?
-        let language: String?
-        let format: String?
-        let publisher: String?
-        let translator: String?
-        let estimatedPrice: Double?
+        var title: String
+        var authors: String
+        var genres: [String]
+        var synopsis: String?
+        var pageCount: Int?
+        var language: String?
+        var format: String?
+        var publisher: String?
+        var translator: String?
+        var estimatedPrice: Double?
         let awards: [AwardsSection.Item]
         let ratings: [PublicRatingsSection.Item]
-        let series: String?
-        let seriesNumber: Int?
+        var series: String?
+        var seriesNumber: Int?
     }
 }
 
@@ -131,12 +155,12 @@ extension ScanConfirmationView {
         ScanConfirmationView(
             preview: .init(
                 previewId: "preview-1",
-                title: "L'Étranger",
+                title: "L'\u{00C9}tranger",
                 authors: "Albert Camus",
                 genres: ["Roman", "Philosophie"],
-                synopsis: "Meursault, un employé de bureau à Alger, apprend la mort de sa mère. Il assiste aux funérailles sans montrer d'émotion apparente.",
+                synopsis: "Meursault, un employ\u{00E9} de bureau \u{00E0} Alger, apprend la mort de sa m\u{00E8}re. Il assiste aux fun\u{00E9}railles sans montrer d'\u{00E9}motion apparente.",
                 pageCount: 185,
-                language: "Français",
+                language: "Fran\u{00E7}ais",
                 format: "pocket",
                 publisher: "Gallimard",
                 translator: nil,
@@ -147,7 +171,7 @@ extension ScanConfirmationView {
                 seriesNumber: nil
             ),
             onScanAnother: {},
-            onConfirm: { _ in }
+            onConfirm: { _, _ in }
         )
     }
 }
