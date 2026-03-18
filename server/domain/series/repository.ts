@@ -4,6 +4,19 @@ import type { Series, SeriesBook, SeriesId } from '~/domain/series/types'
 const seriesStorage = () => useStorage('series')
 const seriesBooksStorage = () => useStorage('series-books')
 
+// In-memory index to avoid fs driver consistency issues during rapid writes
+const seriesByName = new Map<string, Series>()
+let seriesIndexLoaded = false
+
+const ensureSeriesIndex = async () => {
+  if (seriesIndexLoaded) return
+  const all = await findAllSeries()
+  for (const series of all) {
+    seriesByName.set(series.name.toLowerCase(), series)
+  }
+  seriesIndexLoaded = true
+}
+
 export const findAllSeries = async () => {
   const keys = await seriesStorage().getKeys()
   const items = await seriesStorage().getItems<Series>(keys)
@@ -13,17 +26,24 @@ export const findAllSeries = async () => {
 export const findSeriesBy = (id: SeriesId) => seriesStorage().getItem<Series>(id)
 
 export const findSeriesByName = async (name: string) => {
-  const all = await findAllSeries()
-  return all.find((s) => s.name.toLowerCase() === name.toLowerCase()) ?? null
+  await ensureSeriesIndex()
+  return seriesByName.get(name.toLowerCase()) ?? null
 }
 
 export const saveSeries = async (series: Series) => {
   await seriesStorage().setItem(series.id, series)
+  seriesByName.set(series.name.toLowerCase(), series)
   return series
 }
 
 export const removeSeries = async (id: SeriesId) => {
   await seriesStorage().removeItem(id)
+  for (const [key, series] of seriesByName) {
+    if (series.id === id) {
+      seriesByName.delete(key)
+      break
+    }
+  }
 }
 
 export const findAllSeriesBooks = async () => {
