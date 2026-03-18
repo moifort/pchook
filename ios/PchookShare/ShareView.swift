@@ -115,8 +115,8 @@ private struct SharePreviewForm: View {
     @State private var seriesNumber: String
     @State private var publisher: String
     @State private var pageCount: String
-    @State private var language: String
-    @State private var format: String
+    @State private var language: ShareBookLanguage?
+    @State private var format: ShareBookFormat?
     @State private var translator: String
     @State private var estimatedPrice: String
     @State private var duration: String
@@ -140,8 +140,8 @@ private struct SharePreviewForm: View {
         _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
         _publisher = State(initialValue: preview.publisher ?? "")
         _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
-        _language = State(initialValue: preview.language ?? "")
-        _format = State(initialValue: preview.format ?? "")
+        _language = State(initialValue: ShareBookLanguage(apiValue: preview.language))
+        _format = State(initialValue: ShareBookFormat(apiValue: preview.format))
         _translator = State(initialValue: preview.translator ?? "")
         _estimatedPrice = State(initialValue: preview.estimatedPrice.map { String($0) } ?? "")
         _duration = State(initialValue: preview.duration ?? "")
@@ -242,32 +242,38 @@ private struct SharePreviewForm: View {
                     Label("Pages", systemImage: "doc.text")
                 }
 
-                LabeledContent {
-                    TextField("Dur\u{00E9}e", text: $duration)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Label("Dur\u{00E9}e", systemImage: "clock")
-                }
-
-                LabeledContent {
-                    TextField("Narrateur(s)", text: $narrators)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Label("Narrateur(s)", systemImage: "person.wave.2")
-                }
-
-                LabeledContent {
-                    TextField("Langue", text: $language)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $language) {
+                    Text("Non d\u{00E9}finie").tag(nil as ShareBookLanguage?)
+                    ForEach(ShareBookLanguage.allCases) { lang in
+                        Text(lang.label).tag(lang as ShareBookLanguage?)
+                    }
                 } label: {
                     Label("Langue", systemImage: "globe")
                 }
 
-                LabeledContent {
-                    TextField("Format", text: $format)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $format) {
+                    Text("Non d\u{00E9}fini").tag(nil as ShareBookFormat?)
+                    ForEach(ShareBookFormat.allCases) { fmt in
+                        Text(fmt.label).tag(fmt as ShareBookFormat?)
+                    }
                 } label: {
                     Label("Format", systemImage: "doc")
+                }
+
+                if format == .audiobook {
+                    LabeledContent {
+                        TextField("Dur\u{00E9}e", text: $duration)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Dur\u{00E9}e", systemImage: "clock")
+                    }
+
+                    LabeledContent {
+                        TextField("Narrateur(s)", text: $narrators)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Narrateur(s)", systemImage: "person.wave.2")
+                    }
                 }
 
                 LabeledContent {
@@ -349,10 +355,8 @@ private struct SharePreviewForm: View {
         if Int(pageCount) != preview.pageCount { overrides.pageCount = Int(pageCount); hasChanges = true }
         let syn = synopsis.trimmingCharacters(in: .whitespaces)
         if (syn.isEmpty ? nil : syn) != preview.synopsis { overrides.synopsis = syn.isEmpty ? nil : syn; hasChanges = true }
-        let lang = language.trimmingCharacters(in: .whitespaces)
-        if (lang.isEmpty ? nil : lang) != preview.language { overrides.language = lang.isEmpty ? nil : lang; hasChanges = true }
-        let fmt = format.trimmingCharacters(in: .whitespaces)
-        if (fmt.isEmpty ? nil : fmt) != preview.format { overrides.format = fmt.isEmpty ? nil : fmt; hasChanges = true }
+        if language?.rawValue != preview.language { overrides.language = language?.rawValue; hasChanges = true }
+        if format?.rawValue != preview.format { overrides.format = format?.rawValue; hasChanges = true }
         let trans = translator.trimmingCharacters(in: .whitespaces)
         if (trans.isEmpty ? nil : trans) != preview.translator { overrides.translator = trans.isEmpty ? nil : trans; hasChanges = true }
         if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }

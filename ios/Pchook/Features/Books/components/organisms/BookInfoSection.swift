@@ -31,10 +31,18 @@ struct BookInfoSection: View {
                     )
                 }
                 if let language {
-                    LabeledInfoRow(title: "Langue", value: language, icon: "globe")
+                    LabeledInfoRow(
+                        title: "Langue",
+                        value: BookLanguage(apiValue: language)?.label ?? language,
+                        icon: "globe"
+                    )
                 }
                 if let format {
-                    LabeledInfoRow(title: "Format", value: format, icon: "doc")
+                    LabeledInfoRow(
+                        title: "Format",
+                        value: BookFormatOption(apiValue: format)?.label ?? format,
+                        icon: "doc"
+                    )
                 }
                 if let translator {
                     LabeledInfoRow(title: "Traducteur", value: translator, icon: "person.2")

@@ -12,8 +12,8 @@ struct ScanConfirmationView: View {
     @State private var seriesNumber: String
     @State private var publisher: String
     @State private var pageCount: String
-    @State private var language: String
-    @State private var format: String
+    @State private var language: BookLanguage?
+    @State private var format: BookFormatOption?
     @State private var translator: String
     @State private var estimatedPrice: String
     @State private var duration: String
@@ -35,8 +35,8 @@ struct ScanConfirmationView: View {
         _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
         _publisher = State(initialValue: preview.publisher ?? "")
         _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
-        _language = State(initialValue: preview.language ?? "")
-        _format = State(initialValue: preview.format ?? "")
+        _language = State(initialValue: BookLanguage(apiValue: preview.language))
+        _format = State(initialValue: BookFormatOption(apiValue: preview.format))
         _translator = State(initialValue: preview.translator ?? "")
         _estimatedPrice = State(initialValue: preview.estimatedPrice.map { String($0) } ?? "")
         _duration = State(initialValue: preview.duration ?? "")
@@ -113,32 +113,38 @@ struct ScanConfirmationView: View {
                     Label("Pages", systemImage: "doc.text")
                 }
 
-                LabeledContent {
-                    TextField("Dur\u{00E9}e", text: $duration)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Label("Dur\u{00E9}e", systemImage: "clock")
-                }
-
-                LabeledContent {
-                    TextField("Narrateur(s)", text: $narrators)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Label("Narrateur(s)", systemImage: "person.wave.2")
-                }
-
-                LabeledContent {
-                    TextField("Langue", text: $language)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $language) {
+                    Text("Non d\u{00E9}finie").tag(nil as BookLanguage?)
+                    ForEach(BookLanguage.allCases) { lang in
+                        Text(lang.label).tag(lang as BookLanguage?)
+                    }
                 } label: {
                     Label("Langue", systemImage: "globe")
                 }
 
-                LabeledContent {
-                    TextField("Format", text: $format)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $format) {
+                    Text("Non d\u{00E9}fini").tag(nil as BookFormatOption?)
+                    ForEach(BookFormatOption.allCases) { fmt in
+                        Text(fmt.label).tag(fmt as BookFormatOption?)
+                    }
                 } label: {
                     Label("Format", systemImage: "doc")
+                }
+
+                if format == .audiobook {
+                    LabeledContent {
+                        TextField("Dur\u{00E9}e", text: $duration)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Dur\u{00E9}e", systemImage: "clock")
+                    }
+
+                    LabeledContent {
+                        TextField("Narrateur(s)", text: $narrators)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Narrateur(s)", systemImage: "person.wave.2")
+                    }
                 }
 
                 LabeledContent {
@@ -212,8 +218,8 @@ struct ScanConfirmationView: View {
         if publisher.nilIfEmpty != preview.publisher { overrides.publisher = publisher.nilIfEmpty; hasChanges = true }
         if Int(pageCount) != preview.pageCount { overrides.pageCount = Int(pageCount); hasChanges = true }
         if synopsis.nilIfEmpty != preview.synopsis { overrides.synopsis = synopsis.nilIfEmpty; hasChanges = true }
-        if language.nilIfEmpty != preview.language { overrides.language = language.nilIfEmpty; hasChanges = true }
-        if format.nilIfEmpty != preview.format { overrides.format = format.nilIfEmpty; hasChanges = true }
+        if language?.rawValue != preview.language { overrides.language = language?.rawValue; hasChanges = true }
+        if format?.rawValue != preview.format { overrides.format = format?.rawValue; hasChanges = true }
         if translator.nilIfEmpty != preview.translator { overrides.translator = translator.nilIfEmpty; hasChanges = true }
         if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }
         if series.nilIfEmpty != preview.series { overrides.series = series.nilIfEmpty; hasChanges = true }

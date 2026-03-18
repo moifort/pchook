@@ -136,6 +136,8 @@ struct BookDetailPage: View {
             format: detail.book.format ?? "",
             translator: detail.book.translator ?? "",
             estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
+            duration: detail.book.duration ?? "",
+            narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
             synopsis: detail.book.synopsis ?? "",
             personalNotes: detail.book.personalNotes ?? ""
         )

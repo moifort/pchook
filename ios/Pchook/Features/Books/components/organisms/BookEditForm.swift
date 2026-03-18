@@ -11,9 +11,11 @@ struct BookEditForm: View {
     @State private var publisher: String
     @State private var pageCount: String
     @State private var isbn: String
-    @State private var language: String
-    @State private var format: String
+    @State private var language: BookLanguage?
+    @State private var format: BookFormatOption?
     @State private var translator: String
+    @State private var duration: String
+    @State private var narrators: String
     @State private var estimatedPrice: String
     @State private var synopsis: String
     @State private var personalNotes: String
@@ -30,9 +32,11 @@ struct BookEditForm: View {
         _publisher = State(initialValue: initial.publisher)
         _pageCount = State(initialValue: initial.pageCount)
         _isbn = State(initialValue: initial.isbn)
-        _language = State(initialValue: initial.language)
-        _format = State(initialValue: initial.format)
+        _language = State(initialValue: BookLanguage(apiValue: initial.language))
+        _format = State(initialValue: BookFormatOption(apiValue: initial.format))
         _translator = State(initialValue: initial.translator)
+        _duration = State(initialValue: initial.duration)
+        _narrators = State(initialValue: initial.narrators)
         _estimatedPrice = State(initialValue: initial.estimatedPrice)
         _synopsis = State(initialValue: initial.synopsis)
         _personalNotes = State(initialValue: initial.personalNotes)
@@ -86,18 +90,38 @@ struct BookEditForm: View {
                     Label("ISBN", systemImage: "barcode")
                 }
 
-                LabeledContent {
-                    TextField("Langue", text: $language)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $language) {
+                    Text("Non d\u{00E9}finie").tag(nil as BookLanguage?)
+                    ForEach(BookLanguage.allCases) { lang in
+                        Text(lang.label).tag(lang as BookLanguage?)
+                    }
                 } label: {
                     Label("Langue", systemImage: "globe")
                 }
 
-                LabeledContent {
-                    TextField("Format", text: $format)
-                        .multilineTextAlignment(.trailing)
+                Picker(selection: $format) {
+                    Text("Non d\u{00E9}fini").tag(nil as BookFormatOption?)
+                    ForEach(BookFormatOption.allCases) { fmt in
+                        Text(fmt.label).tag(fmt as BookFormatOption?)
+                    }
                 } label: {
                     Label("Format", systemImage: "doc")
+                }
+
+                if format == .audiobook {
+                    LabeledContent {
+                        TextField("Dur\u{00E9}e", text: $duration)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Dur\u{00E9}e", systemImage: "clock")
+                    }
+
+                    LabeledContent {
+                        TextField("Narrateur(s)", text: $narrators)
+                            .multilineTextAlignment(.trailing)
+                    } label: {
+                        Label("Narrateur(s)", systemImage: "person.wave.2")
+                    }
                 }
 
                 LabeledContent {
@@ -162,6 +186,11 @@ struct BookEditForm: View {
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
 
+        let narratorsList = narrators
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
         let request = UpdateBookRequest(
             title: title,
             authors: authorsList.isEmpty ? nil : authorsList,
@@ -170,10 +199,12 @@ struct BookEditForm: View {
             genre: genre.isEmpty ? nil : genre,
             synopsis: synopsis.isEmpty ? nil : synopsis,
             isbn: isbn.isEmpty ? nil : isbn,
-            language: language.isEmpty ? nil : language,
-            format: format.isEmpty ? nil : format,
+            language: language?.rawValue,
+            format: format?.rawValue,
             translator: translator.isEmpty ? nil : translator,
             estimatedPrice: Double(estimatedPrice),
+            duration: format == .audiobook && !duration.isEmpty ? duration : nil,
+            narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
             personalNotes: personalNotes.isEmpty ? nil : personalNotes
         )
 
@@ -198,6 +229,8 @@ extension BookEditForm {
         var format: String
         var translator: String
         var estimatedPrice: String
+        var duration: String
+        var narrators: String
         var synopsis: String
         var personalNotes: String
     }
@@ -213,10 +246,12 @@ extension BookEditForm {
                 publisher: "J'ai Lu",
                 pageCount: "320",
                 isbn: "978-2-290-30540-0",
-                language: "Fran\u{00E7}ais",
+                language: "FR",
                 format: "pocket",
                 translator: "Jean Bonnefoy",
                 estimatedPrice: "8.50",
+                duration: "",
+                narrators: "",
                 synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission.",
                 personalNotes: "Excellent"
             ),

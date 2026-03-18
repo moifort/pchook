@@ -48,6 +48,12 @@ export default defineEventHandler(async (event) => {
     ...(body.estimatedPrice !== undefined && {
       estimatedPrice: body.estimatedPrice ? Eur(body.estimatedPrice) : undefined,
     }),
+    ...(body.duration !== undefined && { duration: body.duration as string | undefined }),
+    ...(body.narrators !== undefined && {
+      narrators: body.narrators
+        ? (body.narrators as unknown[]).map((n) => PersonName(n))
+        : undefined,
+    }),
     ...(body.personalNotes !== undefined && {
       personalNotes: body.personalNotes as string | undefined,
     }),

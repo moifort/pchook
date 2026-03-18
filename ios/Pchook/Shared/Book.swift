@@ -176,6 +176,50 @@ struct BookPreview: Codable, Sendable {
     var coverImageBase64: String?
 }
 
+// MARK: - Enums
+
+enum BookLanguage: String, CaseIterable, Identifiable {
+    case fr = "FR"
+    case en = "EN"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .fr: "Fran\u{00E7}ais"
+        case .en: "English"
+        }
+    }
+
+    init?(apiValue: String?) {
+        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).uppercased() else { return nil }
+        self.init(rawValue: value)
+    }
+}
+
+enum BookFormatOption: String, CaseIterable, Identifiable {
+    case pocket
+    case paperback
+    case hardcover
+    case audiobook
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .pocket: "Poche"
+        case .paperback: "Broch\u{00E9}"
+        case .hardcover: "Reli\u{00E9}"
+        case .audiobook: "Livre audio"
+        }
+    }
+
+    init?(apiValue: String?) {
+        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).lowercased() else { return nil }
+        self.init(rawValue: value)
+    }
+}
+
 // MARK: - Requests
 
 struct UpdateBookRequest: Encodable, Sendable {
@@ -191,6 +235,8 @@ struct UpdateBookRequest: Encodable, Sendable {
     var format: String?
     var translator: String?
     var estimatedPrice: Double?
+    var duration: String?
+    var narrators: [String]?
     var personalNotes: String?
     var status: String?
     var readDate: String?
