@@ -3,132 +3,230 @@ import SwiftUI
 struct ScanConfirmationView: View {
     let preview: Item
     let onScanAnother: () -> Void
-    let onConfirm: (String, Item) async -> Void
+    let onConfirm: (String, ConfirmBookOverrides?) async -> Void
 
-    @State private var editablePreview: Item
-    @State private var isConfirming = false
-    @State private var isEditing = false
+    @State private var title: String
+    @State private var authors: String
+    @State private var genre: String
+    @State private var series: String
+    @State private var seriesNumber: String
+    @State private var publisher: String
+    @State private var pageCount: String
+    @State private var language: String
+    @State private var format: String
+    @State private var translator: String
+    @State private var estimatedPrice: String
+    @State private var duration: String
+    @State private var narrators: String
+    @State private var synopsis: String
 
-    init(preview: Item, onScanAnother: @escaping () -> Void, onConfirm: @escaping (String, Item) async -> Void) {
+    init(
+        preview: Item,
+        onScanAnother: @escaping () -> Void,
+        onConfirm: @escaping (String, ConfirmBookOverrides?) async -> Void
+    ) {
         self.preview = preview
         self.onScanAnother = onScanAnother
         self.onConfirm = onConfirm
-        _editablePreview = State(initialValue: preview)
+        _title = State(initialValue: preview.title)
+        _authors = State(initialValue: preview.authors)
+        _genre = State(initialValue: preview.genres.joined(separator: ", "))
+        _series = State(initialValue: preview.series ?? "")
+        _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
+        _publisher = State(initialValue: preview.publisher ?? "")
+        _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
+        _language = State(initialValue: preview.language ?? "")
+        _format = State(initialValue: preview.format ?? "")
+        _translator = State(initialValue: preview.translator ?? "")
+        _estimatedPrice = State(initialValue: preview.estimatedPrice.map { String($0) } ?? "")
+        _duration = State(initialValue: preview.duration ?? "")
+        _narrators = State(initialValue: preview.narrators?.joined(separator: ", ") ?? "")
+        _synopsis = State(initialValue: preview.synopsis ?? "")
     }
 
     var body: some View {
-        List {
-            Section {
-                LabeledInfoRow(title: "Titre", value: editablePreview.title, icon: "book")
-                LabeledInfoRow(title: "Auteurs", value: editablePreview.authors, icon: "person.2")
-                if let series = editablePreview.series {
-                    LabeledInfoRow(
-                        title: "S\u{00E9}rie",
-                        value: editablePreview.seriesNumber.map { "\(series) \u{2014} Tome \($0)" } ?? series,
-                        icon: "books.vertical"
-                    )
+        Form {
+            Section("Informations principales") {
+                LabeledContent {
+                    TextField("Titre", text: $title)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Titre", systemImage: "book")
                 }
-                if !editablePreview.genres.isEmpty {
-                    HStack(spacing: 6) {
-                        ForEach(editablePreview.genres, id: \.self) { genre in
-                            GenreBadge(genre: genre)
-                        }
-                    }
+
+                LabeledContent {
+                    TextField("Auteurs", text: $authors)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Auteurs", systemImage: "person.2")
+                }
+
+                LabeledContent {
+                    TextField("Genre", text: $genre)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Genre", systemImage: "tag")
                 }
             }
 
-            if !editablePreview.ratings.isEmpty {
+            Section("S\u{00E9}rie") {
+                LabeledContent {
+                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("S\u{00E9}rie", systemImage: "books.vertical")
+                }
+
+                LabeledContent {
+                    TextField("Tome", text: $seriesNumber)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Tome", systemImage: "number")
+                }
+            }
+
+            if !preview.ratings.isEmpty {
                 PublicRatingsSection(
-                    ratings: editablePreview.ratings,
+                    ratings: preview.ratings,
                     userRating: nil
                 )
             }
 
-            if !editablePreview.awards.isEmpty {
-                AwardsSection(awards: editablePreview.awards)
+            if !preview.awards.isEmpty {
+                AwardsSection(awards: preview.awards)
             }
 
-            BookInfoSection(
-                publisher: editablePreview.publisher,
-                pageCount: editablePreview.pageCount,
-                language: editablePreview.language,
-                format: editablePreview.format,
-                translator: editablePreview.translator,
-                estimatedPrice: editablePreview.estimatedPrice,
-                publishedDate: nil,
-                duration: editablePreview.duration,
-                narrators: editablePreview.narrators
-            )
+            Section("D\u{00E9}tails") {
+                LabeledContent {
+                    TextField("\u{00C9}diteur", text: $publisher)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("\u{00C9}diteur", systemImage: "building.2")
+                }
 
-            BookSynopsisSection(synopsis: editablePreview.synopsis)
+                LabeledContent {
+                    TextField("0", text: $pageCount)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Pages", systemImage: "doc.text")
+                }
+
+                LabeledContent {
+                    TextField("Dur\u{00E9}e", text: $duration)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Dur\u{00E9}e", systemImage: "clock")
+                }
+
+                LabeledContent {
+                    TextField("Narrateur(s)", text: $narrators)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Narrateur(s)", systemImage: "person.wave.2")
+                }
+
+                LabeledContent {
+                    TextField("Langue", text: $language)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Langue", systemImage: "globe")
+                }
+
+                LabeledContent {
+                    TextField("Format", text: $format)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Format", systemImage: "doc")
+                }
+
+                LabeledContent {
+                    TextField("Traducteur", text: $translator)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Traducteur", systemImage: "person.2")
+                }
+
+                LabeledContent {
+                    HStack(spacing: 4) {
+                        TextField("0", text: $estimatedPrice)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                        Text("\u{20AC}")
+                            .foregroundStyle(.secondary)
+                    }
+                } label: {
+                    Label("Prix", systemImage: "eurosign.circle")
+                }
+            }
+
+            Section("Synopsis") {
+                TextField("Synopsis", text: $synopsis, axis: .vertical)
+                    .lineLimit(3...8)
+            }
         }
-        .navigationTitle("Aper\u{00E7}u")
+        .navigationTitle("V\u{00E9}rifier le livre")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Modifier", systemImage: "pencil") {
-                    isEditing = true
-                }
-            }
-        }
-        .sheet(isPresented: $isEditing) {
-            PreviewEditForm(
-                initial: editablePreview,
-                onSave: { updated in
-                    editablePreview = updated
-                    isEditing = false
-                },
-                onCancel: { isEditing = false }
-            )
-        }
-        .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 12) {
-                Button {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Scanner un autre", systemImage: "camera") {
                     onScanAnother()
-                } label: {
-                    Label("Scanner un autre", systemImage: "camera")
-                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
                 .accessibilityIdentifier("scan-another-button")
-
-                HStack(spacing: 12) {
-                    Button {
-                        isConfirming = true
-                        Task {
-                            await onConfirm("to-read", editablePreview)
-                            isConfirming = false
-                        }
-                    } label: {
-                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .disabled(isConfirming)
-                    .accessibilityIdentifier("status-to-read-button")
-
-                    Button {
-                        isConfirming = true
-                        Task {
-                            await onConfirm("read", editablePreview)
-                            isConfirming = false
-                        }
-                    } label: {
-                        Label("Lu", systemImage: "checkmark.circle.fill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .disabled(isConfirming)
-                    .accessibilityIdentifier("status-read-button")
-                }
             }
-            .padding()
-            .background(.bar)
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                AsyncToolbarButton(title: "\u{00C0} lire", systemImage: "bookmark.fill") {
+                    await onConfirm("to-read", buildOverrides())
+                }
+                .accessibilityIdentifier("status-to-read-button")
+
+                AsyncToolbarButton(title: "Lu", systemImage: "checkmark.circle.fill") {
+                    await onConfirm("read", buildOverrides())
+                }
+                .accessibilityIdentifier("status-read-button")
+            }
         }
+    }
+
+    private func buildOverrides() -> ConfirmBookOverrides? {
+        let editedAuthors = authors
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+        let editedGenre = genre.trimmingCharacters(in: .whitespaces)
+        let originalGenre = preview.genres.joined(separator: ", ")
+        let editedNarrators = narrators
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
+        var overrides = ConfirmBookOverrides()
+        var hasChanges = false
+
+        if title != preview.title { overrides.title = title; hasChanges = true }
+        if editedAuthors.joined(separator: ", ") != preview.authors { overrides.authors = editedAuthors; hasChanges = true }
+        if editedGenre != originalGenre { overrides.genre = editedGenre; hasChanges = true }
+        if publisher.nilIfEmpty != preview.publisher { overrides.publisher = publisher.nilIfEmpty; hasChanges = true }
+        if Int(pageCount) != preview.pageCount { overrides.pageCount = Int(pageCount); hasChanges = true }
+        if synopsis.nilIfEmpty != preview.synopsis { overrides.synopsis = synopsis.nilIfEmpty; hasChanges = true }
+        if language.nilIfEmpty != preview.language { overrides.language = language.nilIfEmpty; hasChanges = true }
+        if format.nilIfEmpty != preview.format { overrides.format = format.nilIfEmpty; hasChanges = true }
+        if translator.nilIfEmpty != preview.translator { overrides.translator = translator.nilIfEmpty; hasChanges = true }
+        if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }
+        if series.nilIfEmpty != preview.series { overrides.series = series.nilIfEmpty; hasChanges = true }
+        if Int(seriesNumber) != preview.seriesNumber { overrides.seriesNumber = Int(seriesNumber); hasChanges = true }
+
+        return hasChanges ? overrides : nil
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        let trimmed = trimmingCharacters(in: .whitespaces)
+        return trimmed.isEmpty ? nil : trimmed
     }
 }
 
@@ -162,7 +260,7 @@ extension ScanConfirmationView {
                 title: "L'\u{00C9}tranger",
                 authors: "Albert Camus",
                 genres: ["Roman", "Philosophie"],
-                synopsis: "Meursault, un employ\u{00E9} de bureau \u{00E0} Alger, apprend la mort de sa m\u{00E8}re. Il assiste aux fun\u{00E9}railles sans montrer d'\u{00E9}motion apparente.",
+                synopsis: "Meursault, un employ\u{00E9} de bureau \u{00E0} Alger.",
                 pageCount: 185,
                 language: "Fran\u{00E7}ais",
                 format: "pocket",
