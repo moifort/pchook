@@ -33,20 +33,9 @@ struct BooksPage: View {
                     }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                if viewModel.hasBooks {
-                    ToolbarItem(placement: .principal) {
-                        HStack {
-                            Text(viewModel.mode.title)
-                                .font(.headline)
-                            Text("\(viewModel.count(for: viewModel.mode))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
+            .navigationTitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.mode.title)
+            .navigationSubtitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.mode.subtitle)
+            .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
             .task(id: "\(viewModel.filterKey)-\(refreshTrigger)") {

@@ -27,6 +27,14 @@ enum BookListMode: String, CaseIterable, Identifiable {
         case .favorites: "Favoris"
         }
     }
+    var subtitle: String {
+        switch self {
+        case .all: "Tous vos livres ajout\u{00E9}s"
+        case .toRead: "Livres en attente de lecture"
+        case .series: "Vos livres regroup\u{00E9}s par s\u{00E9}rie"
+        case .favorites: "Vos livres not\u{00E9}s 5 \u{00E9}toiles"
+        }
+    }
 }
 
 enum BookSort: String, CaseIterable, Identifiable {
