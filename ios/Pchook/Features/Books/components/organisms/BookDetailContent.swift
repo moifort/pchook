@@ -48,7 +48,9 @@ struct BookDetailContent: View {
                 format: detail.book.format,
                 translator: detail.book.translator,
                 estimatedPrice: detail.book.estimatedPrice,
-                publishedDate: detail.book.publishedDate
+                publishedDate: detail.book.publishedDate,
+                duration: detail.book.duration,
+                narrators: detail.book.narrators
             )
 
             BookSynopsisSection(

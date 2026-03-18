@@ -191,6 +191,8 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
       seriesNumber: (enriched.seriesNumber as number) ?? scanResult.seriesNumber,
       translator: (enriched.translator as string) ?? scanResult.translator,
       estimatedPrice: (enriched.estimatedPrice as number) ?? scanResult.estimatedPrice,
+      duration: (enriched.duration as string) ?? scanResult.duration,
+      narrators: (enriched.narrators as string[]) ?? scanResult.narrators,
       awards: (enriched.awards as { name: string; year?: number }[]) ?? scanResult.awards,
       publicRatings:
         (enriched.publicRatings as {

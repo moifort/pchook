@@ -16,6 +16,8 @@ struct ShareBookPreview: Codable, Sendable {
     var seriesNumber: Int?
     var translator: String?
     var estimatedPrice: Double?
+    var duration: String?
+    var narrators: [String]?
     var awards: [ShareAward]
     var publicRatings: [SharePublicRating]
 }

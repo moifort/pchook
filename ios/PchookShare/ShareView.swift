@@ -121,10 +121,22 @@ struct ShareView: View {
                 }
 
                 // Info
-                if preview.pageCount != nil || preview.format != nil || preview.language != nil {
+                if preview.pageCount != nil || preview.format != nil || preview.language != nil
+                    || preview.duration != nil
+                {
                     Section("Informations") {
                         if let pageCount = preview.pageCount {
                             infoRow(icon: "doc.text", title: "Pages", value: "\(pageCount)")
+                        }
+                        if let duration = preview.duration {
+                            infoRow(icon: "clock", title: "Durée", value: duration)
+                        }
+                        if let narrators = preview.narrators, !narrators.isEmpty {
+                            infoRow(
+                                icon: "person.wave.2",
+                                title: "Narrateur(s)",
+                                value: narrators.joined(separator: ", ")
+                            )
                         }
                         if let format = preview.format {
                             infoRow(icon: "doc", title: "Format", value: format)

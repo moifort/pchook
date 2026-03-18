@@ -54,6 +54,8 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
   "seriesNumber": number ou null (numéro du tome dans la série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
+  "duration": string ou null (durée totale, format "Xh Ymin" — uniquement si le format est audiobook),
+  "narrators": string[] ou null (narrateurs/conteurs de l'audiobook — uniquement si le format est audiobook),
   "awards": [{"name": string, "year": number}] (nom du prix principal uniquement, sans sous-catégorie — "Prix Hugo" et non "Prix Hugo du meilleur roman court", "Prix Nebula" et non "Prix Nebula du meilleur roman" — tableau vide si aucun),
   "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants)
 }`

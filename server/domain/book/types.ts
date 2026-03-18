@@ -41,6 +41,8 @@ export type Book = {
   format?: BookFormat
   translator?: PersonName
   estimatedPrice?: Eur
+  duration?: string
+  narrators?: PersonName[]
   personalNotes?: string
   status: BookStatus
   readDate?: Date

@@ -137,6 +137,8 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
     seriesNumber: parsed.seriesNumber as number | undefined,
     translator: parsed.translator as string | undefined,
     estimatedPrice: parsed.estimatedPrice as number | undefined,
+    duration: parsed.duration as string | undefined,
+    narrators: (parsed.narrators as string[]) ?? undefined,
     awards: (parsed.awards as { name: string; year?: number }[]) ?? [],
     publicRatings:
       (parsed.publicRatings as {

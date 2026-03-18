@@ -8,6 +8,8 @@ struct BookInfoSection: View {
     let translator: String?
     let estimatedPrice: Double?
     let publishedDate: Date?
+    let duration: String?
+    let narrators: [String]?
 
     var body: some View {
         if hasContent {
@@ -17,6 +19,16 @@ struct BookInfoSection: View {
                 }
                 if let pageCount {
                     LabeledInfoRow(title: "Pages", value: "\(pageCount)", icon: "doc.text")
+                }
+                if let duration {
+                    LabeledInfoRow(title: "Dur\u{00E9}e", value: duration, icon: "clock")
+                }
+                if let narrators, !narrators.isEmpty {
+                    LabeledInfoRow(
+                        title: "Narrateur(s)",
+                        value: narrators.joined(separator: ", "),
+                        icon: "person.wave.2"
+                    )
                 }
                 if let language {
                     LabeledInfoRow(title: "Langue", value: language, icon: "globe")
@@ -48,6 +60,7 @@ struct BookInfoSection: View {
     private var hasContent: Bool {
         publisher != nil || pageCount != nil || language != nil
             || format != nil || translator != nil || estimatedPrice != nil || publishedDate != nil
+            || duration != nil || (narrators != nil && !(narrators?.isEmpty ?? true))
     }
 }
 
@@ -56,11 +69,13 @@ struct BookInfoSection: View {
         BookInfoSection(
             publisher: "Gallimard",
             pageCount: 320,
-            language: "Fran\u{00E7}ais",
+            language: "FR",
             format: "pocket",
             translator: nil,
             estimatedPrice: 8.50,
-            publishedDate: Date()
+            publishedDate: Date(),
+            duration: nil,
+            narrators: nil
         )
     }
 }

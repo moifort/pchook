@@ -55,7 +55,9 @@ struct ScanConfirmationView: View {
                 format: editablePreview.format,
                 translator: editablePreview.translator,
                 estimatedPrice: editablePreview.estimatedPrice,
-                publishedDate: nil
+                publishedDate: nil,
+                duration: editablePreview.duration,
+                narrators: editablePreview.narrators
             )
 
             BookSynopsisSection(synopsis: editablePreview.synopsis)
@@ -143,6 +145,8 @@ extension ScanConfirmationView {
         var publisher: String?
         var translator: String?
         var estimatedPrice: Double?
+        var duration: String?
+        var narrators: [String]?
         let awards: [AwardsSection.Item]
         let ratings: [PublicRatingsSection.Item]
         var series: String?
@@ -165,6 +169,8 @@ extension ScanConfirmationView {
                 publisher: "Gallimard",
                 translator: nil,
                 estimatedPrice: 6.90,
+                duration: nil,
+                narrators: nil,
                 awards: [.init(name: "Prix Nobel", year: 1957)],
                 ratings: [.init(source: "Goodreads", score: 4.18, maxScore: 5, voterCount: 125_000)],
                 series: nil,

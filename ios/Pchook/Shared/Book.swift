@@ -21,6 +21,8 @@ struct Book: Codable, Identifiable, Sendable {
     var format: String?
     var translator: String?
     var estimatedPrice: Double?
+    var duration: String?
+    var narrators: [String]?
     var personalNotes: String?
     var status: String
     var readDate: Date?
@@ -167,6 +169,8 @@ struct BookPreview: Codable, Sendable {
     var seriesNumber: Int?
     var translator: String?
     var estimatedPrice: Double?
+    var duration: String?
+    var narrators: [String]?
     var awards: [Award]
     var publicRatings: [PublicRating]
     var coverImageBase64: String?

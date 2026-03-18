@@ -27,6 +27,8 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
     format: scanResult.format ? BookFormat(scanResult.format) : undefined,
     translator: scanResult.translator ? PersonName(scanResult.translator) : undefined,
     estimatedPrice: scanResult.estimatedPrice ? Eur(scanResult.estimatedPrice) : undefined,
+    duration: scanResult.duration,
+    narrators: scanResult.narrators?.map((n) => PersonName(n)),
     awards: scanResult.awards as Award[],
     publicRatings: scanResult.publicRatings
       .filter(({ score, maxScore }) => score != null && maxScore != null)

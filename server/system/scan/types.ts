@@ -18,6 +18,8 @@ export type ScanResult = {
   seriesNumber?: number
   translator?: string
   estimatedPrice?: number
+  duration?: string
+  narrators?: string[]
   awards: { name: string; year?: number }[]
   publicRatings: { source: string; score: number; maxScore: number; voterCount: number }[]
 }
