@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { createHash, createSign, randomBytes, randomUUID } from 'node:crypto'
 import { AudibleCommand } from '~/domain/audible/command'
 import { Asin } from '~/domain/audible/primitives'
 import type {
@@ -201,15 +201,29 @@ export const refreshAccessToken = async (credentials: AudibleCredentials) => {
   return updated
 }
 
-// --- Library & Wishlist ---
+// --- Request Signing (used by Audible mobile apps) ---
 
-const ensureValidToken = async (credentials: AudibleCredentials) => {
-  const fiveMinutes = 5 * 60 * 1000
-  if (new Date(credentials.expiresAt).getTime() - Date.now() < fiveMinutes) {
-    return await refreshAccessToken(credentials)
+const signRequest = (
+  method: string,
+  path: string,
+  body: string,
+  credentials: AudibleCredentials,
+) => {
+  const date = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const data = `${method}\n${path}\n${date}\n${body}\n${credentials.adpToken}`
+
+  const signer = createSign('SHA256')
+  signer.update(data)
+  const signature = signer.sign(credentials.devicePrivateKey, 'base64')
+
+  return {
+    'x-adp-token': credentials.adpToken,
+    'x-adp-alg': 'SHA256withRSA:1.0',
+    'x-adp-signature': `${signature}:${date}`,
   }
-  return credentials
 }
+
+// --- Library & Wishlist ---
 
 const audibleFetch = async <T>(
   path: string,
@@ -217,18 +231,19 @@ const audibleFetch = async <T>(
   query?: Record<string, string>,
 ) => {
   const config = AUDIBLE_LOCALES[credentials.locale]
-  const fresh = await ensureValidToken(credentials)
+  const fullPath = `/1.0${path}`
+  const queryString = query ? `?${new URLSearchParams(query).toString()}` : ''
+  const signPath = `${fullPath}${queryString}`
+
+  const headers = signRequest('GET', signPath, '', credentials)
 
   try {
-    const response = await $fetch<T>(`https://api.audible.${config.domain}/1.0${path}`, {
-      headers: {
-        Authorization: `Bearer ${fresh.accessToken}`,
-        'client-id': toHexString(`${fresh.serial}#${DEVICE_TYPE}`),
-      },
+    const response = await $fetch<T>(`https://api.audible.${config.domain}${fullPath}`, {
+      headers,
       query,
     })
 
-    return { response, credentials: fresh }
+    return { response, credentials }
   } catch (error: unknown) {
     const fetchError = error as { data?: unknown; status?: number }
     log.error('Audible API error', {
