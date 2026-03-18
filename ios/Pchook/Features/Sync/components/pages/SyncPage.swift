@@ -17,6 +17,7 @@ struct SyncPage: View {
                 }
             }
             .task(id: refreshTrigger) { await audibleViewModel.checkStatus() }
+            .onDisappear { audibleViewModel.cancelPolling() }
             .sheet(isPresented: $audibleViewModel.showLogin) {
                 AudibleLoginSheet {
                     await audibleViewModel.onLoginComplete()

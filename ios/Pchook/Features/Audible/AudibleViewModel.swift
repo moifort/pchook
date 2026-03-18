@@ -13,6 +13,7 @@ final class AudibleViewModel {
     var error: String?
     var showLogin = false
     var showSyncConfirmation = false
+    private var pollingTask: Task<Void, Never>?
 
     func checkStatus() async {
         isCheckingStatus = true
@@ -29,7 +30,7 @@ final class AudibleViewModel {
                 if progress.phase != "idle" {
                     syncProgress = progress
                     isSyncing = true
-                    Task { await resumePolling() }
+                    pollingTask = Task { await resumePolling() }
                 }
             }
         } catch {
@@ -99,6 +100,13 @@ final class AudibleViewModel {
     func onLoginComplete() async {
         showLogin = false
         await checkStatus()
+    }
+
+    func cancelPolling() {
+        pollingTask?.cancel()
+        pollingTask = nil
+        isSyncing = false
+        syncProgress = nil
     }
 
     func disconnect() async {
