@@ -44,6 +44,26 @@ final class ScanViewModel {
         }
     }
 
+    func scanBarcode(_ isbn: String) {
+        step = .scanning
+        error = nil
+
+        Task {
+            do {
+                let result = try await ScanAPI.analyzeBarcode(isbn: isbn)
+                switch result {
+                case .preview(let preview):
+                    self.step = .preview(preview)
+                case .duplicate(let bookId, let title, let authors):
+                    self.step = .duplicate(bookId: bookId, title: title, authors: authors)
+                }
+            } catch {
+                self.error = reportError(error)
+                self.step = .camera
+            }
+        }
+    }
+
     func reset() {
         step = .camera
         error = nil
