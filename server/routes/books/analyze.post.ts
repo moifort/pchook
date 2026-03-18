@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createLogger } from '~/system/logger'
 import { BookScanner } from '~/system/scan/index'
 import * as previewRepository from '~/system/scan/preview-repository'
 
@@ -10,6 +11,12 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { imageBase64, ocrText } = bodySchema.parse(body)
+
+  const log = createLogger('analyze')
+  log.info('Received analyze request', {
+    imageSize: imageBase64.length,
+    ocrText: ocrText ?? null,
+  })
 
   const imageBuffer = Buffer.from(imageBase64, 'base64')
   const scanResult = await BookScanner.scan(imageBuffer, ocrText)
