@@ -232,7 +232,11 @@ const audibleFetch = async <T>(
 ) => {
   const config = AUDIBLE_LOCALES[credentials.locale]
   const fullPath = `/1.0${path}`
-  const queryString = query ? `?${new URLSearchParams(query).toString()}` : ''
+  const queryString = query
+    ? `?${Object.entries(query)
+        .map(([k, v]) => `${k}=${v}`)
+        .join('&')}`
+    : ''
   const signPath = `${fullPath}${queryString}`
 
   const headers = signRequest('GET', signPath, '', credentials)
