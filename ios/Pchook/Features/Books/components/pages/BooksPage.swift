@@ -13,6 +13,8 @@ struct BooksPage: View {
             Group {
                 if !viewModel.hasBooks && viewModel.isLoading {
                     ProgressView("Chargement...")
+                } else if let error = viewModel.error {
+                    ContentUnavailableView("Erreur", systemImage: "exclamationmark.triangle", description: Text(error))
                 } else if viewModel.displayedBooks.isEmpty {
                     emptyState
                 } else {
