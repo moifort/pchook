@@ -32,7 +32,7 @@ struct ContentView: View {
             }
             .accessibilityIdentifier("tab-home")
             Tab(TabSelection.books.label, systemImage: TabSelection.books.icon, value: .books) {
-                BooksPage(refreshTrigger: refreshTrigger)
+                BooksPage(refreshTrigger: $refreshTrigger)
             }
             .accessibilityIdentifier("tab-books")
             Tab(value: .scan, role: .search) {

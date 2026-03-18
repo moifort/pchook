@@ -3,7 +3,7 @@ import SentrySwiftUI
 import SwiftUI
 
 struct BooksPage: View {
-    var refreshTrigger: Int = 0
+    @Binding var refreshTrigger: Int
 
     @State private var viewModel = BooksViewModel()
     @State private var selectedBookId: String?
@@ -151,5 +151,5 @@ struct BookIdWrapper: Identifiable {
 }
 
 #Preview {
-    BooksPage()
+    BooksPage(refreshTrigger: .constant(0))
 }
