@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto'
 import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
-import { lookupByIsbn } from '~/system/scan/index'
 import { UrlHash } from '~/system/scan/primitives'
 import type { ScanResult } from '~/system/scan/types'
 import * as repository from '~/system/scan/url-import-repository'
@@ -179,18 +178,7 @@ export namespace ShareImporter {
       return 'extraction-failed' as const
     }
 
-    const isbnData = await lookupByIsbn(extracted.isbn)
-    log.info('ISBN lookup result', isbnData ?? 'no data')
-
-    const scanResult: ScanResult = isbnData
-      ? {
-          ...extracted,
-          publisher: isbnData.publisher ?? extracted.publisher,
-          pageCount: isbnData.pageCount ?? extracted.pageCount,
-          publishedDate: isbnData.publishedDate ?? extracted.publishedDate,
-          synopsis: extracted.synopsis ?? isbnData.synopsis,
-        }
-      : extracted
+    const scanResult = extracted
 
     await repository.save({
       urlHash,
