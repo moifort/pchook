@@ -1,43 +1,14 @@
 import { createHash } from 'node:crypto'
-import type { BookFormat } from '~/domain/book/types'
 import { config } from '~/system/config/index'
 import { createLogger } from '~/system/logger'
+import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
 import { ImageHash } from '~/system/scan/primitives'
 import * as repository from '~/system/scan/repository'
 import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('scan')
 
-const formatAliases: Record<string, BookFormat> = {
-  pocket: 'pocket',
-  poche: 'pocket',
-  'format poche': 'pocket',
-  'livre de poche': 'pocket',
-  'mass market': 'pocket',
-  'mass market paperback': 'pocket',
-  paperback: 'paperback',
-  broché: 'paperback',
-  'grand format': 'paperback',
-  'trade paperback': 'paperback',
-  hardcover: 'hardcover',
-  relié: 'hardcover',
-  cartonné: 'hardcover',
-  'couverture rigide': 'hardcover',
-  audiobook: 'audiobook',
-  'livre audio': 'audiobook',
-  audio: 'audiobook',
-}
-
-const normalizeBookFormat = (value: string | undefined): BookFormat | undefined => {
-  if (!value) return undefined
-  const normalized = formatAliases[value.toLowerCase().trim()]
-  if (!normalized) log.warn('Unknown book format, discarding', value)
-  return normalized
-}
-
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
-const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 const hashImage = (buffer: Buffer) => {
   const hash = createHash('sha256').update(buffer).digest('hex')
@@ -188,8 +159,6 @@ export const lookupByIsbn = async (
 }
 
 const enrichWithGemini = async (scanResult: ScanResult) => {
-  const { googleApiKey } = config()
-
   const bookDescription = [
     scanResult.title,
     scanResult.authors.join(', '),
@@ -200,44 +169,12 @@ const enrichWithGemini = async (scanResult: ScanResult) => {
 
   const prompt = `Pour le livre "${bookDescription}", recherche et complète les informations suivantes au format JSON strict (sans markdown, sans backticks) :
 
-{
-  "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
-  "pageCount": number ou null,
-  "synopsis": string ou null (résumé de 3-5 phrases en français, pas la 4ème de couverture mais un vrai résumé du contenu),
-  "isbn": string ou null (ISBN-13 de préférence),
-  "language": string ou null (langue originale du texte),
-  "genre": string ou null (sous-genres séparés par des virgules, ex: "LitRPG, Science Fantasy" ou "Thriller, Policier" — sois précis et spécifique),
-  "series": string ou null (nom de la série ou du cycle),
-  "seriesNumber": number ou null (numéro du tome dans la série),
-  "publisher": string ou null (maison d'édition de cette édition),
-  "publishedDate": string ou null (date de première publication, format YYYY-MM-DD ou YYYY),
-  "format": string ou null ("pocket", "paperback" ou "hardcover"),
-  "translator": string ou null (traducteur si c'est une traduction),
-  "awards": [{"name": string, "year": number}] (tous les prix littéraires reçus, tableau vide si aucun — cherche sur Wikipedia et les sites de prix),
-  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc. — inclus chaque source trouvée avec son score, son barème et le nombre de votants)
-}
+${buildBookJsonSchema(false)}
 
 Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`
 
   try {
-    const response = await $fetch<{
-      candidates: { content: { parts: { text?: string }[] } }[]
-    }>(`${GEMINI_API_URL}?key=${googleApiKey}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: {
-        contents: [{ parts: [{ text: prompt }] }],
-        tools: [{ google_search: {} }],
-      },
-    })
-
-    const text = response.candidates?.[0]?.content?.parts?.find((part) => part.text)?.text
-    if (!text) return scanResult
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return scanResult
-
-    const enriched = JSON.parse(jsonMatch[0]) as Record<string, unknown>
+    const enriched = await callGemini(prompt)
 
     return {
       title: scanResult.title,
