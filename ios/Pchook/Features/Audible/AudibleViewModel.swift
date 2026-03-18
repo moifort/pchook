@@ -23,6 +23,15 @@ final class AudibleViewModel {
             libraryCount = status.libraryCount
             wishlistCount = status.wishlistCount
             lastSyncAt = status.lastSyncAt
+
+            if !isSyncing {
+                let progress = try await AudibleAPI.syncProgress()
+                if progress.phase != "idle" {
+                    syncProgress = progress
+                    isSyncing = true
+                    Task { await resumePolling() }
+                }
+            }
         } catch {
             self.error = reportError(error)
         }
@@ -53,6 +62,25 @@ final class AudibleViewModel {
             await checkStatus()
         } catch {
             self.error = reportError(error)
+        }
+    }
+
+    private func resumePolling() async {
+        while isSyncing {
+            try? await Task.sleep(for: .seconds(2))
+            guard isSyncing else { break }
+            do {
+                let progress = try await AudibleAPI.syncProgress()
+                syncProgress = progress
+                if progress.phase == "idle" || progress.phase == "done" {
+                    isSyncing = false
+                    syncProgress = nil
+                    await checkStatus()
+                    return
+                }
+            } catch {
+                break
+            }
         }
     }
 
