@@ -6,7 +6,7 @@ struct RecentAwardsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("Prix r\u{00E9}cents", systemImage: "medal")
+                Label("Prix r\u{00E9}cents", systemImage: "trophy")
                     .font(.headline)
                     .foregroundStyle(.primary)
                 Spacer()
@@ -25,7 +25,7 @@ struct RecentAwardsSection: View {
                 VStack(spacing: 0) {
                     ForEach(items) { item in
                         HStack(spacing: 10) {
-                            Image(systemName: "medal.fill")
+                            Image(systemName: "trophy.fill")
                                 .foregroundStyle(.orange)
                                 .font(.caption)
                             VStack(alignment: .leading, spacing: 2) {

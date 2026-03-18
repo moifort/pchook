@@ -212,7 +212,7 @@ private struct SharePreviewForm: View {
                 Section("Prix litt\u{00E9}raires") {
                     ForEach(preview.awards) { award in
                         HStack {
-                            Image(systemName: "medal.fill")
+                            Image(systemName: "trophy.fill")
                                 .foregroundStyle(.orange)
                             Text(award.name)
                             Spacer()

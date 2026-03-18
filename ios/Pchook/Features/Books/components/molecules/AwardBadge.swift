@@ -4,7 +4,7 @@ struct AwardBadge: View {
     let count: Int
 
     var body: some View {
-        Label("\(count)", systemImage: "medal")
+        Label("\(count)", systemImage: "trophy")
             .font(.caption2)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)

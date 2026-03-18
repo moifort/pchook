@@ -57,7 +57,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .author: "person"
         case .genre: "tag"
         case .myRating: "star"
-        case .awards: "medal"
+        case .awards: "trophy"
         }
     }
 }
