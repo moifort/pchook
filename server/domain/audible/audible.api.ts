@@ -48,7 +48,7 @@ export const generateLoginUrl = async (locale: AudibleLocale) => {
     'openid.oa2.response_type': 'code',
     'openid.oa2.code_challenge_method': 'S256',
     'openid.oa2.code_challenge': codeChallenge,
-    'openid.return_to': 'pchook://audible-callback',
+    'openid.return_to': `https://www.amazon.${config.domain}/ap/maplanding`,
     'openid.assoc_handle': `amzn_audible_ios_${config.countryCode}`,
     'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
     pageId: 'amzn_audible_ios',

@@ -74,7 +74,8 @@ feature('Audible Auth Flow', () => {
     const event = mockEvent({
       body: {
         sessionId: VALID_SESSION,
-        redirectUrl: 'pchook://audible-callback?openid.oa2.authorization_code=AUTH_CODE_123',
+        redirectUrl:
+          'https://www.amazon.fr/ap/maplanding?openid.oa2.authorization_code=AUTH_CODE_123',
       },
     })
     const result = await callbackHandler(event as never)
@@ -95,7 +96,8 @@ feature('Audible Auth Flow', () => {
     const event = mockEvent({
       body: {
         sessionId: UNKNOWN_SESSION,
-        redirectUrl: 'pchook://audible-callback?openid.oa2.authorization_code=AUTH_CODE_123',
+        redirectUrl:
+          'https://www.amazon.fr/ap/maplanding?openid.oa2.authorization_code=AUTH_CODE_123',
       },
     })
 
@@ -121,7 +123,7 @@ feature('Audible Auth Flow', () => {
     const event = mockEvent({
       body: {
         sessionId: NO_CODE_SESSION,
-        redirectUrl: 'pchook://audible-callback?error=access_denied',
+        redirectUrl: 'https://www.amazon.fr/ap/maplanding?error=access_denied',
       },
     })
 

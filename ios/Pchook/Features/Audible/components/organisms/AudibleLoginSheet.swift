@@ -1,23 +1,33 @@
-import AuthenticationServices
 import SwiftUI
+import UIKit
 
 struct AudibleLoginSheet: View {
     let onComplete: () async -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var isLoading = false
     @State private var error: String?
+    @State private var sessionId: String?
+    @State private var step: AuthStep = .loading
+
+    private enum AuthStep {
+        case loading
+        case openSafari
+        case waitingForUrl
+        case processing
+    }
 
     var body: some View {
         NavigationStack {
             Group {
-                if let error {
-                    ContentUnavailableView(
-                        "Erreur",
-                        systemImage: "exclamationmark.triangle",
-                        description: Text(error)
-                    )
-                } else {
-                    ProgressView("Connexion à Amazon...")
+                switch step {
+                case .loading:
+                    ProgressView("Préparation...")
+                case .openSafari:
+                    safariInstructions
+                case .waitingForUrl:
+                    pasteInstructions
+                case .processing:
+                    ProgressView("Connexion en cours...")
                 }
             }
             .navigationTitle("Connexion Audible")
@@ -27,71 +37,71 @@ struct AudibleLoginSheet: View {
                     Button("Annuler") { dismiss() }
                 }
             }
+            .alert("Erreur", isPresented: .constant(error != nil)) {
+                Button("OK") { error = nil }
+            } message: {
+                if let error { Text(error) }
+            }
         }
-        .task { await startAuth() }
+        .task { await prepareLogin() }
     }
 
-    private func startAuth() async {
-        isLoading = true
-        defer { isLoading = false }
+    private var safariInstructions: some View {
+        ContentUnavailableView {
+            Label("Connexion Amazon", systemImage: "safari")
+        } description: {
+            Text("Safari va s'ouvrir pour vous connecter à Amazon. Après la connexion, vous arriverez sur une page d'erreur — c'est normal.\n\nCopiez l'URL de la barre d'adresse, puis revenez ici.")
+        } actions: {
+            Button("Ouvrir Safari") {
+                step = .waitingForUrl
+            }
+            .buttonStyle(.borderedProminent)
+        }
+    }
 
+    private var pasteInstructions: some View {
+        ContentUnavailableView {
+            Label("Coller l'URL", systemImage: "doc.on.clipboard")
+        } description: {
+            Text("Connectez-vous à Amazon dans Safari, puis copiez l'URL de la page d'erreur et revenez ici.")
+        } actions: {
+            Button("Coller l'URL copiée") {
+                Task { await handlePaste() }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(step == .processing)
+        }
+    }
+
+    private func prepareLogin() async {
         do {
             let response = try await AudibleAPI.authStart()
-            guard let loginUrl = URL(string: response.loginUrl) else {
+            sessionId = response.sessionId
+            guard let url = URL(string: response.loginUrl) else {
                 error = "URL de connexion invalide"
                 return
             }
-
-            let callbackUrl = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<URL, Error>) in
-                let session = ASWebAuthenticationSession(
-                    url: loginUrl,
-                    callbackURLScheme: "pchook"
-                ) { callbackURL, error in
-                    if let error {
-                        continuation.resume(throwing: error)
-                    } else if let callbackURL {
-                        continuation.resume(returning: callbackURL)
-                    } else {
-                        continuation.resume(throwing: AuthError.noCallback)
-                    }
-                }
-                session.prefersEphemeralWebBrowserSession = false
-                session.presentationContextProvider = PresentationContextProvider.shared
-                session.start()
-            }
-
-            try await AudibleAPI.authCallback(
-                sessionId: response.sessionId,
-                redirectUrl: callbackUrl.absoluteString
-            )
-            await onComplete()
-        } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
-            dismiss()
+            step = .openSafari
+            await UIApplication.shared.open(url)
         } catch {
             self.error = reportError(error)
         }
     }
-}
 
-private enum AuthError: LocalizedError {
-    case noCallback
-
-    var errorDescription: String? {
-        switch self {
-        case .noCallback: "Aucune réponse d'authentification reçue"
+    private func handlePaste() async {
+        guard let sessionId else { return }
+        guard let pastedUrl = UIPasteboard.general.string, pastedUrl.contains("maplanding") else {
+            error = "L'URL copiée ne semble pas être la bonne. Copiez l'URL complète de la barre d'adresse Safari après la connexion."
+            return
         }
-    }
-}
 
-private final class PresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding, @unchecked Sendable {
-    static let shared = PresentationContextProvider()
-
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = scene.windows.first
-        else {
-            return ASPresentationAnchor()
+        step = .processing
+        do {
+            try await AudibleAPI.authCallback(sessionId: sessionId, redirectUrl: pastedUrl)
+            await onComplete()
+        } catch {
+            step = .waitingForUrl
+            self.error = reportError(error)
         }
-        return window
     }
 }
