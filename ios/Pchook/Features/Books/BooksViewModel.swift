@@ -1,13 +1,14 @@
 import Foundation
 
 enum BookListMode: String, CaseIterable, Identifiable {
-    case all, toRead, read, favorites
+    case all, toRead, read, series, favorites
     var id: String { rawValue }
     var label: String {
         switch self {
         case .all: "Tous"
         case .toRead: "\u{00C0} lire"
         case .read: "Lus"
+        case .series: "S\u{00E9}ries"
         case .favorites: "Favoris"
         }
     }
@@ -16,6 +17,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
         case .all: "books.vertical"
         case .toRead: "bookmark"
         case .read: "checkmark.circle"
+        case .series: "books.vertical.circle"
         case .favorites: "heart.fill"
         }
     }
@@ -24,6 +26,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
         case .all: "Mes Livres"
         case .toRead: "\u{00C0} lire"
         case .read: "Lus"
+        case .series: "S\u{00E9}ries"
         case .favorites: "Favoris"
         }
     }
@@ -81,15 +84,17 @@ final class BooksViewModel {
         case .all: books
         case .toRead: books.filter { $0.status == "to-read" }
         case .read: books.filter { $0.status == "read" }
+        case .series: books.filter { $0.seriesName != nil }
         case .favorites: books.filter { $0.rating == 5 }
         }
     }
 
     var usesGrouping: Bool {
-        sort != .title
+        sort != .title || mode == .series
     }
 
     var groupedBooks: [BookSection] {
+        if mode == .series { return seriesGroupedBooks }
         let items = displayedBooks
         switch sort {
         case .createdAt:
@@ -176,6 +181,21 @@ final class BooksViewModel {
 
         case .title:
             return []
+        }
+    }
+
+    private var seriesGroupedBooks: [BookSection] {
+        var dict: [String: [BookListItem]] = [:]
+        for book in displayedBooks {
+            let key = book.seriesName ?? ""
+            dict[key, default: []].append(book)
+        }
+        return dict.keys.sorted().map { key in
+            let sorted = dict[key]!.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
+            return BookSection(
+                title: key,
+                items: sorted.map { SectionedBook(sectionTitle: key, book: $0) }
+            )
         }
     }
 

@@ -101,6 +101,12 @@ struct BooksPage: View {
                 systemImage: "checkmark.circle",
                 description: Text("Les livres lus appara\u{00EE}tront ici")
             )
+        case .series:
+            ContentUnavailableView(
+                "Aucune s\u{00E9}rie",
+                systemImage: "books.vertical.circle",
+                description: Text("Les livres dans une s\u{00E9}rie appara\u{00EE}tront ici")
+            )
         case .favorites:
             ContentUnavailableView(
                 "Aucun favori",
@@ -126,6 +132,15 @@ struct BooksPage: View {
     }
 
     private func subtitle(for book: BookListItem) -> String? {
+        if viewModel.mode == .series {
+            let parts: [String?] = [
+                book.seriesPosition.map { "Tome \($0)" },
+                book.authors.first,
+            ]
+            let filtered = parts.compactMap { $0 }
+            return filtered.isEmpty ? nil : filtered.joined(separator: " \u{2022} ")
+        }
+
         let parts: [String?] = [
             book.authors.first,
             book.genre?.split(separator: ",").first.map { $0.trimmingCharacters(in: .whitespaces) },
