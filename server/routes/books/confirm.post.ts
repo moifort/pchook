@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BookId } from '~/domain/book/primitives'
 import { BookUseCase } from '~/domain/book/use-case'
 import * as previewRepository from '~/system/scan/preview-repository'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
@@ -24,11 +25,12 @@ const bodySchema = z.object({
   previewId: z.string().uuid(),
   status: z.enum(['to-read', 'read']),
   overrides: overridesSchema,
+  replaceBookId: z.string().uuid().optional(),
 })
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { previewId, status, overrides } = bodySchema.parse(body)
+  const { previewId, status, overrides, replaceBookId } = bodySchema.parse(body)
 
   const preview = await previewRepository.findBy(previewId)
   if (!preview) {
@@ -42,6 +44,25 @@ export default defineEventHandler(async (event) => {
       }
     : preview.scanResult
   const { title, data, seriesInfo } = scanResultToBookData(mergedScanResult)
+
+  if (replaceBookId) {
+    const result = await BookUseCase.replaceFromScan(
+      BookId(replaceBookId),
+      title,
+      { ...data, status },
+      seriesInfo,
+      preview.coverImageBase64,
+    )
+
+    await previewRepository.remove(previewId)
+
+    if (result.tag === 'not-found') {
+      throw createError({ statusCode: 404, statusMessage: 'Book to replace not found' })
+    }
+
+    return { status: 200, data: result.book } as const
+  }
+
   const result = await BookUseCase.addFromScan(
     title,
     { ...data, status },
@@ -49,12 +70,11 @@ export default defineEventHandler(async (event) => {
     preview.coverImageBase64,
   )
 
-  await previewRepository.remove(previewId)
-
   if (result.tag === 'duplicate') {
     setResponseStatus(event, 409)
     return { status: 409, data: result.book } as const
   }
 
+  await previewRepository.remove(previewId)
   return { status: 201, data: result.book } as const
 })

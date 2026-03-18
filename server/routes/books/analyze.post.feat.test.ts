@@ -122,4 +122,83 @@ feature('POST /books/analyze + POST /books/confirm', () => {
     const books = await BookListReadModel.all({})
     expect(books).toHaveLength(1)
   })
+
+  scenario('replaces a duplicate book with new scan data', async () => {
+    given('a first book has been confirmed')
+    const firstAnalyze = mockEvent({ body: analyzeBody })
+    const firstResult = await analyzeHandler(firstAnalyze as never)
+    const firstConfirm = mockEvent({
+      body: { previewId: firstResult.data.previewId, status: 'read' },
+    })
+    const created = await confirmHandler(firstConfirm as never)
+    const existingBookId = created.data.id
+
+    and('a second preview is created for the same book')
+    const secondAnalyze = mockEvent({ body: analyzeBody })
+    const secondResult = await analyzeHandler(secondAnalyze as never)
+
+    and('the duplicate is detected')
+    const duplicateConfirm = mockEvent({
+      body: { previewId: secondResult.data.previewId, status: 'to-read' },
+    })
+    const duplicateResult = await confirmHandler(duplicateConfirm as never)
+    expect(duplicateResult.status).toBe(409)
+
+    when('POST /books/confirm is called with replaceBookId')
+    const thirdAnalyze = mockEvent({ body: analyzeBody })
+    const thirdResult = await analyzeHandler(thirdAnalyze as never)
+    const replaceConfirm = mockEvent({
+      body: {
+        previewId: thirdResult.data.previewId,
+        status: 'to-read',
+        replaceBookId: String(existingBookId),
+      },
+    })
+    const result = await confirmHandler(replaceConfirm as never)
+
+    then('the existing book is updated')
+    expect(result.status).toBe(200)
+    expect(String(result.data.id)).toBe(String(existingBookId))
+    expect(String(result.data.title)).toBe('Les Misérables')
+
+    and('the book preserves its original status when overridden')
+    expect(result.data.status).toBe('to-read')
+
+    and('no extra book is created')
+    const books = await BookListReadModel.all({})
+    expect(books).toHaveLength(1)
+  })
+
+  scenario('preserves the preview on duplicate for later replacement', async () => {
+    given('a first book has been confirmed')
+    const firstAnalyze = mockEvent({ body: analyzeBody })
+    const firstResult = await analyzeHandler(firstAnalyze as never)
+    const firstConfirm = mockEvent({
+      body: { previewId: firstResult.data.previewId, status: 'to-read' },
+    })
+    const created = await confirmHandler(firstConfirm as never)
+
+    and('a second scan triggers a duplicate')
+    const secondAnalyze = mockEvent({ body: analyzeBody })
+    const secondResult = await analyzeHandler(secondAnalyze as never)
+    const secondPreviewId = secondResult.data.previewId
+
+    const duplicateConfirm = mockEvent({
+      body: { previewId: secondPreviewId, status: 'to-read' },
+    })
+    await confirmHandler(duplicateConfirm as never)
+
+    when('the same preview is used for replacement')
+    const replaceConfirm = mockEvent({
+      body: {
+        previewId: secondPreviewId,
+        status: 'to-read',
+        replaceBookId: String(created.data.id),
+      },
+    })
+    const result = await confirmHandler(replaceConfirm as never)
+
+    then('the replacement succeeds using the preserved preview')
+    expect(result.status).toBe(200)
+  })
 })
