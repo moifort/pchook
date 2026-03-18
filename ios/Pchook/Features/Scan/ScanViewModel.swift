@@ -35,9 +35,9 @@ final class ScanViewModel {
         }
     }
 
-    func confirm(previewId: String, status: String) async -> ConfirmResult? {
+    func confirm(previewId: String, status: String, overrides: ConfirmBookOverrides? = nil) async -> ConfirmResult? {
         do {
-            return try await ScanAPI.confirm(previewId: previewId, status: status)
+            return try await ScanAPI.confirm(previewId: previewId, status: status, overrides: overrides)
         } catch {
             self.error = reportError(error)
             return nil

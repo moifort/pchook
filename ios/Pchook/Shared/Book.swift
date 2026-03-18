@@ -195,6 +195,22 @@ struct UpdateBookRequest: Encodable, Sendable {
 struct ConfirmBookRequest: Encodable, Sendable {
     let previewId: String
     let status: String
+    var overrides: ConfirmBookOverrides?
+}
+
+struct ConfirmBookOverrides: Encodable, Sendable {
+    var title: String?
+    var authors: [String]?
+    var publisher: String?
+    var pageCount: Int?
+    var genre: String?
+    var synopsis: String?
+    var language: String?
+    var format: String?
+    var translator: String?
+    var estimatedPrice: Double?
+    var series: String?
+    var seriesNumber: Int?
 }
 
 struct CreateReviewRequest: Encodable, Sendable {

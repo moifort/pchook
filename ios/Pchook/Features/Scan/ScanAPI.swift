@@ -13,10 +13,10 @@ enum ScanAPI {
         return response.data
     }
 
-    static func confirm(previewId: String, status: String) async throws -> ConfirmResult {
+    static func confirm(previewId: String, status: String, overrides: ConfirmBookOverrides? = nil) async throws -> ConfirmResult {
         let (statusCode, response): (Int, APIResponse<Book>) = try await APIClient.shared.postWithStatus(
             "/books/confirm",
-            body: ConfirmBookRequest(previewId: previewId, status: status),
+            body: ConfirmBookRequest(previewId: previewId, status: status, overrides: overrides),
             allowedStatuses: [201, 409]
         )
         return statusCode == 409 ? .duplicate(response.data) : .created(response.data)
