@@ -188,8 +188,7 @@ final class BooksViewModel {
         }
         return dict.keys.sorted().map { key in
             let sorted = dict[key]!.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
-            let author = sorted.first?.authors.first
-            let sectionTitle = [key, author].compactMap { $0 }.joined(separator: " \u{2022} ")
+            let sectionTitle = key
             return BookSection(
                 title: sectionTitle,
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
