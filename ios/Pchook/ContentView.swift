@@ -28,7 +28,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab(TabSelection.home.label, systemImage: TabSelection.home.icon, value: .home) {
-                DashboardPage(refreshTrigger: refreshTrigger)
+                DashboardPage(refreshTrigger: $refreshTrigger)
             }
             .accessibilityIdentifier("tab-home")
             Tab(TabSelection.books.label, systemImage: TabSelection.books.icon, value: .books) {

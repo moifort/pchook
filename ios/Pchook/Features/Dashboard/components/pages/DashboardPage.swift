@@ -3,7 +3,7 @@ import SentrySwiftUI
 import SwiftUI
 
 struct DashboardPage: View {
-    var refreshTrigger: Int = 0
+    @Binding var refreshTrigger: Int
 
     @State private var viewModel = DashboardViewModel()
     @State private var showSync = false
@@ -81,7 +81,9 @@ struct DashboardPage: View {
                     }
                 }
             }
-            .sheet(isPresented: $showSync, onDismiss: { Task { await viewModel.load() } }) {
+            .sheet(isPresented: $showSync, onDismiss: {
+                refreshTrigger += 1
+            }) {
                 SyncPage(refreshTrigger: refreshTrigger)
             }
         }
@@ -89,5 +91,5 @@ struct DashboardPage: View {
 }
 
 #Preview {
-    DashboardPage()
+    DashboardPage(refreshTrigger: .constant(0))
 }

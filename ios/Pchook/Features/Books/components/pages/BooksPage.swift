@@ -35,13 +35,15 @@ struct BooksPage: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    HStack {
-                        Text(viewModel.mode.title)
-                            .font(.headline)
-                        Text("\(viewModel.count(for: viewModel.mode))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                if viewModel.hasBooks {
+                    ToolbarItem(placement: .principal) {
+                        HStack {
+                            Text(viewModel.mode.title)
+                                .font(.headline)
+                            Text("\(viewModel.count(for: viewModel.mode))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
