@@ -8,6 +8,9 @@ export default defineEventHandler(async () => {
     'suggestions',
     'scan-cache',
     'migration-meta',
+    'audible-credentials',
+    'audible-mappings',
+    'audible-auth-sessions',
   ]) {
     const storage = useStorage(name)
     const keys = await storage.getKeys()
