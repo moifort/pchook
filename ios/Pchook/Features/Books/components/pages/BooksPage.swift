@@ -119,8 +119,7 @@ struct BooksPage: View {
                 title: book.title,
                 subtitle: subtitle(for: book),
                 rating: book.rating,
-                status: book.status,
-                seriesPosition: viewModel.mode == .series ? book.seriesPosition : nil
+                status: book.status
             )
         }
         .tint(.primary)
@@ -128,7 +127,12 @@ struct BooksPage: View {
 
     private func subtitle(for book: BookListItem) -> String? {
         if viewModel.mode == .series {
-            return book.authors.first
+            let parts: [String?] = [
+                book.seriesPosition.map { "Tome \($0)" },
+                book.authors.first,
+            ]
+            let filtered = parts.compactMap { $0 }
+            return filtered.isEmpty ? nil : filtered.joined(separator: " \u{2022} ")
         }
 
         let parts: [String?] = [
