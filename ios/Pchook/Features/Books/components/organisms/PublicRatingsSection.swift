@@ -13,7 +13,7 @@ struct PublicRatingsSection: View {
                     StarRatingView(rating: Double(userRating), font: .body)
                 }
             }
-            ForEach(ratings) { rating in
+            ForEach(ratings.sorted { $0.voterCount > $1.voterCount }) { rating in
                 HStack {
                     Text(rating.source)
                     Text("(\(formattedVoterCount(rating.voterCount)))")
