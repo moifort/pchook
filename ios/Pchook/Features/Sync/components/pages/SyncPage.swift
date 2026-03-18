@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SyncPage: View {
     let refreshTrigger: Int
+    @Environment(\.dismiss) private var dismiss
     @State private var audibleViewModel = AudibleViewModel()
 
     var body: some View {
@@ -10,6 +11,11 @@ struct SyncPage: View {
                 AudibleSection(viewModel: audibleViewModel)
             }
             .navigationTitle("Synchronisation")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Fermer", systemImage: "xmark") { dismiss() }
+                }
+            }
             .task(id: refreshTrigger) { await audibleViewModel.checkStatus() }
             .sheet(isPresented: $audibleViewModel.showLogin) {
                 AudibleLoginSheet {
