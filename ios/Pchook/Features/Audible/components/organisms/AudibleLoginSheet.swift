@@ -1,28 +1,23 @@
+import AuthenticationServices
 import SwiftUI
-@preconcurrency import WebKit
 
 struct AudibleLoginSheet: View {
     let onComplete: () async -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var isLoading = true
+    @State private var isLoading = false
     @State private var error: String?
-    @State private var loginUrl: String?
-    @State private var sessionId: String?
-    @State private var cookies: [AuthCookie] = []
 
     var body: some View {
         NavigationStack {
             Group {
                 if let error {
-                    ContentUnavailableView("Erreur", systemImage: "exclamationmark.triangle", description: Text(error))
-                } else if let loginUrl {
-                    AudibleWebView(
-                        urlString: loginUrl,
-                        cookies: cookies,
-                        onAuthCodeReceived: handleAuthCode
+                    ContentUnavailableView(
+                        "Erreur",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(error)
                     )
                 } else {
-                    ProgressView("Chargement...")
+                    ProgressView("Connexion à Amazon...")
                 }
             }
             .navigationTitle("Connexion Audible")
@@ -33,98 +28,70 @@ struct AudibleLoginSheet: View {
                 }
             }
         }
-        .task { await loadLoginUrl() }
+        .task { await startAuth() }
     }
 
-    private func loadLoginUrl() async {
+    private func startAuth() async {
+        isLoading = true
+        defer { isLoading = false }
+
         do {
             let response = try await AudibleAPI.authStart()
-            loginUrl = response.loginUrl
-            sessionId = response.sessionId
-            cookies = response.cookies
+            guard let loginUrl = URL(string: response.loginUrl) else {
+                error = "URL de connexion invalide"
+                return
+            }
+
+            let callbackUrl = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<URL, Error>) in
+                let session = ASWebAuthenticationSession(
+                    url: loginUrl,
+                    callbackURLScheme: "pchook"
+                ) { callbackURL, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else if let callbackURL {
+                        continuation.resume(returning: callbackURL)
+                    } else {
+                        continuation.resume(throwing: AuthError.noCallback)
+                    }
+                }
+                session.prefersEphemeralWebBrowserSession = false
+                session.presentationContextProvider = PresentationContextProvider.shared
+                session.start()
+            }
+
+            try await AudibleAPI.authCallback(
+                sessionId: response.sessionId,
+                redirectUrl: callbackUrl.absoluteString
+            )
+            await onComplete()
+        } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+            dismiss()
         } catch {
             self.error = reportError(error)
         }
     }
+}
 
-    private func handleAuthCode(_ redirectUrl: String) {
-        guard let sessionId else { return }
-        Task {
-            do {
-                try await AudibleAPI.authCallback(sessionId: sessionId, redirectUrl: redirectUrl)
-                await onComplete()
-            } catch {
-                self.error = reportError(error)
-            }
+private enum AuthError: LocalizedError {
+    case noCallback
+
+    var errorDescription: String? {
+        switch self {
+        case .noCallback: "Aucune réponse d'authentification reçue"
         }
     }
 }
 
-struct AudibleWebView: UIViewRepresentable {
-    let urlString: String
-    let cookies: [AuthCookie]
-    let onAuthCodeReceived: (String) -> Void
+private final class PresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding, @unchecked Sendable {
+    static let shared = PresentationContextProvider()
 
-    func makeUIView(context: Context) -> WKWebView {
-        let config = WKWebViewConfiguration()
-        let webView = WKWebView(frame: .zero, configuration: config)
-        webView.navigationDelegate = context.coordinator
-        webView.customUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
-
-        let store = webView.configuration.websiteDataStore.httpCookieStore
-        let group = DispatchGroup()
-        for cookie in cookies {
-            guard let httpCookie = HTTPCookie(properties: [
-                .name: cookie.name,
-                .value: cookie.value,
-                .domain: cookie.domain,
-                .path: "/",
-            ]) else { continue }
-            group.enter()
-            store.setCookie(httpCookie) { group.leave() }
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first
+        else {
+            return ASPresentationAnchor()
         }
-
-        group.notify(queue: .main) {
-            guard let url = URL(string: urlString) else { return }
-            webView.load(URLRequest(url: url))
-        }
-
-        return webView
-    }
-
-    func updateUIView(_ webView: WKWebView, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onAuthCodeReceived: onAuthCodeReceived)
-    }
-
-    final class Coordinator: NSObject, WKNavigationDelegate {
-        let onAuthCodeReceived: (String) -> Void
-
-        init(onAuthCodeReceived: @escaping (String) -> Void) {
-            self.onAuthCodeReceived = onAuthCodeReceived
-        }
-
-        func webView(
-            _ webView: WKWebView,
-            decidePolicyFor navigationAction: WKNavigationAction,
-            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
-        ) {
-            guard let url = navigationAction.request.url else {
-                decisionHandler(.allow)
-                return
-            }
-
-            if url.path.contains("maplanding") {
-                let urlString = url.absoluteString
-                if urlString.contains("openid.oa2.authorization_code") {
-                    decisionHandler(.cancel)
-                    onAuthCodeReceived(urlString)
-                    return
-                }
-            }
-
-            decisionHandler(.allow)
-        }
+        return window
     }
 }

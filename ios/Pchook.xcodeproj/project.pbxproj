@@ -492,6 +492,7 @@
 				DEVELOPMENT_TEAM = 46C337T7YN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Pchook-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Pchook utilise la caméra pour scanner les couvertures de livres";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Pchook utilise le réseau local pour communiquer avec le serveur";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -527,6 +528,7 @@
 				DEVELOPMENT_TEAM = 46C337T7YN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Pchook-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Pchook utilise la caméra pour scanner les couvertures de livres";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Pchook utilise le réseau local pour communiquer avec le serveur";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
