@@ -13,6 +13,7 @@ export default defineNitroConfig({
     anthropicApiKey: '',
     googleApiKey: '',
     sentryDsn: '',
+    scanStrategy: '',
   },
   storage: {
     'migration-meta': { driver: 'fs', base: './.data/db/migration-meta' },

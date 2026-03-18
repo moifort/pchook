@@ -32,19 +32,18 @@ mock.module('~/system/suggestion/index', () => ({
   },
 }))
 
-// @ts-expect-error — global mock for h3's readRawBody
-globalThis.readRawBody = async () => Buffer.from('fake-image-data')
-
 import { BookListReadModel } from '~/read-model/book-list/index'
 import analyzeHandler from '~/routes/books/analyze.post'
 import confirmHandler from '~/routes/books/confirm.post'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 import { mockEvent } from '~/test/setup'
 
+const analyzeBody = { imageBase64: 'ZmFrZS1pbWFnZS1kYXRh', ocrText: undefined }
+
 feature('POST /books/analyze + POST /books/confirm', () => {
   scenario('analyzes a book cover and returns a preview', async () => {
-    given('an image buffer sent as raw body')
-    const event = mockEvent()
+    given('an image sent as base64 in JSON body')
+    const event = mockEvent({ body: analyzeBody })
 
     when('POST /books/analyze is called')
     const result = await analyzeHandler(event as never)
@@ -63,7 +62,7 @@ feature('POST /books/analyze + POST /books/confirm', () => {
 
   scenario('confirms a preview and creates a book', async () => {
     given('a preview has been created from a scan')
-    const analyzeEvent = mockEvent()
+    const analyzeEvent = mockEvent({ body: analyzeBody })
     const analyzeResult = await analyzeHandler(analyzeEvent as never)
     const { previewId } = analyzeResult.data
 
@@ -83,7 +82,7 @@ feature('POST /books/analyze + POST /books/confirm', () => {
 
   scenario('confirms with read status', async () => {
     given('a preview has been created from a scan')
-    const analyzeEvent = mockEvent()
+    const analyzeEvent = mockEvent({ body: analyzeBody })
     const analyzeResult = await analyzeHandler(analyzeEvent as never)
     const { previewId } = analyzeResult.data
 
@@ -98,7 +97,7 @@ feature('POST /books/analyze + POST /books/confirm', () => {
 
   scenario('rejects a duplicate book by ISBN on confirm', async () => {
     given('a first book has been confirmed')
-    const firstAnalyze = mockEvent()
+    const firstAnalyze = mockEvent({ body: analyzeBody })
     const firstResult = await analyzeHandler(firstAnalyze as never)
     const firstConfirm = mockEvent({
       body: { previewId: firstResult.data.previewId, status: 'to-read' },
@@ -106,7 +105,7 @@ feature('POST /books/analyze + POST /books/confirm', () => {
     await confirmHandler(firstConfirm as never)
 
     and('a second preview is created for the same book')
-    const secondAnalyze = mockEvent()
+    const secondAnalyze = mockEvent({ body: analyzeBody })
     const secondResult = await analyzeHandler(secondAnalyze as never)
 
     when('POST /books/confirm is called for the duplicate')

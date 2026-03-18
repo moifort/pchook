@@ -1,17 +1,24 @@
+import { z } from 'zod'
 import { BookScanner } from '~/system/scan/index'
 import * as previewRepository from '~/system/scan/preview-repository'
 
-export default defineEventHandler(async (event) => {
-  const rawBody = await readRawBody(event, false)
-  if (!rawBody) throw createError({ statusCode: 400, statusMessage: 'No image data provided' })
+const bodySchema = z.object({
+  imageBase64: z.string().min(1),
+  ocrText: z.string().optional(),
+})
 
-  const imageBuffer = Buffer.from(rawBody)
-  const scanResult = await BookScanner.scan(imageBuffer)
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+  const { imageBase64, ocrText } = bodySchema.parse(body)
+
+  const imageBuffer = Buffer.from(imageBase64, 'base64')
+  const scanResult = await BookScanner.scan(imageBuffer, ocrText)
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
     previewId,
     scanResult,
+    coverImageBase64: imageBase64,
     createdAt: new Date(),
   })
 

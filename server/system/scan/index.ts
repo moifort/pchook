@@ -112,6 +112,53 @@ const scanWithClaude = async (imageBase64: string) => {
   } satisfies ScanResult
 }
 
+const scanWithNativeOcr = async (ocrText: string) => {
+  const prompt = `Pour le livre dont voici le texte extrait de la couverture par OCR :
+
+"${ocrText}"
+
+Identifie ce livre et retourne toutes les informations suivantes au format JSON strict (sans markdown, sans backticks) :
+
+${buildBookJsonSchema(true)}
+
+Recherche les données les plus récentes et précises possibles sur Wikipedia, Goodreads, Babelio, Sens Critique, Amazon et d'autres sources fiables. Toutes les valeurs textuelles en français.`
+
+  const parsed = await callGemini(prompt)
+
+  const title = parsed.title as string | undefined
+  const authors = parsed.authors as string[] | undefined
+  if (!title || !authors?.length) {
+    throw new Error('Gemini could not identify the book from OCR text')
+  }
+
+  return {
+    title,
+    authors,
+    publisher: parsed.publisher as string | undefined,
+    publishedDate: parsed.publishedDate as string | undefined,
+    pageCount: parsed.pageCount as number | undefined,
+    genre: parsed.genre as string | undefined,
+    synopsis: parsed.synopsis as string | undefined,
+    isbn: (parsed.isbn as string) ?? undefined,
+    language: parsed.language as string | undefined,
+    format: normalizeBookFormat(parsed.format as string | undefined),
+    series: parsed.series as string | undefined,
+    seriesNumber: parsed.seriesNumber as number | undefined,
+    translator: parsed.translator as string | undefined,
+    estimatedPrice: parsed.estimatedPrice as number | undefined,
+    duration: parsed.duration as string | undefined,
+    narrators: (parsed.narrators as string[]) ?? undefined,
+    awards: (parsed.awards as { name: string; year?: number }[]) ?? [],
+    publicRatings:
+      (parsed.publicRatings as {
+        source: string
+        score: number
+        maxScore: number
+        voterCount: number
+      }[]) ?? [],
+  } satisfies ScanResult
+}
+
 const enrichWithGemini = async (scanResult: ScanResult) => {
   const bookDescription = [
     scanResult.title,
@@ -163,7 +210,7 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
 }
 
 export namespace BookScanner {
-  export const scan = async (imageBuffer: Buffer) => {
+  export const scan = async (imageBuffer: Buffer, ocrText?: string) => {
     const imageHash = hashImage(imageBuffer)
 
     const cached = await repository.findBy(imageHash)
@@ -172,20 +219,41 @@ export namespace BookScanner {
       return cached.result
     }
 
-    const imageBase64 = imageBuffer.toString('base64')
+    const { scanStrategy } = config()
 
-    log.info('Scanning book cover with Claude Vision...')
-    const scanResult = await scanWithClaude(imageBase64)
-
-    log.info('Enriching with Gemini...', scanResult.title)
-    const enrichedResult = await enrichWithGemini(scanResult)
+    const scanResult =
+      scanStrategy === 'native'
+        ? await scanWithNativeOcrStrategy(ocrText)
+        : await scanWithClaudeStrategy(imageBuffer)
 
     await repository.save({
       imageHash,
-      result: enrichedResult,
+      result: scanResult,
       cachedAt: new Date(),
     })
 
-    return enrichedResult
+    return scanResult
   }
+}
+
+const scanWithClaudeStrategy = async (imageBuffer: Buffer) => {
+  const imageBase64 = imageBuffer.toString('base64')
+
+  log.info('Scanning book cover with Claude Vision...')
+  const scanResult = await scanWithClaude(imageBase64)
+
+  log.info('Enriching with Gemini...', scanResult.title)
+  return await enrichWithGemini(scanResult)
+}
+
+const scanWithNativeOcrStrategy = async (ocrText: string | undefined) => {
+  if (!ocrText?.trim()) {
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'OCR text is empty — cannot identify book',
+    })
+  }
+
+  log.info('Scanning book cover with native OCR text...')
+  return await scanWithNativeOcr(ocrText.trim())
 }
