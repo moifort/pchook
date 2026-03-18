@@ -9,18 +9,29 @@ struct ScanFlowView: View {
     @State private var viewModel = ScanViewModel()
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var shouldCapture = false
+    @State private var scanMode: ScanMode = .barcode
 
     var body: some View {
         Group {
             switch viewModel.step {
             case .camera:
                 ZStack {
-                    CameraView(onCapture: { data in
-                        viewModel.capturePhoto(data)
-                    }, shouldCapture: $shouldCapture)
+                    if scanMode == .photo {
+                        CameraView(onCapture: { data in
+                            viewModel.capturePhoto(data)
+                        }, shouldCapture: $shouldCapture)
+                            .ignoresSafeArea()
+                        ViewfinderOverlay()
+                    } else {
+                        BarcodeScannerView { barcode in
+                            if isValidISBN(barcode) {
+                                viewModel.scanBarcode(barcode)
+                            } else {
+                                viewModel.error = "Ce code-barres n'est pas un ISBN"
+                            }
+                        }
                         .ignoresSafeArea()
-
-                    ViewfinderOverlay()
+                    }
 
                     VStack {
                         HStack {
@@ -42,37 +53,46 @@ struct ScanFlowView: View {
 
                     VStack {
                         Spacer()
-                        HStack {
-                            PhotosPicker(
-                                selection: $selectedPhoto,
-                                matching: .images
-                            ) {
-                                Image(systemName: "photo")
-                                    .font(.title2)
-                                    .foregroundStyle(.white)
-                                    .frame(width: 56, height: 56)
-                                    .background(.ultraThinMaterial, in: .circle)
+
+                        ScanModePicker(selectedMode: $scanMode)
+                            .padding(.bottom, 16)
+
+                        if scanMode == .photo {
+                            HStack {
+                                PhotosPicker(
+                                    selection: $selectedPhoto,
+                                    matching: .images
+                                ) {
+                                    Image(systemName: "photo")
+                                        .font(.title2)
+                                        .foregroundStyle(.white)
+                                        .frame(width: 56, height: 56)
+                                        .background(.ultraThinMaterial, in: .circle)
+                                }
+                                .accessibilityIdentifier("scan-photo-picker")
+                                Spacer()
+                                Button {
+                                    shouldCapture = true
+                                } label: {
+                                    Circle()
+                                        .stroke(.white, lineWidth: 4)
+                                        .frame(width: 72, height: 72)
+                                        .overlay(
+                                            Circle()
+                                                .fill(.white)
+                                                .frame(width: 60, height: 60)
+                                        )
+                                }
+                                .accessibilityIdentifier("scan-capture-button")
+                                Spacer()
+                                Color.clear.frame(width: 56, height: 56)
                             }
-                            .accessibilityIdentifier("scan-photo-picker")
-                            Spacer()
-                            Button {
-                                shouldCapture = true
-                            } label: {
-                                Circle()
-                                    .stroke(.white, lineWidth: 4)
-                                    .frame(width: 72, height: 72)
-                                    .overlay(
-                                        Circle()
-                                            .fill(.white)
-                                            .frame(width: 60, height: 60)
-                                    )
-                            }
-                            .accessibilityIdentifier("scan-capture-button")
-                            Spacer()
-                            Color.clear.frame(width: 56, height: 56)
+                            .padding(.horizontal, 32)
+                            .padding(.bottom, 32)
+                        } else {
+                            Color.clear.frame(height: 100)
+                                .padding(.bottom, 32)
                         }
-                        .padding(.horizontal, 32)
-                        .padding(.bottom, 32)
                     }
                 }
 
@@ -138,6 +158,11 @@ struct ScanFlowView: View {
         } message: {
             Text(viewModel.error ?? "")
         }
+    }
+
+    private func isValidISBN(_ code: String) -> Bool {
+        let digits = code.filter(\.isNumber)
+        return digits.count == 10 || digits.count == 13
     }
 
     private func mapPreview(_ preview: BookPreview) -> ScanConfirmationView.Item {
