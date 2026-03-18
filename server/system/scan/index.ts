@@ -112,52 +112,6 @@ const scanWithClaude = async (imageBase64: string) => {
   } satisfies ScanResult
 }
 
-export type OpenLibraryData = {
-  publisher?: string
-  pageCount?: number
-  publishedDate?: string
-  synopsis?: string
-}
-
-export const lookupByIsbn = async (
-  isbn: string | undefined,
-): Promise<OpenLibraryData | undefined> => {
-  if (!isbn) return undefined
-  const cleanIsbn = isbn.replace(/[-\s]/g, '')
-
-  try {
-    log.info('Looking up ISBN on Open Library...', cleanIsbn)
-    const edition = await $fetch<Record<string, unknown>>(
-      `https://openlibrary.org/isbn/${cleanIsbn}.json`,
-    )
-
-    let synopsis: string | undefined
-    const works = edition.works as { key: string }[] | undefined
-    if (works?.[0]?.key) {
-      try {
-        const work = await $fetch<Record<string, unknown>>(
-          `https://openlibrary.org${works[0].key}.json`,
-        )
-        const desc = work.description
-        synopsis = typeof desc === 'string' ? desc : (desc as { value?: string })?.value
-      } catch {
-        /* best-effort */
-      }
-    }
-
-    const publishers = edition.publishers as string[] | undefined
-    return {
-      publisher: publishers?.[0],
-      pageCount: edition.number_of_pages as number | undefined,
-      publishedDate: edition.publish_date as string | undefined,
-      synopsis,
-    }
-  } catch {
-    log.info('Open Library lookup failed, skipping')
-    return undefined
-  }
-}
-
 const enrichWithGemini = async (scanResult: ScanResult) => {
   const bookDescription = [
     scanResult.title,
@@ -223,19 +177,8 @@ export namespace BookScanner {
     log.info('Scanning book cover with Claude Vision...')
     const scanResult = await scanWithClaude(imageBase64)
 
-    const isbnData = await lookupByIsbn(scanResult.isbn)
-    const withIsbn: ScanResult = isbnData
-      ? {
-          ...scanResult,
-          publisher: isbnData.publisher ?? scanResult.publisher,
-          pageCount: isbnData.pageCount ?? scanResult.pageCount,
-          publishedDate: isbnData.publishedDate ?? scanResult.publishedDate,
-          synopsis: scanResult.synopsis ?? isbnData.synopsis,
-        }
-      : scanResult
-
-    log.info('Enriching with Gemini...', withIsbn.title)
-    const enrichedResult = await enrichWithGemini(withIsbn)
+    log.info('Enriching with Gemini...', scanResult.title)
+    const enrichedResult = await enrichWithGemini(scanResult)
 
     await repository.save({
       imageHash,
