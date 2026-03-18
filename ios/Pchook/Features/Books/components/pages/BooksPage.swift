@@ -7,6 +7,7 @@ struct BooksPage: View {
 
     @State private var viewModel = BooksViewModel()
     @State private var selectedBookId: String?
+    @State private var showSync = false
 
     var body: some View {
         NavigationStack {
@@ -33,7 +34,7 @@ struct BooksPage: View {
                     }
                 }
             }
-            .navigationTitle(viewModel.mode.title)
+            .navigationTitle("\(viewModel.mode.title) (\(viewModel.count(for: viewModel.mode)))")
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
@@ -47,7 +48,7 @@ struct BooksPage: View {
                         Button {
                             viewModel.mode = mode
                         } label: {
-                            Label(mode.label, systemImage: mode.icon)
+                            Label("\(viewModel.count(for: mode))", systemImage: mode.icon)
                         }
                         .tint(viewModel.mode == mode ? .accentColor : .primary)
                         .accessibilityIdentifier("booklist-mode-\(mode.rawValue)")
@@ -55,6 +56,12 @@ struct BooksPage: View {
                 }
                 ToolbarSpacer(.fixed)
                 ToolbarItemGroup {
+                    Button {
+                        showSync = true
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    .accessibilityIdentifier("booklist-sync")
                     Menu {
                         Picker("Tri", selection: $viewModel.sort) {
                             ForEach(BookSort.allCases) { sort in
@@ -76,6 +83,9 @@ struct BooksPage: View {
                 onDismiss: { Task { await viewModel.load() } }
             ) { wrapper in
                 BookDetailPage(bookId: wrapper.id)
+            }
+            .sheet(isPresented: $showSync, onDismiss: { Task { await viewModel.load() } }) {
+                SyncPage(refreshTrigger: refreshTrigger)
             }
         }
     }

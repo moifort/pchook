@@ -85,6 +85,15 @@ final class BooksViewModel {
         }
     }
 
+    func count(for mode: BookListMode) -> Int {
+        switch mode {
+        case .all: books.count
+        case .toRead: books.filter { $0.status == "to-read" }.count
+        case .series: Set(books.compactMap { $0.seriesName }).count
+        case .favorites: books.filter { $0.rating == 5 }.count
+        }
+    }
+
     var usesGrouping: Bool {
         sort != .title || mode == .series
     }

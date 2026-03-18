@@ -11,6 +11,7 @@ final class AudibleViewModel {
     private(set) var lastSyncAt: Date?
     var error: String?
     var showLogin = false
+    var showSyncConfirmation = false
 
     func checkStatus() async {
         isCheckingStatus = true
@@ -26,7 +27,11 @@ final class AudibleViewModel {
         }
     }
 
-    func startSync() async {
+    func requestSync() {
+        showSyncConfirmation = true
+    }
+
+    func confirmSync() async {
         isSyncing = true
         error = nil
         defer { isSyncing = false }
