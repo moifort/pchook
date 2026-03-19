@@ -49,10 +49,6 @@ struct AudibleSection: View {
     @ViewBuilder
     private var statusRows: some View {
         if !viewModel.isVerifying {
-            if viewModel.libraryCount > 0 || viewModel.wishlistCount > 0 {
-                SyncResultRow(label: "Bibliothèque", value: viewModel.libraryCount, icon: "books.vertical")
-                SyncResultRow(label: "Liste de souhaits", value: viewModel.wishlistCount, icon: "heart")
-            }
             if let lastSync = viewModel.lastSyncAt {
                 HStack {
                     Label("Dernière sync", systemImage: "clock")
