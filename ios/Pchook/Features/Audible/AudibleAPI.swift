@@ -12,9 +12,13 @@ struct AuthCookie: Decodable, Sendable {
     let domain: String
 }
 
-struct SyncResult: Decodable, Sendable {
-    let libraryCount: Int
-    let wishlistCount: Int
+struct AudibleSummary: Decodable, Sendable {
+    let libraryTotal: Int
+    let listenedTotal: Int
+    let wishlistTotal: Int
+}
+
+struct ImportResult: Decodable, Sendable {
     let newBooksAdded: Int
     let duplicatesSkipped: Int
     let failed: Int
@@ -57,10 +61,30 @@ enum AudibleAPI {
         )
     }
 
-    static func sync() async throws -> SyncResult {
+    static func syncVerify() async throws {
         struct Empty: Encodable, Sendable {}
-        let response: APIResponse<SyncResult> = try await APIClient.shared.post(
-            "/audible/sync",
+        struct Result: Decodable, Sendable {
+            let verified: Bool
+        }
+        let _: APIResponse<Result> = try await APIClient.shared.post(
+            "/audible/sync/verify",
+            body: Empty()
+        )
+    }
+
+    static func syncFetch() async throws -> AudibleSummary {
+        struct Empty: Encodable, Sendable {}
+        let response: APIResponse<AudibleSummary> = try await APIClient.shared.post(
+            "/audible/sync/fetch",
+            body: Empty()
+        )
+        return response.data
+    }
+
+    static func syncImport() async throws -> ImportResult {
+        struct Empty: Encodable, Sendable {}
+        let response: APIResponse<ImportResult> = try await APIClient.shared.post(
+            "/audible/sync/import",
             body: Empty()
         )
         return response.data

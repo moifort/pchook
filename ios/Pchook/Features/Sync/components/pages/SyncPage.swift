@@ -16,7 +16,7 @@ struct SyncPage: View {
                     Button("Fermer", systemImage: "xmark") { dismiss() }
                 }
             }
-            .task(id: refreshTrigger) { await audibleViewModel.checkStatus() }
+            .task(id: refreshTrigger) { await audibleViewModel.checkStatusAndVerify() }
             .onDisappear { audibleViewModel.cancelPolling() }
             .sheet(isPresented: $audibleViewModel.showLogin) {
                 AudibleLoginSheet {

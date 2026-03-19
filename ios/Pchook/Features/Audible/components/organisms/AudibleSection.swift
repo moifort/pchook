@@ -5,31 +5,16 @@ struct AudibleSection: View {
 
     var body: some View {
         Section {
-            if viewModel.isConnected {
-                Label("Connecté", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                SyncResultRow(label: "Bibliothèque", value: viewModel.libraryCount, icon: "books.vertical")
-                SyncResultRow(label: "Liste de souhaits", value: viewModel.wishlistCount, icon: "heart")
-                if let lastSync = viewModel.lastSyncAt {
-                    HStack {
-                        Label("Dernière sync", systemImage: "clock")
-                        Spacer()
-                        Text(lastSync, style: .relative)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                syncRow
-                if let result = viewModel.lastSyncResult, !viewModel.isSyncing {
-                    SyncResultRow(label: "Ajoutés", value: result.newBooksAdded, icon: "plus.circle")
-                    SyncResultRow(label: "Doublons", value: result.duplicatesSkipped, icon: "arrow.triangle.2.circlepath")
-                    if result.failed > 0 {
-                        SyncResultRow(label: "Échoués", value: result.failed, icon: "exclamationmark.triangle")
-                    }
-                }
-                Button(role: .destructive) {
-                    Task { await viewModel.disconnect() }
-                } label: {
-                    Label("Se déconnecter", systemImage: "person.slash")
+            if viewModel.isConnected || viewModel.isVerifying {
+                connectionRow
+                statusRows
+                fetchRow
+                importRow
+                disconnectButton
+            } else if viewModel.isCheckingStatus {
+                HStack {
+                    ProgressView()
+                    Text("Chargement...")
                 }
             } else {
                 Button {
@@ -41,48 +26,128 @@ struct AudibleSection: View {
         } header: {
             Label("Audible", systemImage: "headphones")
         }
-        .confirmationDialog(
-            "Importer depuis Audible",
-            isPresented: $viewModel.showSyncConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Importer bibliothèque et souhaits") {
-                Task { await viewModel.confirmSync() }
+    }
+
+    // MARK: - Connection status
+
+    @ViewBuilder
+    private var connectionRow: some View {
+        if viewModel.isVerifying {
+            HStack(spacing: 8) {
+                ProgressView()
+                Text("Vérification de la connexion...")
+                    .foregroundStyle(.secondary)
             }
-            Button("Annuler", role: .cancel) {}
-        } message: {
-            Text("Les livres seront importés et enrichis automatiquement. Les doublons existants seront mis à jour.\n\nCette opération peut prendre plusieurs minutes.")
+        } else {
+            Label("Connecté", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
         }
     }
 
+    // MARK: - Status counts (from last status check)
+
     @ViewBuilder
-    private var syncRow: some View {
-        if viewModel.isSyncing {
-            VStack(alignment: .leading, spacing: 8) {
-                if let progress = viewModel.syncProgress {
-                    Text(progress.message)
-                        .font(.caption)
+    private var statusRows: some View {
+        if !viewModel.isVerifying {
+            if viewModel.libraryCount > 0 || viewModel.wishlistCount > 0 {
+                SyncResultRow(label: "Bibliothèque", value: viewModel.libraryCount, icon: "books.vertical")
+                SyncResultRow(label: "Liste de souhaits", value: viewModel.wishlistCount, icon: "heart")
+            }
+            if let lastSync = viewModel.lastSyncAt {
+                HStack {
+                    Label("Dernière sync", systemImage: "clock")
+                    Spacer()
+                    Text(lastSync, style: .relative)
                         .foregroundStyle(.secondary)
-                    if progress.total > 0 {
-                        ProgressView(
-                            value: Double(progress.current),
-                            total: Double(progress.total)
-                        )
-                    } else {
-                        ProgressView()
-                    }
-                } else {
-                    HStack {
-                        ProgressView()
-                        Text("Démarrage...")
-                    }
                 }
             }
-        } else {
+        }
+    }
+
+    // MARK: - Fetch step
+
+    @ViewBuilder
+    private var fetchRow: some View {
+        if viewModel.isFetching {
+            progressRow
+        } else if let summary = viewModel.summaryResult {
+            Label {
+                Text("\(summary.libraryTotal) livres · \(summary.listenedTotal) écoutés · \(summary.wishlistTotal) souhaits")
+            } icon: {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            }
+        } else if !viewModel.isVerifying, !viewModel.isImporting {
             Button {
-                viewModel.requestSync()
+                Task { await viewModel.fetch() }
             } label: {
-                Label("Lancer la synchronisation", systemImage: "arrow.triangle.2.circlepath")
+                Label("Synchroniser les données", systemImage: "arrow.triangle.2.circlepath")
+            }
+        }
+    }
+
+    // MARK: - Import step
+
+    @ViewBuilder
+    private var importRow: some View {
+        if viewModel.isImporting {
+            progressRow
+        } else if let result = viewModel.importResult {
+            Label {
+                let parts = [
+                    "\(result.newBooksAdded) ajoutés",
+                    "\(result.duplicatesSkipped) doublons",
+                    result.failed > 0 ? "\(result.failed) échoués" : nil,
+                ].compactMap { $0 }
+                Text(parts.joined(separator: " · "))
+            } icon: {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            }
+        } else if viewModel.summaryResult != nil, !viewModel.isFetching {
+            Button {
+                Task { await viewModel.importBooks() }
+            } label: {
+                Label("Importer dans la bibliothèque", systemImage: "square.and.arrow.down")
+            }
+        }
+    }
+
+    // MARK: - Progress
+
+    @ViewBuilder
+    private var progressRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let progress = viewModel.syncProgress {
+                Text(progress.message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if progress.total > 0 {
+                    ProgressView(
+                        value: Double(progress.current),
+                        total: Double(progress.total)
+                    )
+                } else {
+                    ProgressView()
+                }
+            } else {
+                HStack {
+                    ProgressView()
+                    Text("Démarrage...")
+                }
+            }
+        }
+    }
+
+    // MARK: - Disconnect
+
+    @ViewBuilder
+    private var disconnectButton: some View {
+        if !viewModel.isBusy, !viewModel.isVerifying {
+            Button(role: .destructive) {
+                Task { await viewModel.disconnect() }
+            } label: {
+                Label("Se déconnecter", systemImage: "person.slash")
             }
         }
     }
