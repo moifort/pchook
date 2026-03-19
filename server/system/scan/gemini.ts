@@ -61,6 +61,15 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
 }`
 }
 
+const cleanGeminiJson = (raw: string) =>
+  raw
+    .replace(/,\s*]/g, ']')
+    .replace(/,\s*}/g, '}')
+    // Fix: "value" ou "other" → "value"
+    .replace(/"([^"]*?)"\s+ou\s+[^,}\]]+/g, '"$1"')
+    // Fix: 123 ou 456 → 123
+    .replace(/(\d+)\s+ou\s+\d+/g, '$1')
+
 export const parseGeminiJson = (text: string) => {
   const withoutFences = text.replace(/```(?:json)?\s*([\s\S]*?)```/g, '$1')
 
@@ -70,10 +79,8 @@ export const parseGeminiJson = (text: string) => {
   try {
     return JSON.parse(jsonMatch[0]) as Record<string, unknown>
   } catch {
-    const cleaned = jsonMatch[0].replace(/,\s*]/g, ']').replace(/,\s*}/g, '}')
-
     try {
-      return JSON.parse(cleaned) as Record<string, unknown>
+      return JSON.parse(cleanGeminiJson(jsonMatch[0])) as Record<string, unknown>
     } catch {
       throw new Error(`Gemini returned unparseable JSON: ${jsonMatch[0].slice(0, 300)}`)
     }
