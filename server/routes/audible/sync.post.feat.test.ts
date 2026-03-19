@@ -26,6 +26,16 @@ const fakeLibraryItems: AudibleItem[] = [
     series: { name: 'Dune', position: 1 },
     isFinished: true,
   },
+  {
+    asin: Asin('B07XYZTEST'),
+    title: 'Neuromancien',
+    authors: ['William Gibson'],
+    narrators: ['Olivier Chauvel'],
+    durationMinutes: 540,
+    publisher: 'Audible Studios',
+    language: 'fr',
+    isFinished: false,
+  },
 ]
 
 const fakeWishlistItems: AudibleItem[] = [
@@ -138,7 +148,7 @@ feature('POST /audible/sync/fetch', () => {
 
     then('it returns the summary with correct counts')
     expect(result.status).toBe(200)
-    expect(result.data.libraryTotal).toBe(1)
+    expect(result.data.libraryTotal).toBe(2)
     expect(result.data.listenedTotal).toBe(1)
     expect(result.data.wishlistTotal).toBe(1)
   })
@@ -152,7 +162,7 @@ feature('POST /audible/sync/fetch', () => {
     const result = await fetchHandler(mockEvent() as never)
 
     then('it returns the same summary')
-    expect(result.data.libraryTotal).toBe(1)
+    expect(result.data.libraryTotal).toBe(2)
     expect(result.data.wishlistTotal).toBe(1)
   })
 })
@@ -169,12 +179,12 @@ feature('POST /audible/sync/import', () => {
 
     then('import returns correct counts')
     expect(result.status).toBe(200)
-    expect(result.data.newBooksAdded).toBe(2)
+    expect(result.data.newBooksAdded).toBe(3)
     expect(result.data.duplicatesSkipped).toBe(0)
 
     and('books are created with correct format and status')
     const books = await BookQuery.findAll()
-    expect(books).toHaveLength(2)
+    expect(books).toHaveLength(3)
 
     const dune = books.find((b) => String(b.title) === 'Dune')
     expect(dune).toBeDefined()
@@ -182,6 +192,11 @@ feature('POST /audible/sync/import', () => {
     expect(dune?.status).toBe('read')
     expect(dune?.duration).toBe('21h 30min')
     expect(dune?.narrators?.map(String)).toEqual(['Benjamin Jungers'])
+
+    const neuromancien = books.find((b) => String(b.title) === 'Neuromancien')
+    expect(neuromancien).toBeDefined()
+    expect(neuromancien?.format).toBe('audiobook')
+    expect(neuromancien?.status).toBe('to-read')
 
     const fondation = books.find((b) => String(b.title) === 'Fondation')
     expect(fondation).toBeDefined()
@@ -200,11 +215,11 @@ feature('POST /audible/sync/import', () => {
 
     then('all items are skipped as duplicates')
     expect(result.data.newBooksAdded).toBe(0)
-    expect(result.data.duplicatesSkipped).toBe(2)
+    expect(result.data.duplicatesSkipped).toBe(3)
 
     and('no duplicate books are created')
     const books = await BookQuery.findAll()
-    expect(books).toHaveLength(2)
+    expect(books).toHaveLength(3)
   })
 
   scenario('returns 422 when no data was fetched', async () => {
@@ -237,7 +252,7 @@ feature('GET /audible/status', () => {
     then('status shows connected with correct counts')
     expect(result.status).toBe(200)
     expect(result.data.connected).toBe(true)
-    expect(result.data.libraryCount).toBe(1)
+    expect(result.data.libraryCount).toBe(2)
     expect(result.data.wishlistCount).toBe(1)
     expect(result.data.lastSyncAt).toBeDefined()
   })

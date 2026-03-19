@@ -69,7 +69,7 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const scanResult = mergeAudibleIntoScanResult(geminiResult, item)
 
   const { title, data, seriesInfo } = scanResultToBookData(scanResult)
-  const status = source === 'library' ? 'read' : 'to-read'
+  const status = source === 'library' && item.isFinished === true ? 'read' : 'to-read'
   const coverBase64 = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
 
   const result = await BookUseCase.addFromScan(title, { ...data, status }, seriesInfo, coverBase64)
