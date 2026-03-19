@@ -31,7 +31,8 @@ export const findByTitleAndAuthors = async (title: string, authors: string[]) =>
   })
 }
 
-export const findImageBy = (id: BookId) => imageStorage().getItem<string>(id)
+export const findImageBy = async (id: BookId) =>
+  (await imageStorage().getItem<string>(id)) ?? undefined
 
 export const save = async (book: Book) => {
   await storage().setItem(book.id, book)

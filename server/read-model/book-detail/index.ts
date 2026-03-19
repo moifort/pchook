@@ -37,7 +37,7 @@ export namespace BookDetailReadModel {
 
     return {
       book,
-      coverImageBase64: coverImageBase64 ?? undefined,
+      coverImageBase64,
       series,
       review,
       suggestions,
