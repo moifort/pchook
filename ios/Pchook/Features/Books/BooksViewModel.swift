@@ -219,18 +219,18 @@ final class BooksViewModel {
         }
     }
 
-    private static func flagEmoji(for languageCode: String) -> String? {
-        let countryCode: String? = switch languageCode.uppercased() {
-        case "FR": "FR"
-        case "EN": "GB"
-        case "ES": "ES"
-        case "DE": "DE"
-        case "IT": "IT"
-        case "PT": "PT"
-        case "JA": "JP"
-        case "ZH": "CN"
-        case "KO": "KR"
-        case "RU": "RU"
+    private static func flagEmoji(for language: String) -> String? {
+        let countryCode: String? = switch language.lowercased() {
+        case "fr", "french", "fran\u{00E7}ais": "FR"
+        case "en", "english", "anglais": "GB"
+        case "es", "spanish", "espagnol": "ES"
+        case "de", "german", "allemand": "DE"
+        case "it", "italian", "italien": "IT"
+        case "pt", "portuguese", "portugais": "PT"
+        case "ja", "japanese", "japonais": "JP"
+        case "zh", "chinese", "chinois": "CN"
+        case "ko", "korean", "cor\u{00E9}en": "KR"
+        case "ru", "russian", "russe": "RU"
         default: nil
         }
         guard let code = countryCode else { return nil }
