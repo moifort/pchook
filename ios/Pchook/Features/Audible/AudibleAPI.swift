@@ -73,19 +73,15 @@ enum AudibleAPI {
     }
 
     static func syncFetch() async throws -> AudibleSummary {
-        struct Empty: Encodable, Sendable {}
-        let response: APIResponse<AudibleSummary> = try await APIClient.shared.post(
-            "/audible/sync/fetch",
-            body: Empty()
+        let response: APIResponse<AudibleSummary> = try await APIClient.shared.postLongRunning(
+            "/audible/sync/fetch"
         )
         return response.data
     }
 
     static func syncImport() async throws -> ImportResult {
-        struct Empty: Encodable, Sendable {}
-        let response: APIResponse<ImportResult> = try await APIClient.shared.post(
-            "/audible/sync/import",
-            body: Empty()
+        let response: APIResponse<ImportResult> = try await APIClient.shared.postLongRunning(
+            "/audible/sync/import"
         )
         return response.data
     }

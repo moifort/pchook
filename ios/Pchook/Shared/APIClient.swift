@@ -18,6 +18,11 @@ final class APIClient: Sendable {
     }
 
     private let session = URLSession.shared
+    private let longRunningSession: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 600
+        return URLSession(configuration: config)
+    }()
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
         let withFraction = ISO8601DateFormatter()
@@ -56,6 +61,14 @@ final class APIClient: Sendable {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try encoder.encode(body)
         let (data, response) = try await session.data(for: request)
+        try validateResponse(response, for: request)
+        return try decoder.decode(T.self, from: data)
+    }
+
+    func postLongRunning<T: Decodable & Sendable>(_ path: String) async throws -> T {
+        var request = authenticatedRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
+        let (data, response) = try await longRunningSession.data(for: request)
         try validateResponse(response, for: request)
         return try decoder.decode(T.self, from: data)
     }
