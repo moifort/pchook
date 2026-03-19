@@ -234,6 +234,101 @@ export const migration0005: Migration = {
     }
 
     log.info(`Deduplicated ${transformed} books`)
-    return { ok: true, transformed }
+
+    // --- Phase 2: Merge duplicate series by name ---
+    const seriesStorage = ctx.storage('series')
+    type SeriesEntry = { id: string; name: string; createdAt: string }
+
+    const seriesKeys = await seriesStorage.getKeys()
+    const seriesItems = await seriesStorage.getItems<SeriesEntry>(seriesKeys)
+    const allSeriesList = seriesItems.map(({ value }) => value)
+
+    const byName = new Map<string, SeriesEntry[]>()
+    for (const series of allSeriesList) {
+      const key = series.name.toLowerCase().trim()
+      const group = byName.get(key) ?? []
+      group.push(series)
+      byName.set(key, group)
+    }
+
+    // Reload series-books after book dedup
+    const sbKeys2 = await seriesBooksStorage.getKeys()
+    const sbItems2 = await seriesBooksStorage.getItems<SeriesBookEntry>(sbKeys2)
+    const allSB2 = sbItems2.map(({ value }) => value)
+
+    let mergedSeries = 0
+    for (const [, group] of byName) {
+      if (group.length <= 1) continue
+
+      const sorted = group.sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      const canonical = sorted[0]
+      const duplicates = sorted.slice(1)
+
+      log.info(
+        `Merging ${duplicates.length} duplicate series "${canonical.name}" into ${canonical.id}`,
+      )
+
+      for (const dup of duplicates) {
+        const entries = allSB2.filter(({ seriesId }) => seriesId === dup.id)
+        for (const entry of entries) {
+          const alreadyLinked = allSB2.some(
+            (sb) => sb.seriesId === canonical.id && sb.bookId === entry.bookId,
+          )
+          if (!alreadyLinked) {
+            await seriesBooksStorage.setItem(`${canonical.id}:${entry.bookId}`, {
+              ...entry,
+              seriesId: canonical.id,
+            })
+          }
+          await seriesBooksStorage.removeItem(`${dup.id}:${entry.bookId}`)
+        }
+        await seriesStorage.removeItem(dup.id)
+        mergedSeries++
+      }
+    }
+
+    if (mergedSeries > 0) {
+      log.info(`Merged ${mergedSeries} duplicate series`)
+    }
+
+    // --- Phase 3: Ensure each book belongs to at most one series ---
+    const sbKeys3 = await seriesBooksStorage.getKeys()
+    const sbItems3 = await seriesBooksStorage.getItems<SeriesBookEntry>(sbKeys3)
+    const allSB3 = sbItems3.map(({ value, key }) => ({ ...value, _key: key }))
+
+    const byBookId = new Map<string, (SeriesBookEntry & { _key: string })[]>()
+    for (const entry of allSB3) {
+      const group = byBookId.get(entry.bookId) ?? []
+      group.push(entry)
+      byBookId.set(entry.bookId, group)
+    }
+
+    let removedDupLinks = 0
+    for (const [bookId, entries] of byBookId) {
+      if (entries.length <= 1) continue
+
+      // Keep the first (oldest addedAt), remove the rest
+      const sorted = entries.sort(
+        (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime(),
+      )
+      const keep = sorted[0]
+      const remove = sorted.slice(1)
+
+      for (const entry of remove) {
+        await seriesBooksStorage.removeItem(entry._key)
+        removedDupLinks++
+        log.info(
+          `Removed duplicate series-book link for book ${bookId} (was in series ${entry.seriesId}, keeping ${keep.seriesId})`,
+        )
+      }
+    }
+
+    if (removedDupLinks > 0) {
+      log.info(`Removed ${removedDupLinks} duplicate series-book links`)
+    }
+
+    return { ok: true, transformed: transformed + mergedSeries + removedDupLinks }
   },
 }
