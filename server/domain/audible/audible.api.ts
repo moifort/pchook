@@ -301,12 +301,6 @@ const extractItems = (response: Record<string, unknown>): AudibleRawItem[] => {
   return []
 }
 
-const extractTotal = (response: Record<string, unknown>): number => {
-  if (typeof response.total_results === 'number') return response.total_results
-  if (typeof response.total === 'number') return response.total
-  return 0
-}
-
 const fetchPaginated = async (
   path: string,
   credentials: AudibleCredentials,
@@ -314,10 +308,9 @@ const fetchPaginated = async (
   const allItems: AudibleItem[] = []
   const pageSize = 50
   let page = 1
-  let totalResults = Infinity
   let currentCredentials = credentials
 
-  while (allItems.length < totalResults) {
+  while (true) {
     const { response, credentials: updated } = await audibleFetch<Record<string, unknown>>(
       path,
       currentCredentials,
@@ -330,13 +323,12 @@ const fetchPaginated = async (
 
     currentCredentials = updated
     const rawItems = extractItems(response)
-    totalResults = extractTotal(response) || rawItems.length
     allItems.push(...parseItems(rawItems))
+
+    log.info(`Fetched page ${page}`, { path, count: allItems.length, pageItems: rawItems.length })
+
+    if (rawItems.length < pageSize) break
     page += 1
-
-    log.info(`Fetched page ${page - 1}`, { path, count: allItems.length, total: totalResults })
-
-    if (rawItems.length === 0) break
   }
 
   return { items: allItems, credentials: currentCredentials }
