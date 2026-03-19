@@ -21,9 +21,17 @@ struct BooksPage: View {
                     List {
                         if viewModel.usesGrouping {
                             ForEach(viewModel.groupedBooks) { section in
-                                Section(section.title) {
+                                Section {
                                     ForEach(section.items) { item in
                                         bookButton(item.book)
+                                    }
+                                } header: {
+                                    HStack {
+                                        Text(section.title)
+                                        Spacer()
+                                        if let flag = section.flag {
+                                            Text(flag)
+                                        }
                                     }
                                 }
                             }

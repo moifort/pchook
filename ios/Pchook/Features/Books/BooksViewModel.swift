@@ -64,8 +64,9 @@ enum BookSort: String, CaseIterable, Identifiable {
 
 struct BookSection: Identifiable {
     let title: String
+    var flag: String?
     let items: [SectionedBook]
-    var id: String { title }
+    var id: String { title + (flag ?? "") }
 }
 
 struct SectionedBook: Identifiable {
@@ -209,13 +210,31 @@ final class BooksViewModel {
         return dict.keys.sorted().map { key in
             let entry = dict[key]!
             let sorted = entry.books.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
-            let suffix = entry.language.map { " (\($0))" } ?? ""
-            let sectionTitle = "\(entry.seriesName)\(suffix)"
+            let sectionTitle = entry.seriesName
             return BookSection(
                 title: sectionTitle,
+                flag: entry.language.flatMap { Self.flagEmoji(for: $0) },
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
             )
         }
+    }
+
+    private static func flagEmoji(for languageCode: String) -> String? {
+        let countryCode: String? = switch languageCode.uppercased() {
+        case "FR": "FR"
+        case "EN": "GB"
+        case "ES": "ES"
+        case "DE": "DE"
+        case "IT": "IT"
+        case "PT": "PT"
+        case "JA": "JP"
+        case "ZH": "CN"
+        case "KO": "KR"
+        case "RU": "RU"
+        default: nil
+        }
+        guard let code = countryCode else { return nil }
+        return code.unicodeScalars.map { String(UnicodeScalar(127397 + $0.value)!) }.joined()
     }
 
     var filterKey: String {
