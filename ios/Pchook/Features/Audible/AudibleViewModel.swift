@@ -7,8 +7,7 @@ final class AudibleViewModel {
     private(set) var isFetching = false
     private(set) var isImporting = false
     private(set) var isCheckingStatus = false
-    private(set) var summaryResult: AudibleSummary?
-    private(set) var importResult: ImportResult?
+    private(set) var hasFetchedData = false
     private(set) var libraryCount = 0
     private(set) var wishlistCount = 0
     private(set) var lastSyncAt: Date?
@@ -50,6 +49,10 @@ final class AudibleViewModel {
                 syncProgress = nil
                 await refreshStatus()
             }
+
+            if libraryCount > 0 {
+                hasFetchedData = true
+            }
         } catch {
             self.error = reportError(error)
         }
@@ -80,7 +83,7 @@ final class AudibleViewModel {
         isFetching = true
         error = nil
         syncProgress = nil
-        summaryResult = nil
+        hasFetchedData = false
 
         do {
             try await AudibleAPI.syncFetch()
@@ -97,7 +100,6 @@ final class AudibleViewModel {
         isImporting = true
         error = nil
         syncProgress = nil
-        importResult = nil
 
         do {
             try await AudibleAPI.syncImport()
@@ -124,6 +126,7 @@ final class AudibleViewModel {
                     let progress = try await AudibleAPI.syncProgress()
                     syncProgress = progress
                     if progress.phase == "idle" || progress.phase == "done" {
+                        if isFetching { hasFetchedData = true }
                         isFetching = false
                         isImporting = false
                         syncProgress = nil
@@ -152,8 +155,7 @@ final class AudibleViewModel {
             libraryCount = 0
             wishlistCount = 0
             lastSyncAt = nil
-            summaryResult = nil
-            importResult = nil
+            hasFetchedData = false
             lastVerifiedAt = nil
         } catch {
             self.error = reportError(error)

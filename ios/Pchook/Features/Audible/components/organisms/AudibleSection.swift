@@ -70,9 +70,9 @@ struct AudibleSection: View {
     private var fetchRow: some View {
         if viewModel.isFetching {
             progressRow
-        } else if let summary = viewModel.summaryResult {
+        } else if viewModel.hasFetchedData {
             Label {
-                Text("\(summary.libraryTotal) livres · \(summary.listenedTotal) écoutés · \(summary.wishlistTotal) souhaits")
+                Text("\(viewModel.libraryCount) livres · \(viewModel.wishlistCount) souhaits")
             } icon: {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
@@ -92,19 +92,7 @@ struct AudibleSection: View {
     private var importRow: some View {
         if viewModel.isImporting {
             progressRow
-        } else if let result = viewModel.importResult {
-            Label {
-                let parts = [
-                    "\(result.newBooksAdded) ajoutés",
-                    "\(result.duplicatesSkipped) doublons",
-                    result.failed > 0 ? "\(result.failed) échoués" : nil,
-                ].compactMap { $0 }
-                Text(parts.joined(separator: " · "))
-            } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-            }
-        } else if viewModel.summaryResult != nil, !viewModel.isFetching {
+        } else if viewModel.hasFetchedData, !viewModel.isFetching {
             Button {
                 Task { await viewModel.importBooks() }
             } label: {

@@ -12,18 +12,6 @@ struct AuthCookie: Decodable, Sendable {
     let domain: String
 }
 
-struct AudibleSummary: Decodable, Sendable {
-    let libraryTotal: Int
-    let listenedTotal: Int
-    let wishlistTotal: Int
-}
-
-struct ImportResult: Decodable, Sendable {
-    let newBooksAdded: Int
-    let duplicatesSkipped: Int
-    let failed: Int
-}
-
 struct AudibleStatus: Decodable, Sendable {
     let connected: Bool
     let libraryCount: Int
