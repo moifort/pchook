@@ -271,6 +271,7 @@ type AudibleRawItem = {
   release_date?: string
   product_images?: Record<string, string>
   series?: { asin: string; title: string; sequence?: string }[]
+  listening_status?: { is_finished?: boolean; percent_complete?: number }
 }
 
 const parseItems = (items: AudibleRawItem[]): AudibleItem[] =>
@@ -290,9 +291,10 @@ const parseItems = (items: AudibleRawItem[]): AudibleItem[] =>
           position: item.series[0].sequence ? Number(item.series[0].sequence) : undefined,
         }
       : undefined,
+    isFinished: item.listening_status?.is_finished,
   }))
 
-const RESPONSE_GROUPS = 'product_details,contributors,media,product_attrs'
+const RESPONSE_GROUPS = 'product_details,contributors,media,product_attrs,listening_status'
 
 const extractItems = (response: Record<string, unknown>): AudibleRawItem[] => {
   if (Array.isArray(response.items)) return response.items
@@ -342,4 +344,13 @@ export const fetchLibrary = async (credentials: AudibleCredentials) => {
 export const fetchWishlist = async (credentials: AudibleCredentials) => {
   log.info('Fetching wishlist', { locale: credentials.locale })
   return fetchPaginated('/wishlist', credentials)
+}
+
+export const verifyConnection = async (credentials: AudibleCredentials) => {
+  log.info('Verifying Audible connection', { locale: credentials.locale })
+  await audibleFetch<Record<string, unknown>>('/library', credentials, {
+    num_results: '1',
+    page: '1',
+    response_groups: 'product_details',
+  })
 }

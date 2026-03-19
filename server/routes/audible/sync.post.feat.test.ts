@@ -24,6 +24,7 @@ const fakeLibraryItems: AudibleItem[] = [
     releaseDate: new Date('2020-01-15'),
     coverUrl: 'https://example.com/dune.jpg',
     series: { name: 'Dune', position: 1 },
+    isFinished: true,
   },
 ]
 
@@ -48,6 +49,7 @@ mock.module('~/domain/audible/audible.api', () => ({
     items: fakeWishlistItems,
     credentials,
   }),
+  verifyConnection: async () => {},
   refreshAccessToken: async (credentials: AudibleCredentials) => credentials,
   generateLoginUrl: async () => ({
     loginUrl: 'https://example.com',
@@ -80,26 +82,93 @@ mock.module('~/system/scan/gemini', () => ({
   normalizeBookFormat: (value: string) => value,
 }))
 
+mock.module('~/system/suggestion/index', () => ({
+  SuggestionGenerator: {
+    generate: async () => [],
+  },
+}))
+
 import { AudibleCommand } from '~/domain/audible/command'
 import { BookQuery } from '~/domain/book/query'
 import statusHandler from '~/routes/audible/status.get'
-import syncHandler from '~/routes/audible/sync.post'
+import fetchHandler from '~/routes/audible/sync/fetch.post'
+import importHandler from '~/routes/audible/sync/import.post'
+import verifyHandler from '~/routes/audible/sync/verify.post'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 import { mockEvent } from '~/test/setup'
 
-feature('POST /audible/sync', () => {
-  scenario('syncs library and wishlist into books', async () => {
+feature('POST /audible/sync/verify', () => {
+  scenario('verifies connection when credentials exist', async () => {
     given('Audible credentials are configured')
     await AudibleCommand.saveCredentials(fakeCredentials)
 
-    when('POST /audible/sync is called')
+    when('POST /audible/sync/verify is called')
     const event = mockEvent()
-    const result = await syncHandler(event as never)
+    const result = await verifyHandler(event as never)
 
-    then('sync returns correct counts')
+    then('it returns verified')
     expect(result.status).toBe(200)
-    expect(result.data.libraryCount).toBe(1)
-    expect(result.data.wishlistCount).toBe(1)
+    expect(result.data.verified).toBe(true)
+  })
+
+  scenario('returns 422 when credentials are missing', async () => {
+    given('no Audible credentials are configured')
+
+    when('POST /audible/sync/verify is called')
+    const event = mockEvent()
+
+    then('it throws a 422 error')
+    try {
+      await verifyHandler(event as never)
+      expect(true).toBe(false)
+    } catch (error: unknown) {
+      expect((error as { statusCode: number }).statusCode).toBe(422)
+    }
+  })
+})
+
+feature('POST /audible/sync/fetch', () => {
+  scenario('fetches and stores raw Audible data', async () => {
+    given('Audible credentials are configured')
+    await AudibleCommand.saveCredentials(fakeCredentials)
+
+    when('POST /audible/sync/fetch is called')
+    const event = mockEvent()
+    const result = await fetchHandler(event as never)
+
+    then('it returns the summary with correct counts')
+    expect(result.status).toBe(200)
+    expect(result.data.libraryTotal).toBe(1)
+    expect(result.data.listenedTotal).toBe(1)
+    expect(result.data.wishlistTotal).toBe(1)
+  })
+
+  scenario('overwrites raw data on re-fetch', async () => {
+    given('Audible credentials are configured and a first fetch was done')
+    await AudibleCommand.saveCredentials(fakeCredentials)
+    await fetchHandler(mockEvent() as never)
+
+    when('POST /audible/sync/fetch is called again')
+    const result = await fetchHandler(mockEvent() as never)
+
+    then('it returns the same summary')
+    expect(result.data.libraryTotal).toBe(1)
+    expect(result.data.wishlistTotal).toBe(1)
+  })
+})
+
+feature('POST /audible/sync/import', () => {
+  scenario('imports fetched data into books', async () => {
+    given('Audible credentials are configured and data was fetched')
+    await AudibleCommand.saveCredentials(fakeCredentials)
+    await fetchHandler(mockEvent() as never)
+
+    when('POST /audible/sync/import is called')
+    const event = mockEvent()
+    const result = await importHandler(event as never)
+
+    then('import returns correct counts')
+    expect(result.status).toBe(200)
     expect(result.data.newBooksAdded).toBe(2)
     expect(result.data.duplicatesSkipped).toBe(0)
 
@@ -120,15 +189,14 @@ feature('POST /audible/sync', () => {
     expect(fondation?.status).toBe('to-read')
   })
 
-  scenario('skips already-synced ASINs on re-sync', async () => {
-    given('Audible credentials are configured and a first sync was done')
+  scenario('skips already-imported ASINs on re-import', async () => {
+    given('Audible credentials are configured, data fetched, and a first import was done')
     await AudibleCommand.saveCredentials(fakeCredentials)
-    const firstEvent = mockEvent()
-    await syncHandler(firstEvent as never)
+    await fetchHandler(mockEvent() as never)
+    await importHandler(mockEvent() as never)
 
-    when('POST /audible/sync is called again')
-    const secondEvent = mockEvent()
-    const result = await syncHandler(secondEvent as never)
+    when('POST /audible/sync/import is called again')
+    const result = await importHandler(mockEvent() as never)
 
     then('all items are skipped as duplicates')
     expect(result.data.newBooksAdded).toBe(0)
@@ -139,15 +207,15 @@ feature('POST /audible/sync', () => {
     expect(books).toHaveLength(2)
   })
 
-  scenario('returns 422 when credentials are missing', async () => {
-    given('no Audible credentials are configured')
+  scenario('returns 422 when no data was fetched', async () => {
+    given('no Audible data has been fetched')
 
-    when('POST /audible/sync is called')
+    when('POST /audible/sync/import is called')
     const event = mockEvent()
 
     then('it throws a 422 error')
     try {
-      await syncHandler(event as never)
+      await importHandler(event as never)
       expect(true).toBe(false)
     } catch (error: unknown) {
       expect((error as { statusCode: number }).statusCode).toBe(422)
@@ -156,11 +224,11 @@ feature('POST /audible/sync', () => {
 })
 
 feature('GET /audible/status', () => {
-  scenario('returns status after sync', async () => {
+  scenario('returns status after full sync', async () => {
     given('credentials are configured and sync was performed')
     await AudibleCommand.saveCredentials(fakeCredentials)
-    const syncEvent = mockEvent()
-    await syncHandler(syncEvent as never)
+    await fetchHandler(mockEvent() as never)
+    await importHandler(mockEvent() as never)
 
     when('GET /audible/status is called')
     const event = mockEvent()

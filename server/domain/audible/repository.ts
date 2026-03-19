@@ -3,12 +3,14 @@ import type {
   AsinBookMapping,
   AudibleCredentials,
   AuthSession,
+  RawAudibleEntry,
   SyncProgress,
 } from '~/domain/audible/types'
 
 const credentialsStorage = () => useStorage<AudibleCredentials>('audible-credentials')
 const mappingsStorage = () => useStorage<AsinBookMapping>('audible-mappings')
 const authSessionsStorage = () => useStorage<AuthSession>('audible-auth-sessions')
+const rawItemsStorage = () => useStorage<RawAudibleEntry>('audible-raw')
 
 export const findCredentials = async () => credentialsStorage().getItem('current')
 
@@ -40,6 +42,21 @@ export const saveAuthSession = async (sessionId: string, session: AuthSession) =
 
 export const removeAuthSession = async (sessionId: string) => {
   await authSessionsStorage().removeItem(sessionId)
+}
+
+export const saveRawItem = async (asin: Asin, entry: RawAudibleEntry) => {
+  await rawItemsStorage().setItem(asin, entry)
+}
+
+export const findAllRawItems = async () => {
+  const keys = await rawItemsStorage().getKeys()
+  const items = await rawItemsStorage().getItems<RawAudibleEntry>(keys)
+  return items.map(({ value }) => value)
+}
+
+export const clearRawItems = async () => {
+  const keys = await rawItemsStorage().getKeys()
+  await Promise.all(keys.map((key) => rawItemsStorage().removeItem(key)))
 }
 
 // In-memory sync progress (not persisted)

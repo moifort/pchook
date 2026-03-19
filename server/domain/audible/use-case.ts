@@ -1,4 +1,4 @@
-import { fetchLibrary, fetchWishlist } from '~/domain/audible/audible.api'
+import { fetchLibrary, fetchWishlist, verifyConnection } from '~/domain/audible/audible.api'
 import {
   buildGeminiPrompt,
   formatDuration,
@@ -6,7 +6,7 @@ import {
 } from '~/domain/audible/business-rules'
 import { AudibleCommand } from '~/domain/audible/command'
 import { AudibleQuery } from '~/domain/audible/query'
-import type { AsinBookMapping, AudibleItem } from '~/domain/audible/types'
+import type { AsinBookMapping, AudibleItem, AudibleSummary } from '~/domain/audible/types'
 import { BookCommand } from '~/domain/book/command'
 import type { Book } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
@@ -48,7 +48,7 @@ const mergeAudibleDataIntoDuplicate = async (book: Book, item: AudibleItem) => {
   }
 }
 
-const syncItem = async (item: AudibleItem, source: 'library' | 'wishlist') => {
+const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => {
   log.info('Audible item', {
     asin: item.asin,
     title: item.title,
@@ -97,23 +97,44 @@ const syncItem = async (item: AudibleItem, source: 'library' | 'wishlist') => {
 }
 
 export namespace AudibleUseCase {
-  export const syncAll = async () => {
+  export const verify = async () => {
     const credentials = await AudibleQuery.getCredentials()
     if (!credentials) return 'no-credentials' as const
 
-    log.info('Starting Audible sync')
+    try {
+      AudibleCommand.setSyncProgress({
+        phase: 'verifying',
+        current: 0,
+        total: 0,
+        message: 'Vérification de la connexion...',
+      })
+      await verifyConnection(credentials)
+      return 'ok' as const
+    } catch {
+      return 'invalid-credentials' as const
+    } finally {
+      AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
+    }
+  }
+
+  export const fetchAndStore = async () => {
+    const credentials = await AudibleQuery.getCredentials()
+    if (!credentials) return 'no-credentials' as const
+
+    log.info('Starting Audible fetch')
 
     try {
       AudibleCommand.setSyncProgress({
-        phase: 'fetching',
+        phase: 'downloading',
         current: 0,
         total: 0,
         message: 'Récupération de la bibliothèque...',
       })
 
       const { items: libraryItems, credentials: afterLibrary } = await fetchLibrary(credentials)
+
       AudibleCommand.setSyncProgress({
-        phase: 'fetching',
+        phase: 'downloading',
         current: 0,
         total: 0,
         message: 'Récupération de la liste de souhaits...',
@@ -126,30 +147,71 @@ export namespace AudibleUseCase {
         wishlist: wishlistItems.length,
       })
 
-      const allItems = [
+      await AudibleCommand.clearRawItems()
+
+      const allEntries = [
         ...libraryItems.map((item) => ({ item, source: 'library' as const })),
         ...wishlistItems.map((item) => ({ item, source: 'wishlist' as const })),
       ]
-      const total = allItems.length
+      const total = allEntries.length
+
+      for (const [index, { item, source }] of allEntries.entries()) {
+        AudibleCommand.setSyncProgress({
+          phase: 'downloading',
+          current: index + 1,
+          total,
+          message: `Stockage de "${item.title}"...`,
+        })
+        await AudibleCommand.saveRawItem(item.asin, {
+          item,
+          source,
+          downloadedAt: new Date(),
+        })
+      }
+
+      const listenedTotal = libraryItems.filter(({ isFinished }) => isFinished === true).length
+
+      const summary: AudibleSummary = {
+        libraryTotal: libraryItems.length,
+        listenedTotal,
+        wishlistTotal: wishlistItems.length,
+      }
+
+      log.info('Fetch completed', summary)
+
+      return summary
+    } finally {
+      AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
+    }
+  }
+
+  export const importAll = async () => {
+    const rawItems = await AudibleQuery.getAllRawItems()
+    if (rawItems.length === 0) return 'no-data' as const
+
+    log.info('Starting import', { total: rawItems.length })
+
+    try {
+      const total = rawItems.length
       let newBooksAdded = 0
       let duplicatesSkipped = 0
       let failed = 0
 
-      for (const [index, { item, source }] of allItems.entries()) {
+      for (const [index, { item, source }] of rawItems.entries()) {
         AudibleCommand.setSyncProgress({
-          phase: 'syncing',
+          phase: 'importing',
           current: index + 1,
           total,
           message: `Import de "${item.title}"...`,
         })
 
         try {
-          const result = await syncItem(item, source)
+          const result = await importItem(item, source)
           if (result === 'created') newBooksAdded += 1
           else duplicatesSkipped += 1
         } catch (error) {
           failed += 1
-          log.error('Failed to sync item', {
+          log.error('Failed to import item', {
             asin: item.asin,
             title: item.title,
             error: String(error),
@@ -157,15 +219,9 @@ export namespace AudibleUseCase {
         }
       }
 
-      log.info('Sync completed', { newBooksAdded, duplicatesSkipped, failed })
+      log.info('Import completed', { newBooksAdded, duplicatesSkipped, failed })
 
-      return {
-        libraryCount: libraryItems.length,
-        wishlistCount: wishlistItems.length,
-        newBooksAdded,
-        duplicatesSkipped,
-        failed,
-      } as const
+      return { newBooksAdded, duplicatesSkipped, failed } as const
     } finally {
       AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
     }

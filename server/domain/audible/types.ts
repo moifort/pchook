@@ -36,6 +36,7 @@ export type AudibleItem = {
   releaseDate?: Date
   coverUrl?: string
   series?: { name: string; position?: number }
+  isFinished?: boolean
 }
 
 export type AsinBookMapping = {
@@ -52,7 +53,19 @@ export type AuthSession = {
   createdAt: Date
 }
 
-export type SyncPhase = 'idle' | 'fetching' | 'syncing' | 'done'
+export type SyncPhase = 'idle' | 'verifying' | 'downloading' | 'importing' | 'done'
+
+export type RawAudibleEntry = {
+  item: AudibleItem
+  source: 'library' | 'wishlist'
+  downloadedAt: Date
+}
+
+export type AudibleSummary = {
+  libraryTotal: number
+  listenedTotal: number
+  wishlistTotal: number
+}
 
 export type SyncProgress = {
   phase: SyncPhase
