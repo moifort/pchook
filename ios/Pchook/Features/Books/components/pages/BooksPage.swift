@@ -28,7 +28,6 @@ struct BooksPage: View {
                                 } header: {
                                     HStack {
                                         Text(section.title)
-                                        Spacer()
                                         if let flag = section.flag {
                                             Text(flag)
                                         }
