@@ -33,7 +33,7 @@ export const scanResultSchema = z
     pageCount: nullToUndefined(z.number().int().positive()),
     genre: nullToUndefined(z.string().min(1)),
     synopsis: nullToUndefined(z.string().min(1)),
-    isbn: nullToUndefined(z.string().min(10).max(17)),
+    isbn: nullToUndefined(z.string()),
     language: nullToUndefined(z.string().min(1)),
     format: nullToUndefined(z.string()),
     series: nullToUndefined(z.string().min(1)),
