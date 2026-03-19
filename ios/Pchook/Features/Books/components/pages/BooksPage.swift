@@ -43,7 +43,7 @@ struct BooksPage: View {
                 }
             }
             .navigationTitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.mode.title)
-            .navigationSubtitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.mode.subtitle)
+            .navigationSubtitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.navigationSubtitle)
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }

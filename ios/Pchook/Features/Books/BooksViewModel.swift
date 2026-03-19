@@ -120,6 +120,11 @@ final class BooksViewModel {
         return filtered.isEmpty ? nil : filtered.joined(separator: " • ")
     }
 
+    var navigationSubtitle: String {
+        let count = displayedBooks.count
+        return "\(mode.subtitle) · \(count) \(count <= 1 ? "livre" : "livres")"
+    }
+
     var filterKey: String {
         "\(mode.rawValue)-\(sort.rawValue)-\(sortDescending)"
     }
