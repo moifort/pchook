@@ -1,3 +1,4 @@
+import { match } from 'ts-pattern'
 import { z } from 'zod'
 import { BookId } from '~/domain/book/primitives'
 import { BookUseCase } from '~/domain/book/use-case'
@@ -56,11 +57,12 @@ export default defineEventHandler(async (event) => {
 
     await previewRepository.remove(previewId)
 
-    if (result.tag === 'not-found') {
-      throw createError({ statusCode: 404, statusMessage: 'Book to replace not found' })
-    }
-
-    return { status: 200, data: result.book } as const
+    return match(result)
+      .with({ tag: 'replaced' }, ({ book }) => ({ status: 200, data: book }) as const)
+      .with({ tag: 'not-found' }, () => {
+        throw createError({ statusCode: 404, statusMessage: 'Book to replace not found' })
+      })
+      .exhaustive()
   }
 
   const result = await BookUseCase.addFromScan(
@@ -70,11 +72,14 @@ export default defineEventHandler(async (event) => {
     preview.coverImageBase64,
   )
 
-  if (result.tag === 'duplicate') {
-    setResponseStatus(event, 409)
-    return { status: 409, data: result.book } as const
-  }
-
-  await previewRepository.remove(previewId)
-  return { status: 201, data: result.book } as const
+  return match(result)
+    .with({ tag: 'created' }, ({ book }) => {
+      previewRepository.remove(previewId)
+      return { status: 201, data: book } as const
+    })
+    .with({ tag: 'duplicate' }, ({ book }) => {
+      setResponseStatus(event, 409)
+      return { status: 409, data: book } as const
+    })
+    .exhaustive()
 })
