@@ -16,18 +16,27 @@ export const findByISBN = async (isbn: ISBN) => {
   return books.find((book) => book.isbn === isbn)
 }
 
+const normalizeForMatch = (s: string) => s.toLowerCase().trim()
+
+const coreTitle = (title: string) =>
+  title
+    .split(/[.:]/)[0]
+    .trim()
+    .replace(/[''""«»]/g, '')
+    .replace(/\s+/g, ' ')
+
 export const findByTitleAndAuthors = async (title: string, authors: string[]) => {
-  const normalize = (s: string) => s.toLowerCase().trim()
-  const normalizedTitle = normalize(title)
-  const normalizedAuthors = authors.map(normalize).sort()
+  const normalizedTitle = normalizeForMatch(title)
+  const normalizedCore = normalizeForMatch(coreTitle(title))
+  const normalizedAuthors = authors.map(normalizeForMatch).sort()
   const books = await findAll()
   return books.find((book) => {
-    const bookAuthors = book.authors.map((a) => normalize(String(a))).sort()
-    return (
-      normalize(String(book.title)) === normalizedTitle &&
-      bookAuthors.length === normalizedAuthors.length &&
-      bookAuthors.every((a, i) => a === normalizedAuthors[i])
-    )
+    const bookAuthors = book.authors.map((a) => normalizeForMatch(String(a))).sort()
+    if (bookAuthors.length !== normalizedAuthors.length) return false
+    if (!bookAuthors.every((a, i) => a === normalizedAuthors[i])) return false
+    const bookTitle = normalizeForMatch(String(book.title))
+    const bookCore = normalizeForMatch(coreTitle(String(book.title)))
+    return bookTitle === normalizedTitle || bookCore === normalizedCore
   })
 }
 
