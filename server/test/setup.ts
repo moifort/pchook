@@ -1,4 +1,6 @@
-import { afterEach, mock } from 'bun:test'
+import { afterEach, beforeEach, mock } from 'bun:test'
+import { registerReviewEventHandlers } from '~/domain/review/event-handlers'
+import { registerSeriesEventHandlers } from '~/domain/series/event-handlers'
 
 type StorageItem = { base: string; key: string; value: unknown }
 
@@ -87,6 +89,14 @@ mock.module('~/system/logger', () => ({
   }),
 }))
 
+import { clearHandlers } from '~/system/event-bus'
+
 afterEach(() => {
   clearAllStores()
+  clearHandlers()
+})
+
+beforeEach(() => {
+  registerReviewEventHandlers()
+  registerSeriesEventHandlers()
 })

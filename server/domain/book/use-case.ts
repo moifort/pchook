@@ -1,9 +1,10 @@
 import { BookCommand } from '~/domain/book/command'
+import type { BookRemovedEvent } from '~/domain/book/events'
 import { BookQuery } from '~/domain/book/query'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
-import { ReviewCommand } from '~/domain/review/command'
 import { SeriesCommand } from '~/domain/series/command'
 import { Position } from '~/domain/series/primitives'
+import { emit } from '~/system/event-bus'
 
 export namespace BookUseCase {
   export const addFromScan = async (
@@ -80,7 +81,7 @@ export namespace BookUseCase {
   export const removeCompletely = async (id: BookId) => {
     const result = await BookCommand.remove(id)
     if (result === 'not-found') return 'not-found' as const
-    await Promise.all([ReviewCommand.removeBook(id), SeriesCommand.removeBook(id)])
+    await emit<BookRemovedEvent>('book-removed', { bookId: id })
     return undefined
   }
 }
