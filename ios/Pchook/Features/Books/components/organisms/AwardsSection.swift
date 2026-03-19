@@ -7,7 +7,7 @@ struct AwardsSection: View {
         Section("Prix litt\u{00E9}raires") {
             ForEach(awards) { award in
                 HStack {
-                    Image(systemName: "trophy.fill")
+                    Image(systemName: "trophy").foregroundStyle(.secondary)
                     Text(award.name)
                     Spacer()
                     if let year = award.year {
