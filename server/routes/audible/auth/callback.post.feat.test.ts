@@ -96,12 +96,7 @@ feature('Audible Auth Flow', () => {
     })
 
     then('it throws a 404 error')
-    try {
-      await callbackHandler(event as never)
-      expect(true).toBe(false)
-    } catch (error: unknown) {
-      expect((error as { statusCode: number }).statusCode).toBe(404)
-    }
+    await expect(callbackHandler(event as never)).rejects.toMatchObject({ statusCode: 404 })
   })
 
   scenario('POST /audible/auth/callback without auth code returns 400', async () => {
@@ -122,11 +117,6 @@ feature('Audible Auth Flow', () => {
     })
 
     then('it throws a 400 error')
-    try {
-      await callbackHandler(event as never)
-      expect(true).toBe(false)
-    } catch (error: unknown) {
-      expect((error as { statusCode: number }).statusCode).toBe(400)
-    }
+    await expect(callbackHandler(event as never)).rejects.toMatchObject({ statusCode: 400 })
   })
 })

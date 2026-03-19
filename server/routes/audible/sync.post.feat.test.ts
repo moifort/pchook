@@ -128,12 +128,7 @@ feature('POST /audible/sync/verify', () => {
     const event = mockEvent()
 
     then('it throws a 422 error')
-    try {
-      await verifyHandler(event as never)
-      expect(true).toBe(false)
-    } catch (error: unknown) {
-      expect((error as { statusCode: number }).statusCode).toBe(422)
-    }
+    await expect(verifyHandler(event as never)).rejects.toMatchObject({ statusCode: 422 })
   })
 })
 
@@ -229,12 +224,7 @@ feature('POST /audible/sync/import', () => {
     const event = mockEvent()
 
     then('it throws a 422 error')
-    try {
-      await importHandler(event as never)
-      expect(true).toBe(false)
-    } catch (error: unknown) {
-      expect((error as { statusCode: number }).statusCode).toBe(422)
-    }
+    await expect(importHandler(event as never)).rejects.toMatchObject({ statusCode: 422 })
   })
 })
 
