@@ -1,6 +1,7 @@
 import { BookQuery } from '~/domain/book/query'
 import type { BookId } from '~/domain/book/types'
 import { ReviewQuery } from '~/domain/review/query'
+import { booksInLanguage } from '~/domain/series/business-rules'
 import { SeriesQuery } from '~/domain/series/query'
 import type { BookDetailView, SeriesInfo } from './types'
 
@@ -19,20 +20,16 @@ export namespace BookDetailReadModel {
     if (seriesInfo) {
       const fullSeries = await SeriesQuery.getById(seriesInfo.id)
       if (fullSeries !== 'not-found') {
-        const bookLanguage = book.language ? String(book.language) : undefined
         series = {
           name: String(fullSeries.name),
           position: seriesInfo.position,
-          books: fullSeries.books
-            .filter(({ language }) => {
-              const lang = language ? String(language) : undefined
-              return lang === bookLanguage
-            })
-            .map(({ id, title, position }) => ({
+          books: booksInLanguage(fullSeries.books, book.language).map(
+            ({ id, title, position }) => ({
               id,
               title: String(title),
               position,
-            })),
+            }),
+          ),
         }
       }
     }
