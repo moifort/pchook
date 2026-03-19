@@ -294,7 +294,8 @@ const audibleRawItemSchema = z.object({
           .transform((v) => v ?? undefined),
       }),
     )
-    .default([]),
+    .nullish()
+    .transform((v) => v ?? []),
   listening_status: z
     .object({
       is_finished: z.boolean().optional(),
