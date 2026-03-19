@@ -9,3 +9,8 @@
   - quand il y a un livre qui a recu un nouveau prix 
   - quand une série ou livre devient populaire
 - Rajouter comme cave a vin
+- pouvoir refresh les données dans la page detail du livre
+- pourvoir like une série ou noter
+- Liste des auteurs
+ - Suggestion avec les Best seller de chaque auteurs
+- Fil d'actualité 
