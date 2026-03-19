@@ -107,9 +107,17 @@ struct AudibleSection: View {
     private var progressRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let progress = viewModel.syncProgress {
-                Text(progress.message)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text(progress.message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if progress.total > 0 {
+                        Spacer()
+                        Text("\(progress.current)/\(progress.total)")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 if progress.total > 0 {
                     ProgressView(
                         value: Double(progress.current),
