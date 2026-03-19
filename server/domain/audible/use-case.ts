@@ -219,6 +219,7 @@ export namespace AudibleUseCase {
         }
       }
 
+      await AudibleCommand.saveSyncCompletedAt(new Date())
       log.info('Import completed', { newBooksAdded, duplicatesSkipped, failed })
 
       return { newBooksAdded, duplicatesSkipped, failed } as const

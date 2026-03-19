@@ -15,5 +15,7 @@ export namespace AudibleQuery {
 
   export const getSyncProgress = () => repository.getSyncProgress()
 
+  export const getSyncCompletedAt = async () => repository.findSyncCompletedAt()
+
   export const getAllRawItems = async () => repository.findAllRawItems()
 }

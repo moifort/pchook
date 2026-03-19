@@ -11,6 +11,7 @@ const credentialsStorage = () => useStorage<AudibleCredentials>('audible-credent
 const mappingsStorage = () => useStorage<AsinBookMapping>('audible-mappings')
 const authSessionsStorage = () => useStorage<AuthSession>('audible-auth-sessions')
 const rawItemsStorage = () => useStorage<RawAudibleEntry>('audible-raw')
+const syncMetaStorage = () => useStorage<Date>('audible-sync-meta')
 
 export const findCredentials = async () => credentialsStorage().getItem('current')
 
@@ -57,6 +58,12 @@ export const findAllRawItems = async () => {
 export const clearRawItems = async () => {
   const keys = await rawItemsStorage().getKeys()
   await Promise.all(keys.map((key) => rawItemsStorage().removeItem(key)))
+}
+
+export const findSyncCompletedAt = async () => syncMetaStorage().getItem('lastCompletedAt')
+
+export const saveSyncCompletedAt = async (date: Date) => {
+  await syncMetaStorage().setItem('lastCompletedAt', date)
 }
 
 // In-memory sync progress (not persisted)

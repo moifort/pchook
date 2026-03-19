@@ -32,6 +32,10 @@ export namespace AudibleCommand {
     await repository.saveMapping(mapping)
   }
 
+  export const saveSyncCompletedAt = async (date: Date) => {
+    await repository.saveSyncCompletedAt(date)
+  }
+
   export const saveRawItem = async (asin: Asin, entry: RawAudibleEntry) => {
     await repository.saveRawItem(asin, entry)
   }

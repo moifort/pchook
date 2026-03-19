@@ -5,10 +5,7 @@ export default defineEventHandler(async () => {
   const mappings = await AudibleQuery.getAllMappings()
   const libraryCount = mappings.filter(({ source }) => source === 'library').length
   const wishlistCount = mappings.filter(({ source }) => source === 'wishlist').length
-  const lastSyncAt =
-    mappings.length > 0
-      ? new Date(Math.max(...mappings.map(({ syncedAt }) => new Date(syncedAt).getTime())))
-      : undefined
+  const lastSyncAt = await AudibleQuery.getSyncCompletedAt()
 
   return {
     status: 200,
