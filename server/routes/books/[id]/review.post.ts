@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { BookCommand } from '~/domain/book/command'
 import { BookId, Note } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
@@ -18,7 +19,11 @@ export default defineEventHandler(async (event) => {
     bookId: id,
     rating: Note(body.rating),
     readDate: body.readDate ? new Date(body.readDate) : undefined,
-    reviewNotes: body.reviewNotes as string | undefined,
+    reviewNotes: z
+      .string()
+      .min(1)
+      .optional()
+      .parse(body.reviewNotes || undefined),
     createdAt: new Date(),
   }
 

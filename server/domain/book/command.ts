@@ -13,6 +13,7 @@ export namespace BookCommand {
       id: randomBookId(),
       title,
       authors: data.authors ?? [],
+      narrators: data.narrators ?? [],
       status: data.status ?? 'to-read',
       awards: data.awards ?? [],
       publicRatings: data.publicRatings ?? [],

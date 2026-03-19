@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { BookCommand } from '~/domain/book/command'
 import {
   BookFormat,
@@ -15,6 +16,22 @@ import type { Award, PublicRating } from '~/domain/book/types'
 import { SeriesCommand } from '~/domain/series/command'
 import { Position } from '~/domain/series/primitives'
 import { Eur, PersonName } from '~/domain/shared/primitives'
+
+const awardSchema = z.array(
+  z.object({
+    name: z.string().min(1),
+    year: z.number().int().positive().optional(),
+  }),
+)
+
+const publicRatingSchema = z.array(
+  z.object({
+    source: z.string().min(1),
+    score: z.unknown(),
+    maxScore: z.unknown(),
+    voterCount: z.number().int().nonnegative(),
+  }),
+)
 
 export default defineEventHandler(async (event) => {
   const id = BookId(getRouterParam(event, 'id'))
@@ -63,21 +80,16 @@ export default defineEventHandler(async (event) => {
     ...(body.readDate !== undefined && {
       readDate: body.readDate ? new Date(body.readDate) : undefined,
     }),
-    ...(body.awards !== undefined && { awards: body.awards as Award[] }),
+    ...(body.awards !== undefined && { awards: awardSchema.parse(body.awards) as Award[] }),
     ...(body.publicRatings !== undefined && {
-      publicRatings: (
-        body.publicRatings as {
-          source: string
-          score: unknown
-          maxScore: unknown
-          voterCount: number
-        }[]
-      ).map(({ source, score, maxScore, voterCount }) => ({
-        source,
-        score: Note(score),
-        maxScore: Note(maxScore),
-        voterCount,
-      })) as PublicRating[],
+      publicRatings: publicRatingSchema
+        .parse(body.publicRatings)
+        .map(({ source, score, maxScore, voterCount }) => ({
+          source,
+          score: Note(score),
+          maxScore: Note(maxScore),
+          voterCount,
+        })) as PublicRating[],
     }),
   }
 

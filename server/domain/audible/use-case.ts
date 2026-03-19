@@ -36,7 +36,7 @@ const mergeAudibleDataIntoDuplicate = async (book: Book, item: AudibleItem) => {
   if (!book.duration && item.durationMinutes > 0) {
     updates.duration = formatDuration(item.durationMinutes)
   }
-  if ((!book.narrators || book.narrators.length === 0) && item.narrators.length > 0) {
+  if (book.narrators.length === 0 && item.narrators.length > 0) {
     updates.narrators = item.narrators.map((name) => PersonName(name))
   }
   if (Object.keys(updates).length > 0) {

@@ -3,6 +3,9 @@ import { BookQuery } from '~/domain/book/query'
 import type { BookId } from '~/domain/book/types'
 import * as repository from '~/domain/series/repository'
 import type { SeriesId } from '~/domain/series/types'
+import { createLogger } from '~/system/logger'
+
+const log = createLogger('series-query')
 
 export namespace SeriesQuery {
   export const findAll = () => repository.findAllSeries()
@@ -14,7 +17,10 @@ export namespace SeriesQuery {
     const books = await Promise.all(
       entries.map(async (entry) => {
         const book = await BookQuery.getById(entry.bookId)
-        if (book === 'not-found') return undefined
+        if (book === 'not-found') {
+          log.warn('Orphaned SeriesBook entry', { seriesId: id, bookId: entry.bookId })
+          return undefined
+        }
         return { ...book, position: entry.position }
       }),
     )

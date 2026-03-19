@@ -1,4 +1,5 @@
 import type { AudibleItem } from '~/domain/audible/types'
+import { partialScanResultSchema } from '~/system/scan/schemas'
 import type { ScanResult } from '~/system/scan/types'
 
 export const formatDuration = (minutes: number) => {
@@ -40,44 +41,30 @@ export const mergeAudibleIntoScanResult = (
   scanResult: Record<string, unknown>,
   item: AudibleItem,
 ): ScanResult => {
-  const base: ScanResult = {
-    title: scanResult.title as string,
-    authors: (scanResult.authors as string[]) ?? [],
-    publisher: scanResult.publisher as string | undefined,
-    publishedDate: scanResult.publishedDate as string | undefined,
-    pageCount: scanResult.pageCount as number | undefined,
-    genre: scanResult.genre as string | undefined,
-    synopsis: scanResult.synopsis as string | undefined,
-    isbn: scanResult.isbn as string | undefined,
-    language: scanResult.language as string | undefined,
-    format: scanResult.format as string | undefined,
-    series: scanResult.series as string | undefined,
-    seriesNumber: scanResult.seriesNumber as number | undefined,
-    translator: scanResult.translator as string | undefined,
-    estimatedPrice: scanResult.estimatedPrice as number | undefined,
-    duration: scanResult.duration as string | undefined,
-    narrators: scanResult.narrators as string[] | undefined,
-    awards: Array.isArray(scanResult.awards) ? (scanResult.awards as ScanResult['awards']) : [],
-    publicRatings: Array.isArray(scanResult.publicRatings)
-      ? (scanResult.publicRatings as ScanResult['publicRatings'])
-      : [],
-  }
+  const base = partialScanResultSchema.parse(scanResult)
 
   return {
-    ...base,
     title: item.title,
     authors: item.authors,
-    format: 'audiobook',
-    narrators: item.narrators,
-    duration: item.durationMinutes > 0 ? formatDuration(item.durationMinutes) : undefined,
     publisher: item.publisher ?? base.publisher,
-    language: item.language ?? base.language,
-    series: item.series?.name ?? base.series,
-    seriesNumber: item.series?.position ?? base.seriesNumber,
     publishedDate: item.releaseDate
       ? item.releaseDate instanceof Date
         ? item.releaseDate.toISOString().split('T')[0]
         : String(item.releaseDate).split('T')[0]
       : base.publishedDate,
+    pageCount: base.pageCount,
+    genre: base.genre,
+    synopsis: base.synopsis,
+    isbn: base.isbn,
+    language: item.language ?? base.language,
+    format: 'audiobook',
+    series: item.series?.name ?? base.series,
+    seriesNumber: item.series?.position ?? base.seriesNumber,
+    translator: base.translator,
+    estimatedPrice: base.estimatedPrice,
+    duration: item.durationMinutes > 0 ? formatDuration(item.durationMinutes) : undefined,
+    narrators: item.narrators,
+    awards: base.awards,
+    publicRatings: base.publicRatings,
   }
 }
