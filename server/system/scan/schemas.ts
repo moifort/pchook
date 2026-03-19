@@ -11,10 +11,18 @@ const awardSchema = z.object({
 
 const publicRatingSchema = z.object({
   source: z.string().min(1),
-  score: z.number(),
-  maxScore: z.number(),
-  voterCount: z.number().int().nonnegative(),
+  score: z.number().nullish(),
+  maxScore: z.number().nullish(),
+  voterCount: z.number().int().nonnegative().nullish(),
 })
+
+type ValidRating = { source: string; score: number; maxScore: number; voterCount: number }
+
+const hasCompleteRating = (r: z.infer<typeof publicRatingSchema>): r is ValidRating =>
+  r.score != null && r.maxScore != null && r.voterCount != null
+
+const toValidRatings = (v: z.infer<typeof publicRatingSchema>[] | null | undefined) =>
+  (v ?? []).filter(hasCompleteRating)
 
 export const scanResultSchema = z
   .object({
@@ -41,10 +49,7 @@ export const scanResultSchema = z
       .array(awardSchema)
       .nullish()
       .transform((v) => v ?? []),
-    publicRatings: z
-      .array(publicRatingSchema)
-      .nullish()
-      .transform((v) => v ?? []),
+    publicRatings: z.array(publicRatingSchema).nullish().transform(toValidRatings),
   })
   .transform((v) => v satisfies ScanResult)
 
@@ -75,8 +80,5 @@ export const partialScanResultSchema = z.object({
     .array(awardSchema)
     .nullish()
     .transform((v) => v ?? []),
-  publicRatings: z
-    .array(publicRatingSchema)
-    .nullish()
-    .transform((v) => v ?? []),
+  publicRatings: z.array(publicRatingSchema).nullish().transform(toValidRatings),
 })
