@@ -75,7 +75,9 @@ export const mergeAudibleIntoScanResult = (
     series: item.series?.name ?? base.series,
     seriesNumber: item.series?.position ?? base.seriesNumber,
     publishedDate: item.releaseDate
-      ? item.releaseDate.toISOString().split('T')[0]
+      ? item.releaseDate instanceof Date
+        ? item.releaseDate.toISOString().split('T')[0]
+        : String(item.releaseDate).split('T')[0]
       : base.publishedDate,
   }
 }
