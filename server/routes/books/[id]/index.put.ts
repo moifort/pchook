@@ -56,11 +56,8 @@ const bodySchema = z.object({
   seriesNumber: z.number().int().positive().optional(),
 })
 
-export default defineEventHandler(async (event) => {
-  const id = BookId(getRouterParam(event, 'id'))
-  const body = bodySchema.parse(await readBody(event))
-
-  const data = {
+function toBookUpdate(body: z.infer<typeof bodySchema>) {
+  return {
     ...(body.title !== undefined && { title: BookTitle(body.title) }),
     ...(body.authors !== undefined && {
       authors: body.authors.map((author) => PersonName(author)),
@@ -112,8 +109,13 @@ export default defineEventHandler(async (event) => {
       })),
     }),
   }
+}
 
-  const result = await BookCommand.update(id, data)
+export default defineEventHandler(async (event) => {
+  const id = BookId(getRouterParam(event, 'id'))
+  const body = bodySchema.parse(await readBody(event))
+
+  const result = await BookCommand.update(id, toBookUpdate(body))
 
   if (result === 'not-found') {
     throw createError({ statusCode: 404, statusMessage: 'Book not found' })
