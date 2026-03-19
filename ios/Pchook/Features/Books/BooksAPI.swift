@@ -36,4 +36,9 @@ enum BooksAPI {
         let _: APIResponse<Ignored> = try await APIClient.shared.post("/books/\(id)/review", body: request)
     }
 
+    static func refresh(id: String) async throws {
+        struct Empty: Encodable, Sendable {}
+        struct Ignored: Decodable, Sendable {}
+        let _: APIResponse<Ignored> = try await APIClient.shared.post("/books/\(id)/refresh", body: Empty())
+    }
 }

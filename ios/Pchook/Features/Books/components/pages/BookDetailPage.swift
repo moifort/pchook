@@ -14,6 +14,7 @@ struct BookDetailPage: View {
     @State private var showDeleteConfirmation = false
     @State private var showReviewSheet = false
     @State private var isDeleting = false
+    @State private var isRefreshing = false
     @State private var isEditing = false
     @State private var seriesBookPath: [String] = []
 
@@ -98,6 +99,10 @@ struct BookDetailPage: View {
         if detail != nil {
             ToolbarItemGroup {
                 Menu {
+                    Button("Actualiser les données", systemImage: "arrow.trianglehead.2.clockwise") {
+                        Task { await refreshEnrichment() }
+                    }
+                    .disabled(isRefreshing)
                     Button("Modifier", systemImage: "pencil") {
                         isEditing = true
                     }
@@ -154,6 +159,18 @@ struct BookDetailPage: View {
             self.error = reportError(error)
         }
         isLoading = false
+    }
+
+    private func refreshEnrichment() async {
+        isRefreshing = true
+        do {
+            try await BooksAPI.refresh(id: bookId)
+            detail = try await BooksAPI.getDetail(id: bookId)
+            onUpdated()
+        } catch {
+            self.error = reportError(error)
+        }
+        isRefreshing = false
     }
 
     private func deleteBook() async {
