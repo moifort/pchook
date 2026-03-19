@@ -13,4 +13,5 @@
 - pourvoir like une série ou noter
 - Liste des auteurs
  - Suggestion avec les Best seller de chaque auteurs
-- Fil d'actualité 
+- Fil d'actualité nouveauté + auteurs + prix
+- gere les mangas et bd 
