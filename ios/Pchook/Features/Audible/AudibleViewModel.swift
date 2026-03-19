@@ -33,11 +33,11 @@ final class AudibleViewModel {
             wishlistCount = status.wishlistCount
             lastSyncAt = status.lastSyncAt
 
-            if isConnected, shouldVerify {
+            let progress = try await AudibleAPI.syncProgress()
+
+            if isConnected, shouldVerify, progress.phase == "idle" {
                 await verify()
             }
-
-            let progress = try await AudibleAPI.syncProgress()
             if progress.phase != "idle" {
                 syncProgress = progress
                 if pollingTask == nil {

@@ -101,19 +101,26 @@ export namespace AudibleUseCase {
     const credentials = await AudibleQuery.getCredentials()
     if (!credentials) return 'no-credentials' as const
 
+    const currentProgress = AudibleQuery.getSyncProgress()
+    const ownProgress = currentProgress.phase === 'idle'
+
     try {
-      AudibleCommand.setSyncProgress({
-        phase: 'verifying',
-        current: 0,
-        total: 0,
-        message: 'Vérification de la connexion...',
-      })
+      if (ownProgress) {
+        AudibleCommand.setSyncProgress({
+          phase: 'verifying',
+          current: 0,
+          total: 0,
+          message: 'Vérification de la connexion...',
+        })
+      }
       await verifyConnection(credentials)
       return 'ok' as const
     } catch {
       return 'invalid-credentials' as const
     } finally {
-      AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
+      if (ownProgress) {
+        AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
+      }
     }
   }
 
