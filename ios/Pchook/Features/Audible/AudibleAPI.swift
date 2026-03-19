@@ -17,6 +17,7 @@ struct SyncResult: Decodable, Sendable {
     let wishlistCount: Int
     let newBooksAdded: Int
     let duplicatesSkipped: Int
+    let failed: Int
 }
 
 struct AudibleStatus: Decodable, Sendable {

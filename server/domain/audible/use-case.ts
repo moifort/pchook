@@ -133,6 +133,7 @@ export namespace AudibleUseCase {
       const total = allItems.length
       let newBooksAdded = 0
       let duplicatesSkipped = 0
+      let failed = 0
 
       for (const [index, { item, source }] of allItems.entries()) {
         AudibleCommand.setSyncProgress({
@@ -142,18 +143,28 @@ export namespace AudibleUseCase {
           message: `Import de "${item.title}"...`,
         })
 
-        const result = await syncItem(item, source)
-        if (result === 'created') newBooksAdded += 1
-        else duplicatesSkipped += 1
+        try {
+          const result = await syncItem(item, source)
+          if (result === 'created') newBooksAdded += 1
+          else duplicatesSkipped += 1
+        } catch (error) {
+          failed += 1
+          log.error('Failed to sync item', {
+            asin: item.asin,
+            title: item.title,
+            error: String(error),
+          })
+        }
       }
 
-      log.info('Sync completed', { newBooksAdded, duplicatesSkipped })
+      log.info('Sync completed', { newBooksAdded, duplicatesSkipped, failed })
 
       return {
         libraryCount: libraryItems.length,
         wishlistCount: wishlistItems.length,
         newBooksAdded,
         duplicatesSkipped,
+        failed,
       } as const
     } finally {
       AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })

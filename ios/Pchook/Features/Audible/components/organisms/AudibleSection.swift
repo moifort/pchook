@@ -22,6 +22,9 @@ struct AudibleSection: View {
                 if let result = viewModel.lastSyncResult, !viewModel.isSyncing {
                     SyncResultRow(label: "Ajoutés", value: result.newBooksAdded, icon: "plus.circle")
                     SyncResultRow(label: "Doublons", value: result.duplicatesSkipped, icon: "arrow.triangle.2.circlepath")
+                    if result.failed > 0 {
+                        SyncResultRow(label: "Échoués", value: result.failed, icon: "exclamationmark.triangle")
+                    }
                 }
                 Button(role: .destructive) {
                     Task { await viewModel.disconnect() }
