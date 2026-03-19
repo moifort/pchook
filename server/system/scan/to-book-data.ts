@@ -39,7 +39,7 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
         source,
         score: Note(score),
         maxScore: Note(maxScore),
-        voterCount,
+        voterCount: Math.round(voterCount),
       })) as PublicRating[],
   }
 
