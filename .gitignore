@@ -25,3 +25,4 @@ ios/PchookUITests/Support/TestSecrets.swift
 
 # Claude Code
 .claude/
+.worktrees/
