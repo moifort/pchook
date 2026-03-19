@@ -101,6 +101,25 @@ final class BooksViewModel {
         return BookGrouping.grouped(books: displayedBooks, sort: sort, descending: sortDescending)
     }
 
+    func subtitle(for book: BookListItem) -> String? {
+        if mode == .series {
+            let parts: [String?] = [
+                book.authors.first,
+                book.seriesPosition.map { "Tome \($0)" },
+            ]
+            let filtered = parts.compactMap { $0 }
+            return filtered.isEmpty ? nil : filtered.joined(separator: " • ")
+        }
+
+        let parts: [String?] = [
+            book.authors.first,
+            book.genre?.split(separator: ",").first.map { $0.trimmingCharacters(in: .whitespaces) },
+            book.awards.isEmpty ? nil : "\(book.awards.count) prix",
+        ]
+        let filtered = parts.compactMap { $0 }
+        return filtered.isEmpty ? nil : filtered.joined(separator: " • ")
+    }
+
     var filterKey: String {
         "\(mode.rawValue)-\(sort.rawValue)-\(sortDescending)"
     }

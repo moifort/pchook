@@ -128,7 +128,7 @@ struct BooksPage: View {
         } label: {
             BookRow(
                 title: book.title,
-                subtitle: subtitle(for: book),
+                subtitle: viewModel.subtitle(for: book),
                 rating: book.rating,
                 status: book.status
             )
@@ -136,24 +136,6 @@ struct BooksPage: View {
         .tint(.primary)
     }
 
-    private func subtitle(for book: BookListItem) -> String? {
-        if viewModel.mode == .series {
-            let parts: [String?] = [
-                book.authors.first,
-                book.seriesPosition.map { "Tome \($0)" },
-            ]
-            let filtered = parts.compactMap { $0 }
-            return filtered.isEmpty ? nil : filtered.joined(separator: " • ")
-        }
-
-        let parts: [String?] = [
-            book.authors.first,
-            book.genre?.split(separator: ",").first.map { $0.trimmingCharacters(in: .whitespaces) },
-            book.awards.isEmpty ? nil : "\(book.awards.count) prix",
-        ]
-        let filtered = parts.compactMap { $0 }
-        return filtered.isEmpty ? nil : filtered.joined(separator: " \u{2022} ")
-    }
 }
 
 struct BookIdWrapper: Identifiable {
