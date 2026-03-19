@@ -38,12 +38,17 @@ final class AudibleViewModel {
                 await verify()
             }
 
-            if !isBusy {
-                let progress = try await AudibleAPI.syncProgress()
-                if progress.phase != "idle" {
-                    syncProgress = progress
+            let progress = try await AudibleAPI.syncProgress()
+            if progress.phase != "idle" {
+                syncProgress = progress
+                if pollingTask == nil {
                     resumePolling(for: progress.phase)
                 }
+            } else if isBusy {
+                isFetching = false
+                isImporting = false
+                syncProgress = nil
+                await refreshStatus()
             }
         } catch {
             self.error = reportError(error)
@@ -182,9 +187,6 @@ final class AudibleViewModel {
     func cancelPolling() {
         pollingTask?.cancel()
         pollingTask = nil
-        isFetching = false
-        isImporting = false
-        syncProgress = nil
     }
 
     // MARK: - Private
