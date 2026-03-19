@@ -60,7 +60,8 @@ describe('Position', () => {
     expect(() => Position(-1)).toThrow()
   })
 
-  test('rejects a non-integer', () => {
-    expect(() => Position(1.5)).toThrow()
+  test('rounds a non-integer to nearest int', () => {
+    expect(Position(1.5)).toBe(Position(2))
+    expect(Position(2.3)).toBe(Position(2))
   })
 })

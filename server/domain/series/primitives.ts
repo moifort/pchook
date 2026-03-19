@@ -20,7 +20,10 @@ export const SeriesName = (value: unknown) => {
 
 export const Position = (value: unknown) => {
   const v = z
-    .preprocess((v) => (typeof v === 'string' ? Number(v) : v), z.number().int().positive())
+    .preprocess((v) => {
+      const n = typeof v === 'string' ? Number(v) : v
+      return typeof n === 'number' ? Math.round(n) : n
+    }, z.number().int().positive())
     .parse(value)
   return make<PositionType>()(v)
 }
