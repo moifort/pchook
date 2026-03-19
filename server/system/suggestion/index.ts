@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { BookTitle as makeBookTitle, Genre as makeGenre, Note } from '~/domain/book/primitives'
 import type { BookId, BookTitle, Genre } from '~/domain/book/types'
 import { PersonName as makePersonName } from '~/domain/shared/primitives'
@@ -58,29 +59,55 @@ Toutes les valeurs en français. Données les plus récentes.`
 
       const jsonMatch = text.match(/\[[\s\S]*\]/)
       if (!jsonMatch) return []
-      const raw = JSON.parse(jsonMatch[0]) as Array<{
-        title: string
-        authors: string[]
-        genre?: string
-        synopsis?: string
-        awards?: { name: string; year?: number }[]
-        publicRatings?: {
-          source: string
-          score: number
-          maxScore: number
-          voterCount: number
-        }[]
-      }>
+
+      const suggestionItemSchema = z.object({
+        title: z.string().min(1),
+        authors: z.array(z.string().min(1)).default([]),
+        genre: z
+          .string()
+          .min(1)
+          .nullish()
+          .transform((v) => v ?? undefined),
+        synopsis: z
+          .string()
+          .nullish()
+          .transform((v) => v ?? undefined),
+        awards: z
+          .array(
+            z.object({
+              name: z.string().min(1),
+              year: z
+                .number()
+                .int()
+                .positive()
+                .nullish()
+                .transform((v) => v ?? undefined),
+            }),
+          )
+          .default([]),
+        publicRatings: z
+          .array(
+            z.object({
+              source: z.string().min(1),
+              score: z.number(),
+              maxScore: z.number(),
+              voterCount: z.number().int().nonnegative(),
+            }),
+          )
+          .default([]),
+      })
+
+      const raw = z.array(suggestionItemSchema).parse(JSON.parse(jsonMatch[0]))
 
       return raw.map((item) => ({
         id: randomSuggestionId(),
         sourceBookId,
         title: makeBookTitle(item.title) as BookTitle,
-        authors: (item.authors ?? []).map((author) => makePersonName(author) as PersonName),
+        authors: item.authors.map((author) => makePersonName(author) as PersonName),
         genre: item.genre ? (makeGenre(item.genre) as Genre) : undefined,
         synopsis: item.synopsis,
-        awards: item.awards ?? [],
-        publicRatings: (item.publicRatings ?? []).map((rating) => ({
+        awards: item.awards,
+        publicRatings: item.publicRatings.map((rating) => ({
           source: rating.source,
           score: Note(Math.min(rating.score, rating.maxScore)),
           maxScore: Note(rating.maxScore),

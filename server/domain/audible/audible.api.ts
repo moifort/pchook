@@ -1,4 +1,5 @@
 import { createHash, createSign, randomBytes, randomUUID } from 'node:crypto'
+import { z } from 'zod'
 import { AudibleCommand } from '~/domain/audible/command'
 import { Asin } from '~/domain/audible/primitives'
 import type {
@@ -260,41 +261,67 @@ const audibleFetch = async <T>(
   }
 }
 
-type AudibleRawItem = {
-  asin: string
-  title: string
-  authors?: { name: string }[]
-  narrators?: { name: string }[]
-  runtime_length_min?: number
-  publisher_name?: string
-  language?: string
-  release_date?: string
-  product_images?: Record<string, string>
-  series?: { asin: string; title: string; sequence?: string }[]
-}
+const audibleRawItemSchema = z.object({
+  asin: z.string().min(1),
+  title: z.string().min(1),
+  authors: z.array(z.object({ name: z.string() })).default([]),
+  narrators: z.array(z.object({ name: z.string() })).default([]),
+  runtime_length_min: z.number().nonnegative().default(0),
+  publisher_name: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  language: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  release_date: z
+    .string()
+    .nullish()
+    .transform((v) => v ?? undefined),
+  product_images: z
+    .record(z.string(), z.string())
+    .nullish()
+    .transform((v) => v ?? undefined),
+  series: z
+    .array(
+      z.object({
+        asin: z.string(),
+        title: z.string(),
+        sequence: z
+          .string()
+          .nullish()
+          .transform((v) => v ?? undefined),
+      }),
+    )
+    .default([]),
+})
 
-const parseItems = (items: AudibleRawItem[]): AudibleItem[] =>
-  items.map((item) => ({
-    asin: Asin(item.asin),
-    title: item.title,
-    authors: (item.authors ?? []).map(({ name }) => name),
-    narrators: (item.narrators ?? []).map(({ name }) => name),
-    durationMinutes: item.runtime_length_min ?? 0,
-    publisher: item.publisher_name,
-    language: item.language,
-    releaseDate: item.release_date ? new Date(item.release_date) : undefined,
-    coverUrl: item.product_images?.['500'] ?? item.product_images?.['252'],
-    series: item.series?.[0]
-      ? {
-          name: item.series[0].title,
-          position: item.series[0].sequence ? Number(item.series[0].sequence) : undefined,
-        }
-      : undefined,
-  }))
+const parseItems = (items: unknown[]): AudibleItem[] =>
+  items.map((raw) => {
+    const item = audibleRawItemSchema.parse(raw)
+    return {
+      asin: Asin(item.asin),
+      title: item.title,
+      authors: item.authors.map(({ name }) => name),
+      narrators: item.narrators.map(({ name }) => name),
+      durationMinutes: item.runtime_length_min,
+      publisher: item.publisher_name,
+      language: item.language,
+      releaseDate: item.release_date ? new Date(item.release_date) : undefined,
+      coverUrl: item.product_images?.['500'] ?? item.product_images?.['252'],
+      series: item.series[0]
+        ? {
+            name: item.series[0].title,
+            position: item.series[0].sequence ? Number(item.series[0].sequence) : undefined,
+          }
+        : undefined,
+    }
+  })
 
 const RESPONSE_GROUPS = 'product_details,contributors,media,product_attrs'
 
-const extractItems = (response: Record<string, unknown>): AudibleRawItem[] => {
+const extractItems = (response: Record<string, unknown>): unknown[] => {
   if (Array.isArray(response.items)) return response.items
   if (Array.isArray(response.products)) return response.products
   log.warn('Unknown response shape, keys:', Object.keys(response))

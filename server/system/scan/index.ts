@@ -4,6 +4,7 @@ import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
 import { ImageHash } from '~/system/scan/primitives'
 import * as repository from '~/system/scan/repository'
+import { partialScanResultSchema, scanResultSchema } from '~/system/scan/schemas'
 import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('scan')
@@ -91,25 +92,8 @@ const scanWithClaude = async (imageBase64: string) => {
     throw new Error('Claude did not return tool_use result')
   }
 
-  const input = toolUse.input
-  return {
-    title: input.title as string,
-    authors: (input.authors as string[]) ?? [],
-    publisher: input.publisher as string | undefined,
-    publishedDate: input.publishedDate as string | undefined,
-    pageCount: input.pageCount as number | undefined,
-    genre: input.genre as string | undefined,
-    synopsis: input.synopsis as string | undefined,
-    isbn: input.isbn as string | undefined,
-    language: input.language as string | undefined,
-    format: normalizeBookFormat(input.format as string | undefined),
-    series: input.series as string | undefined,
-    seriesNumber: input.seriesNumber as number | undefined,
-    translator: input.translator as string | undefined,
-    estimatedPrice: input.estimatedPrice as number | undefined,
-    awards: [] as { name: string; year?: number }[],
-    publicRatings: [] as { source: string; score: number; maxScore: number; voterCount: number }[],
-  } satisfies ScanResult
+  const parsed = scanResultSchema.parse(toolUse.input)
+  return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
 const scanWithNativeOcr = async (ocrText: string) => {
@@ -123,40 +107,9 @@ ${buildBookJsonSchema(true)}
 
 Recherche les données les plus récentes et précises possibles sur Wikipedia, Goodreads, Babelio, Sens Critique, Amazon et d'autres sources fiables. Toutes les valeurs textuelles en français.`
 
-  const parsed = await callGemini(prompt)
-
-  const title = parsed.title as string | undefined
-  const authors = parsed.authors as string[] | undefined
-  if (!title || !authors?.length) {
-    throw new Error('Gemini could not identify the book from OCR text')
-  }
-
-  return {
-    title,
-    authors,
-    publisher: parsed.publisher as string | undefined,
-    publishedDate: parsed.publishedDate as string | undefined,
-    pageCount: parsed.pageCount as number | undefined,
-    genre: parsed.genre as string | undefined,
-    synopsis: parsed.synopsis as string | undefined,
-    isbn: (parsed.isbn as string) ?? undefined,
-    language: parsed.language as string | undefined,
-    format: normalizeBookFormat(parsed.format as string | undefined),
-    series: parsed.series as string | undefined,
-    seriesNumber: parsed.seriesNumber as number | undefined,
-    translator: parsed.translator as string | undefined,
-    estimatedPrice: parsed.estimatedPrice as number | undefined,
-    duration: parsed.duration as string | undefined,
-    narrators: (parsed.narrators as string[]) ?? undefined,
-    awards: (parsed.awards as { name: string; year?: number }[]) ?? [],
-    publicRatings:
-      (parsed.publicRatings as {
-        source: string
-        score: number
-        maxScore: number
-        voterCount: number
-      }[]) ?? [],
-  } satisfies ScanResult
+  const raw = await callGemini(prompt)
+  const parsed = scanResultSchema.parse(raw)
+  return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
 const enrichWithGemini = async (scanResult: ScanResult) => {
@@ -175,33 +128,28 @@ ${buildBookJsonSchema(false)}
 Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`
 
   try {
-    const enriched = await callGemini(prompt)
+    const raw = await callGemini(prompt)
+    const enriched = partialScanResultSchema.parse(raw)
 
     return {
-      title: scanResult.title,
-      authors: scanResult.authors,
-      publisher: (enriched.publisher as string) ?? scanResult.publisher,
-      publishedDate: (enriched.publishedDate as string) ?? scanResult.publishedDate,
-      pageCount: (enriched.pageCount as number) ?? scanResult.pageCount,
-      genre: (enriched.genre as string) ?? scanResult.genre,
-      synopsis: (enriched.synopsis as string) ?? scanResult.synopsis,
-      isbn: (enriched.isbn as string) ?? scanResult.isbn,
-      language: (enriched.language as string) ?? scanResult.language,
-      format: normalizeBookFormat(enriched.format as string) ?? scanResult.format,
-      series: (enriched.series as string) ?? scanResult.series,
-      seriesNumber: (enriched.seriesNumber as number) ?? scanResult.seriesNumber,
-      translator: (enriched.translator as string) ?? scanResult.translator,
-      estimatedPrice: (enriched.estimatedPrice as number) ?? scanResult.estimatedPrice,
-      duration: (enriched.duration as string) ?? scanResult.duration,
-      narrators: (enriched.narrators as string[]) ?? scanResult.narrators,
-      awards: (enriched.awards as { name: string; year?: number }[]) ?? scanResult.awards,
+      ...scanResult,
+      publisher: enriched.publisher ?? scanResult.publisher,
+      publishedDate: enriched.publishedDate ?? scanResult.publishedDate,
+      pageCount: enriched.pageCount ?? scanResult.pageCount,
+      genre: enriched.genre ?? scanResult.genre,
+      synopsis: enriched.synopsis ?? scanResult.synopsis,
+      isbn: enriched.isbn ?? scanResult.isbn,
+      language: enriched.language ?? scanResult.language,
+      format: normalizeBookFormat(enriched.format) ?? scanResult.format,
+      series: enriched.series ?? scanResult.series,
+      seriesNumber: enriched.seriesNumber ?? scanResult.seriesNumber,
+      translator: enriched.translator ?? scanResult.translator,
+      estimatedPrice: enriched.estimatedPrice ?? scanResult.estimatedPrice,
+      duration: enriched.duration ?? scanResult.duration,
+      narrators: enriched.narrators ?? scanResult.narrators,
+      awards: enriched.awards.length > 0 ? enriched.awards : scanResult.awards,
       publicRatings:
-        (enriched.publicRatings as {
-          source: string
-          score: number
-          maxScore: number
-          voterCount: number
-        }[]) ?? scanResult.publicRatings,
+        enriched.publicRatings.length > 0 ? enriched.publicRatings : scanResult.publicRatings,
     } satisfies ScanResult
   } catch (error) {
     log.error('Gemini enrichment failed, using scan result only', error)

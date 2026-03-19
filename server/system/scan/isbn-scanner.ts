@@ -2,7 +2,7 @@ import type { ISBN } from '~/domain/book/types'
 import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
 import * as repository from '~/system/scan/isbn-repository'
-import type { ScanResult } from '~/system/scan/types'
+import { scanResultSchema } from '~/system/scan/schemas'
 
 const log = createLogger('isbn-scanner')
 
@@ -13,40 +13,13 @@ ${buildBookJsonSchema(true)}
 
 Recherche les données les plus récentes et précises possibles sur Wikipedia, Goodreads, Babelio, Sens Critique, Amazon et d'autres sources fiables. Toutes les valeurs textuelles en français.`
 
-  const parsed = await callGemini(prompt)
-
-  const title = parsed.title as string | undefined
-  const authors = parsed.authors as string[] | undefined
-  if (!title || !authors?.length) {
-    throw new Error(`Gemini could not find book data for ISBN ${isbn}`)
-  }
-
+  const raw = await callGemini(prompt)
+  const parsed = scanResultSchema.parse(raw)
   return {
-    title,
-    authors,
-    publisher: parsed.publisher as string | undefined,
-    publishedDate: parsed.publishedDate as string | undefined,
-    pageCount: parsed.pageCount as number | undefined,
-    genre: parsed.genre as string | undefined,
-    synopsis: parsed.synopsis as string | undefined,
-    isbn: (parsed.isbn as string) ?? String(isbn),
-    language: parsed.language as string | undefined,
-    format: normalizeBookFormat(parsed.format as string | undefined),
-    series: parsed.series as string | undefined,
-    seriesNumber: parsed.seriesNumber as number | undefined,
-    translator: parsed.translator as string | undefined,
-    estimatedPrice: parsed.estimatedPrice as number | undefined,
-    duration: parsed.duration as string | undefined,
-    narrators: (parsed.narrators as string[]) ?? undefined,
-    awards: (parsed.awards as { name: string; year?: number }[]) ?? [],
-    publicRatings:
-      (parsed.publicRatings as {
-        source: string
-        score: number
-        maxScore: number
-        voterCount: number
-      }[]) ?? [],
-  } satisfies ScanResult
+    ...parsed,
+    isbn: parsed.isbn ?? String(isbn),
+    format: normalizeBookFormat(parsed.format),
+  }
 }
 
 export namespace IsbnScanner {
