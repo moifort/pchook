@@ -26,12 +26,6 @@ mock.module('~/system/scan/index', () => ({
   },
 }))
 
-mock.module('~/system/suggestion/index', () => ({
-  SuggestionGenerator: {
-    generate: async () => [],
-  },
-}))
-
 import { BookListReadModel } from '~/read-model/book-list/index'
 import analyzeHandler from '~/routes/books/analyze.post'
 import confirmHandler from '~/routes/books/confirm.post'

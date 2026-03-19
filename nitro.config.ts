@@ -22,7 +22,6 @@ export default defineNitroConfig({
     series: { driver: 'fs', base: './.data/db/series' },
     'series-books': { driver: 'fs', base: './.data/db/series-books' },
     reviews: { driver: 'fs', base: './.data/db/reviews' },
-    suggestions: { driver: 'fs', base: './.data/db/suggestions' },
     'scan-cache': { driver: 'fs', base: './.data/db/scan-cache' },
     'audible-credentials': { driver: 'fs', base: './.data/db/audible-credentials' },
     'audible-mappings': { driver: 'fs', base: './.data/db/audible-mappings' },

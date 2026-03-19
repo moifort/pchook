@@ -5,7 +5,6 @@ export default defineEventHandler(async () => {
     'series',
     'series-books',
     'reviews',
-    'suggestions',
     'scan-cache',
     'migration-meta',
     'audible-credentials',

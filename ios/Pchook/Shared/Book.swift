@@ -69,7 +69,6 @@ struct BookDetailData: Decodable, Sendable {
     var coverImageBase64: String?
     var series: SeriesInfo?
     var review: ReviewInfo?
-    let suggestions: [Suggestion]
 }
 
 struct SeriesInfo: Decodable, Sendable {
@@ -88,20 +87,6 @@ struct ReviewInfo: Decodable, Sendable {
     let rating: Int
     var readDate: Date?
     var reviewNotes: String?
-}
-
-// MARK: - Suggestion
-
-struct Suggestion: Codable, Identifiable, Sendable {
-    let id: String
-    let sourceBookId: String
-    let title: String
-    let authors: [String]
-    var genre: String?
-    var synopsis: String?
-    let awards: [Award]
-    let publicRatings: [PublicRating]
-    let createdAt: Date
 }
 
 // MARK: - Series

@@ -33,12 +33,6 @@ mock.module('~/domain/audible/audible.api', () => ({
   refreshAccessToken: async (credentials: AudibleCredentials) => credentials,
 }))
 
-mock.module('~/system/suggestion/index', () => ({
-  SuggestionGenerator: {
-    generate: async () => [],
-  },
-}))
-
 import { AudibleCommand } from '~/domain/audible/command'
 import { AudibleQuery } from '~/domain/audible/query'
 import callbackHandler from '~/routes/audible/auth/callback.post'

@@ -80,12 +80,6 @@ mock.module('~/system/scan/gemini', () => ({
   normalizeBookFormat: (value: string) => value,
 }))
 
-mock.module('~/system/suggestion/index', () => ({
-  SuggestionGenerator: {
-    generate: async () => [],
-  },
-}))
-
 import { AudibleCommand } from '~/domain/audible/command'
 import { BookQuery } from '~/domain/book/query'
 import statusHandler from '~/routes/audible/status.get'

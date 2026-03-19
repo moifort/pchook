@@ -36,8 +36,4 @@ enum BooksAPI {
         let _: APIResponse<Ignored> = try await APIClient.shared.post("/books/\(id)/review", body: request)
     }
 
-    static func getSuggestions(id: String) async throws -> [Suggestion] {
-        let response: APIResponse<[Suggestion]> = try await APIClient.shared.get("/books/\(id)/suggestions")
-        return response.data
-    }
 }

@@ -27,12 +27,6 @@ mock.module('~/system/scan/isbn-scanner', () => ({
   },
 }))
 
-mock.module('~/system/suggestion/index', () => ({
-  SuggestionGenerator: {
-    generate: async () => [],
-  },
-}))
-
 import analyzeIsbnHandler from '~/routes/books/analyze-isbn.post'
 import confirmHandler from '~/routes/books/confirm.post'
 import { feature, given, scenario, then, when } from '~/test/bdd'

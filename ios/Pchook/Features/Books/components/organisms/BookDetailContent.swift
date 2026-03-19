@@ -65,20 +65,6 @@ struct BookDetailContent: View {
                 onAddReview: onAddReview
             )
 
-            if !detail.suggestions.isEmpty {
-                SuggestionsSection(
-                    suggestions: detail.suggestions.map {
-                        .init(
-                            id: $0.id,
-                            title: $0.title,
-                            authors: $0.authors.joined(separator: ", "),
-                            genre: $0.genre,
-                            awardCount: $0.awards.count,
-                            seriesPosition: nil
-                        )
-                    }
-                )
-            }
         }
     }
 }
