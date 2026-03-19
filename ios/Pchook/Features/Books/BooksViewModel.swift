@@ -198,14 +198,19 @@ final class BooksViewModel {
     }
 
     private var seriesGroupedBooks: [BookSection] {
-        var dict: [String: [BookListItem]] = [:]
+        var dict: [String: (seriesName: String, language: String?, books: [BookListItem])] = [:]
         for book in displayedBooks {
-            let key = book.seriesName ?? ""
-            dict[key, default: []].append(book)
+            let seriesName = book.seriesName ?? ""
+            let key = "\(seriesName)\0\(book.language ?? "")"
+            var entry = dict[key] ?? (seriesName: seriesName, language: book.language, books: [])
+            entry.books.append(book)
+            dict[key] = entry
         }
         return dict.keys.sorted().map { key in
-            let sorted = dict[key]!.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
-            let sectionTitle = key
+            let entry = dict[key]!
+            let sorted = entry.books.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
+            let suffix = entry.language.map { " (\($0))" } ?? ""
+            let sectionTitle = "\(entry.seriesName)\(suffix)"
             return BookSection(
                 title: sectionTitle,
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }

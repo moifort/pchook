@@ -53,6 +53,7 @@ struct BookListItem: Codable, Identifiable, Sendable {
     var genre: String?
     let status: String
     var estimatedPrice: Double?
+    var language: String?
     let awards: [Award]
     let publicRatings: [PublicRating]
     var rating: Int?
