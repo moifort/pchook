@@ -112,7 +112,7 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
-const enrichWithGemini = async (scanResult: ScanResult) => {
+export const enrichWithGemini = async (scanResult: ScanResult) => {
   const bookDescription = [
     scanResult.title,
     scanResult.authors.join(', '),
