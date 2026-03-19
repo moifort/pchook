@@ -7,6 +7,15 @@ struct BookDetailContent: View {
 
     var body: some View {
         List {
+            Section {
+                HStack {
+                    Spacer()
+                    CoverImageView(base64String: detail.coverImageBase64)
+                    Spacer()
+                }
+                .listRowBackground(Color.clear)
+            }
+
             BookDetailHeader(
                 title: detail.book.title,
                 authors: detail.book.authors.joined(separator: ", "),
