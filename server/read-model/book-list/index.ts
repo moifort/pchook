@@ -59,12 +59,7 @@ export namespace BookListReadModel {
         estimatedPrice,
         language: language ? String(language) : undefined,
         awards,
-        publicRatings: publicRatings.map(({ source, score, maxScore, voterCount }) => ({
-          source,
-          score,
-          maxScore,
-          voterCount: Math.round(voterCount),
-        })),
+        publicRatings,
         rating: reviewByBookId.get(id)?.rating,
         seriesName: seriesByBookId.get(id)?.seriesName,
         seriesPosition: seriesByBookId.get(id)?.seriesPosition,

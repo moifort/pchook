@@ -39,18 +39,8 @@ export namespace BookDetailReadModel {
 
     const review = reviewResult === 'not-found' ? undefined : reviewResult
 
-    const sanitizedBook = {
-      ...book,
-      publicRatings: book.publicRatings.map(({ source, score, maxScore, voterCount }) => ({
-        source,
-        score,
-        maxScore,
-        voterCount: Math.round(voterCount),
-      })),
-    }
-
     return {
-      book: sanitizedBook,
+      book,
       coverImageBase64: coverImageBase64 ?? undefined,
       series,
       review,
