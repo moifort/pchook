@@ -17,6 +17,7 @@ struct AudibleStatus: Decodable, Sendable {
     let libraryCount: Int
     let wishlistCount: Int
     let lastSyncAt: Date?
+    let rawItemCount: Int
 }
 
 struct SyncProgressData: Decodable, Sendable {

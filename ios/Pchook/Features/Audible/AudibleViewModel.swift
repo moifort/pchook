@@ -50,7 +50,7 @@ final class AudibleViewModel {
                 await refreshStatus()
             }
 
-            if libraryCount > 0 {
+            if status.rawItemCount > 0 {
                 hasFetchedData = true
             }
         } catch {
@@ -119,9 +119,14 @@ final class AudibleViewModel {
             isImporting = true
         }
         pollingTask = Task {
+            var isFirstPoll = true
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(2))
-                guard !Task.isCancelled else { break }
+                if isFirstPoll {
+                    isFirstPoll = false
+                } else {
+                    try? await Task.sleep(for: .seconds(2))
+                    guard !Task.isCancelled else { break }
+                }
                 do {
                     let progress = try await AudibleAPI.syncProgress()
                     syncProgress = progress
@@ -175,6 +180,7 @@ final class AudibleViewModel {
             libraryCount = status.libraryCount
             wishlistCount = status.wishlistCount
             lastSyncAt = status.lastSyncAt
+            if status.rawItemCount > 0 { hasFetchedData = true }
         } catch {}
     }
 }
