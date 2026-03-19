@@ -99,6 +99,7 @@ mock.module('~/system/suggestion/index', () => ({
 }))
 
 import { AudibleCommand } from '~/domain/audible/command'
+import { AudibleUseCase } from '~/domain/audible/use-case'
 import { BookQuery } from '~/domain/book/query'
 import fetchHandler from '~/routes/audible/sync/fetch.post'
 import importHandler from '~/routes/audible/sync/import.post'
@@ -132,46 +133,59 @@ feature('POST /audible/sync/verify', () => {
 })
 
 feature('POST /audible/sync/fetch', () => {
-  scenario('fetches and stores items from library and wishlist', async () => {
+  scenario('accepts fetch request and starts background processing', async () => {
     given('Audible credentials are configured')
     await AudibleCommand.saveCredentials(fakeCredentials)
 
     when('POST /audible/sync/fetch is called')
-    const event = mockEvent()
-    const result = await fetchHandler(event as never)
+    const result = await fetchHandler(mockEvent() as never)
 
-    then('it returns totals for library and wishlist')
-    expect(result.status).toBe(200)
-    expect(result.data.libraryTotal).toBe(2)
-    expect(result.data.listenedTotal).toBe(1)
-    expect(result.data.wishlistTotal).toBe(1)
+    then('it returns 202 with started flag')
+    expect(result.status).toBe(202)
+    expect(result.data.started).toBe(true)
   })
 
   scenario('rejects when no credentials are configured', async () => {
     given('no Audible credentials exist')
 
-    when('POST /audible/sync/fetch is called')
-    const event = mockEvent()
-
     then('it throws a 422 error')
-    await expect(fetchHandler(event as never)).rejects.toMatchObject({ statusCode: 422 })
+    await expect(fetchHandler(mockEvent() as never)).rejects.toMatchObject({ statusCode: 422 })
   })
 })
 
 feature('POST /audible/sync/import', () => {
+  scenario('accepts import request and starts background processing', async () => {
+    given('Audible credentials are configured and raw items were fetched')
+    await AudibleCommand.saveCredentials(fakeCredentials)
+    await AudibleUseCase.fetchAndStore()
+
+    when('POST /audible/sync/import is called')
+    const result = await importHandler(mockEvent() as never)
+
+    then('it returns 202 with started flag')
+    expect(result.status).toBe(202)
+    expect(result.data.started).toBe(true)
+  })
+
+  scenario('rejects when no raw data was fetched', async () => {
+    given('no Audible data has been fetched')
+
+    then('it throws a 422 error')
+    await expect(importHandler(mockEvent() as never)).rejects.toMatchObject({ statusCode: 422 })
+  })
+})
+
+feature('Audible sync end-to-end', () => {
   scenario('imports stored raw items into books', async () => {
     given('Audible credentials are configured and raw items were fetched')
     await AudibleCommand.saveCredentials(fakeCredentials)
-    await fetchHandler(mockEvent() as never)
+    await AudibleUseCase.fetchAndStore()
 
-    when('POST /audible/sync/import is called')
-    const event = mockEvent()
-    const result = await importHandler(event as never)
+    when('import is executed')
+    const result = await AudibleUseCase.importAll()
 
     then('it returns the number of new books and duplicates')
-    expect(result.status).toBe(200)
-    expect(result.data.newBooksAdded).toBe(3)
-    expect(result.data.duplicatesSkipped).toBe(0)
+    expect(result).toMatchObject({ newBooksAdded: 3, duplicatesSkipped: 0 })
 
     and('books are created with audiobook format and correct status')
     const books = await BookQuery.findAll()
@@ -198,28 +212,17 @@ feature('POST /audible/sync/import', () => {
   scenario('skips already-imported ASINs on re-import', async () => {
     given('Audible data was fetched and a first import was done')
     await AudibleCommand.saveCredentials(fakeCredentials)
-    await fetchHandler(mockEvent() as never)
-    await importHandler(mockEvent() as never)
+    await AudibleUseCase.fetchAndStore()
+    await AudibleUseCase.importAll()
 
-    when('POST /audible/sync/import is called again')
-    const result = await importHandler(mockEvent() as never)
+    when('import is executed again')
+    const result = await AudibleUseCase.importAll()
 
     then('all items are skipped as duplicates')
-    expect(result.data.newBooksAdded).toBe(0)
-    expect(result.data.duplicatesSkipped).toBe(3)
+    expect(result).toMatchObject({ newBooksAdded: 0, duplicatesSkipped: 3 })
 
     and('no duplicate books are created')
     const books = await BookQuery.findAll()
     expect(books).toHaveLength(3)
-  })
-
-  scenario('rejects when no raw data was fetched', async () => {
-    given('no Audible data has been fetched')
-
-    when('POST /audible/sync/import is called')
-    const event = mockEvent()
-
-    then('it throws a 422 error')
-    await expect(importHandler(event as never)).rejects.toMatchObject({ statusCode: 422 })
   })
 })

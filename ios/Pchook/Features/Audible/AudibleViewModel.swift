@@ -82,19 +82,13 @@ final class AudibleViewModel {
         syncProgress = nil
         summaryResult = nil
 
-        pollingTask = Task { await pollProgress() }
-
         do {
-            summaryResult = try await AudibleAPI.syncFetch()
-            await refreshStatus()
+            try await AudibleAPI.syncFetch()
+            resumePolling(for: "downloading")
         } catch {
+            isFetching = false
             self.error = reportError(error)
         }
-
-        isFetching = false
-        syncProgress = nil
-        pollingTask?.cancel()
-        pollingTask = nil
     }
 
     // MARK: - Step 3: Import (user action)
@@ -105,34 +99,16 @@ final class AudibleViewModel {
         syncProgress = nil
         importResult = nil
 
-        pollingTask = Task { await pollProgress() }
-
         do {
-            importResult = try await AudibleAPI.syncImport()
-            await refreshStatus()
+            try await AudibleAPI.syncImport()
+            resumePolling(for: "importing")
         } catch {
+            isImporting = false
             self.error = reportError(error)
         }
-
-        isImporting = false
-        syncProgress = nil
-        pollingTask?.cancel()
-        pollingTask = nil
     }
 
     // MARK: - Polling
-
-    private func pollProgress() async {
-        while !Task.isCancelled {
-            try? await Task.sleep(for: .seconds(2))
-            guard !Task.isCancelled else { break }
-            do {
-                syncProgress = try await AudibleAPI.syncProgress()
-            } catch {
-                break
-            }
-        }
-    }
 
     private func resumePolling(for phase: String) {
         if phase == "downloading" {
