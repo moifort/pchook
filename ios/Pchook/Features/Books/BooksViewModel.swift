@@ -6,8 +6,8 @@ enum BookListMode: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .all: "Tous"
-        case .toRead: "\u{00C0} lire"
-        case .series: "S\u{00E9}ries"
+        case .toRead: "À lire"
+        case .series: "Séries"
         case .favorites: "Favoris"
         }
     }
@@ -22,17 +22,17 @@ enum BookListMode: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .all: "Mes Livres"
-        case .toRead: "\u{00C0} lire"
-        case .series: "S\u{00E9}ries"
+        case .toRead: "À lire"
+        case .series: "Séries"
         case .favorites: "Favoris"
         }
     }
     var subtitle: String {
         switch self {
-        case .all: "Tous vos livres ajout\u{00E9}s"
+        case .all: "Tous vos livres ajoutés"
         case .toRead: "Livres en attente de lecture"
-        case .series: "Vos livres regroup\u{00E9}s par s\u{00E9}rie"
-        case .favorites: "Vos livres not\u{00E9}s 5 \u{00E9}toiles"
+        case .series: "Vos livres regroupés par série"
+        case .favorites: "Vos livres notés 5 étoiles"
         }
     }
 }
@@ -47,7 +47,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .author: "Auteur"
         case .genre: "Genre"
         case .myRating: "Ma note"
-        case .awards: "Prix litt\u{00E9}raires"
+        case .awards: "Prix littéraires"
         }
     }
     var icon: String {
@@ -60,19 +60,6 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .awards: "trophy"
         }
     }
-}
-
-struct BookSection: Identifiable {
-    let title: String
-    var flag: String?
-    let items: [SectionedBook]
-    var id: String { title + (flag ?? "") }
-}
-
-struct SectionedBook: Identifiable {
-    let sectionTitle: String
-    let book: BookListItem
-    var id: String { "\(sectionTitle)|\(book.id)" }
 }
 
 @MainActor @Observable
@@ -108,133 +95,10 @@ final class BooksViewModel {
     }
 
     var groupedBooks: [BookSection] {
-        if mode == .series { return seriesGroupedBooks }
-        let items = displayedBooks
-        switch sort {
-        case .createdAt:
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMMM yyyy"
-            formatter.locale = Locale(identifier: "fr_FR")
-            var dict: [String: [BookListItem]] = [:]
-            var order: [String] = []
-            for book in items {
-                let key = formatter.string(from: book.createdAt).capitalized
-                if dict[key] == nil { order.append(key) }
-                dict[key, default: []].append(book)
-            }
-            return order.map { key in
-                BookSection(
-                    title: key,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
-                )
-            }
-
-        case .author:
-            var dict: [String: [BookListItem]] = [:]
-            for book in items {
-                let author = book.authors.first ?? "Auteur inconnu"
-                dict[author, default: []].append(book)
-            }
-            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
-            return keys.map { key in
-                BookSection(
-                    title: key,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
-                )
-            }
-
-        case .genre:
-            var dict: [String: [BookListItem]] = [:]
-            for book in items {
-                let firstGenre = book.genre?
-                    .split(separator: ",")
-                    .first
-                    .map { $0.trimmingCharacters(in: .whitespaces) } ?? "Sans genre"
-                dict[firstGenre, default: []].append(book)
-            }
-            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
-            return keys.map { key in
-                BookSection(
-                    title: key,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
-                )
-            }
-
-        case .myRating:
-            var dict: [Int: [BookListItem]] = [:]
-            for book in items {
-                dict[book.rating ?? 0, default: []].append(book)
-            }
-            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
-            return keys.map { key in
-                let label = key == 0 ? "Aucune note" : String(repeating: "\u{2605}", count: key)
-                return BookSection(
-                    title: label,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: label, book: $0) }
-                )
-            }
-
-        case .awards:
-            var dict: [String: [BookListItem]] = [:]
-            for book in items {
-                if book.awards.isEmpty {
-                    dict["Aucun prix", default: []].append(book)
-                } else {
-                    for award in book.awards {
-                        dict[award.name, default: []].append(book)
-                    }
-                }
-            }
-            let keys = sortDescending ? dict.keys.sorted(by: >) : dict.keys.sorted()
-            return keys.map { key in
-                BookSection(
-                    title: key,
-                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
-                )
-            }
-
-        case .title:
-            return []
+        if mode == .series {
+            return BookGrouping.groupedBySeries(books: displayedBooks)
         }
-    }
-
-    private var seriesGroupedBooks: [BookSection] {
-        var dict: [String: (seriesName: String, language: String?, books: [BookListItem])] = [:]
-        for book in displayedBooks {
-            let seriesName = book.seriesName ?? ""
-            let key = "\(seriesName)\0\(book.language ?? "")"
-            var entry = dict[key] ?? (seriesName: seriesName, language: book.language, books: [])
-            entry.books.append(book)
-            dict[key] = entry
-        }
-        return dict.keys.sorted().map { key in
-            let entry = dict[key]!
-            let sorted = entry.books.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
-            let sectionTitle = entry.seriesName
-            return BookSection(
-                title: sectionTitle,
-                flag: entry.language.flatMap { Self.flagEmoji(for: $0) },
-                items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
-            )
-        }
-    }
-
-    private static func flagEmoji(for language: String) -> String? {
-        let countryCode: String? = switch language.lowercased() {
-        case "fr", "french", "fran\u{00E7}ais": "FR"
-        case "en", "english", "anglais": "GB"
-        case "es", "spanish", "espagnol": "ES"
-        case "de", "german", "allemand": "DE"
-        case "it", "italian", "italien": "IT"
-        case "pt", "portuguese", "portugais": "PT"
-        case "ja", "japanese", "japonais": "JP"
-        case "zh", "chinese", "chinois": "CN"
-        case "ko", "korean", "cor\u{00E9}en": "KR"
-        case "ru", "russian", "russe": "RU"
-        default: nil
-        }
-        guard let code = countryCode else { return nil }
-        return code.unicodeScalars.map { String(UnicodeScalar(127397 + $0.value)!) }.joined()
+        return BookGrouping.grouped(books: displayedBooks, sort: sort, descending: sortDescending)
     }
 
     var filterKey: String {
