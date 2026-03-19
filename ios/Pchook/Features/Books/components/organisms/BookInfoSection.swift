@@ -58,7 +58,7 @@ struct BookInfoSection: View {
                     LabeledInfoRow(
                         title: "Prix estim\u{00E9}",
                         value: String(format: "%.2f \u{20AC}", estimatedPrice),
-                        icon: "eurosign.circle"
+                        icon: "eurosign"
                     )
                 }
             }
