@@ -42,7 +42,7 @@ export type Book = {
   translator?: PersonName
   estimatedPrice?: Eur
   duration?: string
-  narrators?: PersonName[]
+  narrators: PersonName[]
   personalNotes?: string
   status: BookStatus
   readDate?: Date
