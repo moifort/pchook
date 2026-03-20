@@ -8,7 +8,7 @@ export const formatDuration = (minutes: number) => {
   return `${hours}h ${remainingMinutes}min`
 }
 
-export const buildGeminiPrompt = (item: AudibleItem) => {
+export const buildGeminiPrompt = (item: AudibleItem, existingSeriesNames: string[] = []) => {
   const authorsStr = item.authors.join(', ')
   const seriesHint = item.series
     ? `\nCe livre fait partie de la série "${item.series.name}"${item.series.position ? ` (tome ${item.series.position})` : ''}.`
@@ -27,7 +27,7 @@ Retourne toutes les informations au format JSON strict (sans markdown, sans back
   "isbn": string ou null (ISBN-13 de préférence),
   "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
   "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
-  "series": string ou null (nom de la série ou du cycle),
+  "series": string ou null (nom de la série ou du cycle),${existingSeriesNames.length > 0 ? `\n  IMPORTANT : si ce livre fait partie d'une série, vérifie d'abord si elle correspond à une de ces séries existantes : ${existingSeriesNames.map((name) => `"${name}"`).join(', ')}. Utilise le nom existant exact si c'est la même série.` : ''}
   "seriesNumber": number ou null (numéro du tome dans la série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),

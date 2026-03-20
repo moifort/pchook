@@ -34,7 +34,10 @@ export const normalizeBookFormat = (value: string | undefined): BookFormat | und
   return normalized
 }
 
-export const buildBookJsonSchema = (includeIdentification: boolean) => {
+export const buildBookJsonSchema = (
+  includeIdentification: boolean,
+  existingSeriesNames: string[] = [],
+) => {
   const identificationFields = includeIdentification
     ? `  "title": string (titre du livre uniquement, sans préfixe de série ni numéro de tome — ex: "Le Nom du Vent" et non "Tome 1 : Le Nom du Vent"),
   "authors": string[] (liste des auteurs),
@@ -50,7 +53,7 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
   "isbn": string ou null (ISBN-13 de préférence),
   "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
   "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
-  "series": string ou null (nom de la série, du cycle, de la trilogie ou de la saga — recherche activement si ce livre fait partie d'une série même si ce n'est pas explicitement marqué),
+  "series": string ou null (nom de la série, du cycle, de la trilogie ou de la saga — recherche activement si ce livre fait partie d'une série même si ce n'est pas explicitement marqué),${existingSeriesNames.length > 0 ? `\n  IMPORTANT : si ce livre fait partie d'une série, vérifie d'abord si elle correspond à une de ces séries existantes : ${existingSeriesNames.map((name) => `"${name}"`).join(', ')}. Utilise le nom existant exact si c'est la même série, même si tu trouves une variante différente.` : ''}
   "seriesNumber": number ou null (numéro du tome dans la série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),

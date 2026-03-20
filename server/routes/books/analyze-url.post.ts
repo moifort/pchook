@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { SeriesQuery } from '~/domain/series/query'
 import * as previewRepository from '~/system/scan/preview-repository'
 import { ShareImporter } from '~/system/scan/share-import'
 
@@ -13,12 +14,12 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { url, description, rawText, attachmentTypes } = bodySchema.parse(body)
 
-  const result = await ShareImporter.importFromShare({
-    url,
-    description,
-    rawText,
-    attachmentTypes,
-  })
+  const allSeries = await SeriesQuery.findAll()
+  const seriesNames = allSeries.map(({ name }) => String(name))
+  const result = await ShareImporter.importFromShare(
+    { url, description, rawText, attachmentTypes },
+    seriesNames,
+  )
 
   if (result === 'extraction-failed') {
     throw createError({

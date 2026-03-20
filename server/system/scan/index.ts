@@ -96,14 +96,14 @@ const scanWithClaude = async (imageBase64: string) => {
   return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
-const scanWithNativeOcr = async (ocrText: string) => {
+const scanWithNativeOcr = async (ocrText: string, existingSeriesNames: string[] = []) => {
   const prompt = `Pour le livre dont voici le texte extrait de la couverture par OCR :
 
 "${ocrText}"
 
 Identifie ce livre et retourne toutes les informations suivantes au format JSON strict (sans markdown, sans backticks) :
 
-${buildBookJsonSchema(true)}
+${buildBookJsonSchema(true, existingSeriesNames)}
 
 Recherche les données les plus récentes et précises possibles sur Wikipedia, Goodreads, Babelio, Sens Critique, Amazon et d'autres sources fiables. Toutes les valeurs textuelles en français.`
 
@@ -112,7 +112,10 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
-export const enrichWithGemini = async (scanResult: ScanResult) => {
+export const enrichWithGemini = async (
+  scanResult: ScanResult,
+  existingSeriesNames: string[] = [],
+) => {
   const bookDescription = [
     scanResult.title,
     scanResult.authors.join(', '),
@@ -123,7 +126,7 @@ export const enrichWithGemini = async (scanResult: ScanResult) => {
 
   const prompt = `Pour le livre "${bookDescription}", recherche et complète les informations suivantes au format JSON strict (sans markdown, sans backticks) :
 
-${buildBookJsonSchema(false)}
+${buildBookJsonSchema(false, existingSeriesNames)}
 
 Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`
 
@@ -159,7 +162,11 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
 }
 
 export namespace BookScanner {
-  export const scan = async (imageBuffer: Buffer, ocrText?: string) => {
+  export const scan = async (
+    imageBuffer: Buffer,
+    ocrText?: string,
+    existingSeriesNames: string[] = [],
+  ) => {
     const imageHash = hashImage(imageBuffer)
 
     const cached = await repository.findBy(imageHash)
@@ -172,8 +179,8 @@ export namespace BookScanner {
 
     const scanResult =
       scanStrategy === 'native'
-        ? await scanWithNativeOcrStrategy(ocrText)
-        : await scanWithClaudeStrategy(imageBuffer)
+        ? await scanWithNativeOcrStrategy(ocrText, existingSeriesNames)
+        : await scanWithClaudeStrategy(imageBuffer, existingSeriesNames)
 
     await repository.save({
       imageHash,
@@ -185,17 +192,20 @@ export namespace BookScanner {
   }
 }
 
-const scanWithClaudeStrategy = async (imageBuffer: Buffer) => {
+const scanWithClaudeStrategy = async (imageBuffer: Buffer, existingSeriesNames: string[] = []) => {
   const imageBase64 = imageBuffer.toString('base64')
 
   log.info('Scanning book cover with Claude Vision...')
   const scanResult = await scanWithClaude(imageBase64)
 
   log.info('Enriching with Gemini...', scanResult.title)
-  return await enrichWithGemini(scanResult)
+  return await enrichWithGemini(scanResult, existingSeriesNames)
 }
 
-const scanWithNativeOcrStrategy = async (ocrText: string | undefined) => {
+const scanWithNativeOcrStrategy = async (
+  ocrText: string | undefined,
+  existingSeriesNames: string[] = [],
+) => {
   if (!ocrText?.trim()) {
     throw createError({
       statusCode: 422,
@@ -204,5 +214,5 @@ const scanWithNativeOcrStrategy = async (ocrText: string | undefined) => {
   }
 
   log.info('Scanning book cover with native OCR text...')
-  return await scanWithNativeOcr(ocrText.trim())
+  return await scanWithNativeOcr(ocrText.trim(), existingSeriesNames)
 }

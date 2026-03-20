@@ -91,7 +91,7 @@ const buildSourceBlock = ({ url, description, rawText, metaTags }: ShareData) =>
   return `Visite et analyse cette URL : ${url}\n\nIdentifie le livre référencé et retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :`
 }
 
-const extractFromShare = async (data: ShareData) => {
+const extractFromShare = async (data: ShareData, existingSeriesNames: string[] = []) => {
   log.info('Share data received', {
     url: data.url,
     description: data.description,
@@ -103,7 +103,7 @@ const extractFromShare = async (data: ShareData) => {
 
   const prompt = `${sourceBlock}
 
-${buildBookJsonSchema(true)}
+${buildBookJsonSchema(true, existingSeriesNames)}
 
 Si l'URL est un lien Audible/Amazon, le format est probablement "audiobook".
 Recherche les données les plus récentes et précises possibles. Toutes les valeurs textuelles en français.`
@@ -124,6 +124,7 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
 export namespace ShareImporter {
   export const importFromShare = async (
     data: ShareData,
+    existingSeriesNames: string[] = [],
   ): Promise<ScanResult | 'extraction-failed'> => {
     const urlHash = hashUrl(data.url)
 
@@ -144,7 +145,7 @@ export namespace ShareImporter {
 
     let extracted: ScanResult
     try {
-      extracted = await extractFromShare(enrichedData)
+      extracted = await extractFromShare(enrichedData, existingSeriesNames)
     } catch (error) {
       log.error('Extraction failed', { url: data.url, error: String(error) })
       return 'extraction-failed' as const

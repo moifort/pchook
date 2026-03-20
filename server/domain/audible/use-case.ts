@@ -70,7 +70,9 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const existingMapping = await AudibleQuery.getMapping(item.asin)
   if (existingMapping) return 'skipped' as const
 
-  const prompt = buildGeminiPrompt(item)
+  const allSeries = await SeriesQuery.findAll()
+  const seriesNames = allSeries.map(({ name }) => String(name))
+  const prompt = buildGeminiPrompt(item, seriesNames)
   const geminiResult = await callGemini(prompt)
   const scanResult = mergeAudibleIntoScanResult(geminiResult, item)
 

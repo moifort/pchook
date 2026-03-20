@@ -6,10 +6,10 @@ import { scanResultSchema } from '~/system/scan/schemas'
 
 const log = createLogger('isbn-scanner')
 
-const lookupWithGemini = async (isbn: ISBN) => {
+const lookupWithGemini = async (isbn: ISBN, existingSeriesNames: string[] = []) => {
   const prompt = `Pour le livre avec l'ISBN ${isbn}, recherche et retourne toutes les informations suivantes au format JSON strict (sans markdown, sans backticks) :
 
-${buildBookJsonSchema(true)}
+${buildBookJsonSchema(true, existingSeriesNames)}
 
 Recherche les données les plus récentes et précises possibles sur Wikipedia, Goodreads, Babelio, Sens Critique, Amazon et d'autres sources fiables. Toutes les valeurs textuelles en français.`
 
@@ -23,7 +23,7 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
 }
 
 export namespace IsbnScanner {
-  export const scan = async (isbn: ISBN) => {
+  export const scan = async (isbn: ISBN, existingSeriesNames: string[] = []) => {
     const cached = await repository.findBy(isbn)
     if (cached) {
       log.info('Cache hit for ISBN', String(isbn))
@@ -31,7 +31,7 @@ export namespace IsbnScanner {
     }
 
     log.info('Looking up ISBN with Gemini...', String(isbn))
-    const result = await lookupWithGemini(isbn)
+    const result = await lookupWithGemini(isbn, existingSeriesNames)
 
     await repository.save({
       isbn,

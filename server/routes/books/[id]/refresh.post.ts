@@ -47,7 +47,9 @@ export default defineEventHandler(async (event) => {
     book,
     existingSeries?.name ? String(existingSeries.name) : undefined,
   )
-  const enriched = await enrichWithGemini(scanResult)
+  const allSeries = await SeriesQuery.findAll()
+  const seriesNames = allSeries.map(({ name }) => String(name))
+  const enriched = await enrichWithGemini(scanResult, seriesNames)
   const { title, data, seriesInfo } = scanResultToBookData(enriched)
 
   await BookCommand.update(book.id, {

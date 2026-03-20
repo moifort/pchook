@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ISBN } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
+import { SeriesQuery } from '~/domain/series/query'
 import { IsbnScanner } from '~/system/scan/isbn-scanner'
 import * as previewRepository from '~/system/scan/preview-repository'
 
@@ -26,7 +27,9 @@ export default defineEventHandler(async (event) => {
     } as const
   }
 
-  const scanResult = await IsbnScanner.scan(isbn)
+  const allSeries = await SeriesQuery.findAll()
+  const seriesNames = allSeries.map(({ name }) => String(name))
+  const scanResult = await IsbnScanner.scan(isbn, seriesNames)
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
