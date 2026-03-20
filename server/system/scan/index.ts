@@ -142,6 +142,7 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
       language: enriched.language ?? scanResult.language,
       format: normalizeBookFormat(enriched.format) ?? scanResult.format,
       series: enriched.series ?? scanResult.series,
+      seriesLabel: enriched.seriesLabel ?? scanResult.seriesLabel,
       seriesNumber: enriched.seriesNumber ?? scanResult.seriesNumber,
       translator: enriched.translator ?? scanResult.translator,
       estimatedPrice: enriched.estimatedPrice ?? scanResult.estimatedPrice,

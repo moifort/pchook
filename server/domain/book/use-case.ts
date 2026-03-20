@@ -3,14 +3,21 @@ import type { BookRemovedEvent } from '~/domain/book/events'
 import { BookQuery } from '~/domain/book/query'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
 import { SeriesCommand } from '~/domain/series/command'
-import { Position } from '~/domain/series/primitives'
+import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { emit } from '~/system/event-bus'
+
+type SeriesInfo = { name: string; label?: string; number?: number }
+
+const toSeriesLabelAndPosition = (info: SeriesInfo) => ({
+  label: SeriesLabel(info.label ?? String(info.number ?? 1)),
+  position: SeriesPosition(info.number ?? 1),
+})
 
 export namespace BookUseCase {
   export const addFromScan = async (
     title: BookTitle,
     data: Partial<Book>,
-    seriesInfo?: { name: string; number?: number },
+    seriesInfo?: SeriesInfo,
     coverImageBase64?: string,
   ) => {
     const existing =
@@ -27,7 +34,8 @@ export namespace BookUseCase {
 
     if (seriesInfo?.name) {
       const series = await SeriesCommand.findOrCreate(seriesInfo.name)
-      await SeriesCommand.addBook(series.id, book.id, Position(seriesInfo.number ?? 1))
+      const { label, position } = toSeriesLabelAndPosition(seriesInfo)
+      await SeriesCommand.addBook(series.id, book.id, label, position)
     }
 
     return { tag: 'created', book } as const
@@ -37,7 +45,7 @@ export namespace BookUseCase {
     existingBookId: BookId,
     title: BookTitle,
     data: Partial<Book>,
-    seriesInfo?: { name: string; number?: number },
+    seriesInfo?: SeriesInfo,
     coverImageBase64?: string,
   ) => {
     const existing = await BookQuery.getById(existingBookId)
@@ -72,7 +80,8 @@ export namespace BookUseCase {
     await SeriesCommand.removeBook(existingBookId)
     if (seriesInfo?.name) {
       const series = await SeriesCommand.findOrCreate(seriesInfo.name)
-      await SeriesCommand.addBook(series.id, existingBookId, Position(seriesInfo.number ?? 1))
+      const { label, position } = toSeriesLabelAndPosition(seriesInfo)
+      await SeriesCommand.addBook(series.id, existingBookId, label, position)
     }
 
     return { tag: 'replaced', book: updated } as const

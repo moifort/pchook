@@ -1,9 +1,10 @@
 import { make } from 'ts-brand'
 import { z } from 'zod'
 import type {
-  Position as PositionType,
   SeriesId as SeriesIdType,
+  SeriesLabel as SeriesLabelType,
   SeriesName as SeriesNameType,
+  SeriesPosition as SeriesPositionType,
 } from '~/domain/series/types'
 
 export const SeriesId = (value: unknown) => {
@@ -18,12 +19,17 @@ export const SeriesName = (value: unknown) => {
   return make<SeriesNameType>()(v)
 }
 
-export const Position = (value: unknown) => {
+export const SeriesLabel = (value: unknown) => {
+  const v = z.string().min(1).parse(value)
+  return make<SeriesLabelType>()(v)
+}
+
+export const SeriesPosition = (value: unknown) => {
   const v = z
     .preprocess((v) => {
       const n = typeof v === 'string' ? Number(v) : v
-      return typeof n === 'number' ? Math.round(n) : n
-    }, z.number().int().positive())
+      return typeof n === 'number' && Number.isFinite(n) ? n : v
+    }, z.number().positive())
     .parse(value)
-  return make<PositionType>()(v)
+  return make<SeriesPositionType>()(v)
 }

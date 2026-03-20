@@ -16,6 +16,7 @@ export type ScanResult = {
   language?: string
   format?: string
   series?: string
+  seriesLabel?: string
   seriesNumber?: number
   translator?: string
   estimatedPrice?: number

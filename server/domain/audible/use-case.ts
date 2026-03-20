@@ -11,7 +11,7 @@ import { BookCommand } from '~/domain/book/command'
 import type { Book } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
 import { SeriesCommand } from '~/domain/series/command'
-import { Position } from '~/domain/series/primitives'
+import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { PersonName } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
@@ -80,7 +80,9 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
       const existingSeries = await SeriesQuery.getByBookId(result.book.id)
       if (!existingSeries) {
         const series = await SeriesCommand.findOrCreate(seriesInfo.name)
-        await SeriesCommand.addBook(series.id, result.book.id, Position(seriesInfo.number ?? 1))
+        const label = SeriesLabel(seriesInfo.label ?? String(seriesInfo.number ?? 1))
+        const position = SeriesPosition(seriesInfo.number ?? 1)
+        await SeriesCommand.addBook(series.id, result.book.id, label, position)
       }
     }
   }

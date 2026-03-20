@@ -22,12 +22,14 @@ export namespace BookDetailReadModel {
       if (fullSeries !== 'not-found') {
         series = {
           name: String(fullSeries.name),
-          position: seriesInfo.position,
+          label: String(seriesInfo.label),
+          position: Number(seriesInfo.position),
           books: booksInLanguage(fullSeries.books, book.language).map(
-            ({ id, title, position }) => ({
+            ({ id, title, label, position }) => ({
               id,
               title: String(title),
-              position,
+              label: String(label),
+              position: Number(position),
             }),
           ),
         }

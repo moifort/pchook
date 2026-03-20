@@ -3,7 +3,7 @@ import { BookId } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import type { Book } from '~/domain/book/types'
 import { SeriesCommand } from '~/domain/series/command'
-import { Position } from '~/domain/series/primitives'
+import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { enrichWithGemini } from '~/system/scan/index'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
@@ -58,7 +58,9 @@ export default defineEventHandler(async (event) => {
   await SeriesCommand.removeBook(book.id)
   if (seriesInfo?.name) {
     const series = await SeriesCommand.findOrCreate(seriesInfo.name)
-    await SeriesCommand.addBook(series.id, book.id, Position(seriesInfo.number ?? 1))
+    const label = SeriesLabel(seriesInfo.label ?? String(seriesInfo.number ?? 1))
+    const position = SeriesPosition(seriesInfo.number ?? 1)
+    await SeriesCommand.addBook(series.id, book.id, label, position)
   }
 
   return { status: 200, data: { refreshed: true } } as const

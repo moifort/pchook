@@ -3,7 +3,8 @@ import type { BookId } from '~/domain/book/types'
 
 export type SeriesId = Brand<string, 'SeriesId'>
 export type SeriesName = Brand<string, 'SeriesName'>
-export type Position = Brand<number, 'Position'>
+export type SeriesLabel = Brand<string, 'SeriesLabel'>
+export type SeriesPosition = Brand<number, 'SeriesPosition'>
 
 export type Series = {
   id: SeriesId
@@ -14,6 +15,7 @@ export type Series = {
 export type SeriesBook = {
   seriesId: SeriesId
   bookId: BookId
-  position: Position
+  label: SeriesLabel
+  position: SeriesPosition
   addedAt: Date
 }

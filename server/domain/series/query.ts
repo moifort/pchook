@@ -21,7 +21,7 @@ export namespace SeriesQuery {
           log.warn('Orphaned SeriesBook entry', { seriesId: id, bookId: entry.bookId })
           return undefined
         }
-        return { ...book, position: entry.position }
+        return { ...book, label: entry.label, position: entry.position }
       }),
     )
     return {
@@ -38,6 +38,6 @@ export namespace SeriesQuery {
     if (!entry) return null
     const series = await repository.findSeriesBy(entry.seriesId)
     if (!series) return null
-    return { ...series, position: entry.position }
+    return { ...series, label: entry.label, position: entry.position }
   }
 }

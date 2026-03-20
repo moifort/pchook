@@ -24,7 +24,8 @@ export namespace BookListReadModel {
           return {
             bookId: id,
             seriesName: info ? String(info.name) : undefined,
-            seriesPosition: info?.position,
+            seriesLabel: info ? String(info.label) : undefined,
+            seriesPosition: info ? Number(info.position) : undefined,
           }
         }),
       ),
@@ -32,9 +33,9 @@ export namespace BookListReadModel {
 
     const reviewByBookId = new Map(reviews.map((review) => [review.bookId, review]))
     const seriesByBookId = new Map(
-      seriesInfos.map(({ bookId, seriesName, seriesPosition }) => [
+      seriesInfos.map(({ bookId, seriesName, seriesLabel, seriesPosition }) => [
         bookId,
-        { seriesName, seriesPosition },
+        { seriesName, seriesLabel, seriesPosition },
       ]),
     )
 
@@ -62,6 +63,7 @@ export namespace BookListReadModel {
         publicRatings,
         rating: reviewByBookId.get(id)?.rating,
         seriesName: seriesByBookId.get(id)?.seriesName,
+        seriesLabel: seriesByBookId.get(id)?.seriesLabel,
         seriesPosition: seriesByBookId.get(id)?.seriesPosition,
         createdAt,
       }),

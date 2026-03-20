@@ -13,6 +13,7 @@ export type BookListItem = {
   rating?: Note
   language?: string
   seriesName?: string
+  seriesLabel?: string
   seriesPosition?: number
   createdAt: Date
 }

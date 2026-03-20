@@ -1,7 +1,7 @@
 import type { BookId } from '~/domain/book/types'
 import { randomSeriesId, SeriesName } from '~/domain/series/primitives'
 import * as repository from '~/domain/series/repository'
-import type { Position, SeriesId } from '~/domain/series/types'
+import type { SeriesId, SeriesLabel, SeriesPosition } from '~/domain/series/types'
 
 export namespace SeriesCommand {
   export const findOrCreate = async (name: string) => {
@@ -14,10 +14,16 @@ export namespace SeriesCommand {
     })
   }
 
-  export const addBook = async (seriesId: SeriesId, bookId: BookId, position: Position) => {
+  export const addBook = async (
+    seriesId: SeriesId,
+    bookId: BookId,
+    label: SeriesLabel,
+    position: SeriesPosition,
+  ) => {
     return await repository.saveSeriesBook({
       seriesId,
       bookId,
+      label,
       position,
       addedAt: new Date(),
     })

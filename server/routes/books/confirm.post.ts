@@ -18,6 +18,7 @@ const overridesSchema = z
     translator: z.string().optional(),
     estimatedPrice: z.number().optional(),
     series: z.string().optional(),
+    seriesLabel: z.string().optional(),
     seriesNumber: z.number().optional(),
   })
   .optional()

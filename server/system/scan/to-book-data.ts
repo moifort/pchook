@@ -44,7 +44,7 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
   }
 
   const seriesInfo = scanResult.series
-    ? { name: scanResult.series, number: scanResult.seriesNumber }
+    ? { name: scanResult.series, label: scanResult.seriesLabel, number: scanResult.seriesNumber }
     : undefined
 
   return { title, data, seriesInfo }

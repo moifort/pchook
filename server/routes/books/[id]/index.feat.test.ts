@@ -6,7 +6,7 @@ import type { BookId } from '~/domain/book/types'
 import { ReviewCommand } from '~/domain/review/command'
 import { ReviewQuery } from '~/domain/review/query'
 import { SeriesCommand } from '~/domain/series/command'
-import { Position } from '~/domain/series/primitives'
+import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import deleteHandler from '~/routes/books/[id]/index.delete'
 import getHandler from '~/routes/books/[id]/index.get'
@@ -27,7 +27,7 @@ feature('DELETE /books/[id]', () => {
       createdAt: new Date(),
     })
     const series = await SeriesCommand.findOrCreate('Les Rougon-Macquart')
-    await SeriesCommand.addBook(series.id, bookId, Position(13))
+    await SeriesCommand.addBook(series.id, bookId, SeriesLabel('13'), SeriesPosition(13))
 
     when('DELETE /books/[id] is called')
     const event = mockEvent({ params: { id: String(bookId) } })
@@ -76,7 +76,7 @@ feature('GET /books/[id]', () => {
       createdAt: new Date(),
     })
     const series = await SeriesCommand.findOrCreate('Classiques')
-    await SeriesCommand.addBook(series.id, bookId, Position(1))
+    await SeriesCommand.addBook(series.id, bookId, SeriesLabel('1'), SeriesPosition(1))
 
     when('GET /books/[id] is called')
     const event = mockEvent({ params: { id: String(bookId) } })
@@ -89,7 +89,8 @@ feature('GET /books/[id]', () => {
     and('the series info is included')
     expect(result.data.series).toBeDefined()
     expect(result.data.series?.name).toBe('Classiques')
-    expect(Number(result.data.series?.position)).toBe(1)
+    expect(result.data.series?.label).toBe('1')
+    expect(result.data.series?.position).toBe(1)
 
     and('the review is included')
     expect(result.data.review).toBeDefined()

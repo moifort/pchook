@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { Position, randomSeriesId, SeriesId, SeriesName } from '~/domain/series/primitives'
+import {
+  randomSeriesId,
+  SeriesId,
+  SeriesLabel,
+  SeriesName,
+  SeriesPosition,
+} from '~/domain/series/primitives'
 
 describe('SeriesId', () => {
   test('accepts a valid UUID', () => {
@@ -39,29 +45,51 @@ describe('SeriesName', () => {
   })
 })
 
-describe('Position', () => {
-  test('accepts a positive integer', () => {
-    expect(Position(1)).toBe(Position(1))
+describe('SeriesLabel', () => {
+  test('accepts a non-empty string', () => {
+    expect(SeriesLabel('1')).toBe(SeriesLabel('1'))
   })
 
-  test('accepts a large positive integer', () => {
-    expect(Position(42)).toBe(Position(42))
+  test('accepts free-form text', () => {
+    expect(SeriesLabel('Hors-série')).toBe(SeriesLabel('Hors-série'))
+    expect(SeriesLabel('1.5')).toBe(SeriesLabel('1.5'))
+    expect(SeriesLabel('Extra')).toBe(SeriesLabel('Extra'))
+  })
+
+  test('rejects an empty string', () => {
+    expect(() => SeriesLabel('')).toThrow()
+  })
+})
+
+describe('SeriesPosition', () => {
+  test('accepts a positive integer', () => {
+    expect(SeriesPosition(1)).toBe(SeriesPosition(1))
+  })
+
+  test('accepts a positive decimal', () => {
+    expect(SeriesPosition(1.5)).toBe(SeriesPosition(1.5))
+    expect(SeriesPosition(0.5)).toBe(SeriesPosition(0.5))
+  })
+
+  test('accepts a large positive number', () => {
+    expect(SeriesPosition(99)).toBe(SeriesPosition(99))
   })
 
   test('coerces a string to number', () => {
-    expect(Position('3')).toBe(Position(3))
+    expect(SeriesPosition('3')).toBe(SeriesPosition(3))
+    expect(SeriesPosition('1.5')).toBe(SeriesPosition(1.5))
   })
 
   test('rejects zero', () => {
-    expect(() => Position(0)).toThrow()
+    expect(() => SeriesPosition(0)).toThrow()
   })
 
   test('rejects a negative number', () => {
-    expect(() => Position(-1)).toThrow()
+    expect(() => SeriesPosition(-1)).toThrow()
   })
 
-  test('rounds a non-integer to nearest int', () => {
-    expect(Position(1.5)).toBe(Position(2))
-    expect(Position(2.3)).toBe(Position(2))
+  test('preserves decimals without rounding', () => {
+    expect(SeriesPosition(1.1)).toBe(SeriesPosition(1.1))
+    expect(SeriesPosition(2.3)).toBe(SeriesPosition(2.3))
   })
 })

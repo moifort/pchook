@@ -13,7 +13,7 @@ import {
   Publisher,
 } from '~/domain/book/primitives'
 import { SeriesCommand } from '~/domain/series/command'
-import { Position } from '~/domain/series/primitives'
+import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { Eur, PersonName } from '~/domain/shared/primitives'
 
 const bodySchema = z.object({
@@ -53,7 +53,8 @@ const bodySchema = z.object({
     )
     .optional(),
   series: z.string().min(1).nullable().optional(),
-  seriesNumber: z.number().int().positive().optional(),
+  seriesLabel: z.string().min(1).optional(),
+  seriesNumber: z.number().positive().optional(),
 })
 
 function toBookUpdate(body: z.infer<typeof bodySchema>) {
@@ -125,7 +126,9 @@ export default defineEventHandler(async (event) => {
     await SeriesCommand.removeBook(id)
     if (body.series) {
       const series = await SeriesCommand.findOrCreate(body.series)
-      await SeriesCommand.addBook(series.id, id, Position(body.seriesNumber ?? 1))
+      const label = SeriesLabel(body.seriesLabel ?? String(body.seriesNumber ?? 1))
+      const position = SeriesPosition(body.seriesNumber ?? 1)
+      await SeriesCommand.addBook(series.id, id, label, position)
     }
   }
 
