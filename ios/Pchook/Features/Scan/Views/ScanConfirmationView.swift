@@ -32,7 +32,7 @@ struct ScanConfirmationView: View {
         _authors = State(initialValue: preview.authors)
         _genre = State(initialValue: preview.genres.joined(separator: ", "))
         _series = State(initialValue: preview.series ?? "")
-        _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
+        _seriesNumber = State(initialValue: preview.seriesLabel ?? preview.seriesNumber.map { String($0) } ?? "")
         _publisher = State(initialValue: preview.publisher ?? "")
         _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
         _language = State(initialValue: BookLanguage(apiValue: preview.language))
@@ -223,6 +223,8 @@ struct ScanConfirmationView: View {
         if translator.nilIfEmpty != preview.translator { overrides.translator = translator.nilIfEmpty; hasChanges = true }
         if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }
         if series.nilIfEmpty != preview.series { overrides.series = series.nilIfEmpty; hasChanges = true }
+        let seriesLabelValue = seriesNumber.nilIfEmpty
+        if seriesLabelValue != preview.seriesLabel { overrides.seriesLabel = seriesLabelValue; hasChanges = true }
         if Int(seriesNumber) != preview.seriesNumber { overrides.seriesNumber = Int(seriesNumber); hasChanges = true }
 
         return hasChanges ? overrides : nil
@@ -254,6 +256,7 @@ extension ScanConfirmationView {
         let awards: [AwardsSection.Item]
         let ratings: [PublicRatingsSection.Item]
         var series: String?
+        var seriesLabel: String?
         var seriesNumber: Int?
     }
 }

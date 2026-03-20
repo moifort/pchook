@@ -137,7 +137,7 @@ private struct SharePreviewForm: View {
         _authors = State(initialValue: preview.authors.joined(separator: ", "))
         _genre = State(initialValue: preview.genre ?? "")
         _series = State(initialValue: preview.series ?? "")
-        _seriesNumber = State(initialValue: preview.seriesNumber.map { String($0) } ?? "")
+        _seriesNumber = State(initialValue: preview.seriesLabel ?? preview.seriesNumber.map { String($0) } ?? "")
         _publisher = State(initialValue: preview.publisher ?? "")
         _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
         _language = State(initialValue: ShareBookLanguage(apiValue: preview.language))
@@ -362,6 +362,8 @@ private struct SharePreviewForm: View {
         if Double(estimatedPrice) != preview.estimatedPrice { overrides.estimatedPrice = Double(estimatedPrice); hasChanges = true }
         let ser = series.trimmingCharacters(in: .whitespaces)
         if (ser.isEmpty ? nil : ser) != preview.series { overrides.series = ser.isEmpty ? nil : ser; hasChanges = true }
+        let seriesLabelValue = seriesNumber.trimmingCharacters(in: .whitespaces)
+        if (seriesLabelValue.isEmpty ? nil : seriesLabelValue) != preview.seriesLabel { overrides.seriesLabel = seriesLabelValue.isEmpty ? nil : seriesLabelValue; hasChanges = true }
         if Int(seriesNumber) != preview.seriesNumber { overrides.seriesNumber = Int(seriesNumber); hasChanges = true }
 
         return hasChanges ? overrides : nil

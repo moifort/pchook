@@ -26,6 +26,8 @@ struct Book: Codable, Identifiable, Sendable {
     var personalNotes: String?
     var status: String
     var readDate: Date?
+    var importSource: String?
+    var externalUrl: String?
     var awards: [Award]
     var publicRatings: [PublicRating]
     let createdAt: Date
@@ -58,7 +60,8 @@ struct BookListItem: Codable, Identifiable, Sendable {
     let publicRatings: [PublicRating]
     var rating: Int?
     var seriesName: String?
-    var seriesPosition: Int?
+    var seriesLabel: String?
+    var seriesPosition: Double?
     let createdAt: Date
 }
 
@@ -73,14 +76,16 @@ struct BookDetailData: Decodable, Sendable {
 
 struct SeriesInfo: Decodable, Sendable {
     let name: String
-    let position: Int
+    let label: String
+    let position: Double
     let books: [SeriesBookEntry]
 }
 
 struct SeriesBookEntry: Decodable, Identifiable, Sendable {
     let id: String
     let title: String
-    let position: Int
+    let label: String
+    let position: Double
 }
 
 struct ReviewInfo: Decodable, Sendable {
@@ -153,6 +158,7 @@ struct BookPreview: Codable, Sendable {
     var language: String?
     var format: String?
     var series: String?
+    var seriesLabel: String?
     var seriesNumber: Int?
     var translator: String?
     var estimatedPrice: Double?
@@ -228,6 +234,7 @@ struct UpdateBookRequest: Encodable, Sendable {
     var status: String?
     var readDate: String?
     var series: String?
+    var seriesLabel: String?
     var seriesNumber: Int?
 }
 
@@ -255,6 +262,7 @@ struct ConfirmBookOverrides: Encodable, Sendable {
     var translator: String?
     var estimatedPrice: Double?
     var series: String?
+    var seriesLabel: String?
     var seriesNumber: Int?
 }
 

@@ -228,6 +228,7 @@ struct BookEditForm: View {
             narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
             personalNotes: personalNotes.isEmpty ? nil : personalNotes,
             series: series.isEmpty ? "" : series,
+            seriesLabel: seriesNumber.isEmpty ? nil : seriesNumber,
             seriesNumber: Int(seriesNumber)
         )
 

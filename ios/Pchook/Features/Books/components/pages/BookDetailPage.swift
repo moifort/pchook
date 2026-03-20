@@ -144,7 +144,7 @@ struct BookDetailPage: View {
             duration: detail.book.duration ?? "",
             narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
             series: detail.series?.name ?? "",
-            seriesNumber: detail.series.map { String($0.position) } ?? "",
+            seriesNumber: detail.series?.label ?? "",
             synopsis: detail.book.synopsis ?? "",
             personalNotes: detail.book.personalNotes ?? ""
         )

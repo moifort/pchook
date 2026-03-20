@@ -5,13 +5,13 @@ struct BookDetailHeader: View {
     let authors: String
     let genres: [String]
     let status: String
-    let seriesPosition: Int?
+    let seriesLabel: String?
 
     var body: some View {
         Section {
             LabeledInfoRow(title: "Titre", value: title, icon: "book")
-            if let seriesPosition {
-                LabeledInfoRow(title: "Tome", value: "\(seriesPosition)", icon: "number")
+            if let seriesLabel {
+                LabeledInfoRow(title: "Tome", value: seriesLabel, icon: "number")
             }
             LabeledInfoRow(title: "Auteurs", value: authors, icon: "person.2")
             if !genres.isEmpty {
@@ -37,7 +37,7 @@ struct BookDetailHeader: View {
             authors: "William Gibson",
             genres: ["Cyberpunk", "Science-Fiction"],
             status: "to-read",
-            seriesPosition: 1
+            seriesLabel: "1"
         )
     }
 }

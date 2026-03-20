@@ -199,6 +199,7 @@ struct ScanFlowView: View {
                 .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
             },
             series: preview.series,
+            seriesLabel: preview.seriesLabel,
             seriesNumber: preview.seriesNumber
         )
     }

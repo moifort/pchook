@@ -10,6 +10,17 @@ struct BookInfoSection: View {
     let publishedDate: Date?
     let duration: String?
     let narrators: [String]?
+    let importSource: String?
+    let externalUrl: String?
+
+    private var importInfo: (icon: String, label: String)? {
+        guard let importSource else { return nil }
+        if importSource == "scan" { return ("camera", "Scan couverture") }
+        else if importSource == "isbn" { return ("barcode", "Code ISBN") }
+        else if importSource == "url" { return ("link", "Lien partagé") }
+        else if importSource == "audible" { return ("headphones", "Audible") }
+        else { return ("questionmark.circle", importSource) }
+    }
 
     var body: some View {
         if hasContent {
@@ -61,6 +72,15 @@ struct BookInfoSection: View {
                         icon: "eurosign"
                     )
                 }
+                if let importInfo {
+                    if let externalUrl, let url = URL(string: externalUrl) {
+                        Link(destination: url) {
+                            LabeledInfoRow(title: "Origine", value: importInfo.label, icon: importInfo.icon)
+                        }
+                    } else {
+                        LabeledInfoRow(title: "Origine", value: importInfo.label, icon: importInfo.icon)
+                    }
+                }
             }
         }
     }
@@ -69,6 +89,7 @@ struct BookInfoSection: View {
         publisher != nil || pageCount != nil || language != nil
             || format != nil || translator != nil || estimatedPrice != nil || publishedDate != nil
             || duration != nil || (narrators != nil && !(narrators?.isEmpty ?? true))
+            || importSource != nil
     }
 }
 
@@ -83,7 +104,9 @@ struct BookInfoSection: View {
             estimatedPrice: 8.50,
             publishedDate: Date(),
             duration: nil,
-            narrators: nil
+            narrators: nil,
+            importSource: "scan",
+            externalUrl: nil
         )
     }
 }

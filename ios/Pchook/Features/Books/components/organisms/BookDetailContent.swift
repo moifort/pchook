@@ -23,7 +23,7 @@ struct BookDetailContent: View {
                     .split(separator: ",")
                     .map { $0.trimmingCharacters(in: .whitespaces) } ?? [],
                 status: detail.book.status,
-                seriesPosition: detail.series?.position
+                seriesLabel: detail.series?.label
             )
 
             if !detail.book.publicRatings.isEmpty || detail.review?.rating != nil {
@@ -38,8 +38,8 @@ struct BookDetailContent: View {
             if let series = detail.series {
                 SeriesSection(
                     name: series.name,
-                    currentPosition: series.position,
-                    items: series.books.map { .init(id: $0.id, title: $0.title, position: $0.position) },
+                    currentBookId: detail.book.id,
+                    items: series.books.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
                     onSelectBook: onSelectBook
                 )
             }
@@ -59,7 +59,9 @@ struct BookDetailContent: View {
                 estimatedPrice: detail.book.estimatedPrice,
                 publishedDate: detail.book.publishedDate,
                 duration: detail.book.duration,
-                narrators: detail.book.narrators
+                narrators: detail.book.narrators,
+                importSource: detail.book.importSource,
+                externalUrl: detail.book.externalUrl
             )
 
             BookSynopsisSection(

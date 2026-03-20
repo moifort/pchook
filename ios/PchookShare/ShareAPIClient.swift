@@ -13,6 +13,7 @@ struct ShareBookPreview: Codable, Sendable {
     var language: String?
     var format: String?
     var series: String?
+    var seriesLabel: String?
     var seriesNumber: Int?
     var translator: String?
     var estimatedPrice: Double?
@@ -119,6 +120,7 @@ struct ShareConfirmOverrides: Codable, Sendable {
     var translator: String?
     var estimatedPrice: Double?
     var series: String?
+    var seriesLabel: String?
     var seriesNumber: Int?
 }
 

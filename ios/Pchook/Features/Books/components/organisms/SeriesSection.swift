@@ -2,14 +2,14 @@ import SwiftUI
 
 struct SeriesSection: View {
     let name: String
-    let currentPosition: Int
+    let currentBookId: String
     let items: [Item]
     let onSelectBook: (String) -> Void
 
     var body: some View {
         Section("S\u{00E9}rie : \(name)") {
             ForEach(items) { (book: Item) in
-                if book.position == currentPosition {
+                if book.id == currentBookId {
                     seriesRow(book)
                 } else {
                     Button { onSelectBook(book.id) } label: { seriesRow(book) }
@@ -21,7 +21,7 @@ struct SeriesSection: View {
 
     private func seriesRow(_ book: Item) -> some View {
         HStack {
-            Text(verbatim: String(book.position))
+            Text(verbatim: book.label)
                 .font(.subheadline.monospaced())
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)
@@ -31,7 +31,7 @@ struct SeriesSection: View {
             Text(book.title)
                 .lineLimit(1)
             Spacer()
-            if book.position == currentPosition {
+            if book.id == currentBookId {
                 Image(systemName: "checkmark")
                     .foregroundStyle(Color.accentColor)
                     .font(.caption)
@@ -44,7 +44,8 @@ extension SeriesSection {
     struct Item: Identifiable {
         let id: String
         let title: String
-        let position: Int
+        let label: String
+        let position: Double
     }
 }
 
@@ -52,11 +53,11 @@ extension SeriesSection {
     List {
         SeriesSection(
             name: "Les Rougon-Macquart",
-            currentPosition: 7,
+            currentBookId: "3",
             items: [
-                .init(id: "1", title: "La Fortune des Rougon", position: 1),
-                .init(id: "2", title: "La Cur\u{00E9}e", position: 2),
-                .init(id: "3", title: "L'Assommoir", position: 7),
+                .init(id: "1", title: "La Fortune des Rougon", label: "1", position: 1),
+                .init(id: "2", title: "La Cur\u{00E9}e", label: "2", position: 2),
+                .init(id: "3", title: "L'Assommoir", label: "7", position: 7),
             ],
             onSelectBook: { _ in }
         )

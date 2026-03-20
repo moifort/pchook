@@ -105,7 +105,7 @@ final class BooksViewModel {
         if mode == .series {
             let parts: [String?] = [
                 book.authors.first,
-                book.seriesPosition.map { "Tome \($0)" },
+                book.seriesLabel.map { "Tome \($0)" },
             ]
             let filtered = parts.compactMap { $0 }
             return filtered.isEmpty ? nil : filtered.joined(separator: " • ")
