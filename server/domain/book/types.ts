@@ -26,6 +26,7 @@ export type PublicRating = {
   score: Note
   maxScore: Note
   voterCount: number
+  url?: string
 }
 
 export type Book = {

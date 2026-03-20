@@ -29,7 +29,7 @@ struct BookDetailContent: View {
             if !detail.book.publicRatings.isEmpty || detail.review?.rating != nil {
                 PublicRatingsSection(
                     ratings: detail.book.publicRatings.map {
-                        .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount)
+                        .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount, url: $0.url)
                     },
                     userRating: detail.review?.rating
                 )

@@ -44,6 +44,7 @@ struct PublicRating: Codable, Sendable {
     let score: Double
     let maxScore: Double
     let voterCount: Int
+    var url: String?
 }
 
 // MARK: - Book List Item

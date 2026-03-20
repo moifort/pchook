@@ -14,15 +14,25 @@ struct PublicRatingsSection: View {
                 }
             }
             ForEach(ratings.sorted { $0.voterCount > $1.voterCount }) { rating in
-                HStack {
-                    Text(rating.source)
-                    Text("(\(formattedVoterCount(rating.voterCount)))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    StarRatingView(rating: rating.normalizedScore, font: .body)
+                if let url = rating.url.flatMap({ URL(string: $0) }) {
+                    Link(destination: url) {
+                        ratingRow(rating)
+                    }
+                } else {
+                    ratingRow(rating)
                 }
             }
+        }
+    }
+
+    private func ratingRow(_ rating: Item) -> some View {
+        HStack {
+            Text(rating.source)
+            Text("(\(formattedVoterCount(rating.voterCount)))")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+            StarRatingView(rating: rating.normalizedScore, font: .body)
         }
     }
 
@@ -40,6 +50,7 @@ extension PublicRatingsSection {
         let score: Double
         let maxScore: Double
         let voterCount: Int
+        var url: String?
 
         var id: String { source }
 
@@ -54,8 +65,8 @@ extension PublicRatingsSection {
     List {
         PublicRatingsSection(
             ratings: [
-                .init(source: "Goodreads", score: 4.18, maxScore: 5, voterCount: 125000),
-                .init(source: "Babelio", score: 8.3, maxScore: 10, voterCount: 3200),
+                .init(source: "Goodreads", score: 4.18, maxScore: 5, voterCount: 125000, url: "https://www.goodreads.com/book/isbn/9782266320481"),
+                .init(source: "Babelio", score: 8.3, maxScore: 10, voterCount: 3200, url: "https://www.babelio.com/isbn/9782266320481"),
             ],
             userRating: 4
         )

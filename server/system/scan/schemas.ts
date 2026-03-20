@@ -14,9 +14,16 @@ const publicRatingSchema = z.object({
   score: z.number().nullish(),
   maxScore: z.number().nullish(),
   voterCount: z.number().int().nonnegative().nullish(),
+  url: z.string().url().nullish().catch(undefined),
 })
 
-type ValidRating = { source: string; score: number; maxScore: number; voterCount: number }
+type ValidRating = {
+  source: string
+  score: number
+  maxScore: number
+  voterCount: number
+  url?: string
+}
 
 const hasCompleteRating = (r: z.infer<typeof publicRatingSchema>): r is ValidRating =>
   r.score != null && r.maxScore != null && r.voterCount != null
