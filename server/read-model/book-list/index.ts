@@ -84,7 +84,7 @@ export namespace BookListReadModel {
       if (sort === 'publicRating') return popularityScore(item.publicRatings)
       if (sort === 'awards') return awardsCount(item.awards)
       if (sort === 'genre') return (item.genre ?? '').toLowerCase()
-      return new Date(item.createdAt).getTime()
+      return item.createdAt.getTime()
     })
 
     return desc ? sorted.reverse() : sorted

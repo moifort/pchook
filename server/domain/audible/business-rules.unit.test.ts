@@ -166,10 +166,10 @@ describe('mergeAudibleIntoScanResult', () => {
     expect(result.publishedDate).toBe('2020-09-15')
   })
 
-  test('handles releaseDate as string after JSON deserialization', () => {
+  test('uses audible releaseDate over gemini publishedDate', () => {
     const result = mergeAudibleIntoScanResult(
       makeGeminiResult({ publishedDate: '1954-07-29' }),
-      makeItem({ releaseDate: '2020-09-15T00:00:00.000Z' as unknown as Date }),
+      makeItem({ releaseDate: new Date('2020-09-15T00:00:00.000Z') }),
     )
     expect(result.publishedDate).toBe('2020-09-15')
   })

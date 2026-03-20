@@ -35,7 +35,7 @@ export namespace DashboardReadModel {
       [],
     )
 
-    const recentBooks = sortBy(books, ({ createdAt }) => -new Date(createdAt).getTime())
+    const recentBooks = sortBy(books, ({ createdAt }) => -createdAt.getTime())
       .slice(0, RECENT_BOOKS_LIMIT)
       .map(({ id, title, authors, genre, createdAt }) => ({
         id,

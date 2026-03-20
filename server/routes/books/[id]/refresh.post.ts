@@ -13,12 +13,7 @@ const bookToScanResult = (book: Book, seriesName?: string): ScanResult => ({
   title: String(book.title),
   authors: book.authors.map(String),
   publisher: book.publisher ? String(book.publisher) : undefined,
-  publishedDate: book.publishedDate
-    ? (book.publishedDate instanceof Date
-        ? book.publishedDate.toISOString()
-        : String(book.publishedDate)
-      ).split('T')[0]
-    : undefined,
+  publishedDate: book.publishedDate ? book.publishedDate.toISOString().split('T')[0] : undefined,
   pageCount: book.pageCount ? Number(book.pageCount) : undefined,
   genre: book.genre ? String(book.genre) : undefined,
   synopsis: book.synopsis,

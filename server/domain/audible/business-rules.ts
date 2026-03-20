@@ -48,9 +48,7 @@ export const mergeAudibleIntoScanResult = (
     authors: item.authors,
     publisher: item.publisher ?? base.publisher,
     publishedDate: item.releaseDate
-      ? item.releaseDate instanceof Date
-        ? item.releaseDate.toISOString().split('T')[0]
-        : String(item.releaseDate).split('T')[0]
+      ? item.releaseDate.toISOString().split('T')[0]
       : base.publishedDate,
     pageCount: base.pageCount,
     genre: base.genre,
