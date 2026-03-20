@@ -15,3 +15,4 @@
  - Suggestion avec les Best seller de chaque auteurs
 - Fil d'actualité nouveauté + auteurs + prix
 - gere les mangas et bd 
+- vue auteurs quand on clique avec livre + série
