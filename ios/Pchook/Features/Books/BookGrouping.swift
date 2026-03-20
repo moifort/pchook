@@ -104,11 +104,12 @@ enum BookGrouping {
     }
 
     static func groupedBySeries(books: [BookListItem]) -> [BookSection] {
-        var dict: [String: (seriesName: String, language: String?, books: [BookListItem])] = [:]
+        var dict: [String: (seriesName: String, flag: String?, books: [BookListItem])] = [:]
         for book in books {
             let seriesName = book.seriesName ?? ""
-            let key = "\(seriesName)\0\(book.language ?? "")"
-            var entry = dict[key] ?? (seriesName: seriesName, language: book.language, books: [])
+            let flag = book.language.flatMap { flagEmoji(for: $0) }
+            let key = "\(seriesName)\0\(flag ?? "")"
+            var entry = dict[key] ?? (seriesName: seriesName, flag: flag, books: [])
             entry.books.append(book)
             dict[key] = entry
         }
@@ -118,7 +119,7 @@ enum BookGrouping {
             let sectionTitle = entry.seriesName
             return BookSection(
                 title: sectionTitle,
-                flag: entry.language.flatMap { flagEmoji(for: $0) },
+                flag: entry.flag,
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
             )
         }
