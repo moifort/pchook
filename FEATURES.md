@@ -16,3 +16,8 @@
 - Fil d'actualité nouveauté + auteurs + prix
 - gere les mangas et bd 
 - vue auteurs quand on clique avec livre + série
+- pouvoir refresh les données dans la page detail du livre
+- pourvoir like une série ou noter
+- Liste des auteurs
+ - Suggestion avec les Best seller de chaque auteurs
+- Fil d'actualité 
