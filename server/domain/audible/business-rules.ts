@@ -28,7 +28,8 @@ Retourne toutes les informations au format JSON strict (sans markdown, sans back
   "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
   "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
   "series": string ou null (nom de la série ou du cycle),${existingSeriesNames.length > 0 ? `\n  IMPORTANT : si ce livre fait partie d'une série, vérifie d'abord si elle correspond à une de ces séries existantes : ${existingSeriesNames.map((name) => `"${name}"`).join(', ')}. Utilise le nom existant exact si c'est la même série.` : ''}
-  "seriesNumber": number ou null (numéro du tome dans la série),
+  "seriesLabel": string ou null (libellé du tome : "1", "1.5", "Hors-série", "Préquelle" — texte libre),
+  "seriesNumber": number ou null (position de tri décimale : 0.5 pour préquelle, 1.5 pour interlude, 99 pour hors-série),
   "translator": string ou null (traducteur si c'est une traduction),
   "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
   "awards": [{"name": string, "year": number}] (IMPORTANT : nom COURT du prix uniquement, JAMAIS la sous-catégorie ou spécialité. Exemples corrects : "Prix Hugo", "Prix Nebula", "Grand Prix de l'Imaginaire", "Prix Goncourt". Exemples INCORRECTS : "Prix Hugo du meilleur roman", "Prix Nebula du meilleur roman court". Tableau vide si aucun prix),
@@ -57,6 +58,7 @@ export const mergeAudibleIntoScanResult = (
     language: item.language ?? base.language,
     format: 'audiobook',
     series: item.series?.name ?? base.series,
+    seriesLabel: item.series?.position ? String(item.series.position) : base.seriesLabel,
     seriesNumber: item.series?.position ?? base.seriesNumber,
     translator: base.translator,
     estimatedPrice: base.estimatedPrice,

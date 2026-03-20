@@ -37,7 +37,11 @@ const extractBookInfoTool = {
       language: { type: 'string', description: 'Book language' },
       format: { type: 'string', description: 'Book format (pocket, paperback, hardcover)' },
       series: { type: 'string', description: 'Series name if part of a series' },
-      seriesNumber: { type: 'number', description: 'Position in the series' },
+      seriesLabel: {
+        type: 'string',
+        description: 'Volume label as displayed (e.g. "1", "1.5", "Hors-série")',
+      },
+      seriesNumber: { type: 'number', description: 'Sort position in the series (decimal)' },
       translator: { type: 'string', description: 'Translator name' },
       estimatedPrice: { type: 'number', description: 'Estimated price in euros' },
     },
