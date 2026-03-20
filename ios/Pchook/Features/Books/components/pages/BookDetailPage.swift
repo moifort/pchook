@@ -55,7 +55,10 @@ struct BookDetailPage: View {
                 }
             }
             .navigationDestination(for: String.self) { selectedBookId in
-                SeriesBookDetailView(bookId: selectedBookId, onUpdated: {
+                SeriesBookDetailView(bookId: selectedBookId, onDeleted: {
+                    Task { await loadDetail() }
+                    onUpdated()
+                }, onUpdated: {
                     Task { await loadDetail() }
                     onUpdated()
                 })
