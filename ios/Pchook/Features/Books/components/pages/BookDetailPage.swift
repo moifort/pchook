@@ -24,7 +24,7 @@ struct BookDetailPage: View {
                 if let detail {
                     if isEditing {
                         BookEditForm(
-                            initial: editFields(from: detail),
+                            initial: BookEditForm.Fields(from: detail),
                             onSave: { request in
                                 _ = try await BooksAPI.update(id: bookId, request)
                                 self.detail = try await BooksAPI.getDetail(id: bookId)
@@ -128,27 +128,6 @@ struct BookDetailPage: View {
     }
 
     // MARK: - Helpers
-
-    private func editFields(from detail: BookDetailData) -> BookEditForm.Fields {
-        BookEditForm.Fields(
-            title: detail.book.title,
-            authors: detail.book.authors.joined(separator: ", "),
-            genre: detail.book.genre ?? "",
-            publisher: detail.book.publisher ?? "",
-            pageCount: detail.book.pageCount.map(String.init) ?? "",
-            isbn: detail.book.isbn ?? "",
-            language: detail.book.language ?? "",
-            format: detail.book.format ?? "",
-            translator: detail.book.translator ?? "",
-            estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
-            duration: detail.book.duration ?? "",
-            narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
-            series: detail.series?.name ?? "",
-            seriesNumber: detail.series?.label ?? "",
-            synopsis: detail.book.synopsis ?? "",
-            personalNotes: detail.book.personalNotes ?? ""
-        )
-    }
 
     private func loadDetail() async {
         isLoading = true

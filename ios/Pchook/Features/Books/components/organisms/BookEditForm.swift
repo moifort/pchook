@@ -259,6 +259,52 @@ extension BookEditForm {
         var seriesNumber: String
         var synopsis: String
         var personalNotes: String
+
+        init(
+            title: String, authors: String, genre: String, publisher: String,
+            pageCount: String, isbn: String, language: String, format: String,
+            translator: String, estimatedPrice: String, duration: String,
+            narrators: String, series: String, seriesNumber: String,
+            synopsis: String, personalNotes: String
+        ) {
+            self.title = title
+            self.authors = authors
+            self.genre = genre
+            self.publisher = publisher
+            self.pageCount = pageCount
+            self.isbn = isbn
+            self.language = language
+            self.format = format
+            self.translator = translator
+            self.estimatedPrice = estimatedPrice
+            self.duration = duration
+            self.narrators = narrators
+            self.series = series
+            self.seriesNumber = seriesNumber
+            self.synopsis = synopsis
+            self.personalNotes = personalNotes
+        }
+
+        init(from detail: BookDetailData) {
+            self.init(
+                title: detail.book.title,
+                authors: detail.book.authors.joined(separator: ", "),
+                genre: detail.book.genre ?? "",
+                publisher: detail.book.publisher ?? "",
+                pageCount: detail.book.pageCount.map(String.init) ?? "",
+                isbn: detail.book.isbn ?? "",
+                language: detail.book.language ?? "",
+                format: detail.book.format ?? "",
+                translator: detail.book.translator ?? "",
+                estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
+                duration: detail.book.duration ?? "",
+                narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
+                series: detail.series?.name ?? "",
+                seriesNumber: detail.series?.label ?? "",
+                synopsis: detail.book.synopsis ?? "",
+                personalNotes: detail.book.personalNotes ?? ""
+            )
+        }
     }
 }
 
