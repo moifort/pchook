@@ -86,13 +86,6 @@ struct ScanConfirmationView: View {
                 }
             }
 
-            if !preview.ratings.isEmpty {
-                PublicRatingsSection(
-                    ratings: preview.ratings,
-                    userRating: nil
-                )
-            }
-
             if !preview.awards.isEmpty {
                 AwardsSection(awards: preview.awards)
             }
@@ -254,7 +247,6 @@ extension ScanConfirmationView {
         var duration: String?
         var narrators: [String]?
         let awards: [AwardsSection.Item]
-        let ratings: [PublicRatingsSection.Item]
         var series: String?
         var seriesLabel: String?
         var seriesNumber: Int?
@@ -279,7 +271,6 @@ extension ScanConfirmationView {
                 duration: nil,
                 narrators: nil,
                 awards: [.init(name: "Prix Nobel", year: 1957)],
-                ratings: [.init(source: "Goodreads", score: 4.18, maxScore: 5, voterCount: 125_000)],
                 series: nil,
                 seriesNumber: nil
             ),

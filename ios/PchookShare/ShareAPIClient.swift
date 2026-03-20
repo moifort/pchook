@@ -20,7 +20,6 @@ struct ShareBookPreview: Codable, Sendable {
     var duration: String?
     var narrators: [String]?
     var awards: [ShareAward]
-    var publicRatings: [SharePublicRating]
 }
 
 struct ShareAward: Codable, Sendable, Identifiable {
@@ -28,20 +27,6 @@ struct ShareAward: Codable, Sendable, Identifiable {
     var year: Int?
 
     var id: String { "\(name)-\(year ?? 0)" }
-}
-
-struct SharePublicRating: Codable, Sendable, Identifiable {
-    let source: String
-    let score: Double
-    let maxScore: Double
-    let voterCount: Int
-
-    var id: String { source }
-
-    var normalizedScore: Double {
-        guard maxScore > 0 else { return 0 }
-        return (score / maxScore * 5.0 * 2).rounded() / 2
-    }
 }
 
 // MARK: - Enums

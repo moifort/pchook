@@ -191,23 +191,6 @@ private struct SharePreviewForm: View {
                 }
             }
 
-            if !preview.publicRatings.isEmpty {
-                Section("Notes") {
-                    ForEach(preview.publicRatings.sorted { $0.voterCount > $1.voterCount }) { rating in
-                        HStack {
-                            Text(rating.source)
-                            Text("(\(formattedVoterCount(rating.voterCount)))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Text(String(format: "%.1f/%g", rating.score, rating.maxScore))
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-
             if !preview.awards.isEmpty {
                 Section("Prix litt\u{00E9}raires") {
                     ForEach(preview.awards) { award in
@@ -369,10 +352,4 @@ private struct SharePreviewForm: View {
         return hasChanges ? overrides : nil
     }
 
-    private func formattedVoterCount(_ count: Int) -> String {
-        if count >= 1000 {
-            return String(format: "%.1fk", Double(count) / 1000.0)
-        }
-        return "\(count)"
-    }
 }
