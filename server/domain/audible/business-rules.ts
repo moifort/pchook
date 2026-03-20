@@ -1,4 +1,5 @@
 import type { AudibleItem } from '~/domain/audible/types'
+import { buildBookJsonSchema } from '~/system/scan/gemini'
 import { partialScanResultSchema } from '~/system/scan/schemas'
 import type { ScanResult } from '~/system/scan/types'
 
@@ -16,25 +17,9 @@ export const buildGeminiPrompt = (item: AudibleItem, existingSeriesNames: string
 
   return `Recherche le livre "${item.title}" de ${authorsStr}.${seriesHint}
 Retourne toutes les informations au format JSON strict (sans markdown, sans backticks) :
-{
-  "title": string (titre du livre uniquement, sans préfixe de série ni numéro de tome),
-  "authors": string[] (liste des auteurs),
-  "publisher": string ou null (maison d'édition),
-  "publishedDate": string ou null (date de première publication, format YYYY-MM-DD ou YYYY),
-  "pageCount": number ou null,
-  "genre": string ou null (sous-genres séparés par des virgules, ex: "LitRPG, Science Fantasy" — sois précis et spécifique),
-  "synopsis": string ou null (résumé de 3-5 phrases en français, pas la 4ème de couverture mais un vrai résumé du contenu),
-  "isbn": string ou null (ISBN-13 de préférence),
-  "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
-  "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
-  "series": string ou null (nom de la série ou du cycle),${existingSeriesNames.length > 0 ? `\n  IMPORTANT : si ce livre fait partie d'une série, vérifie d'abord si elle correspond à une de ces séries existantes : ${existingSeriesNames.map((name) => `"${name}"`).join(', ')}. Utilise le nom existant exact si c'est la même série.` : ''}
-  "seriesLabel": string ou null (libellé du tome : "1", "1.5", "Hors-série", "Préquelle" — texte libre),
-  "seriesNumber": number ou null (position de tri décimale : 0.5 pour préquelle, 1.5 pour interlude, 99 pour hors-série),
-  "translator": string ou null (traducteur si c'est une traduction),
-  "estimatedPrice": number ou null (prix moyen en euros sur les librairies françaises),
-  "awards": [{"name": string, "year": number}] (IMPORTANT : nom COURT du prix uniquement, JAMAIS la sous-catégorie ou spécialité. Exemples corrects : "Prix Hugo", "Prix Nebula", "Grand Prix de l'Imaginaire", "Prix Goncourt". Exemples INCORRECTS : "Prix Hugo du meilleur roman", "Prix Nebula du meilleur roman court". Tableau vide si aucun prix),
-  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche les notes actuelles sur toutes les plateformes pertinentes : Goodreads /5, Babelio /5, Sens Critique /10, Amazon /5, etc.)
-}
+
+${buildBookJsonSchema(true, existingSeriesNames)}
+
 Toutes les valeurs textuelles en français.`
 }
 
