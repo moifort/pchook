@@ -1,8 +1,9 @@
 import type { BookPreviewData } from '~/system/scan/types'
+import { createTypedStorage } from '~/system/storage'
 
-const storage = () => useStorage('book-preview')
+const storage = () => createTypedStorage<BookPreviewData>('book-preview')
 
-export const findBy = (previewId: string) => storage().getItem<BookPreviewData>(previewId)
+export const findBy = (previewId: string) => storage().getItem(previewId)
 
 export const save = async (entry: BookPreviewData) => {
   await storage().setItem(entry.previewId, entry)

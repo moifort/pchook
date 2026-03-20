@@ -5,23 +5,27 @@ const dateReviver = (_key: string, value: unknown) =>
 
 type StorageItem<T> = { base: string; key: string; value: T }
 
+const parseRaw = <T>(text: string) => {
+  try {
+    return JSON.parse(text, dateReviver) as T
+  } catch {
+    return (ISO_DATE.test(text) ? new Date(text) : text) as T
+  }
+}
+
 export const createTypedStorage = <T>(namespace: string) => {
   const raw = useStorage(namespace)
   return {
     getItem: async (key: string): Promise<T | null> => {
       const text = await raw.getItemRaw<string>(key)
-      return text ? (JSON.parse(text, dateReviver) as T) : null
+      return text ? parseRaw<T>(text) : null
     },
     getItems: async (keys: string[]) =>
       Promise.all(
         keys.map(async (key) => {
           const text = await raw.getItemRaw<string>(key)
           return text
-            ? ({
-                base: namespace,
-                key,
-                value: JSON.parse(text, dateReviver) as T,
-              } as StorageItem<T>)
+            ? ({ base: namespace, key, value: parseRaw<T>(text) } as StorageItem<T>)
             : null
         }),
       ).then((items) => items.filter((item): item is StorageItem<T> => item !== null)),

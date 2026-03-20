@@ -2,12 +2,13 @@ import { sortBy } from 'lodash-es'
 import { createLogger } from '~/system/logger'
 import { MigrationVersion } from '~/system/migration/primitives'
 import type { Migration, MigrationMeta } from '~/system/migration/types'
+import { createTypedStorage } from '~/system/storage'
 
 const log = createLogger('migration')
 
 export const runMigrations = async (migrations: Migration[]) => {
-  const metaStorage = useStorage('migration-meta')
-  const meta = (await metaStorage.getItem<MigrationMeta>('state')) ?? {
+  const metaStorage = createTypedStorage<MigrationMeta>('migration-meta')
+  const meta = (await metaStorage.getItem('state')) ?? {
     version: MigrationVersion(0),
     appliedAt: new Date(0),
   }
@@ -26,7 +27,7 @@ export const runMigrations = async (migrations: Migration[]) => {
       const result = await migration.migrate(ctx)
       if (!result.ok)
         return { outcome: 'failed' as const, version: migration.version, error: result.error }
-      await metaStorage.setItem<MigrationMeta>('state', {
+      await metaStorage.setItem('state', {
         version: migration.version,
         appliedAt: new Date(),
       })

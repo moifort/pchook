@@ -6,12 +6,13 @@ import type {
   RawAudibleEntry,
   SyncProgress,
 } from '~/domain/audible/types'
+import { createTypedStorage } from '~/system/storage'
 
-const credentialsStorage = () => useStorage<AudibleCredentials>('audible-credentials')
-const mappingsStorage = () => useStorage<AsinBookMapping>('audible-mappings')
-const authSessionsStorage = () => useStorage<AuthSession>('audible-auth-sessions')
-const rawItemsStorage = () => useStorage<RawAudibleEntry>('audible-raw')
-const syncMetaStorage = () => useStorage<Date>('audible-sync-meta')
+const credentialsStorage = () => createTypedStorage<AudibleCredentials>('audible-credentials')
+const mappingsStorage = () => createTypedStorage<AsinBookMapping>('audible-mappings')
+const authSessionsStorage = () => createTypedStorage<AuthSession>('audible-auth-sessions')
+const rawItemsStorage = () => createTypedStorage<RawAudibleEntry>('audible-raw')
+const syncMetaStorage = () => createTypedStorage<Date>('audible-sync-meta')
 
 export const findCredentials = async () => credentialsStorage().getItem('current')
 
@@ -27,7 +28,7 @@ export const findMapping = async (asin: Asin) => mappingsStorage().getItem(asin)
 
 export const findAllMappings = async () => {
   const keys = await mappingsStorage().getKeys()
-  const items = await mappingsStorage().getItems<AsinBookMapping>(keys)
+  const items = await mappingsStorage().getItems(keys)
   return items.map(({ value }) => value)
 }
 
@@ -51,7 +52,7 @@ export const saveRawItem = async (asin: Asin, entry: RawAudibleEntry) => {
 
 export const findAllRawItems = async () => {
   const keys = await rawItemsStorage().getKeys()
-  const items = await rawItemsStorage().getItems<RawAudibleEntry>(keys)
+  const items = await rawItemsStorage().getItems(keys)
   return items.map(({ value }) => value)
 }
 

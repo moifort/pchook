@@ -1,8 +1,9 @@
 import type { BookId } from '~/domain/book/types'
 import type { Series, SeriesBook, SeriesId } from '~/domain/series/types'
+import { createTypedStorage } from '~/system/storage'
 
-const seriesStorage = () => useStorage('series')
-const seriesBooksStorage = () => useStorage('series-books')
+const seriesStorage = () => createTypedStorage<Series>('series')
+const seriesBooksStorage = () => createTypedStorage<SeriesBook>('series-books')
 
 // In-memory index to avoid fs driver consistency issues during rapid writes
 const seriesByName = new Map<string, Series>()
@@ -19,11 +20,11 @@ const ensureSeriesIndex = async () => {
 
 export const findAllSeries = async () => {
   const keys = await seriesStorage().getKeys()
-  const items = await seriesStorage().getItems<Series>(keys)
+  const items = await seriesStorage().getItems(keys)
   return items.map(({ value }) => value)
 }
 
-export const findSeriesBy = (id: SeriesId) => seriesStorage().getItem<Series>(id)
+export const findSeriesBy = (id: SeriesId) => seriesStorage().getItem(id)
 
 export const findSeriesByName = async (name: string) => {
   await ensureSeriesIndex()
@@ -48,7 +49,7 @@ export const removeSeries = async (id: SeriesId) => {
 
 export const findAllSeriesBooks = async () => {
   const keys = await seriesBooksStorage().getKeys()
-  const items = await seriesBooksStorage().getItems<SeriesBook>(keys)
+  const items = await seriesBooksStorage().getItems(keys)
   return items.map(({ value }) => value)
 }
 
