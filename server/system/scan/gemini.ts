@@ -102,9 +102,6 @@ export const callGemini = async (prompt: string) => {
     body: {
       contents: [{ parts: [{ text: prompt }] }],
       tools: [{ google_search: {} }],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
     },
   })
 
