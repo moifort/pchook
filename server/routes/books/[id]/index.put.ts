@@ -14,7 +14,7 @@ import {
 } from '~/domain/book/primitives'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
-import { Eur, PersonName } from '~/domain/shared/primitives'
+import { Eur, PersonName, Url } from '~/domain/shared/primitives'
 
 const bodySchema = z.object({
   title: z.string().min(1).optional(),
@@ -49,6 +49,7 @@ const bodySchema = z.object({
         score: z.unknown(),
         maxScore: z.unknown(),
         voterCount: z.number().int().nonnegative(),
+        url: z.string().url(),
       }),
     )
     .optional(),
@@ -102,11 +103,12 @@ function toBookUpdate(body: z.infer<typeof bodySchema>) {
     }),
     ...(body.awards !== undefined && { awards: body.awards }),
     ...(body.publicRatings !== undefined && {
-      publicRatings: body.publicRatings.map(({ source, score, maxScore, voterCount }) => ({
+      publicRatings: body.publicRatings.map(({ source, score, maxScore, voterCount, url }) => ({
         source,
         score: Note(score),
         maxScore: Note(maxScore),
         voterCount,
+        url: Url(url),
       })),
     }),
   }

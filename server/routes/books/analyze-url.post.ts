@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { SeriesQuery } from '~/domain/series/query'
+import { Url } from '~/domain/shared/primitives'
 import * as previewRepository from '~/system/scan/preview-repository'
 import { ShareImporter } from '~/system/scan/share-import'
 
@@ -34,7 +35,7 @@ export default defineEventHandler(async (event) => {
     previewId,
     scanResult: result,
     importSource: 'url',
-    externalUrl: url,
+    externalUrl: Url(url),
     createdAt: new Date(),
   })
 

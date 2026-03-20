@@ -1,5 +1,5 @@
 import type { Brand } from 'ts-brand'
-import type { Eur, PersonName } from '~/domain/shared/types'
+import type { Eur, PersonName, Url } from '~/domain/shared/types'
 
 export type BookId = Brand<string, 'BookId'>
 export type BookTitle = Brand<string, 'BookTitle'>
@@ -26,7 +26,7 @@ export type PublicRating = {
   score: Note
   maxScore: Note
   voterCount: number
-  url?: string
+  url: Url
 }
 
 export type Book = {
@@ -51,7 +51,7 @@ export type Book = {
   awards: Award[]
   publicRatings: PublicRating[]
   importSource?: ImportSource
-  externalUrl?: string
+  externalUrl?: Url
   createdAt: Date
   updatedAt: Date
 }

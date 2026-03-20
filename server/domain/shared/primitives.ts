@@ -4,6 +4,7 @@ import type {
   Count as CountType,
   Eur as EurType,
   PersonName as PersonNameType,
+  Url as UrlType,
 } from '~/domain/shared/types'
 
 export const Eur = (value: unknown) => {
@@ -19,3 +20,8 @@ export const PersonName = (value: unknown) => {
 }
 
 export const Count = (value: number) => make<CountType>()(value)
+
+export const Url = (value: unknown) => {
+  const v = z.string().url().parse(value)
+  return make<UrlType>()(v)
+}

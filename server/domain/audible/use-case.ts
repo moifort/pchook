@@ -13,7 +13,7 @@ import { BookUseCase } from '~/domain/book/use-case'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
-import { PersonName } from '~/domain/shared/primitives'
+import { PersonName, Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 import { callGemini } from '~/system/scan/gemini'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
@@ -80,7 +80,7 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const status = source === 'library' && item.isFinished === true ? 'read' : 'to-read'
   const coverBase64 = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
 
-  const externalUrl = await buildAudibleUrl(String(item.asin))
+  const externalUrl = Url(await buildAudibleUrl(String(item.asin)))
   const result = await BookUseCase.addFromScan(
     title,
     { ...data, status, importSource: 'audible', externalUrl },

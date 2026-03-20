@@ -9,7 +9,7 @@ import {
   Publisher,
 } from '~/domain/book/primitives'
 import type { Award, PublicRating } from '~/domain/book/types'
-import { Eur, PersonName } from '~/domain/shared/primitives'
+import { Eur, PersonName, Url } from '~/domain/shared/primitives'
 import type { ScanResult } from '~/system/scan/types'
 
 const ratingUrlByIsbn = (source: string, isbn: string) => {
@@ -49,6 +49,14 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
         maxScore: Note(maxScore),
         voterCount: Math.round(voterCount),
         url: url ?? ratingUrlByIsbn(source, scanResult.isbn ?? ''),
+      }))
+      .filter(({ url }) => url != null)
+      .map(({ source, score, maxScore, voterCount, url }) => ({
+        source,
+        score,
+        maxScore,
+        voterCount,
+        url: Url(url),
       })) as PublicRating[],
   }
 
