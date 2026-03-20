@@ -140,6 +140,8 @@ final class BooksViewModel {
                 order: sortDescending ? "desc" : "asc"
             )
             if !books.isEmpty { hasBooks = true }
+        } catch is CancellationError {
+            // Ignored — task cancelled by SwiftUI (e.g. refreshTrigger changed)
         } catch {
             self.error = reportError(error)
         }

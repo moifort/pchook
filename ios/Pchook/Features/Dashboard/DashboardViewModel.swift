@@ -11,6 +11,8 @@ final class DashboardViewModel {
         error = nil
         do {
             data = try await DashboardAPI.getData()
+        } catch is CancellationError {
+            // Ignored — task cancelled by SwiftUI (e.g. refreshTrigger changed)
         } catch {
             self.error = reportError(error)
         }
