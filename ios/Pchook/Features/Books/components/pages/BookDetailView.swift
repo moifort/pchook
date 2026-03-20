@@ -2,8 +2,10 @@ import Sentry
 import SentrySwiftUI
 import SwiftUI
 
-struct SeriesBookDetailView: View {
+struct BookDetailView: View {
     let bookId: String
+    var refreshTrigger: Int = 0
+    var onSelectBook: (String) -> Void = { _ in }
     var onDeleted: () -> Void = {}
     var onUpdated: () -> Void = {}
 
@@ -34,7 +36,7 @@ struct SeriesBookDetailView: View {
                     BookDetailContent(
                         detail: detail,
                         onAddReview: { showReviewSheet = true },
-                        onSelectBook: { _ in }
+                        onSelectBook: onSelectBook
                     )
                     .refreshable { await loadDetail() }
                 }
@@ -45,13 +47,14 @@ struct SeriesBookDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .sentryTrace("Series Book Detail")
+        .sentryTrace("Book Detail")
         .toolbar {
             if !isEditing {
                 readToolbar
             }
         }
         .task { await loadDetail() }
+        .onChange(of: refreshTrigger) { Task { await loadDetail() } }
         .sheet(isPresented: $showReviewSheet) {
             AddReviewSheet(bookId: bookId) {
                 showReviewSheet = false
@@ -96,9 +99,11 @@ struct SeriesBookDetailView: View {
                     Button("Supprimer", systemImage: "trash", role: .destructive) {
                         showDeleteConfirmation = true
                     }
+                    .accessibilityIdentifier("delete-book-button")
                 } label: {
                     Image(systemName: "ellipsis")
                 }
+                .accessibilityIdentifier("book-detail-menu")
                 .confirmationDialog(
                     "Supprimer ce livre ?",
                     isPresented: $showDeleteConfirmation,
@@ -115,6 +120,7 @@ struct SeriesBookDetailView: View {
     // MARK: - Helpers
 
     private func loadDetail() async {
+        error = nil
         do {
             detail = try await BooksAPI.getDetail(id: bookId)
         } catch {
