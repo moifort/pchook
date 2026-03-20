@@ -86,7 +86,6 @@ mock.module('~/system/scan/gemini', () => ({
     translator: null,
     estimatedPrice: 20,
     awards: [],
-    publicRatings: [{ source: 'Goodreads', score: 4.2, maxScore: 5, voterCount: 10000 }],
   }),
   buildBookJsonSchema: () => '{}',
   normalizeBookFormat: (value: string) => value,

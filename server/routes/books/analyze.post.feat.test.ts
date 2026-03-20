@@ -17,7 +17,6 @@ const fakeScanResult: ScanResult = {
   translator: undefined,
   estimatedPrice: 12.5,
   awards: [{ name: 'Prix littéraire', year: 2025 }],
-  publicRatings: [{ source: 'Babelio', score: 4, maxScore: 5, voterCount: 5000 }],
 }
 
 mock.module('~/system/scan/index', () => ({

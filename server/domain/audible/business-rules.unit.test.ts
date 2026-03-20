@@ -36,7 +36,6 @@ const makeGeminiResult = (overrides: Record<string, unknown> = {}): Record<strin
   translator: 'Francis Ledoux',
   estimatedPrice: 25,
   awards: [{ name: 'Prix Hugo', year: 1966 }],
-  publicRatings: [{ source: 'Goodreads', score: 4.5, maxScore: 5, voterCount: 600000 }],
   ...overrides,
 })
 
@@ -107,7 +106,7 @@ describe('mergeAudibleIntoScanResult', () => {
     expect(result.language).toBe('fr')
   })
 
-  test('gemini provides complement: genre, synopsis, awards, ratings, isbn, estimatedPrice', () => {
+  test('gemini provides complement: genre, synopsis, awards, isbn, estimatedPrice', () => {
     const result = mergeAudibleIntoScanResult(makeGeminiResult(), makeItem())
 
     expect(result.genre).toBe('Fantasy, Aventure')
@@ -115,9 +114,6 @@ describe('mergeAudibleIntoScanResult', () => {
     expect(result.isbn).toBe('978-2-267-02700-0')
     expect(result.estimatedPrice).toBe(25)
     expect(result.awards).toEqual([{ name: 'Prix Hugo', year: 1966 }])
-    expect(result.publicRatings).toEqual([
-      { source: 'Goodreads', score: 4.5, maxScore: 5, voterCount: 600000 },
-    ])
   })
 
   test('audible series overrides gemini series', () => {
@@ -182,13 +178,9 @@ describe('mergeAudibleIntoScanResult', () => {
     expect(result.publishedDate).toBe('1954-07-29')
   })
 
-  test('handles empty awards and ratings from gemini', () => {
-    const result = mergeAudibleIntoScanResult(
-      makeGeminiResult({ awards: null, publicRatings: null }),
-      makeItem(),
-    )
+  test('handles empty awards from gemini', () => {
+    const result = mergeAudibleIntoScanResult(makeGeminiResult({ awards: null }), makeItem())
     expect(result.awards).toEqual([])
-    expect(result.publicRatings).toEqual([])
   })
 
   test('preserves translator from gemini', () => {

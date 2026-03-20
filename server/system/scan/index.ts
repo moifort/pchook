@@ -156,8 +156,6 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
       duration: enriched.duration ?? scanResult.duration,
       narrators: enriched.narrators ?? scanResult.narrators,
       awards: enriched.awards.length > 0 ? enriched.awards : scanResult.awards,
-      publicRatings:
-        enriched.publicRatings.length > 0 ? enriched.publicRatings : scanResult.publicRatings,
     } satisfies ScanResult
   } catch (error) {
     log.error('Gemini enrichment failed, using scan result only', error)

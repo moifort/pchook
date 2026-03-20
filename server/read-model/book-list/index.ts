@@ -1,5 +1,5 @@
 import { sortBy } from 'lodash-es'
-import { awardsCount, popularityScore } from '~/domain/book/business-rules'
+import { awardsCount } from '~/domain/book/business-rules'
 import { BookQuery } from '~/domain/book/query'
 import type { BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/types'
 import { ReviewQuery } from '~/domain/review/query'
@@ -40,18 +40,7 @@ export namespace BookListReadModel {
     )
 
     let items = books.map(
-      ({
-        id,
-        title,
-        authors,
-        genre,
-        status,
-        estimatedPrice,
-        language,
-        awards,
-        publicRatings,
-        createdAt,
-      }) => ({
+      ({ id, title, authors, genre, status, estimatedPrice, language, awards, createdAt }) => ({
         id,
         title: String(title),
         authors,
@@ -60,7 +49,6 @@ export namespace BookListReadModel {
         estimatedPrice,
         language: language ? String(language) : undefined,
         awards,
-        publicRatings,
         rating: reviewByBookId.get(id)?.rating,
         seriesName: seriesByBookId.get(id)?.seriesName,
         seriesLabel: seriesByBookId.get(id)?.seriesLabel,
@@ -83,7 +71,6 @@ export namespace BookListReadModel {
     const sorted = sortBy(items, (item) => {
       if (sort === 'title') return item.title.toLowerCase()
       if (sort === 'author') return item.authors[0] ? String(item.authors[0]).toLowerCase() : ''
-      if (sort === 'publicRating') return popularityScore(item.publicRatings)
       if (sort === 'awards') return awardsCount(item.awards)
       if (sort === 'genre') return (item.genre ?? '').toLowerCase()
       return item.createdAt.getTime()

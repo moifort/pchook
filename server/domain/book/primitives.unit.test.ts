@@ -208,10 +208,6 @@ describe('BookSort', () => {
     expect(BookSort('author')).toBe('author')
   })
 
-  test('accepts publicRating', () => {
-    expect(BookSort('publicRating')).toBe('publicRating')
-  })
-
   test('accepts awards', () => {
     expect(BookSort('awards')).toBe('awards')
   })

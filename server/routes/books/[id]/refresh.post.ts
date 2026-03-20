@@ -27,13 +27,6 @@ const bookToScanResult = (book: Book, seriesName?: string): ScanResult => ({
   duration: book.duration,
   narrators: book.narrators.length > 0 ? book.narrators.map(String) : undefined,
   awards: book.awards,
-  publicRatings: book.publicRatings.map(({ source, score, maxScore, voterCount, url }) => ({
-    source,
-    score: Number(score),
-    maxScore: Number(maxScore),
-    voterCount,
-    url,
-  })),
 })
 
 export default defineEventHandler(async (event) => {

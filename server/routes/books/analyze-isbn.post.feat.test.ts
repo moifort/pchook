@@ -18,7 +18,6 @@ const fakeScanResult: ScanResult = {
   translator: undefined,
   estimatedPrice: 9.7,
   awards: [{ name: 'Prix Hugo', year: 1966 }],
-  publicRatings: [{ source: 'Babelio', score: 4.3, maxScore: 5, voterCount: 12000 }],
 }
 
 mock.module('~/system/scan/isbn-scanner', () => ({

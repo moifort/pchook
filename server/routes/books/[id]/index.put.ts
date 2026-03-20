@@ -8,13 +8,12 @@ import {
   Genre,
   ISBN,
   Language,
-  Note,
   PageCount,
   Publisher,
 } from '~/domain/book/primitives'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
-import { Eur, PersonName, Url } from '~/domain/shared/primitives'
+import { Eur, PersonName } from '~/domain/shared/primitives'
 
 const bodySchema = z.object({
   title: z.string().min(1).optional(),
@@ -39,17 +38,6 @@ const bodySchema = z.object({
       z.object({
         name: z.string().min(1),
         year: z.number().int().positive().optional(),
-      }),
-    )
-    .optional(),
-  publicRatings: z
-    .array(
-      z.object({
-        source: z.string().min(1),
-        score: z.unknown(),
-        maxScore: z.unknown(),
-        voterCount: z.number().int().nonnegative(),
-        url: z.string().url(),
       }),
     )
     .optional(),
@@ -102,15 +90,6 @@ function toBookUpdate(body: z.infer<typeof bodySchema>) {
       readDate: body.readDate ? new Date(body.readDate) : undefined,
     }),
     ...(body.awards !== undefined && { awards: body.awards }),
-    ...(body.publicRatings !== undefined && {
-      publicRatings: body.publicRatings.map(({ source, score, maxScore, voterCount, url }) => ({
-        source,
-        score: Note(score),
-        maxScore: Note(maxScore),
-        voterCount,
-        url: Url(url),
-      })),
-    }),
   }
 }
 

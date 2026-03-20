@@ -24,13 +24,6 @@ export type ScanResult = {
   duration?: string
   narrators?: string[]
   awards: { name: string; year?: number }[]
-  publicRatings: {
-    source: string
-    score: number
-    maxScore: number
-    voterCount: number
-    url?: string
-  }[]
 }
 
 export type CachedScanResult = {

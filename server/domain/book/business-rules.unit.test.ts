@@ -1,8 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { awardsCount, isFavorite, popularityScore } from '~/domain/book/business-rules'
+import { awardsCount, isFavorite } from '~/domain/book/business-rules'
 import { Note } from '~/domain/book/primitives'
-import type { Award, PublicRating } from '~/domain/book/types'
-import { Url } from '~/domain/shared/primitives'
+import type { Award } from '~/domain/book/types'
 
 describe('isFavorite', () => {
   test('returns true when rating is 5', () => {
@@ -30,58 +29,5 @@ describe('awardsCount', () => {
       { name: 'Pulitzer Prize', year: 2019 },
     ]
     expect(awardsCount(awards)).toBe(3)
-  })
-})
-
-describe('popularityScore', () => {
-  test('returns 0 for an empty array', () => {
-    expect(popularityScore([])).toBe(0)
-  })
-
-  test('returns the score for a single rating', () => {
-    const ratings: PublicRating[] = [
-      {
-        source: 'Babelio',
-        score: Note(4),
-        maxScore: Note(5),
-        voterCount: 100,
-        url: Url('https://www.babelio.com/isbn/123'),
-      },
-    ]
-    expect(popularityScore(ratings)).toBe(4)
-  })
-
-  test('computes a weighted average across multiple ratings', () => {
-    const ratings: PublicRating[] = [
-      {
-        source: 'Babelio',
-        score: Note(4),
-        maxScore: Note(5),
-        voterCount: 100,
-        url: Url('https://www.babelio.com/isbn/123'),
-      },
-      {
-        source: 'Goodreads',
-        score: Note(3),
-        maxScore: Note(5),
-        voterCount: 200,
-        url: Url('https://www.goodreads.com/book/isbn/123'),
-      },
-    ]
-    // (4*100 + 3*200) / (100+200) = 1000/300 = 3.333... → rounded to 3.33
-    expect(popularityScore(ratings)).toBe(3.33)
-  })
-
-  test('returns 0 when all voter counts are zero', () => {
-    const ratings: PublicRating[] = [
-      {
-        source: 'Babelio',
-        score: Note(4),
-        maxScore: Note(5),
-        voterCount: 0,
-        url: Url('https://www.babelio.com/isbn/123'),
-      },
-    ]
-    expect(popularityScore(ratings)).toBe(0)
   })
 })

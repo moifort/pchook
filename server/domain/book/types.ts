@@ -13,20 +13,12 @@ export type Note = Brand<number, 'Note'>
 export type BookFormat = 'pocket' | 'paperback' | 'hardcover' | 'audiobook'
 export type BookStatus = 'to-read' | 'read'
 export type ImportSource = 'scan' | 'isbn' | 'url' | 'audible'
-export type BookSort = 'createdAt' | 'title' | 'author' | 'publicRating' | 'awards' | 'genre'
+export type BookSort = 'createdAt' | 'title' | 'author' | 'awards' | 'genre'
 export type SortOrder = 'asc' | 'desc'
 
 export type Award = {
   name: string
   year?: number
-}
-
-export type PublicRating = {
-  source: string
-  score: Note
-  maxScore: Note
-  voterCount: number
-  url: Url
 }
 
 export type Book = {
@@ -49,7 +41,6 @@ export type Book = {
   status: BookStatus
   readDate?: Date
   awards: Award[]
-  publicRatings: PublicRating[]
   importSource?: ImportSource
   externalUrl?: Url
   createdAt: Date
