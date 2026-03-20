@@ -48,6 +48,12 @@ const mergeAudibleDataIntoDuplicate = async (book: Book, item: AudibleItem) => {
   }
 }
 
+const buildAudibleUrl = async (asin: string) => {
+  const credentials = await AudibleQuery.getCredentials()
+  const locale = credentials?.locale ?? 'fr'
+  return `https://www.audible.${locale}/pd/${asin}`
+}
+
 const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => {
   log.info('Audible item', {
     asin: item.asin,
@@ -72,7 +78,13 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const status = source === 'library' && item.isFinished === true ? 'read' : 'to-read'
   const coverBase64 = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
 
-  const result = await BookUseCase.addFromScan(title, { ...data, status }, seriesInfo, coverBase64)
+  const externalUrl = await buildAudibleUrl(String(item.asin))
+  const result = await BookUseCase.addFromScan(
+    title,
+    { ...data, status, importSource: 'audible', externalUrl },
+    seriesInfo,
+    coverBase64,
+  )
 
   if (result.tag === 'duplicate') {
     await mergeAudibleDataIntoDuplicate(result.book, item)

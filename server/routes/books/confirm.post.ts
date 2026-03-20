@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     const result = await BookUseCase.replaceFromScan(
       BookId(replaceBookId),
       title,
-      { ...data, status },
+      { ...data, status, importSource: preview.importSource, externalUrl: preview.externalUrl },
       seriesInfo,
       preview.coverImageBase64,
     )
@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
 
   const result = await BookUseCase.addFromScan(
     title,
-    { ...data, status },
+    { ...data, status, importSource: preview.importSource, externalUrl: preview.externalUrl },
     seriesInfo,
     preview.coverImageBase64,
   )

@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
   await previewRepository.save({
     previewId,
     scanResult,
+    importSource: 'isbn',
     createdAt: new Date(),
   })
 

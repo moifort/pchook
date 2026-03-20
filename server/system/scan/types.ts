@@ -1,5 +1,5 @@
 import type { Brand } from 'ts-brand'
-import type { ISBN } from '~/domain/book/types'
+import type { ImportSource, ISBN } from '~/domain/book/types'
 
 export type ImageHash = Brand<string, 'ImageHash'>
 export type UrlHash = Brand<string, 'UrlHash'>
@@ -48,5 +48,7 @@ export type BookPreviewData = {
   previewId: string
   scanResult: ScanResult
   coverImageBase64?: string
+  importSource?: ImportSource
+  externalUrl?: string
   createdAt: Date
 }

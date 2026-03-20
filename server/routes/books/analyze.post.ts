@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
     previewId,
     scanResult,
     coverImageBase64: imageBase64,
+    importSource: 'scan',
     createdAt: new Date(),
   })
 

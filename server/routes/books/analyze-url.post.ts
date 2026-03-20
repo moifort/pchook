@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
   await previewRepository.save({
     previewId,
     scanResult: result,
+    importSource: 'url',
+    externalUrl: url,
     createdAt: new Date(),
   })
 
