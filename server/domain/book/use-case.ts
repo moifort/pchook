@@ -68,6 +68,7 @@ export namespace BookUseCase {
       duration: data.duration,
       narrators: data.narrators,
       awards: data.awards,
+      publicRatings: data.publicRatings,
     })
 
     if (updated === 'not-found') return { tag: 'not-found' } as const

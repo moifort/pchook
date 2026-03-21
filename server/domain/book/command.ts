@@ -16,6 +16,7 @@ export namespace BookCommand {
       narrators: data.narrators ?? [],
       status: data.status ?? 'to-read',
       awards: data.awards ?? [],
+      publicRatings: data.publicRatings ?? [],
       createdAt: new Date(),
       updatedAt: new Date(),
     }

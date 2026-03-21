@@ -21,6 +21,14 @@ export type Award = {
   year?: number
 }
 
+export type PublicRating = {
+  source: string
+  score: Note
+  maxScore: Note
+  voterCount: number
+  url: Url
+}
+
 export type Book = {
   id: BookId
   title: BookTitle
@@ -41,6 +49,7 @@ export type Book = {
   status: BookStatus
   readDate?: Date
   awards: Award[]
+  publicRatings: PublicRating[]
   importSource?: ImportSource
   externalUrl?: Url
   createdAt: Date

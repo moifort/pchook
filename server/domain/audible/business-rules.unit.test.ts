@@ -36,6 +36,7 @@ const makeGeminiResult = (overrides: Record<string, unknown> = {}): Record<strin
   translator: 'Francis Ledoux',
   estimatedPrice: 25,
   awards: [{ name: 'Prix Hugo', year: 1966 }],
+  publicRatings: [],
   ...overrides,
 })
 

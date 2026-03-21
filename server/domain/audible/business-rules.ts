@@ -50,5 +50,6 @@ export const mergeAudibleIntoScanResult = (
     duration: item.durationMinutes > 0 ? formatDuration(item.durationMinutes) : undefined,
     narrators: item.narrators,
     awards: base.awards,
+    publicRatings: base.publicRatings,
   }
 }
