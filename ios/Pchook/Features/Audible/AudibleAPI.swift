@@ -1,37 +1,5 @@
 import Foundation
 
-struct AuthStartResponse: Decodable, Sendable {
-    let loginUrl: String
-    let sessionId: String
-    let cookies: [AuthCookie]
-}
-
-struct AuthCookie: Decodable, Sendable {
-    let name: String
-    let value: String
-    let domain: String
-}
-
-struct AudibleStatus: Decodable, Sendable {
-    let connected: Bool
-    let fetchInProgress: Bool
-    let libraryCount: Int
-    let wishlistCount: Int
-    let lastSyncAt: Date?
-    let lastFetchedAt: Date?
-    let rawItemCount: Int
-    let importTask: ImportTaskState
-}
-
-struct ImportTaskState: Decodable, Sendable {
-    let phase: String
-    let current: Int
-    let total: Int
-    let message: String
-    let startedAt: Date?
-    let completedAt: Date?
-}
-
 enum AudibleAPI {
     static func authStart(locale: String = "fr") async throws -> AuthStartResponse {
         let response: APIResponse<AuthStartResponse> = try await APIClient.shared.get(

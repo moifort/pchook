@@ -9,23 +9,38 @@ type JSONSchema = {
   minimum?: number
   maximum?: number
   pattern?: string
+  anyOf?: JSONSchema[]
 }
 
 type SchemaMap = Record<string, JSONSchema>
 
 const KNOWN_TYPES: Record<string, string> = {}
 
+const resolveNullable = (schema: JSONSchema): { inner: JSONSchema; nullable: boolean } => {
+  if (!schema.anyOf) return { inner: schema, nullable: false }
+  const nonNull = schema.anyOf.filter(({ type }) => type !== 'null')
+  if (nonNull.length === 1 && schema.anyOf.length - nonNull.length === 1) {
+    return { inner: nonNull[0], nullable: true }
+  }
+  return { inner: schema, nullable: false }
+}
+
 const swiftType = (schema: JSONSchema, propertyName: string, parentName: string): string => {
-  if (schema.type === 'string' && schema.format === 'date-time') return 'Date'
-  if (schema.type === 'string') return 'String'
-  if (schema.type === 'integer') return 'Int'
-  if (schema.type === 'number') return 'Double'
-  if (schema.type === 'boolean') return 'Bool'
-  if (schema.type === 'array' && schema.items) {
-    const itemType = swiftType(schema.items, propertyName, parentName)
+  const { inner, nullable } = resolveNullable(schema)
+  if (nullable) {
+    const baseType = swiftType(inner, propertyName, parentName)
+    return `${baseType}?`
+  }
+  if (inner.type === 'string' && inner.format === 'date-time') return 'Date'
+  if (inner.type === 'string') return 'String'
+  if (inner.type === 'integer') return 'Int'
+  if (inner.type === 'number') return 'Double'
+  if (inner.type === 'boolean') return 'Bool'
+  if (inner.type === 'array' && inner.items) {
+    const itemType = swiftType(inner.items, propertyName, parentName)
     return `[${itemType}]`
   }
-  if (schema.type === 'object' && schema.properties) {
+  if (inner.type === 'object' && inner.properties) {
     const nestedName = inferNestedTypeName(propertyName, parentName)
     return nestedName
   }
@@ -73,7 +88,9 @@ const generateStruct = (name: string, schema: JSONSchema): string => {
   const fields = Object.entries(properties).map(([propName, propSchema]) => {
     const type = swiftType(propSchema, propName, name)
     const isRequired = required.has(propName)
-    const keyword = isRequired ? 'let' : 'var'
+    const isNullable = type.endsWith('?')
+    const isOptional = !isRequired || isNullable
+    const keyword = isOptional ? 'var' : 'let'
     const typeAnnotation = isRequired ? type : `${type}?`
     return `    ${keyword} ${propName}: ${typeAnnotation}`
   })

@@ -13,7 +13,7 @@ import {
   bookPreviewSchema,
   bookSchema,
   dashboardViewSchema,
-  syncProgressSchema,
+  importTaskStateSchema,
 } from './index'
 
 // Helpers to build typed sample data and validate it through JSON round-trip
@@ -173,21 +173,33 @@ describe('API schema conformance', () => {
   test('AudibleStatus schema validates status data', () => {
     const status = {
       connected: true,
+      fetchInProgress: false,
       libraryCount: 42,
       wishlistCount: 5,
       lastSyncAt: new Date('2024-01-15T10:00:00Z').toISOString(),
+      lastFetchedAt: new Date('2024-01-15T10:00:00Z').toISOString(),
       rawItemCount: 47,
+      importTask: {
+        phase: 'idle',
+        current: 0,
+        total: 0,
+        message: '',
+        startedAt: null,
+        completedAt: null,
+      },
     }
     expect(() => audibleStatusSchema.parse(status)).not.toThrow()
   })
 
-  test('SyncProgress schema validates progress data', () => {
-    const progress = {
-      phase: 'downloading',
+  test('ImportTaskState schema validates task state data', () => {
+    const taskState = {
+      phase: 'importing',
       current: 5,
       total: 42,
-      message: 'Downloading 5/42...',
+      message: 'Importing 5/42...',
+      startedAt: new Date('2024-01-15T10:00:00Z').toISOString(),
+      completedAt: null,
     }
-    expect(() => syncProgressSchema.parse(progress)).not.toThrow()
+    expect(() => importTaskStateSchema.parse(taskState)).not.toThrow()
   })
 })

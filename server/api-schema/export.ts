@@ -11,13 +11,13 @@ import {
   bookSchema,
   dashboardViewSchema,
   favoriteBookSchema,
+  importTaskStateSchema,
   publicRatingSchema,
   recentAwardSchema,
   recentBookSchema,
   reviewSchema,
   seriesBookEntrySchema,
   seriesInfoSchema,
-  syncProgressSchema,
 } from './index'
 
 const schemas = {
@@ -38,7 +38,7 @@ const schemas = {
   AuthCookie: authCookieSchema,
   AuthStartResponse: authStartResponseSchema,
   AudibleStatus: audibleStatusSchema,
-  SyncProgressData: syncProgressSchema,
+  ImportTaskState: importTaskStateSchema,
 } as const
 
 const jsonSchemas = Object.fromEntries(

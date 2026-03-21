@@ -2,7 +2,7 @@ export {
   audibleStatusSchema,
   authCookieSchema,
   authStartResponseSchema,
-  syncProgressSchema,
+  importTaskStateSchema,
 } from './audible'
 export { awardSchema, bookPreviewSchema, bookSchema, publicRatingSchema } from './book'
 export {
