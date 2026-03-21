@@ -7,10 +7,8 @@ struct AudibleSection: View {
         Section {
             if viewModel.isConnected || viewModel.isVerifying {
                 connectionRow
-                statusRows
                 fetchRow
                 importRow
-                syncControlButtons
                 disconnectButton
             } else if viewModel.isCheckingStatus {
                 HStack {
@@ -29,7 +27,7 @@ struct AudibleSection: View {
         }
     }
 
-    // MARK: - Connection status
+    // MARK: - Connection
 
     @ViewBuilder
     private var connectionRow: some View {
@@ -45,109 +43,102 @@ struct AudibleSection: View {
         }
     }
 
-    // MARK: - Status counts (from last status check)
-
-    @ViewBuilder
-    private var statusRows: some View {
-        if !viewModel.isVerifying {
-            if let lastSync = viewModel.lastSyncAt {
-                HStack {
-                    Label("Dernière sync", systemImage: "clock")
-                    Spacer()
-                    Text(lastSync, style: .relative)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    // MARK: - Fetch step
+    // MARK: - Fetch
 
     @ViewBuilder
     private var fetchRow: some View {
-        if viewModel.isFetching {
-            progressRow
+        if viewModel.isVerifying {
+            EmptyView()
+        } else if viewModel.isFetching {
+            HStack(spacing: 8) {
+                ProgressView()
+                Text("Récupération des données...")
+                    .foregroundStyle(.secondary)
+            }
         } else if viewModel.hasFetchedData {
             Label {
                 Text("\(viewModel.libraryCount) livres · \(viewModel.wishlistCount) souhaits")
             } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                Image(systemName: "books.vertical")
             }
-        } else if !viewModel.isVerifying, !viewModel.isImporting {
+            if let lastFetched = viewModel.lastFetchedAt {
+                HStack {
+                    Label("Dernière mise à jour", systemImage: "clock")
+                    Spacer()
+                    Text(lastFetched, style: .relative)
+                        .foregroundStyle(.secondary)
+                }
+            }
             Button {
                 Task { await viewModel.fetch() }
             } label: {
-                Label("Synchroniser les données", systemImage: "arrow.triangle.2.circlepath")
+                Label("Actualiser les données", systemImage: "arrow.triangle.2.circlepath")
+            }
+        } else if !viewModel.isImportActive {
+            Button {
+                Task { await viewModel.fetch() }
+            } label: {
+                Label("Récupérer les données Audible", systemImage: "arrow.triangle.2.circlepath")
             }
         }
     }
 
-    // MARK: - Import step
+    // MARK: - Import
 
     @ViewBuilder
     private var importRow: some View {
-        if viewModel.isImporting {
-            progressRow
-        } else if viewModel.hasFetchedData, !viewModel.isFetching {
+        if viewModel.isVerifying || viewModel.isFetching {
+            EmptyView()
+        } else if let task = viewModel.importTask,
+            task.phase == "running" || task.phase == "paused"
+        {
+            importProgressRow(task)
             Button {
-                Task { await viewModel.importBooks() }
+                Task { await viewModel.toggleImportPause() }
+            } label: {
+                Label(
+                    task.phase == "paused" ? "Reprendre l'import" : "Mettre en pause",
+                    systemImage: task.phase == "paused" ? "play.fill" : "pause.fill"
+                )
+            }
+            Button(role: .destructive) {
+                Task { await viewModel.cancelImport() }
+            } label: {
+                Label("Annuler l'import", systemImage: "xmark.circle")
+            }
+        } else if let task = viewModel.importTask, task.phase == "completed" {
+            Label("Import terminé", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+        } else if viewModel.hasFetchedData {
+            Button {
+                Task { await viewModel.startImport() }
             } label: {
                 Label("Importer dans la bibliothèque", systemImage: "square.and.arrow.down")
             }
         }
     }
 
-    // MARK: - Progress
-
     @ViewBuilder
-    private var progressRow: some View {
+    private func importProgressRow(_ task: ImportTaskState) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let progress = viewModel.syncProgress {
-                HStack {
-                    Text(progress.phase == "paused" ? "En pause" : progress.message)
-                        .font(.caption)
+            HStack {
+                Text(task.phase == "paused" ? "En pause" : task.message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if task.total > 0 {
+                    Spacer()
+                    Text("\(task.current)/\(task.total)")
+                        .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
-                    if progress.total > 0 {
-                        Spacer()
-                        Text("\(progress.current)/\(progress.total)")
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                if progress.total > 0 {
-                    ProgressView(
-                        value: Double(progress.current),
-                        total: Double(progress.total)
-                    )
-                } else {
-                    ProgressView()
-                }
-            } else {
-                HStack {
-                    ProgressView()
-                    Text("Démarrage...")
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private var syncControlButtons: some View {
-        if viewModel.isBusy || viewModel.isPaused {
-            Button {
-                Task { await viewModel.togglePause() }
-            } label: {
-                Label(
-                    viewModel.isPaused ? "Reprendre la sync" : "Mettre en pause",
-                    systemImage: viewModel.isPaused ? "play.fill" : "pause.fill"
+            if task.total > 0 {
+                ProgressView(
+                    value: Double(task.current),
+                    total: Double(task.total)
                 )
-            }
-
-            Button(role: .destructive) {
-                Task { await viewModel.cancelSync() }
-            } label: {
-                Label("Annuler la sync", systemImage: "xmark.circle")
+            } else {
+                ProgressView()
             }
         }
     }
@@ -156,7 +147,7 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var disconnectButton: some View {
-        if !viewModel.isBusy, !viewModel.isVerifying {
+        if !viewModel.isVerifying, !viewModel.isFetching, !viewModel.isImportActive {
             Button(role: .destructive) {
                 Task { await viewModel.disconnect() }
             } label: {

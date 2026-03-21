@@ -2,26 +2,34 @@ import Foundation
 
 @MainActor @Observable
 final class AudibleViewModel {
+    // Section 1: Connection
     private(set) var isConnected = false
-    private(set) var isVerifying = false
-    private(set) var isFetching = false
-    private(set) var isImporting = false
     private(set) var isCheckingStatus = false
-    private(set) var hasFetchedData = false
+    private(set) var isVerifying = false
+
+    // Section 2: Fetch
+    private(set) var isFetching = false
     private(set) var libraryCount = 0
     private(set) var wishlistCount = 0
-    private(set) var lastSyncAt: Date?
-    private(set) var syncProgress: SyncProgressData?
-    private(set) var isPaused = false
+    private(set) var lastFetchedAt: Date?
+    private(set) var rawItemCount = 0
+
+    // Section 3: Import
+    private(set) var importTask: ImportTaskState?
+
     var error: String?
     var showLogin = false
 
     private var lastVerifiedAt: Date?
     private var pollingTask: Task<Void, Never>?
 
-    var isBusy: Bool { isFetching || isImporting }
+    var hasFetchedData: Bool { rawItemCount > 0 }
+    var isImportActive: Bool {
+        guard let task = importTask else { return false }
+        return task.phase == "running" || task.phase == "paused"
+    }
 
-    // MARK: - Auto verify on page open (cached 1h)
+    // MARK: - Load status on page open
 
     func checkStatusAndVerify() async {
         isCheckingStatus = true
@@ -30,29 +38,23 @@ final class AudibleViewModel {
         do {
             let status = try await AudibleAPI.status()
             isConnected = status.connected
+            isFetching = status.fetchInProgress
             libraryCount = status.libraryCount
             wishlistCount = status.wishlistCount
-            lastSyncAt = status.lastSyncAt
+            lastFetchedAt = status.lastFetchedAt
+            rawItemCount = status.rawItemCount
+            importTask = status.importTask
 
-            let progress = try await AudibleAPI.syncProgress()
-
-            if isConnected, shouldVerify, progress.phase == "idle" {
+            if isConnected, shouldVerify, !isFetching, !isImportActive {
                 await verify()
             }
-            if progress.phase != "idle" {
-                syncProgress = progress
-                if pollingTask == nil {
-                    resumePolling(for: progress.phase)
-                }
-            } else if isBusy {
-                isFetching = false
-                isImporting = false
-                syncProgress = nil
-                await refreshStatus()
+
+            if isFetching {
+                startFetchPolling()
             }
 
-            if status.rawItemCount > 0 {
-                hasFetchedData = true
+            if isImportActive {
+                startImportPolling()
             }
         } catch {
             self.error = reportError(error)
@@ -78,57 +80,78 @@ final class AudibleViewModel {
         }
     }
 
-    // MARK: - Step 2: Fetch (user action)
+    // MARK: - Step 2: Fetch
 
     func fetch() async {
         isFetching = true
         error = nil
-        syncProgress = nil
-        hasFetchedData = false
 
         do {
             try await AudibleAPI.syncFetch()
-            resumePolling(for: "downloading")
+            startFetchPolling()
         } catch {
             isFetching = false
             self.error = reportError(error)
         }
     }
 
-    // MARK: - Step 3: Import (user action)
+    private func startFetchPolling() {
+        cancelPolling()
+        pollingTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(2))
+                guard !Task.isCancelled else { break }
+                do {
+                    let status = try await AudibleAPI.status()
+                    isFetching = status.fetchInProgress
+                    libraryCount = status.libraryCount
+                    wishlistCount = status.wishlistCount
+                    lastFetchedAt = status.lastFetchedAt
+                    rawItemCount = status.rawItemCount
+                    if !status.fetchInProgress {
+                        return
+                    }
+                } catch {
+                    break
+                }
+            }
+        }
+    }
 
-    func importBooks() async {
-        isImporting = true
+    // MARK: - Step 3: Import
+
+    func startImport() async {
         error = nil
-        syncProgress = nil
-
         do {
-            try await AudibleAPI.syncImport()
-            resumePolling(for: "importing")
-        } catch {
-            isImporting = false
-            self.error = reportError(error)
-        }
-    }
-
-    // MARK: - Sync control
-
-    func togglePause() async {
-        do {
-            let paused = try await AudibleAPI.syncPause()
-            isPaused = paused
+            try await AudibleAPI.importStart()
+            startImportPolling()
         } catch {
             self.error = reportError(error)
         }
     }
 
-    func cancelSync() async {
+    func toggleImportPause() async {
         do {
-            try await AudibleAPI.syncCancel()
-            isPaused = false
-            isFetching = false
-            isImporting = false
-            syncProgress = nil
+            let paused = try await AudibleAPI.importPause()
+            if let task = importTask {
+                importTask = ImportTaskState(
+                    phase: paused ? "paused" : "running",
+                    current: task.current,
+                    total: task.total,
+                    message: task.message,
+                    startedAt: task.startedAt,
+                    completedAt: task.completedAt
+                )
+            }
+        } catch {
+            self.error = reportError(error)
+        }
+    }
+
+    func cancelImport() async {
+        do {
+            try await AudibleAPI.importCancel()
+            importTask = nil
             cancelPolling()
             await refreshStatus()
         } catch {
@@ -136,41 +159,23 @@ final class AudibleViewModel {
         }
     }
 
-    // MARK: - Polling
-
-    private func resumePolling(for phase: String) {
-        if phase == "downloading" {
-            isFetching = true
-        } else if phase == "importing" {
-            isImporting = true
-        }
+    private func startImportPolling() {
+        cancelPolling()
         pollingTask = Task {
-            var isFirstPoll = true
             while !Task.isCancelled {
-                if isFirstPoll {
-                    isFirstPoll = false
-                } else {
-                    try? await Task.sleep(for: .seconds(2))
-                    guard !Task.isCancelled else { break }
-                }
                 do {
-                    let progress = try await AudibleAPI.syncProgress()
-                    syncProgress = progress
-                    if progress.phase == "paused" {
-                        isPaused = true
-                    }
-                    if progress.phase == "idle" || progress.phase == "done" {
-                        isPaused = false
-                        if isFetching { hasFetchedData = true }
-                        isFetching = false
-                        isImporting = false
-                        syncProgress = nil
+                    let state = try await AudibleAPI.importState()
+                    importTask = state
+                    if state.phase == "idle" || state.phase == "completed"
+                        || state.phase == "cancelled" || state.phase == "failed"
+                    {
                         await refreshStatus()
                         return
                     }
                 } catch {
                     break
                 }
+                try? await Task.sleep(for: .seconds(2))
             }
         }
     }
@@ -189,9 +194,11 @@ final class AudibleViewModel {
             isConnected = false
             libraryCount = 0
             wishlistCount = 0
-            lastSyncAt = nil
-            hasFetchedData = false
+            lastFetchedAt = nil
+            rawItemCount = 0
+            importTask = nil
             lastVerifiedAt = nil
+            cancelPolling()
         } catch {
             self.error = reportError(error)
         }
@@ -209,8 +216,9 @@ final class AudibleViewModel {
             let status = try await AudibleAPI.status()
             libraryCount = status.libraryCount
             wishlistCount = status.wishlistCount
-            lastSyncAt = status.lastSyncAt
-            if status.rawItemCount > 0 { hasFetchedData = true }
+            lastFetchedAt = status.lastFetchedAt
+            rawItemCount = status.rawItemCount
+            importTask = status.importTask
         } catch {}
     }
 }
