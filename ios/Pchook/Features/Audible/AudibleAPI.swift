@@ -89,6 +89,25 @@ enum AudibleAPI {
         return response.data
     }
 
+    static func syncCancel() async throws {
+        struct Empty: Encodable, Sendable {}
+        struct Result: Decodable, Sendable { let cancelled: Bool }
+        let _: APIResponse<Result> = try await APIClient.shared.post(
+            "/audible/sync/cancel",
+            body: Empty()
+        )
+    }
+
+    static func syncPause() async throws -> Bool {
+        struct Empty: Encodable, Sendable {}
+        struct Result: Decodable, Sendable { let paused: Bool }
+        let response: APIResponse<Result> = try await APIClient.shared.post(
+            "/audible/sync/pause",
+            body: Empty()
+        )
+        return response.data.paused
+    }
+
     static func disconnect() async throws {
         struct Empty: Encodable, Sendable {}
         struct Result: Decodable, Sendable {

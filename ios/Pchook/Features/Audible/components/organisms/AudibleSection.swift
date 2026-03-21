@@ -104,7 +104,7 @@ struct AudibleSection: View {
         VStack(alignment: .leading, spacing: 8) {
             if let progress = viewModel.syncProgress {
                 HStack {
-                    Text(progress.message)
+                    Text(progress.phase == "paused" ? "En pause" : progress.message)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if progress.total > 0 {
@@ -122,6 +122,7 @@ struct AudibleSection: View {
                 } else {
                     ProgressView()
                 }
+                syncControlButtons
             } else {
                 HStack {
                     ProgressView()
@@ -129,6 +130,33 @@ struct AudibleSection: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var syncControlButtons: some View {
+        HStack(spacing: 16) {
+            Button {
+                Task { await viewModel.togglePause() }
+            } label: {
+                Label(
+                    viewModel.isPaused ? "Reprendre" : "Pause",
+                    systemImage: viewModel.isPaused ? "play.fill" : "pause.fill"
+                )
+                .font(.caption)
+            }
+            .buttonStyle(.bordered)
+            .tint(viewModel.isPaused ? .green : nil)
+
+            Button(role: .destructive) {
+                Task { await viewModel.cancelSync() }
+            } label: {
+                Label("Annuler", systemImage: "xmark")
+                    .font(.caption)
+            }
+            .buttonStyle(.bordered)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.top, 4)
     }
 
     // MARK: - Disconnect

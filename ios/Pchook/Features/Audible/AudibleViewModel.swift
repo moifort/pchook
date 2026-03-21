@@ -12,6 +12,7 @@ final class AudibleViewModel {
     private(set) var wishlistCount = 0
     private(set) var lastSyncAt: Date?
     private(set) var syncProgress: SyncProgressData?
+    private(set) var isPaused = false
     var error: String?
     var showLogin = false
 
@@ -110,6 +111,31 @@ final class AudibleViewModel {
         }
     }
 
+    // MARK: - Sync control
+
+    func togglePause() async {
+        do {
+            let paused = try await AudibleAPI.syncPause()
+            isPaused = paused
+        } catch {
+            self.error = reportError(error)
+        }
+    }
+
+    func cancelSync() async {
+        do {
+            try await AudibleAPI.syncCancel()
+            isPaused = false
+            isFetching = false
+            isImporting = false
+            syncProgress = nil
+            cancelPolling()
+            await refreshStatus()
+        } catch {
+            self.error = reportError(error)
+        }
+    }
+
     // MARK: - Polling
 
     private func resumePolling(for phase: String) {
@@ -130,7 +156,13 @@ final class AudibleViewModel {
                 do {
                     let progress = try await AudibleAPI.syncProgress()
                     syncProgress = progress
+                    if progress.phase == "paused" {
+                        isPaused = true
+                    } else {
+                        isPaused = false
+                    }
                     if progress.phase == "idle" || progress.phase == "done" {
+                        isPaused = false
                         if isFetching { hasFetchedData = true }
                         isFetching = false
                         isImporting = false
