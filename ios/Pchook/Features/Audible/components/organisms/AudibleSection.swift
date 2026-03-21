@@ -10,6 +10,7 @@ struct AudibleSection: View {
                 statusRows
                 fetchRow
                 importRow
+                syncControlButtons
                 disconnectButton
             } else if viewModel.isCheckingStatus {
                 HStack {
@@ -122,7 +123,6 @@ struct AudibleSection: View {
                 } else {
                     ProgressView()
                 }
-                syncControlButtons
             } else {
                 HStack {
                     ProgressView()
@@ -134,29 +134,22 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var syncControlButtons: some View {
-        HStack(spacing: 16) {
+        if viewModel.isBusy || viewModel.isPaused {
             Button {
                 Task { await viewModel.togglePause() }
             } label: {
                 Label(
-                    viewModel.isPaused ? "Reprendre" : "Pause",
+                    viewModel.isPaused ? "Reprendre la sync" : "Mettre en pause",
                     systemImage: viewModel.isPaused ? "play.fill" : "pause.fill"
                 )
-                .font(.caption)
             }
-            .buttonStyle(.bordered)
-            .tint(viewModel.isPaused ? .green : nil)
 
             Button(role: .destructive) {
                 Task { await viewModel.cancelSync() }
             } label: {
-                Label("Annuler", systemImage: "xmark")
-                    .font(.caption)
+                Label("Annuler la sync", systemImage: "xmark.circle")
             }
-            .buttonStyle(.bordered)
         }
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.top, 4)
     }
 
     // MARK: - Disconnect

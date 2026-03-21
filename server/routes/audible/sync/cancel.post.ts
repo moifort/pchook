@@ -12,5 +12,5 @@ export default defineEventHandler(() => {
     AudibleCommand.requestResume()
   }
 
-  return { data: { cancelled: true } } as const
+  return { status: 200, data: { cancelled: true } } as const
 })

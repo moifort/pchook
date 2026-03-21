@@ -6,7 +6,7 @@ export default defineEventHandler(() => {
 
   if (progress.phase === 'paused') {
     AudibleCommand.requestResume()
-    return { data: { paused: false } } as const
+    return { status: 200, data: { paused: false } } as const
   }
 
   if (progress.phase !== 'downloading' && progress.phase !== 'importing') {
@@ -14,5 +14,5 @@ export default defineEventHandler(() => {
   }
 
   AudibleCommand.requestPause()
-  return { data: { paused: true } } as const
+  return { status: 200, data: { paused: true } } as const
 })
