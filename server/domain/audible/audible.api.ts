@@ -300,7 +300,7 @@ const audibleRawItemSchema = z.object({
     .object({
       is_finished: z.boolean().optional(),
       percent_complete: z.number().optional(),
-      finished_at_timestamp: z.string().optional(),
+      finished_at_timestamp: z.string().nullish(),
     })
     .nullish()
     .transform((v) => v ?? undefined),

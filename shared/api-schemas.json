@@ -12,7 +12,9 @@
         "maximum": 9007199254740991
       }
     },
-    "required": ["name"],
+    "required": [
+      "name"
+    ],
     "additionalProperties": false
   },
   "PublicRating": {
@@ -37,7 +39,12 @@
         "type": "string"
       }
     },
-    "required": ["source", "score", "maxScore", "voterCount"],
+    "required": [
+      "source",
+      "score",
+      "maxScore",
+      "voterCount"
+    ],
     "additionalProperties": false
   },
   "Book": {
@@ -124,7 +131,9 @@
               "maximum": 9007199254740991
             }
           },
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "additionalProperties": false
         }
       },
@@ -151,7 +160,12 @@
               "type": "string"
             }
           },
-          "required": ["source", "score", "maxScore", "voterCount"],
+          "required": [
+            "source",
+            "score",
+            "maxScore",
+            "voterCount"
+          ],
           "additionalProperties": false
         }
       },
@@ -267,7 +281,9 @@
               "maximum": 9007199254740991
             }
           },
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "additionalProperties": false
         }
       },
@@ -294,7 +310,12 @@
               "type": "string"
             }
           },
-          "required": ["source", "score", "maxScore", "voterCount"],
+          "required": [
+            "source",
+            "score",
+            "maxScore",
+            "voterCount"
+          ],
           "additionalProperties": false
         }
       },
@@ -302,7 +323,13 @@
         "type": "string"
       }
     },
-    "required": ["previewId", "title", "authors", "awards", "publicRatings"],
+    "required": [
+      "previewId",
+      "title",
+      "authors",
+      "awards",
+      "publicRatings"
+    ],
     "additionalProperties": false
   },
   "BookListItem": {
@@ -347,7 +374,9 @@
               "maximum": 9007199254740991
             }
           },
-          "required": ["name"],
+          "required": [
+            "name"
+          ],
           "additionalProperties": false
         }
       },
@@ -371,7 +400,14 @@
         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
       }
     },
-    "required": ["id", "title", "authors", "status", "awards", "createdAt"],
+    "required": [
+      "id",
+      "title",
+      "authors",
+      "status",
+      "awards",
+      "createdAt"
+    ],
     "additionalProperties": false
   },
   "SeriesBookEntry": {
@@ -391,7 +427,12 @@
         "type": "number"
       }
     },
-    "required": ["id", "title", "label", "position"],
+    "required": [
+      "id",
+      "title",
+      "label",
+      "position"
+    ],
     "additionalProperties": false
   },
   "SeriesInfo": {
@@ -425,12 +466,22 @@
               "type": "number"
             }
           },
-          "required": ["id", "title", "label", "position"],
+          "required": [
+            "id",
+            "title",
+            "label",
+            "position"
+          ],
           "additionalProperties": false
         }
       }
     },
-    "required": ["name", "label", "position", "books"],
+    "required": [
+      "name",
+      "label",
+      "position",
+      "books"
+    ],
     "additionalProperties": false
   },
   "ReviewInfo": {
@@ -459,7 +510,11 @@
         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
       }
     },
-    "required": ["bookId", "rating", "createdAt"],
+    "required": [
+      "bookId",
+      "rating",
+      "createdAt"
+    ],
     "additionalProperties": false
   },
   "BookDetailData": {
@@ -549,7 +604,9 @@
                   "maximum": 9007199254740991
                 }
               },
-              "required": ["name"],
+              "required": [
+                "name"
+              ],
               "additionalProperties": false
             }
           },
@@ -576,7 +633,12 @@
                   "type": "string"
                 }
               },
-              "required": ["source", "score", "maxScore", "voterCount"],
+              "required": [
+                "source",
+                "score",
+                "maxScore",
+                "voterCount"
+              ],
               "additionalProperties": false
             }
           },
@@ -643,12 +705,22 @@
                   "type": "number"
                 }
               },
-              "required": ["id", "title", "label", "position"],
+              "required": [
+                "id",
+                "title",
+                "label",
+                "position"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["name", "label", "position", "books"],
+        "required": [
+          "name",
+          "label",
+          "position",
+          "books"
+        ],
         "additionalProperties": false
       },
       "review": {
@@ -676,11 +748,17 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           }
         },
-        "required": ["bookId", "rating", "createdAt"],
+        "required": [
+          "bookId",
+          "rating",
+          "createdAt"
+        ],
         "additionalProperties": false
       }
     },
-    "required": ["book"],
+    "required": [
+      "book"
+    ],
     "additionalProperties": false
   },
   "BookCount": {
@@ -703,7 +781,11 @@
         "maximum": 9007199254740991
       }
     },
-    "required": ["total", "toRead", "read"],
+    "required": [
+      "total",
+      "toRead",
+      "read"
+    ],
     "additionalProperties": false
   },
   "FavoriteBook": {
@@ -739,7 +821,12 @@
         "type": "number"
       }
     },
-    "required": ["id", "title", "authors", "rating"],
+    "required": [
+      "id",
+      "title",
+      "authors",
+      "rating"
+    ],
     "additionalProperties": false
   },
   "RecentBook": {
@@ -767,7 +854,12 @@
         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
       }
     },
-    "required": ["id", "title", "authors", "createdAt"],
+    "required": [
+      "id",
+      "title",
+      "authors",
+      "createdAt"
+    ],
     "additionalProperties": false
   },
   "RecentAward": {
@@ -792,7 +884,12 @@
         "maximum": 9007199254740991
       }
     },
-    "required": ["bookTitle", "authors", "awardName", "awardYear"],
+    "required": [
+      "bookTitle",
+      "authors",
+      "awardName",
+      "awardYear"
+    ],
     "additionalProperties": false
   },
   "DashboardData": {
@@ -818,7 +915,11 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["total", "toRead", "read"],
+        "required": [
+          "total",
+          "toRead",
+          "read"
+        ],
         "additionalProperties": false
       },
       "favorites": {
@@ -855,7 +956,12 @@
               "type": "number"
             }
           },
-          "required": ["id", "title", "authors", "rating"],
+          "required": [
+            "id",
+            "title",
+            "authors",
+            "rating"
+          ],
           "additionalProperties": false
         }
       },
@@ -885,7 +991,12 @@
               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
             }
           },
-          "required": ["id", "title", "authors", "createdAt"],
+          "required": [
+            "id",
+            "title",
+            "authors",
+            "createdAt"
+          ],
           "additionalProperties": false
         }
       },
@@ -912,12 +1023,22 @@
               "maximum": 9007199254740991
             }
           },
-          "required": ["bookTitle", "authors", "awardName", "awardYear"],
+          "required": [
+            "bookTitle",
+            "authors",
+            "awardName",
+            "awardYear"
+          ],
           "additionalProperties": false
         }
       }
     },
-    "required": ["bookCount", "favorites", "recentBooks", "recentAwards"],
+    "required": [
+      "bookCount",
+      "favorites",
+      "recentBooks",
+      "recentAwards"
+    ],
     "additionalProperties": false
   },
   "AuthCookie": {
@@ -934,7 +1055,11 @@
         "type": "string"
       }
     },
-    "required": ["name", "value", "domain"],
+    "required": [
+      "name",
+      "value",
+      "domain"
+    ],
     "additionalProperties": false
   },
   "AuthStartResponse": {
@@ -962,12 +1087,20 @@
               "type": "string"
             }
           },
-          "required": ["name", "value", "domain"],
+          "required": [
+            "name",
+            "value",
+            "domain"
+          ],
           "additionalProperties": false
         }
       }
     },
-    "required": ["loginUrl", "sessionId", "cookies"],
+    "required": [
+      "loginUrl",
+      "sessionId",
+      "cookies"
+    ],
     "additionalProperties": false
   },
   "AudibleStatus": {
@@ -1049,7 +1182,14 @@
             ]
           }
         },
-        "required": ["phase", "current", "total", "message", "startedAt", "completedAt"],
+        "required": [
+          "phase",
+          "current",
+          "total",
+          "message",
+          "startedAt",
+          "completedAt"
+        ],
         "additionalProperties": false
       }
     },
@@ -1108,7 +1248,14 @@
         ]
       }
     },
-    "required": ["phase", "current", "total", "message", "startedAt", "completedAt"],
+    "required": [
+      "phase",
+      "current",
+      "total",
+      "message",
+      "startedAt",
+      "completedAt"
+    ],
     "additionalProperties": false
   }
 }
