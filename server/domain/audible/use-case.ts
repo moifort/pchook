@@ -6,13 +6,7 @@ import {
 } from '~/domain/audible/business-rules'
 import { AudibleCommand } from '~/domain/audible/command'
 import { AudibleQuery } from '~/domain/audible/query'
-import type {
-  AsinBookMapping,
-  AudibleItem,
-  AudibleSummary,
-  SyncPhase,
-  SyncProgress,
-} from '~/domain/audible/types'
+import type { AsinBookMapping, AudibleItem, RawAudibleEntry } from '~/domain/audible/types'
 import { BookCommand } from '~/domain/book/command'
 import type { Book } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
@@ -23,6 +17,7 @@ import { PersonName, Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 import { callGemini } from '~/system/scan/gemini'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
+import { createTaskRunner, type TaskDefinition } from '~/system/task-runner'
 
 const log = createLogger('audible-use-case')
 
@@ -118,78 +113,41 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   return result.tag
 }
 
-const checkSyncControl = async (currentPhase: SyncPhase, currentProgress: SyncProgress) => {
-  if (AudibleQuery.isCancelRequested()) {
-    log.info('Sync cancelled by user')
-    return 'cancelled' as const
-  }
-  if (AudibleQuery.isPaused()) {
-    AudibleCommand.setSyncProgress({ ...currentProgress, phase: 'paused' })
-    log.info('Sync paused by user')
-    await AudibleQuery.waitIfPaused()
-    AudibleCommand.setSyncProgress({ ...currentProgress, phase: currentPhase })
-    log.info('Sync resumed by user')
-  }
-  return 'continue' as const
+export const importRunner = createTaskRunner('audible-import')
+
+export const importTaskDefinition: TaskDefinition<RawAudibleEntry> = {
+  items: () => AudibleQuery.getAllRawItems(),
+  execute: async ({ item, source }) => {
+    await importItem(item, source)
+  },
+  label: ({ item }) => `Import de "${item.title}"...`,
 }
 
 export namespace AudibleUseCase {
   export const verify = async () => {
     const credentials = await AudibleQuery.getCredentials()
     if (!credentials) return 'no-credentials' as const
-
-    const currentProgress = AudibleQuery.getSyncProgress()
-    const ownProgress = currentProgress.phase === 'idle'
-
     try {
-      if (ownProgress) {
-        AudibleCommand.setSyncProgress({
-          phase: 'verifying',
-          current: 0,
-          total: 0,
-          message: 'Vérification de la connexion...',
-        })
-      }
       await verifyConnection(credentials)
       return 'ok' as const
     } catch {
       return 'invalid-credentials' as const
-    } finally {
-      if (ownProgress) {
-        AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
-      }
     }
   }
 
   export const fetchAndStore = async () => {
     const credentials = await AudibleQuery.getCredentials()
     if (!credentials) return 'no-credentials' as const
+    if (AudibleQuery.isFetchInProgress()) return 'already-fetching' as const
 
     log.info('Starting Audible fetch')
+    AudibleCommand.setFetchInProgress(true)
 
     try {
-      AudibleCommand.setSyncProgress({
-        phase: 'downloading',
-        current: 0,
-        total: 0,
-        message: 'Récupération de la bibliothèque...',
-      })
-
       const { items: libraryItems, credentials: afterLibrary } = await fetchLibrary(credentials)
-
-      AudibleCommand.setSyncProgress({
-        phase: 'downloading',
-        current: 0,
-        total: 0,
-        message: 'Récupération de la liste de souhaits...',
-      })
-
       const { items: wishlistItems } = await fetchWishlist(afterLibrary)
 
-      log.info('Fetched items', {
-        library: libraryItems.length,
-        wishlist: wishlistItems.length,
-      })
+      log.info('Fetched items', { library: libraryItems.length, wishlist: wishlistItems.length })
 
       await AudibleCommand.clearRawItems()
 
@@ -197,86 +155,23 @@ export namespace AudibleUseCase {
         ...libraryItems.map((item) => ({ item, source: 'library' as const })),
         ...wishlistItems.map((item) => ({ item, source: 'wishlist' as const })),
       ]
-      const total = allEntries.length
 
-      for (const [index, { item, source }] of allEntries.entries()) {
-        const progress = {
-          phase: 'downloading' as const,
-          current: index + 1,
-          total,
-          message: `Stockage de "${item.title}"...`,
-        }
-        const control = await checkSyncControl('downloading', progress)
-        if (control === 'cancelled') break
-        AudibleCommand.setSyncProgress(progress)
-        await AudibleCommand.saveRawItem(item.asin, {
-          item,
-          source,
-          downloadedAt: new Date(),
-        })
+      for (const { item, source } of allEntries) {
+        await AudibleCommand.saveRawItem(item.asin, { item, source, downloadedAt: new Date() })
       }
 
-      const listenedTotal = libraryItems.filter(({ isFinished }) => isFinished === true).length
+      await AudibleCommand.saveLastFetchedAt(new Date())
 
-      const summary: AudibleSummary = {
+      const listenedTotal = libraryItems.filter(({ isFinished }) => isFinished === true).length
+      const summary = {
         libraryTotal: libraryItems.length,
         listenedTotal,
         wishlistTotal: wishlistItems.length,
       }
-
       log.info('Fetch completed', summary)
-
       return summary
     } finally {
-      AudibleCommand.clearCancel()
-      AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
-    }
-  }
-
-  export const importAll = async () => {
-    const rawItems = await AudibleQuery.getAllRawItems()
-    if (rawItems.length === 0) return 'no-data' as const
-
-    log.info('Starting import', { total: rawItems.length })
-
-    try {
-      const total = rawItems.length
-      let newBooksAdded = 0
-      let duplicatesSkipped = 0
-      let failed = 0
-
-      for (const [index, { item, source }] of rawItems.entries()) {
-        const progress = {
-          phase: 'importing' as const,
-          current: index + 1,
-          total,
-          message: `Import de "${item.title}"...`,
-        }
-        const control = await checkSyncControl('importing', progress)
-        if (control === 'cancelled') break
-        AudibleCommand.setSyncProgress(progress)
-
-        try {
-          const result = await importItem(item, source)
-          if (result === 'created') newBooksAdded += 1
-          else duplicatesSkipped += 1
-        } catch (error) {
-          failed += 1
-          log.error('Failed to import item', {
-            asin: item.asin,
-            title: item.title,
-            error: String(error),
-          })
-        }
-      }
-
-      await AudibleCommand.saveSyncCompletedAt(new Date())
-      log.info('Import completed', { newBooksAdded, duplicatesSkipped, failed })
-
-      return { newBooksAdded, duplicatesSkipped, failed } as const
-    } finally {
-      AudibleCommand.clearCancel()
-      AudibleCommand.setSyncProgress({ phase: 'idle', current: 0, total: 0, message: '' })
+      AudibleCommand.setFetchInProgress(false)
     }
   }
 }

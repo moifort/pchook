@@ -5,7 +5,6 @@ import type {
   AudibleCredentials,
   AuthSession,
   RawAudibleEntry,
-  SyncProgress,
 } from '~/domain/audible/types'
 
 export namespace AudibleCommand {
@@ -24,10 +23,6 @@ export namespace AudibleCommand {
     await repository.removeCredentials()
   }
 
-  export const setSyncProgress = (progress: SyncProgress) => {
-    repository.setSyncProgress(progress)
-  }
-
   export const saveMapping = async (mapping: AsinBookMapping) => {
     await repository.saveMapping(mapping)
   }
@@ -44,6 +39,10 @@ export namespace AudibleCommand {
     await repository.clearRawItems()
   }
 
+  export const clearMappings = async () => {
+    await repository.clearMappings()
+  }
+
   export const saveAuthSession = async (sessionId: string, session: AuthSession) => {
     await repository.saveAuthSession(sessionId, session)
   }
@@ -55,19 +54,11 @@ export namespace AudibleCommand {
     return session
   }
 
-  export const requestCancel = () => {
-    repository.requestCancel()
+  export const setFetchInProgress = (value: boolean) => {
+    repository.setFetchInProgress(value)
   }
 
-  export const clearCancel = () => {
-    repository.clearCancel()
-  }
-
-  export const requestPause = () => {
-    repository.requestPause()
-  }
-
-  export const requestResume = () => {
-    repository.requestResume()
+  export const saveLastFetchedAt = async (date: Date) => {
+    await repository.saveLastFetchedAt(date)
   }
 }

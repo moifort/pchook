@@ -4,7 +4,6 @@ import type {
   AudibleCredentials,
   AuthSession,
   RawAudibleEntry,
-  SyncProgress,
 } from '~/domain/audible/types'
 import { createTypedStorage } from '~/system/storage'
 
@@ -67,44 +66,20 @@ export const saveSyncCompletedAt = async (date: Date) => {
   await syncMetaStorage().setItem('lastCompletedAt', date)
 }
 
-// In-memory sync progress (not persisted)
-let syncProgress: SyncProgress = { phase: 'idle', current: 0, total: 0, message: '' }
-
-export const getSyncProgress = () => syncProgress
-
-export const setSyncProgress = (progress: SyncProgress) => {
-  syncProgress = progress
+export const clearMappings = async () => {
+  const keys = await mappingsStorage().getKeys()
+  await Promise.all(keys.map((key) => mappingsStorage().removeItem(key)))
 }
 
-// In-memory sync control (not persisted)
-let cancelRequested = false
-let pauseResolve: (() => void) | null = null
-let pausePromise: Promise<void> | null = null
+// In-memory fetch state
+let fetchInProgress = false
 
-export const requestCancel = () => {
-  cancelRequested = true
+export const isFetchInProgress = () => fetchInProgress
+export const setFetchInProgress = (value: boolean) => {
+  fetchInProgress = value
 }
 
-export const isCancelRequested = () => cancelRequested
-
-export const clearCancel = () => {
-  cancelRequested = false
-}
-
-export const requestPause = () => {
-  pausePromise = new Promise((resolve) => {
-    pauseResolve = resolve
-  })
-}
-
-export const requestResume = () => {
-  pauseResolve?.()
-  pausePromise = null
-  pauseResolve = null
-}
-
-export const isPaused = () => pausePromise !== null
-
-export const waitIfPaused = async () => {
-  if (pausePromise) await pausePromise
+export const findLastFetchedAt = async () => syncMetaStorage().getItem('lastFetchedAt')
+export const saveLastFetchedAt = async (date: Date) => {
+  await syncMetaStorage().setItem('lastFetchedAt', date)
 }

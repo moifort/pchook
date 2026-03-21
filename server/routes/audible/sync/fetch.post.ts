@@ -10,9 +10,8 @@ export default defineEventHandler(async () => {
     throw createError({ statusCode: 422, statusMessage: 'Audible credentials not configured' })
   }
 
-  const progress = AudibleQuery.getSyncProgress()
-  if (progress.phase !== 'idle') {
-    throw createError({ statusCode: 409, statusMessage: 'Sync already in progress' })
+  if (AudibleQuery.isFetchInProgress()) {
+    throw createError({ statusCode: 409, statusMessage: 'Fetch already in progress' })
   }
 
   AudibleUseCase.fetchAndStore().catch((error) => {

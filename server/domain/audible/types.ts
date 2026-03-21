@@ -53,8 +53,6 @@ export type AuthSession = {
   createdAt: Date
 }
 
-export type SyncPhase = 'idle' | 'verifying' | 'downloading' | 'importing' | 'paused' | 'done'
-
 export type RawAudibleEntry = {
   item: AudibleItem
   source: 'library' | 'wishlist'
@@ -65,13 +63,6 @@ export type AudibleSummary = {
   libraryTotal: number
   listenedTotal: number
   wishlistTotal: number
-}
-
-export type SyncProgress = {
-  phase: SyncPhase
-  current: number
-  total: number
-  message: string
 }
 
 export type LocaleConfig = {

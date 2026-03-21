@@ -13,15 +13,11 @@ export namespace AudibleQuery {
 
   export const getAllMappings = async () => repository.findAllMappings()
 
-  export const getSyncProgress = () => repository.getSyncProgress()
-
   export const getSyncCompletedAt = async () => repository.findSyncCompletedAt()
 
   export const getAllRawItems = async () => repository.findAllRawItems()
 
-  export const isCancelRequested = () => repository.isCancelRequested()
+  export const isFetchInProgress = () => repository.isFetchInProgress()
 
-  export const isPaused = () => repository.isPaused()
-
-  export const waitIfPaused = async () => repository.waitIfPaused()
+  export const getLastFetchedAt = async () => repository.findLastFetchedAt()
 }
