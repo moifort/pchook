@@ -6,6 +6,7 @@ import {
 } from '~/domain/audible/business-rules'
 import { Asin } from '~/domain/audible/primitives'
 import type { AudibleItem } from '~/domain/audible/types'
+import type { ScanResult } from '~/system/scan/types'
 
 const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
   asin: Asin('B08G9PRS1K'),
@@ -20,7 +21,7 @@ const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
   ...overrides,
 })
 
-const makeGeminiResult = (overrides: Record<string, unknown> = {}): Record<string, unknown> => ({
+const makeGeminiResult = (overrides: Partial<ScanResult> = {}): ScanResult => ({
   title: 'Le Seigneur des Anneaux',
   authors: ['J.R.R. Tolkien'],
   publisher: 'Christian Bourgois',
@@ -180,7 +181,7 @@ describe('mergeAudibleIntoScanResult', () => {
   })
 
   test('handles empty awards from gemini', () => {
-    const result = mergeAudibleIntoScanResult(makeGeminiResult({ awards: null }), makeItem())
+    const result = mergeAudibleIntoScanResult(makeGeminiResult({ awards: [] }), makeItem())
     expect(result.awards).toEqual([])
   })
 

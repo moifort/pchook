@@ -1,6 +1,5 @@
 import type { AudibleItem } from '~/domain/audible/types'
 import { buildBookJsonSchema } from '~/system/scan/gemini'
-import { partialScanResultSchema } from '~/system/scan/schemas'
 import type { ScanResult } from '~/system/scan/types'
 
 export const formatDuration = (minutes: number) => {
@@ -23,33 +22,26 @@ ${buildBookJsonSchema(true, existingSeriesNames)}
 Toutes les valeurs textuelles en français.`
 }
 
-export const mergeAudibleIntoScanResult = (
-  scanResult: Record<string, unknown>,
-  item: AudibleItem,
-): ScanResult => {
-  const base = partialScanResultSchema.parse(scanResult)
-
-  return {
-    title: item.title,
-    authors: item.authors,
-    publisher: item.publisher ?? base.publisher,
-    publishedDate: item.releaseDate
-      ? item.releaseDate.toISOString().split('T')[0]
-      : base.publishedDate,
-    pageCount: base.pageCount,
-    genre: base.genre,
-    synopsis: base.synopsis,
-    isbn: base.isbn,
-    language: item.language ?? base.language,
-    format: 'audiobook',
-    series: item.series?.name ?? base.series,
-    seriesLabel: item.series?.position ? String(item.series.position) : base.seriesLabel,
-    seriesNumber: item.series?.position ?? base.seriesNumber,
-    translator: base.translator,
-    estimatedPrice: base.estimatedPrice,
-    duration: item.durationMinutes > 0 ? formatDuration(item.durationMinutes) : undefined,
-    narrators: item.narrators,
-    awards: base.awards,
-    publicRatings: base.publicRatings,
-  }
-}
+export const mergeAudibleIntoScanResult = (base: ScanResult, item: AudibleItem): ScanResult => ({
+  title: item.title,
+  authors: item.authors,
+  publisher: item.publisher ?? base.publisher,
+  publishedDate: item.releaseDate
+    ? item.releaseDate.toISOString().split('T')[0]
+    : base.publishedDate,
+  pageCount: base.pageCount,
+  genre: base.genre,
+  synopsis: base.synopsis,
+  isbn: base.isbn,
+  language: item.language ?? base.language,
+  format: 'audiobook',
+  series: item.series?.name ?? base.series,
+  seriesLabel: item.series?.position ? String(item.series.position) : base.seriesLabel,
+  seriesNumber: item.series?.position ?? base.seriesNumber,
+  translator: base.translator,
+  estimatedPrice: base.estimatedPrice,
+  duration: item.durationMinutes > 0 ? formatDuration(item.durationMinutes) : undefined,
+  narrators: item.narrators,
+  awards: base.awards,
+  publicRatings: base.publicRatings,
+})

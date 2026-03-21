@@ -16,6 +16,8 @@ import { SeriesQuery } from '~/domain/series/query'
 import { PersonName, Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 import { callGemini } from '~/system/scan/gemini'
+import { enrichWithHardcover } from '~/system/scan/index'
+import { partialScanResultSchema } from '~/system/scan/schemas'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
 import { createTaskRunner, type TaskDefinition } from '~/system/task-runner'
 
@@ -75,13 +77,24 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const seriesNames = allSeries.map(({ name }) => String(name))
   const prompt = buildGeminiPrompt(item, seriesNames)
   const geminiResult = await callGemini(prompt)
-  const scanResult = mergeAudibleIntoScanResult(geminiResult, item)
+  const geminiPartial = partialScanResultSchema.parse(geminiResult)
+  const geminiScanResult = {
+    ...geminiPartial,
+    title: geminiPartial.title ?? item.title,
+    authors: geminiPartial.authors ?? item.authors,
+    awards: geminiPartial.awards,
+    publicRatings: geminiPartial.publicRatings,
+  }
+  const { result: enrichedResult, coverImageBase64: hardcoverCover } =
+    await enrichWithHardcover(geminiScanResult)
+  const scanResult = mergeAudibleIntoScanResult(enrichedResult, item)
 
   const { title, data, seriesInfo } = scanResultToBookData(scanResult)
   const isRead = source === 'library' && item.finishedAt !== undefined
   const status = isRead ? 'read' : 'to-read'
   const readDate = isRead ? item.finishedAt : undefined
-  const coverBase64 = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
+  const audibleCover = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
+  const coverBase64 = audibleCover ?? hardcoverCover
 
   const externalUrl = Url(await buildAudibleUrl(String(item.asin)))
   const result = await BookUseCase.addFromScan(
