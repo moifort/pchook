@@ -90,6 +90,18 @@ struct ScanConfirmationView: View {
                 AwardsSection(awards: preview.awards)
             }
 
+            if let rating = preview.ratings.first {
+                Section("Notes") {
+                    RatingRow(
+                        label: rating.source,
+                        score: rating.score,
+                        maxScore: rating.maxScore,
+                        voterCount: rating.voterCount,
+                        url: rating.url
+                    )
+                }
+            }
+
             Section("D\u{00E9}tails") {
                 LabeledContent {
                     TextField("\u{00C9}diteur", text: $publisher)
@@ -247,6 +259,7 @@ extension ScanConfirmationView {
         var duration: String?
         var narrators: [String]?
         let awards: [AwardsSection.Item]
+        let ratings: [RatingsSection.Item]
         var series: String?
         var seriesLabel: String?
         var seriesNumber: Int?
@@ -271,6 +284,7 @@ extension ScanConfirmationView {
                 duration: nil,
                 narrators: nil,
                 awards: [.init(name: "Prix Nobel", year: 1957)],
+                ratings: [.init(source: "Babelio", score: 4.02, maxScore: 5, voterCount: 98000, url: "https://www.babelio.com")],
                 series: nil,
                 seriesNumber: nil
             ),

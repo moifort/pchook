@@ -29,6 +29,7 @@ struct Book: Codable, Identifiable, Sendable {
     var importSource: String?
     var externalUrl: String?
     var awards: [Award]
+    var publicRatings: [PublicRating]
     let createdAt: Date
     let updatedAt: Date
 }
@@ -36,6 +37,14 @@ struct Book: Codable, Identifiable, Sendable {
 struct Award: Codable, Sendable {
     let name: String
     var year: Int?
+}
+
+struct PublicRating: Codable, Sendable {
+    let source: String
+    let score: Double
+    let maxScore: Double
+    let voterCount: Int
+    var url: String?
 }
 
 // MARK: - Book List Item
@@ -156,6 +165,7 @@ struct BookPreview: Codable, Sendable {
     var duration: String?
     var narrators: [String]?
     var awards: [Award]
+    var publicRatings: [PublicRating]
     var coverImageBase64: String?
 }
 

@@ -26,6 +26,14 @@ struct BookDetailContent: View {
                 seriesLabel: detail.series?.label
             )
 
+            RatingsSection(
+                publicRatings: detail.book.publicRatings.map {
+                    .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount, url: $0.url)
+                },
+                userRating: detail.review?.rating,
+                onAddReview: onAddReview
+            )
+
             if let series = detail.series {
                 SeriesSection(
                     name: series.name,

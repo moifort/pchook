@@ -195,6 +195,9 @@ struct ScanFlowView: View {
             duration: preview.duration,
             narrators: preview.narrators,
             awards: preview.awards.map { .init(name: $0.name, year: $0.year) },
+            ratings: preview.publicRatings.map {
+                .init(source: $0.source, score: $0.score, maxScore: $0.maxScore, voterCount: $0.voterCount, url: $0.url)
+            },
             series: preview.series,
             seriesLabel: preview.seriesLabel,
             seriesNumber: preview.seriesNumber

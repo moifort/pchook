@@ -35,13 +35,6 @@ struct ReviewSection: View {
                 .accessibilityIdentifier("add-review-button")
             }
 
-            if review?.rating == nil {
-                Button {
-                    onAddReview()
-                } label: {
-                    Label("Noter", systemImage: "star")
-                }
-            }
         }
     }
 }
