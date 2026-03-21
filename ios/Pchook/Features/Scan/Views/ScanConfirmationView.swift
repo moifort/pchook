@@ -90,15 +90,17 @@ struct ScanConfirmationView: View {
                 AwardsSection(awards: preview.awards)
             }
 
-            if let rating = preview.ratings.first {
+            if !preview.ratings.isEmpty {
                 Section("Notes") {
-                    RatingRow(
-                        label: rating.source,
-                        score: rating.score,
-                        maxScore: rating.maxScore,
-                        voterCount: rating.voterCount,
-                        url: rating.url
-                    )
+                    ForEach(preview.ratings) { rating in
+                        RatingRow(
+                            label: rating.source,
+                            score: rating.score,
+                            maxScore: rating.maxScore,
+                            voterCount: rating.voterCount,
+                            url: rating.url
+                        )
+                    }
                 }
             }
 

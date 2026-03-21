@@ -17,7 +17,7 @@ struct RatingsSection: View {
                 }
             }
 
-            if let rating = publicRatings.first {
+            ForEach(publicRatings) { rating in
                 RatingRow(
                     label: rating.source,
                     score: rating.score,
@@ -46,7 +46,7 @@ extension RatingsSection {
     List {
         RatingsSection(
             publicRatings: [
-                .init(source: "Sens Critique", score: 7.2, maxScore: 10, voterCount: 3400, url: "https://www.senscritique.com")
+                .init(source: "Hardcover", score: 4.12, maxScore: 5, voterCount: 8500, url: "https://hardcover.app/books/neuromancer")
             ],
             userRating: 4,
             onAddReview: {}
@@ -54,10 +54,11 @@ extension RatingsSection {
     }
 }
 
-#Preview("Sans note utilisateur") {
+#Preview("Plusieurs notes publiques") {
     List {
         RatingsSection(
             publicRatings: [
+                .init(source: "Hardcover", score: 4.12, maxScore: 5, voterCount: 8500, url: "https://hardcover.app/books/neuromancer"),
                 .init(source: "Babelio", score: 4.18, maxScore: 5, voterCount: 125000, url: "https://www.babelio.com")
             ],
             userRating: nil,
