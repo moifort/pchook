@@ -306,6 +306,18 @@ const audibleRawItemSchema = z.object({
     .transform((v) => v ?? undefined),
 })
 
+const parseFinishedAt = (timestamp: string | null | undefined): Date | undefined => {
+  if (!timestamp) return undefined
+  const asNumber = Number(timestamp)
+  if (!Number.isNaN(asNumber)) {
+    const date = new Date(asNumber * 1000)
+    if (!Number.isNaN(date.getTime())) return date
+  }
+  const date = new Date(timestamp)
+  if (!Number.isNaN(date.getTime())) return date
+  return undefined
+}
+
 const parseItems = (items: unknown[]): AudibleItem[] =>
   items.map((raw) => {
     const item = audibleRawItemSchema.parse(raw)
@@ -325,9 +337,7 @@ const parseItems = (items: unknown[]): AudibleItem[] =>
             position: item.series[0].sequence ? Number(item.series[0].sequence) : undefined,
           }
         : undefined,
-      finishedAt: item.listening_status?.finished_at_timestamp
-        ? new Date(item.listening_status.finished_at_timestamp)
-        : undefined,
+      finishedAt: parseFinishedAt(item.listening_status?.finished_at_timestamp),
     }
   })
 
