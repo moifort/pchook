@@ -433,7 +433,7 @@
     "required": ["name", "label", "position", "books"],
     "additionalProperties": false
   },
-  "Review": {
+  "ReviewInfo": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
@@ -462,7 +462,7 @@
     "required": ["bookId", "rating", "createdAt"],
     "additionalProperties": false
   },
-  "BookDetailView": {
+  "BookDetailData": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
@@ -795,7 +795,7 @@
     "required": ["bookTitle", "authors", "awardName", "awardYear"],
     "additionalProperties": false
   },
-  "DashboardView": {
+  "DashboardData": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
@@ -1001,7 +1001,7 @@
     "required": ["connected", "libraryCount", "wishlistCount", "rawItemCount"],
     "additionalProperties": false
   },
-  "SyncProgress": {
+  "SyncProgressData": {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {

@@ -28,17 +28,17 @@ const schemas = {
   BookListItem: bookListItemSchema,
   SeriesBookEntry: seriesBookEntrySchema,
   SeriesInfo: seriesInfoSchema,
-  Review: reviewSchema,
-  BookDetailView: bookDetailViewSchema,
+  ReviewInfo: reviewSchema,
+  BookDetailData: bookDetailViewSchema,
   BookCount: bookCountSchema,
   FavoriteBook: favoriteBookSchema,
   RecentBook: recentBookSchema,
   RecentAward: recentAwardSchema,
-  DashboardView: dashboardViewSchema,
+  DashboardData: dashboardViewSchema,
   AuthCookie: authCookieSchema,
   AuthStartResponse: authStartResponseSchema,
   AudibleStatus: audibleStatusSchema,
-  SyncProgress: syncProgressSchema,
+  SyncProgressData: syncProgressSchema,
 } as const
 
 const jsonSchemas = Object.fromEntries(

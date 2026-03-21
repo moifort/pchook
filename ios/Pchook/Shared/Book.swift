@@ -5,170 +5,6 @@ struct APIResponse<T: Decodable & Sendable>: Decodable, Sendable {
     let data: T
 }
 
-// MARK: - Book
-
-struct Book: Codable, Identifiable, Sendable {
-    let id: String
-    let title: String
-    let authors: [String]
-    var publisher: String?
-    var publishedDate: Date?
-    var pageCount: Int?
-    var genre: String?
-    var synopsis: String?
-    var isbn: String?
-    var language: String?
-    var format: String?
-    var translator: String?
-    var estimatedPrice: Double?
-    var duration: String?
-    var narrators: [String]?
-    var personalNotes: String?
-    var status: String
-    var readDate: Date?
-    var importSource: String?
-    var externalUrl: String?
-    var awards: [Award]
-    var publicRatings: [PublicRating]
-    let createdAt: Date
-    let updatedAt: Date
-}
-
-struct Award: Codable, Sendable {
-    let name: String
-    var year: Int?
-}
-
-struct PublicRating: Codable, Sendable {
-    let source: String
-    let score: Double
-    let maxScore: Double
-    let voterCount: Int
-    var url: String?
-}
-
-// MARK: - Book List Item
-
-struct BookListItem: Codable, Identifiable, Sendable {
-    let id: String
-    let title: String
-    let authors: [String]
-    var genre: String?
-    let status: String
-    var estimatedPrice: Double?
-    var language: String?
-    let awards: [Award]
-    var rating: Int?
-    var seriesName: String?
-    var seriesLabel: String?
-    var seriesPosition: Double?
-    let createdAt: Date
-}
-
-// MARK: - Book Detail
-
-struct BookDetailData: Decodable, Sendable {
-    let book: Book
-    var coverImageBase64: String?
-    var series: SeriesInfo?
-    var review: ReviewInfo?
-}
-
-struct SeriesInfo: Decodable, Sendable {
-    let name: String
-    let label: String
-    let position: Double
-    let books: [SeriesBookEntry]
-}
-
-struct SeriesBookEntry: Decodable, Identifiable, Sendable {
-    let id: String
-    let title: String
-    let label: String
-    let position: Double
-}
-
-struct ReviewInfo: Decodable, Sendable {
-    let rating: Int
-    var readDate: Date?
-    var reviewNotes: String?
-}
-
-// MARK: - Series
-
-struct Series: Codable, Identifiable, Sendable {
-    let id: String
-    let name: String
-    let createdAt: Date
-}
-
-// MARK: - Dashboard
-
-struct DashboardData: Decodable, Sendable {
-    let bookCount: BookCount
-    let favorites: [FavoriteBook]
-    let recentBooks: [RecentBook]
-    let recentAwards: [RecentAward]
-}
-
-struct BookCount: Decodable, Sendable {
-    let total: Int
-    let toRead: Int
-    let read: Int
-}
-
-struct FavoriteBook: Decodable, Identifiable, Sendable {
-    let id: String
-    let title: String
-    let authors: [String]
-    var genre: String?
-    let rating: Int
-    var readDate: Date?
-    var estimatedPrice: Double?
-}
-
-struct RecentBook: Decodable, Identifiable, Sendable {
-    let id: String
-    let title: String
-    let authors: [String]
-    var genre: String?
-    let createdAt: Date
-}
-
-struct RecentAward: Decodable, Sendable, Identifiable {
-    let bookTitle: String
-    let authors: [String]
-    let awardName: String
-    let awardYear: Int
-
-    var id: String { "\(bookTitle)-\(awardName)-\(awardYear)" }
-}
-
-// MARK: - Book Preview
-
-struct BookPreview: Codable, Sendable {
-    let previewId: String
-    let title: String
-    let authors: [String]
-    var publisher: String?
-    var pageCount: Int?
-    var genre: String?
-    var synopsis: String?
-    var isbn: String?
-    var language: String?
-    var format: String?
-    var series: String?
-    var seriesLabel: String?
-    var seriesNumber: Int?
-    var translator: String?
-    var estimatedPrice: Double?
-    var duration: String?
-    var narrators: [String]?
-    var awards: [Award]
-    var publicRatings: [PublicRating]
-    var coverImageBase64: String?
-}
-
 // MARK: - Enums
 
 enum BookLanguage: String, CaseIterable, Identifiable {
@@ -179,7 +15,7 @@ enum BookLanguage: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .fr: "Fran\u{00E7}ais"
+        case .fr: "Français"
         case .en: "English"
         }
     }
@@ -201,8 +37,8 @@ enum BookFormatOption: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .pocket: "Poche"
-        case .paperback: "Broch\u{00E9}"
-        case .hardcover: "Reli\u{00E9}"
+        case .paperback: "Broché"
+        case .hardcover: "Relié"
         case .audiobook: "Livre audio"
         }
     }

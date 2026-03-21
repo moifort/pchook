@@ -97,7 +97,7 @@ struct SeriesInfo: Decodable, Sendable {
     let books: [SeriesBookEntry]
 }
 
-struct Review: Decodable, Sendable {
+struct ReviewInfo: Decodable, Sendable {
     let bookId: String
     let rating: Int
     var readDate: Date?
@@ -105,11 +105,11 @@ struct Review: Decodable, Sendable {
     let createdAt: Date
 }
 
-struct BookDetailView: Decodable, Sendable {
+struct BookDetailData: Decodable, Sendable {
     let book: Book
     var coverImageBase64: String?
     var series: SeriesInfo?
-    var review: Review?
+    var review: ReviewInfo?
 }
 
 struct BookCount: Decodable, Sendable {
@@ -143,7 +143,7 @@ struct RecentAward: Decodable, Sendable {
     let awardYear: Int
 }
 
-struct DashboardView: Decodable, Sendable {
+struct DashboardData: Decodable, Sendable {
     let bookCount: BookCount
     let favorites: [FavoriteBook]
     let recentBooks: [RecentBook]
@@ -170,7 +170,7 @@ struct AudibleStatus: Decodable, Sendable {
     let rawItemCount: Int
 }
 
-struct SyncProgress: Decodable, Sendable {
+struct SyncProgressData: Decodable, Sendable {
     let phase: String
     let current: Int
     let total: Int

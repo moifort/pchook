@@ -316,7 +316,7 @@ extension BookEditForm {
                 translator: detail.book.translator ?? "",
                 estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
                 duration: detail.book.duration ?? "",
-                narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
+                narrators: detail.book.narrators.joined(separator: ", "),
                 series: detail.series?.name ?? "",
                 seriesLabel: detail.series?.label ?? "",
                 seriesNumber: positionString,
