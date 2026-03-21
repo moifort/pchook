@@ -22,7 +22,7 @@ const fakeScanResult: ScanResult = {
 
 mock.module('~/system/scan/index', () => ({
   BookScanner: {
-    scan: async () => fakeScanResult,
+    scan: async () => ({ result: fakeScanResult }),
   },
 }))
 

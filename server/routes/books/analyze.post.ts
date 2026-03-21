@@ -22,16 +22,16 @@ export default defineEventHandler(async (event) => {
   const imageBuffer = Buffer.from(imageBase64, 'base64')
   const allSeries = await SeriesQuery.findAll()
   const seriesNames = allSeries.map(({ name }) => String(name))
-  const scanResult = await BookScanner.scan(imageBuffer, ocrText, seriesNames)
+  const scanOutput = await BookScanner.scan(imageBuffer, ocrText, seriesNames)
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
     previewId,
-    scanResult,
-    coverImageBase64: imageBase64,
+    scanResult: scanOutput.result,
+    coverImageBase64: scanOutput.coverImageBase64 ?? imageBase64,
     importSource: 'scan',
     createdAt: new Date(),
   })
 
-  return { status: 200, data: { previewId, ...scanResult } } as const
+  return { status: 200, data: { previewId, ...scanOutput.result } } as const
 })

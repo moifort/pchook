@@ -23,7 +23,7 @@ const fakeScanResult: ScanResult = {
 
 mock.module('~/system/scan/isbn-scanner', () => ({
   IsbnScanner: {
-    scan: async () => fakeScanResult,
+    scan: async () => ({ result: fakeScanResult }),
   },
 }))
 

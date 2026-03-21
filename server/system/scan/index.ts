@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { config } from '~/system/config/index'
 import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
-import { searchByIsbn, searchByTitle } from '~/system/scan/hardcover.api'
+import { fetchCoverImage, searchByIsbn, searchByTitle } from '~/system/scan/hardcover.api'
 import { ImageHash } from '~/system/scan/primitives'
 import * as repository from '~/system/scan/repository'
 import { partialScanResultSchema, scanResultSchema } from '~/system/scan/schemas'
@@ -117,14 +117,19 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
-export const enrichWithHardcover = async (scanResult: ScanResult) => {
+export type HardcoverEnrichment = {
+  result: ScanResult
+  coverImageBase64?: string
+}
+
+export const enrichWithHardcover = async (scanResult: ScanResult): Promise<HardcoverEnrichment> => {
   try {
     const data = scanResult.isbn
       ? ((await searchByIsbn(scanResult.isbn)) ??
         (await searchByTitle(scanResult.title, scanResult.authors)))
       : await searchByTitle(scanResult.title, scanResult.authors)
 
-    if (!data) return scanResult
+    if (!data) return { result: scanResult }
 
     const publicRatings: ScanResult['publicRatings'] = data.rating
       ? [
@@ -138,15 +143,22 @@ export const enrichWithHardcover = async (scanResult: ScanResult) => {
         ]
       : scanResult.publicRatings
 
+    const coverImageBase64 = data.coverImageUrl
+      ? await fetchCoverImage(data.coverImageUrl)
+      : undefined
+
     return {
-      ...scanResult,
-      genre: scanResult.genre ?? (data.genres.length > 0 ? data.genres.join(', ') : undefined),
-      pageCount: scanResult.pageCount ?? data.pageCount,
-      publicRatings,
-    } satisfies ScanResult
+      result: {
+        ...scanResult,
+        genre: scanResult.genre ?? (data.genres.length > 0 ? data.genres.join(', ') : undefined),
+        pageCount: scanResult.pageCount ?? data.pageCount,
+        publicRatings,
+      } satisfies ScanResult,
+      coverImageBase64,
+    }
   } catch (error) {
     log.error('Hardcover enrichment failed, continuing without it', error)
-    return scanResult
+    return { result: scanResult }
   }
 }
 
@@ -197,45 +209,59 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
   }
 }
 
+export type ScanOutput = {
+  result: ScanResult
+  coverImageBase64?: string
+}
+
 export namespace BookScanner {
   export const scan = async (
     imageBuffer: Buffer,
     ocrText?: string,
     existingSeriesNames: string[] = [],
-  ) => {
+  ): Promise<ScanOutput> => {
     const imageHash = hashImage(imageBuffer)
 
     const cached = await repository.findBy(imageHash)
     if (cached) {
       log.info('Cache hit for image', imageHash)
-      return cached.result
+      return { result: cached.result }
     }
 
     const { scanStrategy } = config()
 
-    const scanResult =
+    const output =
       scanStrategy === 'native'
         ? await scanWithNativeOcrStrategy(ocrText, existingSeriesNames)
         : await scanWithClaudeStrategy(imageBuffer, existingSeriesNames)
 
     await repository.save({
       imageHash,
-      result: scanResult,
+      result: output.result,
       cachedAt: new Date(),
     })
 
-    return scanResult
+    return output
   }
 }
 
-const mergeEnrichments = (hardcoverResult: ScanResult, geminiResult: ScanResult) => ({
-  ...geminiResult,
-  publicRatings: hardcoverResult.publicRatings,
-  genre: geminiResult.genre ?? hardcoverResult.genre,
-  pageCount: geminiResult.pageCount ?? hardcoverResult.pageCount,
+const mergeEnrichments = (
+  hardcover: HardcoverEnrichment,
+  geminiResult: ScanResult,
+): ScanOutput => ({
+  result: {
+    ...geminiResult,
+    publicRatings: hardcover.result.publicRatings,
+    genre: geminiResult.genre ?? hardcover.result.genre,
+    pageCount: geminiResult.pageCount ?? hardcover.result.pageCount,
+  },
+  coverImageBase64: hardcover.coverImageBase64,
 })
 
-const scanWithClaudeStrategy = async (imageBuffer: Buffer, existingSeriesNames: string[] = []) => {
+const scanWithClaudeStrategy = async (
+  imageBuffer: Buffer,
+  existingSeriesNames: string[] = [],
+): Promise<ScanOutput> => {
   const imageBase64 = imageBuffer.toString('base64')
 
   log.info('Scanning book cover with Claude Vision...')
@@ -253,7 +279,7 @@ const scanWithClaudeStrategy = async (imageBuffer: Buffer, existingSeriesNames: 
 const scanWithNativeOcrStrategy = async (
   ocrText: string | undefined,
   existingSeriesNames: string[] = [],
-) => {
+): Promise<ScanOutput> => {
   if (!ocrText?.trim()) {
     throw createError({
       statusCode: 422,
@@ -262,5 +288,6 @@ const scanWithNativeOcrStrategy = async (
   }
 
   log.info('Scanning book cover with native OCR text...')
-  return await scanWithNativeOcr(ocrText.trim(), existingSeriesNames)
+  const result = await scanWithNativeOcr(ocrText.trim(), existingSeriesNames)
+  return { result }
 }

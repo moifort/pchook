@@ -1,8 +1,10 @@
 import type { ISBN } from '~/domain/book/types'
 import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
+import { enrichWithHardcover, type HardcoverEnrichment } from '~/system/scan/index'
 import * as repository from '~/system/scan/isbn-repository'
 import { scanResultSchema } from '~/system/scan/schemas'
+import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('isbn-scanner')
 
@@ -22,16 +24,28 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   }
 }
 
+export type IsbnScanOutput = {
+  result: ScanResult
+  coverImageBase64?: string
+}
+
 export namespace IsbnScanner {
-  export const scan = async (isbn: ISBN, existingSeriesNames: string[] = []) => {
+  export const scan = async (
+    isbn: ISBN,
+    existingSeriesNames: string[] = [],
+  ): Promise<IsbnScanOutput> => {
     const cached = await repository.findBy(isbn)
     if (cached) {
       log.info('Cache hit for ISBN', String(isbn))
-      return cached.result
+      const hardcover = await enrichWithHardcover(cached.result)
+      return { result: cached.result, coverImageBase64: hardcover.coverImageBase64 }
     }
 
-    log.info('Looking up ISBN with Gemini...', String(isbn))
-    const result = await lookupWithGemini(isbn, existingSeriesNames)
+    log.info('Looking up ISBN with Gemini + Hardcover...', String(isbn))
+    const geminiResult = await lookupWithGemini(isbn, existingSeriesNames)
+
+    const hardcover = await enrichWithHardcover(geminiResult)
+    const result = mergeIsbnEnrichments(hardcover, geminiResult)
 
     await repository.save({
       isbn,
@@ -39,6 +53,13 @@ export namespace IsbnScanner {
       cachedAt: new Date(),
     })
 
-    return result
+    return { result, coverImageBase64: hardcover.coverImageBase64 }
   }
 }
+
+const mergeIsbnEnrichments = (hardcover: HardcoverEnrichment, geminiResult: ScanResult) => ({
+  ...geminiResult,
+  publicRatings: hardcover.result.publicRatings,
+  genre: geminiResult.genre ?? hardcover.result.genre,
+  pageCount: geminiResult.pageCount ?? hardcover.result.pageCount,
+})

@@ -29,15 +29,16 @@ export default defineEventHandler(async (event) => {
 
   const allSeries = await SeriesQuery.findAll()
   const seriesNames = allSeries.map(({ name }) => String(name))
-  const scanResult = await IsbnScanner.scan(isbn, seriesNames)
+  const scanOutput = await IsbnScanner.scan(isbn, seriesNames)
   const previewId = crypto.randomUUID()
 
   await previewRepository.save({
     previewId,
-    scanResult,
+    scanResult: scanOutput.result,
+    coverImageBase64: scanOutput.coverImageBase64,
     importSource: 'isbn',
     createdAt: new Date(),
   })
 
-  return { status: 200, data: { previewId, ...scanResult } } as const
+  return { status: 200, data: { previewId, ...scanOutput.result } } as const
 })

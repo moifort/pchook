@@ -16,6 +16,7 @@ export type HardcoverBookData = {
   rating?: HardcoverRating
   genres: string[]
   pageCount?: number
+  coverImageUrl?: string
 }
 
 type GraphQLResponse<T> = {
@@ -38,28 +39,23 @@ type SearchResult = {
   }
 }
 
+type BookFields = {
+  slug: string
+  rating: number | null
+  ratings_count: number | null
+  pages: number | null
+  cached_tags: Record<string, { tag: string; count: number }[]> | null
+  image: { url: string } | null
+}
+
 type BookResult = {
-  books: {
-    id: number
-    slug: string
-    rating: number | null
-    ratings_count: number | null
-    pages: number | null
-    cached_tags: Record<string, { tag: string; count: number }[]> | null
-  }[]
+  books: BookFields[]
 }
 
 type EditionResult = {
   editions: {
     book_id: number
-    book: {
-      id: number
-      slug: string
-      rating: number | null
-      ratings_count: number | null
-      pages: number | null
-      cached_tags: Record<string, { tag: string; count: number }[]> | null
-    }
+    book: BookFields
   }[]
 }
 
@@ -87,13 +83,7 @@ const query = async <T>(graphqlQuery: string, variables: Record<string, unknown>
   return response.data
 }
 
-const toBookData = (book: {
-  slug: string
-  rating: number | null
-  ratings_count: number | null
-  pages: number | null
-  cached_tags: Record<string, { tag: string; count: number }[]> | null
-}): HardcoverBookData => {
+const toBookData = (book: BookFields): HardcoverBookData => {
   const genres = (book.cached_tags?.['Genre'] ?? []).map(({ tag }) => tag)
 
   const rating: HardcoverRating | undefined =
@@ -110,6 +100,7 @@ const toBookData = (book: {
     rating,
     genres,
     pageCount: book.pages ?? undefined,
+    coverImageUrl: book.image?.url ?? undefined,
   }
 }
 
@@ -119,6 +110,7 @@ const BOOK_FIELDS = `
   ratings_count
   pages
   cached_tags
+  image { url }
 `
 
 export const searchByIsbn = async (isbn: string): Promise<HardcoverBookData | undefined> => {
@@ -178,4 +170,15 @@ export const searchByTitle = async (
   if (!book) return undefined
 
   return toBookData(book)
+}
+
+export const fetchCoverImage = async (url: string) => {
+  try {
+    log.info('Fetching cover image', url)
+    const buffer = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
+    return Buffer.from(buffer).toString('base64')
+  } catch (error) {
+    log.warn('Failed to fetch cover image', error)
+    return undefined
+  }
 }
