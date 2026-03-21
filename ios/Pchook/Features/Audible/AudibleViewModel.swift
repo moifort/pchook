@@ -158,8 +158,6 @@ final class AudibleViewModel {
                     syncProgress = progress
                     if progress.phase == "paused" {
                         isPaused = true
-                    } else {
-                        isPaused = false
                     }
                     if progress.phase == "idle" || progress.phase == "done" {
                         isPaused = false
