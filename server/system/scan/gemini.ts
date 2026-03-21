@@ -61,7 +61,7 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
   "duration": string ou null (durée totale, format "Xh Ymin" — uniquement si le format est audiobook),
   "narrators": string[] ou null (narrateurs/conteurs de l'audiobook — uniquement si le format est audiobook),
   "awards": [{"name": string, "year": number}] (IMPORTANT : nom COURT du prix uniquement, JAMAIS la sous-catégorie ou spécialité. Exemples corrects : "Prix Hugo", "Prix Nebula", "Grand Prix de l'Imaginaire", "Prix Goncourt". Exemples INCORRECTS : "Prix Hugo du meilleur roman", "Prix Nebula du meilleur roman court", "Grand Prix de l'Imaginaire du meilleur roman francophone". Tableau vide si aucun prix)
-  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number}] (cherche la note sur la plateforme la plus pertinente et connue parmi Sens Critique /10, Babelio /5, Goodreads /5. Retourne UNE SEULE source — la plus fiable avec le plus de votes. Score exact, barème et nombre de votants. Tableau vide si aucune note trouvée)
+  "publicRatings": [{"source": string, "score": number, "maxScore": number, "voterCount": number, "url": string}] (cherche la note sur la plateforme la plus pertinente et connue parmi Sens Critique /10, Babelio /5, Goodreads /5. Retourne UNE SEULE source — la plus fiable avec le plus de votes. Score exact, barème, nombre de votants et URL directe vers la page du livre. Tableau vide si aucune note trouvée)
 }`
 }
 

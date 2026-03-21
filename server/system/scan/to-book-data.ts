@@ -45,12 +45,12 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
         ({ score, maxScore, voterCount }) =>
           score != null && maxScore != null && voterCount != null,
       )
-      .map(({ source, score, maxScore, voterCount }) => ({
+      .map(({ source, score, maxScore, voterCount, url }) => ({
         source,
         score: Note(score),
         maxScore: Note(maxScore),
         voterCount: Math.round(voterCount),
-        url: ratingUrl(source, scanResult.isbn ?? ''),
+        url: url ?? ratingUrl(source, scanResult.isbn ?? ''),
       }))
       .filter(({ url }) => url != null)
       .map(({ source, score, maxScore, voterCount, url }) => ({

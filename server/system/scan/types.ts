@@ -29,6 +29,7 @@ export type ScanResult = {
     score: number
     maxScore: number
     voterCount: number
+    url?: string
   }[]
 }
 

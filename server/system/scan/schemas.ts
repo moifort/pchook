@@ -14,6 +14,7 @@ const publicRatingSchema = z.object({
   score: z.number().nullish(),
   maxScore: z.number().nullish(),
   voterCount: z.number().int().nonnegative().nullish(),
+  url: z.string().url().nullish().catch(undefined),
 })
 
 type ValidRating = {
