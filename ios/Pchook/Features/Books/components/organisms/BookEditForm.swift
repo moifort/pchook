@@ -18,6 +18,7 @@ struct BookEditForm: View {
     @State private var narrators: String
     @State private var estimatedPrice: String
     @State private var series: String
+    @State private var seriesLabel: String
     @State private var seriesNumber: String
     @State private var synopsis: String
     @State private var personalNotes: String
@@ -41,6 +42,7 @@ struct BookEditForm: View {
         _narrators = State(initialValue: initial.narrators)
         _estimatedPrice = State(initialValue: initial.estimatedPrice)
         _series = State(initialValue: initial.series)
+        _seriesLabel = State(initialValue: initial.seriesLabel)
         _seriesNumber = State(initialValue: initial.seriesNumber)
         _synopsis = State(initialValue: initial.synopsis)
         _personalNotes = State(initialValue: initial.personalNotes)
@@ -157,11 +159,18 @@ struct BookEditForm: View {
                 }
 
                 LabeledContent {
+                    TextField("Ex: Tome 1", text: $seriesLabel)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Label("Label", systemImage: "tag")
+                }
+
+                LabeledContent {
                     TextField("0", text: $seriesNumber)
                         .keyboardType(.numberPad)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("Tome", systemImage: "number")
+                    Label("Position", systemImage: "number")
                 }
             }
 
@@ -228,7 +237,7 @@ struct BookEditForm: View {
             narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
             personalNotes: personalNotes.isEmpty ? nil : personalNotes,
             series: series.isEmpty ? "" : series,
-            seriesLabel: seriesNumber.isEmpty ? nil : seriesNumber,
+            seriesLabel: seriesLabel.isEmpty ? nil : seriesLabel,
             seriesNumber: Int(seriesNumber)
         )
 
@@ -256,6 +265,7 @@ extension BookEditForm {
         var duration: String
         var narrators: String
         var series: String
+        var seriesLabel: String
         var seriesNumber: String
         var synopsis: String
         var personalNotes: String
@@ -264,7 +274,7 @@ extension BookEditForm {
             title: String, authors: String, genre: String, publisher: String,
             pageCount: String, isbn: String, language: String, format: String,
             translator: String, estimatedPrice: String, duration: String,
-            narrators: String, series: String, seriesNumber: String,
+            narrators: String, series: String, seriesLabel: String, seriesNumber: String,
             synopsis: String, personalNotes: String
         ) {
             self.title = title
@@ -280,12 +290,20 @@ extension BookEditForm {
             self.duration = duration
             self.narrators = narrators
             self.series = series
+            self.seriesLabel = seriesLabel
             self.seriesNumber = seriesNumber
             self.synopsis = synopsis
             self.personalNotes = personalNotes
         }
 
         init(from detail: BookDetailData) {
+            let position = detail.series?.position
+            let positionString = position.map {
+                $0.truncatingRemainder(dividingBy: 1) == 0
+                    ? String(Int($0))
+                    : String($0)
+            } ?? ""
+
             self.init(
                 title: detail.book.title,
                 authors: detail.book.authors.joined(separator: ", "),
@@ -300,7 +318,8 @@ extension BookEditForm {
                 duration: detail.book.duration ?? "",
                 narrators: detail.book.narrators?.joined(separator: ", ") ?? "",
                 series: detail.series?.name ?? "",
-                seriesNumber: detail.series?.label ?? "",
+                seriesLabel: detail.series?.label ?? "",
+                seriesNumber: positionString,
                 synopsis: detail.book.synopsis ?? "",
                 personalNotes: detail.book.personalNotes ?? ""
             )
@@ -325,6 +344,7 @@ extension BookEditForm {
                 duration: "",
                 narrators: "",
                 series: "Sprawl",
+                seriesLabel: "Tome 1",
                 seriesNumber: "1",
                 synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission.",
                 personalNotes: "Excellent"
