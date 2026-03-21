@@ -12,6 +12,7 @@ export default defineNitroConfig({
     apiToken: '',
     anthropicApiKey: '',
     googleApiKey: '',
+    hardcoverApiToken: '',
     sentryDsn: '',
     scanStrategy: '',
   },
