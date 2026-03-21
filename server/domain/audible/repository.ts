@@ -75,3 +75,36 @@ export const getSyncProgress = () => syncProgress
 export const setSyncProgress = (progress: SyncProgress) => {
   syncProgress = progress
 }
+
+// In-memory sync control (not persisted)
+let cancelRequested = false
+let pauseResolve: (() => void) | null = null
+let pausePromise: Promise<void> | null = null
+
+export const requestCancel = () => {
+  cancelRequested = true
+}
+
+export const isCancelRequested = () => cancelRequested
+
+export const clearCancel = () => {
+  cancelRequested = false
+}
+
+export const requestPause = () => {
+  pausePromise = new Promise((resolve) => {
+    pauseResolve = resolve
+  })
+}
+
+export const requestResume = () => {
+  pauseResolve?.()
+  pausePromise = null
+  pauseResolve = null
+}
+
+export const isPaused = () => pausePromise !== null
+
+export const waitIfPaused = async () => {
+  if (pausePromise) await pausePromise
+}

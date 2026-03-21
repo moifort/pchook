@@ -53,7 +53,7 @@ export type AuthSession = {
   createdAt: Date
 }
 
-export type SyncPhase = 'idle' | 'verifying' | 'downloading' | 'importing' | 'done'
+export type SyncPhase = 'idle' | 'verifying' | 'downloading' | 'importing' | 'paused' | 'done'
 
 export type RawAudibleEntry = {
   item: AudibleItem

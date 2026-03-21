@@ -54,4 +54,20 @@ export namespace AudibleCommand {
     await repository.removeAuthSession(sessionId)
     return session
   }
+
+  export const requestCancel = () => {
+    repository.requestCancel()
+  }
+
+  export const clearCancel = () => {
+    repository.clearCancel()
+  }
+
+  export const requestPause = () => {
+    repository.requestPause()
+  }
+
+  export const requestResume = () => {
+    repository.requestResume()
+  }
 }

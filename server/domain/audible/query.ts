@@ -18,4 +18,10 @@ export namespace AudibleQuery {
   export const getSyncCompletedAt = async () => repository.findSyncCompletedAt()
 
   export const getAllRawItems = async () => repository.findAllRawItems()
+
+  export const isCancelRequested = () => repository.isCancelRequested()
+
+  export const isPaused = () => repository.isPaused()
+
+  export const waitIfPaused = async () => repository.waitIfPaused()
 }
