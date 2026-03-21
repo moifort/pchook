@@ -42,7 +42,8 @@ cp .env.example .env
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `NITRO_ANTHROPIC_API_KEY` | Yes | Claude API — extracts book info from cover photos |
-| `NITRO_GOOGLE_API_KEY` | Yes | Gemini API — enriches metadata (awards, ratings, synopsis) |
+| `NITRO_GOOGLE_API_KEY` | Yes | Gemini API — enriches metadata (awards, synopsis) |
+| `NITRO_HARDCOVER_API_TOKEN` | No | Hardcover API — community ratings and cover images |
 | `NITRO_API_TOKEN` | No | Protects the API with a bearer token |
 | `NITRO_SENTRY_DSN` | No | Error tracking via Sentry |
 

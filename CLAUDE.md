@@ -108,3 +108,4 @@ See `.example` files next to the Secrets files for the expected format.
 External API keys required for book scanning and suggestion generation:
 - `NITRO_ANTHROPIC_API_KEY` — Claude API key for cover image analysis (vision)
 - `NITRO_GOOGLE_API_KEY` — Gemini API key for book data enrichment and suggestion generation
+- `NITRO_HARDCOVER_API_TOKEN` — Hardcover API token for community ratings and cover images (get from hardcover.app > Settings > API)

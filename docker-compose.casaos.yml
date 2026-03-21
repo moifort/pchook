@@ -19,6 +19,7 @@ services:
       HOST: 0.0.0.0
       PORT: "3000"
       NITRO_API_TOKEN: changeme
+      NITRO_HARDCOVER_API_TOKEN: ""
       NITRO_SENTRY_DSN: ""
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
