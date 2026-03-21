@@ -300,6 +300,7 @@ const audibleRawItemSchema = z.object({
     .object({
       is_finished: z.boolean().optional(),
       percent_complete: z.number().optional(),
+      finished_at_timestamp: z.string().optional(),
     })
     .nullish()
     .transform((v) => v ?? undefined),
@@ -324,7 +325,9 @@ const parseItems = (items: unknown[]): AudibleItem[] =>
             position: item.series[0].sequence ? Number(item.series[0].sequence) : undefined,
           }
         : undefined,
-      isFinished: item.listening_status?.is_finished,
+      finishedAt: item.listening_status?.finished_at_timestamp
+        ? new Date(item.listening_status.finished_at_timestamp)
+        : undefined,
     }
   })
 

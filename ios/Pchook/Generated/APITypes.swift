@@ -150,29 +150,3 @@ struct DashboardData: Decodable, Sendable {
     let recentAwards: [RecentAward]
 }
 
-struct AuthCookie: Decodable, Sendable {
-    let name: String
-    let value: String
-    let domain: String
-}
-
-struct AuthStartResponse: Decodable, Sendable {
-    let loginUrl: String
-    let sessionId: String
-    let cookies: [AuthCookie]
-}
-
-struct AudibleStatus: Decodable, Sendable {
-    let connected: Bool
-    let libraryCount: Int
-    let wishlistCount: Int
-    var lastSyncAt: Date?
-    let rawItemCount: Int
-}
-
-struct SyncProgressData: Decodable, Sendable {
-    let phase: String
-    let current: Int
-    let total: Int
-    let message: String
-}

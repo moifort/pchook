@@ -24,7 +24,7 @@ const fakeLibraryItems: AudibleItem[] = [
     releaseDate: new Date('2020-01-15'),
     coverUrl: 'https://example.com/dune.jpg',
     series: { name: 'Dune', position: 1 },
-    isFinished: true,
+    finishedAt: new Date('2024-06-15'),
   },
   {
     asin: Asin('B07XYZTEST'),
@@ -34,7 +34,6 @@ const fakeLibraryItems: AudibleItem[] = [
     durationMinutes: 540,
     publisher: 'Audible Studios',
     language: 'fr',
-    isFinished: false,
   },
 ]
 

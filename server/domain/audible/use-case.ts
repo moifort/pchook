@@ -78,13 +78,15 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const scanResult = mergeAudibleIntoScanResult(geminiResult, item)
 
   const { title, data, seriesInfo } = scanResultToBookData(scanResult)
-  const status = source === 'library' && item.isFinished === true ? 'read' : 'to-read'
+  const isRead = source === 'library' && item.finishedAt !== undefined
+  const status = isRead ? 'read' : 'to-read'
+  const readDate = isRead ? item.finishedAt : undefined
   const coverBase64 = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
 
   const externalUrl = Url(await buildAudibleUrl(String(item.asin)))
   const result = await BookUseCase.addFromScan(
     title,
-    { ...data, status, importSource: 'audible', externalUrl },
+    { ...data, status, readDate, importSource: 'audible', externalUrl },
     seriesInfo,
     coverBase64,
   )
@@ -162,7 +164,7 @@ export namespace AudibleUseCase {
 
       await AudibleCommand.saveLastFetchedAt(new Date())
 
-      const listenedTotal = libraryItems.filter(({ isFinished }) => isFinished === true).length
+      const listenedTotal = libraryItems.filter(({ finishedAt }) => finishedAt !== undefined).length
       const summary = {
         libraryTotal: libraryItems.length,
         listenedTotal,

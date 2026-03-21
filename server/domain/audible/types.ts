@@ -36,7 +36,7 @@ export type AudibleItem = {
   releaseDate?: Date
   coverUrl?: string
   series?: { name: string; position?: number }
-  isFinished?: boolean
+  finishedAt?: Date
 }
 
 export type AsinBookMapping = {
