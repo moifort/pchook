@@ -66,7 +66,7 @@ const query = async <T>(graphqlQuery: string, variables: Record<string, unknown>
   const response = await $fetch<GraphQLResponse<T>>(HARDCOVER_API_URL, {
     method: 'POST',
     headers: {
-      authorization: `Bearer ${String(hardcoverApiToken)}`,
+      authorization: String(hardcoverApiToken),
       'content-type': 'application/json',
     },
     body: { query: graphqlQuery, variables },
