@@ -5,7 +5,7 @@ import { createLogger } from '~/system/logger'
 const log = createLogger('gemini')
 
 const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent'
 
 const formatAliases: Record<string, BookFormat> = {
   pocket: 'pocket',
@@ -74,18 +74,21 @@ const cleanGeminiJson = (raw: string) =>
     .replace(/(\d+)\s+ou\s+\d+/g, '$1')
 
 export const parseGeminiJson = (text: string) => {
-  const withoutFences = text.replace(/```(?:json)?\s*([\s\S]*?)```/g, '$1')
-
-  const jsonMatch = withoutFences.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error(`Gemini did not return valid JSON: ${text.slice(0, 200)}`)
-
   try {
-    return JSON.parse(jsonMatch[0]) as Record<string, unknown>
+    return JSON.parse(text) as Record<string, unknown>
   } catch {
+    // Fallback: extract JSON from markdown fences or raw text
+    const withoutFences = text.replace(/```(?:json)?\s*([\s\S]*?)```/g, '$1')
+    const jsonMatch = withoutFences.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error(`Gemini did not return valid JSON: ${text.slice(0, 200)}`)
     try {
-      return JSON.parse(cleanGeminiJson(jsonMatch[0])) as Record<string, unknown>
+      return JSON.parse(jsonMatch[0]) as Record<string, unknown>
     } catch {
-      throw new Error(`Gemini returned unparseable JSON: ${jsonMatch[0].slice(0, 300)}`)
+      try {
+        return JSON.parse(cleanGeminiJson(jsonMatch[0])) as Record<string, unknown>
+      } catch {
+        throw new Error(`Gemini returned unparseable JSON: ${jsonMatch[0].slice(0, 300)}`)
+      }
     }
   }
 }
@@ -101,6 +104,9 @@ export const callGemini = async (prompt: string) => {
     body: {
       contents: [{ parts: [{ text: prompt }] }],
       tools: [{ google_search: {} }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
     },
   })
 
