@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { config } from '~/system/config/index'
 import { createLogger } from '~/system/logger'
 import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
+import { searchByIsbn, searchByTitle } from '~/system/scan/hardcover.api'
 import { ImageHash } from '~/system/scan/primitives'
 import * as repository from '~/system/scan/repository'
 import { partialScanResultSchema, scanResultSchema } from '~/system/scan/schemas'
@@ -116,6 +117,39 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   return { ...parsed, format: normalizeBookFormat(parsed.format) }
 }
 
+export const enrichWithHardcover = async (scanResult: ScanResult) => {
+  try {
+    const data = scanResult.isbn
+      ? ((await searchByIsbn(scanResult.isbn)) ??
+        (await searchByTitle(scanResult.title, scanResult.authors)))
+      : await searchByTitle(scanResult.title, scanResult.authors)
+
+    if (!data) return scanResult
+
+    const publicRatings: ScanResult['publicRatings'] = data.rating
+      ? [
+          {
+            source: 'Hardcover',
+            score: data.rating.score,
+            maxScore: data.rating.maxScore,
+            voterCount: data.rating.voterCount,
+            url: data.rating.url,
+          },
+        ]
+      : scanResult.publicRatings
+
+    return {
+      ...scanResult,
+      genre: scanResult.genre ?? (data.genres.length > 0 ? data.genres.join(', ') : undefined),
+      pageCount: scanResult.pageCount ?? data.pageCount,
+      publicRatings,
+    } satisfies ScanResult
+  } catch (error) {
+    log.error('Hardcover enrichment failed, continuing without it', error)
+    return scanResult
+  }
+}
+
 export const enrichWithGemini = async (
   scanResult: ScanResult,
   existingSeriesNames: string[] = [],
@@ -156,8 +190,6 @@ Recherche les données les plus récentes et précises possibles. Toutes les val
       duration: enriched.duration ?? scanResult.duration,
       narrators: enriched.narrators ?? scanResult.narrators,
       awards: enriched.awards.length > 0 ? enriched.awards : scanResult.awards,
-      publicRatings:
-        enriched.publicRatings.length > 0 ? enriched.publicRatings : scanResult.publicRatings,
     } satisfies ScanResult
   } catch (error) {
     log.error('Gemini enrichment failed, using scan result only', error)
@@ -196,14 +228,26 @@ export namespace BookScanner {
   }
 }
 
+const mergeEnrichments = (hardcoverResult: ScanResult, geminiResult: ScanResult) => ({
+  ...geminiResult,
+  publicRatings: hardcoverResult.publicRatings,
+  genre: geminiResult.genre ?? hardcoverResult.genre,
+  pageCount: geminiResult.pageCount ?? hardcoverResult.pageCount,
+})
+
 const scanWithClaudeStrategy = async (imageBuffer: Buffer, existingSeriesNames: string[] = []) => {
   const imageBase64 = imageBuffer.toString('base64')
 
   log.info('Scanning book cover with Claude Vision...')
   const scanResult = await scanWithClaude(imageBase64)
 
-  log.info('Enriching with Gemini...', scanResult.title)
-  return await enrichWithGemini(scanResult, existingSeriesNames)
+  log.info('Enriching with Hardcover + Gemini...', scanResult.title)
+  const [hardcoverResult, geminiResult] = await Promise.all([
+    enrichWithHardcover(scanResult),
+    enrichWithGemini(scanResult, existingSeriesNames),
+  ])
+
+  return mergeEnrichments(hardcoverResult, geminiResult)
 }
 
 const scanWithNativeOcrStrategy = async (
