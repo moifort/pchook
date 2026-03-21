@@ -96,16 +96,34 @@ struct AudibleSection: View {
             Button {
                 Task { await viewModel.toggleImportPause() }
             } label: {
-                Label(
-                    task.phase == "paused" ? "Reprendre l'import" : "Mettre en pause",
-                    systemImage: task.phase == "paused" ? "play.fill" : "pause.fill"
-                )
+                if viewModel.isPausing {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text(task.phase == "paused" ? "Reprise..." : "Pause...")
+                    }
+                } else {
+                    Label(
+                        task.phase == "paused" ? "Reprendre l'import" : "Mettre en pause",
+                        systemImage: task.phase == "paused" ? "play.fill" : "pause.fill"
+                    )
+                }
             }
+            .disabled(viewModel.isPausing || viewModel.isCancelling)
             Button(role: .destructive) {
                 Task { await viewModel.cancelImport() }
             } label: {
-                Label("Annuler l'import", systemImage: "xmark.circle")
+                if viewModel.isCancelling {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Annulation...")
+                    }
+                } else {
+                    Label("Annuler l'import", systemImage: "xmark.circle")
+                }
             }
+            .disabled(viewModel.isPausing || viewModel.isCancelling)
         } else if let task = viewModel.importTask, task.phase == "completed" {
             Label("Import terminé", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)

@@ -16,6 +16,8 @@ final class AudibleViewModel {
 
     // Section 3: Import
     private(set) var importTask: ImportTaskState?
+    private(set) var isPausing = false
+    private(set) var isCancelling = false
 
     var error: String?
     var showLogin = false
@@ -131,30 +133,21 @@ final class AudibleViewModel {
     }
 
     func toggleImportPause() async {
+        isPausing = true
         do {
-            let paused = try await AudibleAPI.importPause()
-            if let task = importTask {
-                importTask = ImportTaskState(
-                    phase: paused ? "paused" : "running",
-                    current: task.current,
-                    total: task.total,
-                    message: task.message,
-                    startedAt: task.startedAt,
-                    completedAt: task.completedAt
-                )
-            }
+            _ = try await AudibleAPI.importPause()
         } catch {
+            isPausing = false
             self.error = reportError(error)
         }
     }
 
     func cancelImport() async {
+        isCancelling = true
         do {
             try await AudibleAPI.importCancel()
-            importTask = nil
-            cancelPolling()
-            await refreshStatus()
         } catch {
+            isCancelling = false
             self.error = reportError(error)
         }
     }
@@ -166,9 +159,12 @@ final class AudibleViewModel {
                 do {
                     let state = try await AudibleAPI.importState()
                     importTask = state
+                    if state.phase == "paused" { isPausing = false }
                     if state.phase == "idle" || state.phase == "completed"
                         || state.phase == "cancelled" || state.phase == "failed"
                     {
+                        isPausing = false
+                        isCancelling = false
                         await refreshStatus()
                         return
                     }
