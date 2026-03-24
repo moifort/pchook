@@ -29,12 +29,23 @@ extension PchookGraphQL {
 
     static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
+      case "AudibleStatus": return PchookGraphQL.Objects.AudibleStatus
+      case "AuthCookie": return PchookGraphQL.Objects.AuthCookie
+      case "AuthStartResponse": return PchookGraphQL.Objects.AuthStartResponse
       case "Award": return PchookGraphQL.Objects.Award
       case "Book": return PchookGraphQL.Objects.Book
+      case "BookCount": return PchookGraphQL.Objects.BookCount
       case "BookListItem": return PchookGraphQL.Objects.BookListItem
+      case "BookPreview": return PchookGraphQL.Objects.BookPreview
+      case "ConfirmBookResult": return PchookGraphQL.Objects.ConfirmBookResult
+      case "DashboardView": return PchookGraphQL.Objects.DashboardView
+      case "FavoriteBook": return PchookGraphQL.Objects.FavoriteBook
+      case "ImportTaskState": return PchookGraphQL.Objects.ImportTaskState
       case "Mutation": return PchookGraphQL.Objects.Mutation
       case "PublicRating": return PchookGraphQL.Objects.PublicRating
       case "Query": return PchookGraphQL.Objects.Query
+      case "RecentAward": return PchookGraphQL.Objects.RecentAward
+      case "RecentBook": return PchookGraphQL.Objects.RecentBook
       case "Review": return PchookGraphQL.Objects.Review
       case "SeriesBookEntry": return PchookGraphQL.Objects.SeriesBookEntry
       case "SeriesInfo": return PchookGraphQL.Objects.SeriesInfo

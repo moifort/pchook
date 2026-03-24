@@ -38,7 +38,7 @@ final class AudibleViewModel {
         defer { isCheckingStatus = false }
 
         do {
-            let status = try await AudibleAPI.status()
+            let status = try await GraphQLAudibleAPI.status()
             isConnected = status.connected
             isFetching = status.fetchInProgress
             libraryCount = status.libraryCount
@@ -74,7 +74,7 @@ final class AudibleViewModel {
         isVerifying = true
         defer { isVerifying = false }
         do {
-            try await AudibleAPI.syncVerify()
+            try await GraphQLAudibleAPI.syncVerify()
             lastVerifiedAt = Date()
         } catch {
             self.error = reportError(error)
@@ -89,7 +89,7 @@ final class AudibleViewModel {
         error = nil
 
         do {
-            try await AudibleAPI.syncFetch()
+            try await GraphQLAudibleAPI.syncFetch()
             startFetchPolling()
         } catch {
             isFetching = false
@@ -104,7 +104,7 @@ final class AudibleViewModel {
                 try? await Task.sleep(for: .seconds(2))
                 guard !Task.isCancelled else { break }
                 do {
-                    let status = try await AudibleAPI.status()
+                    let status = try await GraphQLAudibleAPI.status()
                     isFetching = status.fetchInProgress
                     libraryCount = status.libraryCount
                     wishlistCount = status.wishlistCount
@@ -125,7 +125,7 @@ final class AudibleViewModel {
     func startImport() async {
         error = nil
         do {
-            try await AudibleAPI.importStart()
+            try await GraphQLAudibleAPI.importStart()
             startImportPolling()
         } catch {
             self.error = reportError(error)
@@ -135,7 +135,7 @@ final class AudibleViewModel {
     func toggleImportPause() async {
         isPausing = true
         do {
-            _ = try await AudibleAPI.importPause()
+            _ = try await GraphQLAudibleAPI.importPause()
         } catch {
             isPausing = false
             self.error = reportError(error)
@@ -145,7 +145,7 @@ final class AudibleViewModel {
     func cancelImport() async {
         isCancelling = true
         do {
-            try await AudibleAPI.importCancel()
+            try await GraphQLAudibleAPI.importCancel()
         } catch {
             isCancelling = false
             self.error = reportError(error)
@@ -157,7 +157,7 @@ final class AudibleViewModel {
         pollingTask = Task {
             while !Task.isCancelled {
                 do {
-                    let state = try await AudibleAPI.importState()
+                    let state = try await GraphQLAudibleAPI.importState()
                     importTask = state
                     if state.phase == "paused" { isPausing = false }
                     if state.phase == "idle" || state.phase == "completed"
@@ -186,7 +186,7 @@ final class AudibleViewModel {
 
     func disconnect() async {
         do {
-            try await AudibleAPI.disconnect()
+            try await GraphQLAudibleAPI.disconnect()
             isConnected = false
             libraryCount = 0
             wishlistCount = 0
@@ -209,7 +209,7 @@ final class AudibleViewModel {
 
     private func refreshStatus() async {
         do {
-            let status = try await AudibleAPI.status()
+            let status = try await GraphQLAudibleAPI.status()
             libraryCount = status.libraryCount
             wishlistCount = status.wishlistCount
             lastFetchedAt = status.lastFetchedAt

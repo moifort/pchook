@@ -28,7 +28,7 @@ final class ScanViewModel {
         Task {
             do {
                 let ocrText = await TextRecognizer.recognizeText(from: imageData)
-                let preview = try await ScanAPI.analyze(imageData: imageData, ocrText: ocrText)
+                let preview = try await GraphQLScanAPI.analyze(imageData: imageData, ocrText: ocrText)
                 self.step = .preview(preview)
             } catch {
                 self.error = reportError(error)
@@ -44,7 +44,7 @@ final class ScanViewModel {
         replaceBookId: String? = nil
     ) async -> ConfirmResult? {
         do {
-            return try await ScanAPI.confirm(
+            return try await GraphQLScanAPI.confirm(
                 previewId: previewId,
                 status: status,
                 overrides: overrides,

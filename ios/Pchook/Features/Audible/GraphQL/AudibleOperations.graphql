@@ -1,0 +1,70 @@
+query AudibleStatus {
+  audibleStatus {
+    connected
+    fetchInProgress
+    libraryCount
+    wishlistCount
+    lastSyncAt
+    lastFetchedAt
+    rawItemCount
+    importTask {
+      phase
+      current
+      total
+      message
+      startedAt
+      completedAt
+    }
+  }
+}
+
+query ImportState {
+  importState {
+    phase
+    current
+    total
+    message
+    startedAt
+    completedAt
+  }
+}
+
+mutation AudibleAuthStart($locale: String) {
+  audibleAuthStart(locale: $locale) {
+    loginUrl
+    sessionId
+    cookies {
+      name
+      value
+      domain
+    }
+  }
+}
+
+mutation AudibleAuthCallback($sessionId: String!, $redirectUrl: String!) {
+  audibleAuthCallback(sessionId: $sessionId, redirectUrl: $redirectUrl)
+}
+
+mutation AudibleDisconnect {
+  audibleDisconnect
+}
+
+mutation AudibleSyncFetch {
+  audibleSyncFetch
+}
+
+mutation AudibleSyncVerify {
+  audibleSyncVerify
+}
+
+mutation AudibleImportStart {
+  audibleImportStart
+}
+
+mutation AudibleImportPause {
+  audibleImportPause
+}
+
+mutation AudibleImportCancel {
+  audibleImportCancel
+}

@@ -2,7 +2,12 @@
   "schemaNamespace": "PchookGraphQL",
   "input": {
     "schemaSearchPaths": ["../shared/schema.graphql"],
-    "operationSearchPaths": ["Pchook/Features/Books/GraphQL/**/*.graphql"]
+    "operationSearchPaths": [
+      "Pchook/Features/Books/GraphQL/*.graphql",
+      "Pchook/Features/Dashboard/GraphQL/*.graphql",
+      "Pchook/Features/Audible/GraphQL/*.graphql",
+      "Pchook/Features/Scan/GraphQL/*.graphql"
+    ]
   },
   "output": {
     "schemaTypes": {

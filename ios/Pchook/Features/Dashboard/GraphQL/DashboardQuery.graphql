@@ -1,0 +1,31 @@
+query Dashboard {
+  dashboard {
+    bookCount {
+      total
+      toRead
+      read
+    }
+    favorites {
+      id
+      title
+      authors
+      genre
+      rating
+      readDate
+      estimatedPrice
+    }
+    recentBooks {
+      id
+      title
+      authors
+      genre
+      createdAt
+    }
+    recentAwards {
+      bookTitle
+      authors
+      awardName
+      awardYear
+    }
+  }
+}

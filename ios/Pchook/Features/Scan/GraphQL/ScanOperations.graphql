@@ -1,0 +1,91 @@
+mutation AnalyzeBookCover($imageBase64: String!, $ocrText: String) {
+  analyzeBookCover(imageBase64: $imageBase64, ocrText: $ocrText) {
+    previewId
+    title
+    authors
+    publisher
+    publishedDate
+    pageCount
+    genre
+    synopsis
+    isbn
+    language
+    format
+    series
+    seriesLabel
+    seriesNumber
+    translator
+    estimatedPrice
+    duration
+    narrators
+    awards {
+      name
+      year
+    }
+    publicRatings {
+      source
+      score
+      maxScore
+      voterCount
+      url
+    }
+  }
+}
+
+mutation AnalyzeISBN($isbn: String!) {
+  analyzeISBN(isbn: $isbn) {
+    previewId
+    title
+    authors
+    publisher
+    genre
+    isbn
+    language
+    awards {
+      name
+      year
+    }
+    publicRatings {
+      source
+      score
+      maxScore
+      voterCount
+      url
+    }
+  }
+}
+
+mutation AnalyzeURL($url: String!, $description: String, $rawText: String) {
+  analyzeURL(url: $url, description: $description, rawText: $rawText) {
+    previewId
+    title
+    authors
+    publisher
+    genre
+    isbn
+    language
+    awards {
+      name
+      year
+    }
+    publicRatings {
+      source
+      score
+      maxScore
+      voterCount
+      url
+    }
+  }
+}
+
+mutation ConfirmBook($input: ConfirmBookInput!) {
+  confirmBook(input: $input) {
+    tag
+    book {
+      id
+      title
+      authors
+      status
+    }
+  }
+}

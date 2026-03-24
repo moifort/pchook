@@ -19,13 +19,13 @@ enum GraphQLBooksAPI {
             order: order.flatMap { PchookGraphQL.SortOrder(rawValue: $0) }.map { .some(.case($0)) } ?? .none
         )
 
-        let data = try await fetch(query)
+        let data = try await GraphQLHelpers.fetch(client, query: query)
         return (data.books ?? []).map { mapBookListItem($0) }
     }
 
     static func getDetail(id: String) async throws -> BookDetailData {
         let query = PchookGraphQL.BookDetailQuery(id: id)
-        let data = try await fetch(query)
+        let data = try await GraphQLHelpers.fetch(client, query: query)
 
         guard let book = data.book else {
             throw APIError.httpError(404)
@@ -53,9 +53,9 @@ enum GraphQLBooksAPI {
                 ReviewInfo(
                     bookId: review.bookId ?? "",
                     rating: review.rating ?? 0,
-                    readDate: review.readDate.flatMap(parseISO8601Optional),
+                    readDate: review.readDate.flatMap(GraphQLHelpers.parseISO8601),
                     reviewNotes: review.reviewNotes,
-                    createdAt: parseISO8601(review.createdAt)
+                    createdAt: GraphQLHelpers.parseISO8601(review.createdAt ?? "") ?? Date()
                 )
             }
         )
@@ -78,19 +78,19 @@ enum GraphQLBooksAPI {
         )
 
         let mutation = PchookGraphQL.UpdateBookMutation(id: id, input: input)
-        _ = try await perform(mutation)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
 
         return try await getDetail(id: id).book
     }
 
     static func delete(id: String) async throws {
         let mutation = PchookGraphQL.DeleteBookMutation(id: id)
-        _ = try await perform(mutation)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
     static func addToFavorites(id: String) async throws {
         let mutation = PchookGraphQL.AddToFavoritesMutation(id: id)
-        _ = try await perform(mutation)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
     static func addReview(id: String, _ request: CreateReviewRequest) async throws {
@@ -100,60 +100,12 @@ enum GraphQLBooksAPI {
             reviewNotes: graphQLNullable(request.reviewNotes)
         )
         let mutation = PchookGraphQL.AddReviewMutation(bookId: id, input: input)
-        _ = try await perform(mutation)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
     static func refresh(id: String) async throws {
         let mutation = PchookGraphQL.RefreshBookMutation(id: id)
-        _ = try await perform(mutation)
-    }
-}
-
-// MARK: - Apollo helpers
-
-private extension GraphQLBooksAPI {
-    static func fetch<Q: GraphQLQuery>(_ query: Q) async throws -> Q.Data {
-        try await withCheckedThrowingContinuation { continuation in
-            client.fetch(query: query, cachePolicy: .fetchIgnoringCacheData) { result in
-                switch result {
-                case .success(let graphQLResult):
-                    if let errors = graphQLResult.errors, !errors.isEmpty {
-                        continuation.resume(throwing: APIError.httpError(422))
-                        return
-                    }
-                    guard let data = graphQLResult.data else {
-                        continuation.resume(throwing: APIError.invalidResponse)
-                        return
-                    }
-                    nonisolated(unsafe) let sendableData = data
-                    continuation.resume(returning: sendableData)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
-    static func perform<M: GraphQLMutation>(_ mutation: M) async throws -> M.Data {
-        try await withCheckedThrowingContinuation { continuation in
-            client.perform(mutation: mutation) { result in
-                switch result {
-                case .success(let graphQLResult):
-                    if let errors = graphQLResult.errors, !errors.isEmpty {
-                        continuation.resume(throwing: APIError.httpError(422))
-                        return
-                    }
-                    guard let data = graphQLResult.data else {
-                        continuation.resume(throwing: APIError.invalidResponse)
-                        return
-                    }
-                    nonisolated(unsafe) let sendableData = data
-                    continuation.resume(returning: sendableData)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 }
 
@@ -173,21 +125,6 @@ private extension GraphQLBooksAPI {
         status == "read" ? "READ" : "TO_READ"
     }
 
-    static func parseISO8601(_ string: String?) -> Date {
-        guard let string else { return Date() }
-        return parseISO8601Optional(string) ?? Date()
-    }
-
-    static func parseISO8601Optional(_ string: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter.date(from: string) ?? {
-            let basic = ISO8601DateFormatter()
-            basic.formatOptions = [.withInternetDateTime]
-            return basic.date(from: string)
-        }()
-    }
-
     static func mapBookListItem(_ book: PchookGraphQL.BookListQuery.Data.Book) -> BookListItem {
         let awards = (book.awards ?? []).map { Award(name: $0.name ?? "", year: $0.year) }
         let position: Double? = book.seriesPosition.map { Double($0) }
@@ -204,7 +141,7 @@ private extension GraphQLBooksAPI {
             seriesName: book.seriesName,
             seriesLabel: book.seriesLabel,
             seriesPosition: position,
-            createdAt: parseISO8601(book.createdAt)
+            createdAt: GraphQLHelpers.parseISO8601(book.createdAt ?? "") ?? Date()
         )
     }
 
@@ -214,7 +151,7 @@ private extension GraphQLBooksAPI {
             title: book.title ?? "",
             authors: book.authors ?? [],
             publisher: book.publisher,
-            publishedDate: book.publishedDate.flatMap(parseISO8601Optional),
+            publishedDate: book.publishedDate.flatMap(GraphQLHelpers.parseISO8601),
             pageCount: book.pageCount,
             genre: book.genre,
             synopsis: book.synopsis,
@@ -227,7 +164,7 @@ private extension GraphQLBooksAPI {
             narrators: book.narrators ?? [],
             personalNotes: book.personalNotes,
             status: mapBookStatus(book.status),
-            readDate: book.readDate.flatMap(parseISO8601Optional),
+            readDate: book.readDate.flatMap(GraphQLHelpers.parseISO8601),
             awards: (book.awards ?? []).map { Award(name: $0.name ?? "", year: $0.year) },
             publicRatings: (book.publicRatings ?? []).map {
                 PublicRating(
@@ -240,8 +177,8 @@ private extension GraphQLBooksAPI {
             },
             importSource: book.importSource?.rawValue,
             externalUrl: book.externalUrl,
-            createdAt: parseISO8601(book.createdAt),
-            updatedAt: parseISO8601(book.updatedAt)
+            createdAt: GraphQLHelpers.parseISO8601(book.createdAt ?? "") ?? Date(),
+            updatedAt: GraphQLHelpers.parseISO8601(book.updatedAt ?? "") ?? Date()
         )
     }
 }
