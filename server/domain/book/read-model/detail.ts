@@ -20,15 +20,15 @@ export namespace BookDetailReadModel {
       const fullSeries = await SeriesQuery.getById(seriesInfo.id)
       if (fullSeries !== 'not-found') {
         series = {
-          name: String(fullSeries.name),
-          label: String(seriesInfo.label),
-          position: Number(seriesInfo.position),
+          name: fullSeries.name,
+          label: seriesInfo.label,
+          position: seriesInfo.position,
           books: booksInLanguage(fullSeries.books, book.language).map(
             ({ id, title, label, position }) => ({
               id,
-              title: String(title),
-              label: String(label),
-              position: Number(position),
+              title,
+              label,
+              position,
             }),
           ),
         }

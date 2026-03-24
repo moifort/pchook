@@ -5,7 +5,7 @@ import { builder } from '~/domain/shared/graphql/builder'
 export const SeriesType = builder.objectRef<Series>('Series').implement({
   description: 'A book series',
   fields: (t) => ({
-    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
+    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => id }),
     name: t.field({
       type: 'SeriesName',
       description: 'Series name',
@@ -24,7 +24,7 @@ export const SeriesBookEntryType = builder
   .implement({
     description: 'A book entry within a series',
     fields: (t) => ({
-      id: t.id({ description: 'Book ID', resolve: ({ id }) => String(id) }),
+      id: t.id({ description: 'Book ID', resolve: ({ id }) => id }),
       title: t.exposeString('title', { description: 'Book title' }),
       label: t.exposeString('label', { description: 'Label in series (e.g. Volume 3)' }),
       position: t.exposeInt('position', { description: 'Position in series' }),

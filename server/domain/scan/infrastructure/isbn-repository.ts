@@ -7,6 +7,6 @@ const storage = () => createTypedStorage<CachedIsbnResult>('isbn-cache')
 export const findBy = (isbn: ISBN) => storage().getItem(isbn)
 
 export const save = async (entry: CachedIsbnResult) => {
-  await storage().setItem(String(entry.isbn), entry)
+  await storage().setItem(entry.isbn, entry)
   return entry
 }

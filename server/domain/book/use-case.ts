@@ -23,7 +23,7 @@ export namespace BookUseCase {
   ) => {
     const existing =
       (data.isbn ? await BookQuery.findByISBN(data.isbn) : undefined) ??
-      (await BookQuery.findByTitleAndAuthors(String(title), (data.authors ?? []).map(String)))
+      (await BookQuery.findByTitleAndAuthors(title, data.authors ?? []))
 
     if (existing) return { tag: 'duplicate', book: existing } as const
 

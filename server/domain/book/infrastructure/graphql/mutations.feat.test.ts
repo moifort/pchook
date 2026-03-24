@@ -1,9 +1,10 @@
 import { expect } from 'bun:test'
 import { graphql } from 'graphql'
 import { BookCommand } from '~/domain/book/command'
-import { BookTitle, Genre } from '~/domain/book/primitives'
+import { BookTitle, Genre, Note } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { ReviewQuery } from '~/domain/review/query'
+import { SeriesName } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { schema } from '~/domain/shared/graphql/schema'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
@@ -21,7 +22,7 @@ feature('GraphQL mutation: updateBook', () => {
       `mutation ($id: BookId!, $input: UpdateBookInput!) {
         updateBook(id: $id, input: $input) { title genre }
       }`,
-      { id: String(book.id), input: { title: 'Germinal', genre: 'Roman naturaliste' } },
+      { id: book.id, input: { title: 'Germinal', genre: 'Roman naturaliste' } },
     )
 
     then('book is updated')
@@ -41,7 +42,7 @@ feature('GraphQL mutation: updateBook', () => {
         updateBook(id: $id, input: $input) { title }
       }`,
       {
-        id: String(book.id),
+        id: book.id,
         input: { series: 'Les Rougon-Macquart', seriesLabel: 'Tome 13', seriesNumber: 13 },
       },
     )
@@ -52,7 +53,7 @@ feature('GraphQL mutation: updateBook', () => {
     and('series is linked')
     const seriesInfo = await SeriesQuery.getByBookId(book.id)
     expect(seriesInfo).not.toBeNull()
-    expect(String(seriesInfo?.name)).toBe('Les Rougon-Macquart')
+    expect(seriesInfo?.name).toBe(SeriesName('Les Rougon-Macquart'))
   })
 
   scenario('returns error for non-existent book', async () => {
@@ -75,7 +76,7 @@ feature('GraphQL mutation: deleteBook', () => {
     const book = await BookCommand.add(BookTitle('Germinal'), {})
 
     when('deleteBook mutation is called')
-    const result = await execute(`mutation { deleteBook(id: "${String(book.id)}") }`)
+    const result = await execute(`mutation { deleteBook(id: "${book.id}") }`)
 
     then('deletion succeeds')
     expect(result.errors).toBeUndefined()
@@ -93,9 +94,7 @@ feature('GraphQL mutation: addToFavorites', () => {
     const book = await BookCommand.add(BookTitle('Le Petit Prince'), { status: 'to-read' })
 
     when('addToFavorites mutation is called')
-    const result = await execute(
-      `mutation { addToFavorites(id: "${String(book.id)}") { title status } }`,
-    )
+    const result = await execute(`mutation { addToFavorites(id: "${book.id}") { title status } }`)
 
     then('book is marked as read')
     expect(result.errors).toBeUndefined()
@@ -106,7 +105,7 @@ feature('GraphQL mutation: addToFavorites', () => {
     const review = await ReviewQuery.getByBookId(book.id)
     expect(review).not.toBe('not-found')
     if (review !== 'not-found') {
-      expect(Number(review.rating)).toBe(5)
+      expect(review.rating).toBe(Note(5))
     }
   })
 })
@@ -122,7 +121,7 @@ feature('GraphQL mutation: addReview', () => {
         addReview(bookId: $bookId, input: $input) { rating readDate reviewNotes }
       }`,
       {
-        bookId: String(book.id),
+        bookId: book.id,
         input: { rating: 9, readDate: '2024-06-15', reviewNotes: "Chef-d'œuvre du naturalisme" },
       },
     )
