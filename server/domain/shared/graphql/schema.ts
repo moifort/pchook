@@ -1,13 +1,13 @@
 import { builder } from '~/domain/shared/graphql/builder'
 
-import '~/domain/shared/graphql/types/enums'
-import '~/domain/shared/graphql/types/book'
-import '~/domain/shared/graphql/types/review'
-import '~/domain/shared/graphql/types/series'
+import '~/domain/book/graphql/enums'
+import '~/domain/book/graphql/types'
+import '~/domain/review/graphql/types'
+import '~/domain/series/graphql/types'
 
-import '~/domain/shared/graphql/queries/book'
+import '~/domain/book/graphql/queries'
 
-import '~/domain/shared/graphql/inputs/book'
-import '~/domain/shared/graphql/mutations/book'
+import '~/domain/book/graphql/inputs'
+import '~/domain/book/graphql/mutations'
 
 export const schema = builder.toSchema()

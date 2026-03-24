@@ -1,5 +1,5 @@
 import { builder } from '~/domain/shared/graphql/builder'
-import type { SeriesInfo } from '~/read-model/book-detail/types'
+import type { SeriesInfo } from '~/domain/book/read-model/types'
 
 const SeriesBookEntryType = builder
   .objectRef<SeriesInfo['books'][number]>('SeriesBookEntry')

@@ -26,7 +26,7 @@ mock.module('~/system/scan/index', () => ({
   },
 }))
 
-import { BookListReadModel } from '~/read-model/book-list/index'
+import { BookListReadModel } from '~/domain/book/read-model/list'
 import analyzeHandler from '~/routes/books/analyze.post'
 import confirmHandler from '~/routes/books/confirm.post'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'

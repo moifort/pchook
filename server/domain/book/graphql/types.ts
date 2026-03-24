@@ -1,6 +1,6 @@
+import type { BookListItem as BookListItemModel } from '~/domain/book/read-model/types'
 import type { Book, PublicRating as PublicRatingType } from '~/domain/book/types'
 import { builder } from '~/domain/shared/graphql/builder'
-import type { BookListItem as BookListItemModel } from '~/read-model/book-list/types'
 import { BookFormatEnum, BookStatusEnum, ImportSourceEnum } from './enums'
 
 export const AwardType = builder.objectRef<{ name: string; year?: number }>('Award').implement({

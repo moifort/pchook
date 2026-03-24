@@ -1,5 +1,5 @@
 import { BookId } from '~/domain/book/primitives'
-import { BookDetailReadModel } from '~/read-model/book-detail/index'
+import { BookDetailReadModel } from '~/domain/book/read-model/detail'
 
 export default defineEventHandler(async (event) => {
   const id = BookId(getRouterParam(event, 'id'))

@@ -1,15 +1,15 @@
 import { BookId, BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
+import { BookListReadModel } from '~/domain/book/read-model/list'
+import type { SeriesInfo } from '~/domain/book/read-model/types'
+import { ReviewType } from '~/domain/review/graphql/types'
 import { ReviewQuery } from '~/domain/review/query'
 import { booksInLanguage } from '~/domain/series/business-rules'
+import { SeriesInfoType } from '~/domain/series/graphql/types'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
-import { BookListItemType, BookType } from '~/domain/shared/graphql/types/book'
-import { BookSortEnum, SortOrderEnum } from '~/domain/shared/graphql/types/enums'
-import { ReviewType } from '~/domain/shared/graphql/types/review'
-import { SeriesInfoType } from '~/domain/shared/graphql/types/series'
-import type { SeriesInfo } from '~/read-model/book-detail/types'
-import { BookListReadModel } from '~/read-model/book-list/index'
+import { BookSortEnum, SortOrderEnum } from './enums'
+import { BookListItemType, BookType } from './types'
 
 builder.objectField(BookType, 'review', (t) =>
   t.field({

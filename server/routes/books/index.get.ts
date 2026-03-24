@@ -1,5 +1,5 @@
 import { BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/primitives'
-import { BookListReadModel } from '~/read-model/book-list/index'
+import { BookListReadModel } from '~/domain/book/read-model/list'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
