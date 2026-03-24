@@ -66,7 +66,7 @@ mock.module('~/system/logger', () => ({
   }),
 }))
 
-import { resetCache as resetSeriesCache } from '~/domain/series/repository'
+import { resetCache as resetSeriesCache } from '~/domain/series/infrastructure/repository'
 import { clearHandlers } from '~/system/event-bus'
 
 afterEach(async () => {

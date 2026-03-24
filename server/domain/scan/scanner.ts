@@ -1,8 +1,16 @@
 import { createHash } from 'node:crypto'
-import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/domain/scan/gemini'
-import { fetchCoverImage, searchByIsbn, searchByTitle } from '~/domain/scan/hardcover.api'
+import {
+  buildBookJsonSchema,
+  callGemini,
+  normalizeBookFormat,
+} from '~/domain/scan/infrastructure/gemini'
+import {
+  fetchCoverImage,
+  searchByIsbn,
+  searchByTitle,
+} from '~/domain/scan/infrastructure/hardcover.api'
+import * as repository from '~/domain/scan/infrastructure/repository'
 import { ImageHash } from '~/domain/scan/primitives'
-import * as repository from '~/domain/scan/repository'
 import { partialScanResultSchema, scanResultSchema } from '~/domain/scan/schemas'
 import type { ScanResult } from '~/domain/scan/types'
 import { config } from '~/system/config/index'

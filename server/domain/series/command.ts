@@ -1,6 +1,6 @@
 import type { BookId } from '~/domain/book/types'
+import * as repository from '~/domain/series/infrastructure/repository'
 import { randomSeriesId, SeriesName } from '~/domain/series/primitives'
-import * as repository from '~/domain/series/repository'
 import type { SeriesId, SeriesLabel, SeriesPosition } from '~/domain/series/types'
 
 export namespace SeriesCommand {

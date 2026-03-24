@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash-es'
 import { BookQuery } from '~/domain/book/query'
 import type { BookId } from '~/domain/book/types'
-import * as repository from '~/domain/series/repository'
+import * as repository from '~/domain/series/infrastructure/repository'
 import type { SeriesId } from '~/domain/series/types'
 import { createLogger } from '~/system/logger'
 

@@ -1,5 +1,5 @@
+import * as repository from '~/domain/image/infrastructure/repository'
 import { randomImageId } from '~/domain/image/primitives'
-import * as repository from '~/domain/image/repository'
 import type { ImageId } from '~/domain/image/types'
 
 export namespace ImageCommand {

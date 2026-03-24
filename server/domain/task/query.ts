@@ -1,4 +1,4 @@
-import * as repository from '~/domain/task/repository'
+import * as repository from '~/domain/task/infrastructure/repository'
 import type { TaskId } from '~/domain/task/types'
 
 export namespace TaskQuery {

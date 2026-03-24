@@ -1,4 +1,4 @@
-import * as repository from '~/domain/audible/repository'
+import * as repository from '~/domain/audible/infrastructure/repository'
 import type {
   Asin,
   AsinBookMapping,

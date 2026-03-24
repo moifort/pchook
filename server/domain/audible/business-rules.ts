@@ -1,5 +1,5 @@
 import type { AudibleItem } from '~/domain/audible/types'
-import { buildBookJsonSchema } from '~/domain/scan/gemini'
+import { buildBookJsonSchema } from '~/domain/scan/infrastructure/gemini'
 import type { ScanResult } from '~/domain/scan/types'
 
 export const formatDuration = (minutes: number) => {

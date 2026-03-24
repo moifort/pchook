@@ -1,6 +1,6 @@
 import { FAVORITE_RATING } from '~/domain/book/business-rules'
 import type { BookId } from '~/domain/book/types'
-import * as repository from '~/domain/review/repository'
+import * as repository from '~/domain/review/infrastructure/repository'
 
 export namespace ReviewQuery {
   export const getByBookId = async (bookId: BookId) => {

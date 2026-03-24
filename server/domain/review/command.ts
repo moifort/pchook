@@ -1,5 +1,5 @@
 import type { BookId } from '~/domain/book/types'
-import * as repository from '~/domain/review/repository'
+import * as repository from '~/domain/review/infrastructure/repository'
 import type { Review } from '~/domain/review/types'
 
 export namespace ReviewCommand {

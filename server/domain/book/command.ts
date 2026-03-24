@@ -1,5 +1,5 @@
+import * as repository from '~/domain/book/infrastructure/repository'
 import { randomBookId } from '~/domain/book/primitives'
-import * as repository from '~/domain/book/repository'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
 
 const withoutUndefined = <T extends Record<string, unknown>>(obj: T) =>

@@ -1,6 +1,10 @@
 import type { ISBN } from '~/domain/book/types'
-import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/domain/scan/gemini'
-import * as repository from '~/domain/scan/isbn-repository'
+import {
+  buildBookJsonSchema,
+  callGemini,
+  normalizeBookFormat,
+} from '~/domain/scan/infrastructure/gemini'
+import * as repository from '~/domain/scan/infrastructure/isbn-repository'
 import { enrichWithHardcover, type HardcoverEnrichment } from '~/domain/scan/scanner'
 import { scanResultSchema } from '~/domain/scan/schemas'
 import type { ScanResult } from '~/domain/scan/types'

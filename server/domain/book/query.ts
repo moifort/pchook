@@ -1,4 +1,4 @@
-import * as repository from '~/domain/book/repository'
+import * as repository from '~/domain/book/infrastructure/repository'
 import type { BookId, ISBN } from '~/domain/book/types'
 
 export namespace BookQuery {

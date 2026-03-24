@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql'
 import { z } from 'zod'
-import { generateLoginUrl, registerDevice } from '~/domain/audible/audible.api'
 import { AudibleCommand } from '~/domain/audible/command'
+import { generateLoginUrl, registerDevice } from '~/domain/audible/infrastructure/audible.api'
 import { AudibleLocale } from '~/domain/audible/primitives'
 import { AudibleQuery } from '~/domain/audible/query'
 import {
