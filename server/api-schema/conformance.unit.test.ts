@@ -1,9 +1,8 @@
 import { describe, expect, test } from 'bun:test'
+import type { BookDetailView, BookListItem, SeriesInfo } from '~/domain/book/read-model/types'
 import type { Book, PublicRating } from '~/domain/book/types'
+import type { DashboardView } from '~/domain/dashboard/types'
 import type { Review } from '~/domain/review/types'
-import type { BookDetailView, SeriesInfo } from '~/domain/book/read-model/types'
-import type { BookListItem } from '~/domain/book/read-model/types'
-import type { DashboardView } from '~/read-model/dashboard/types'
 import type { ScanResult } from '~/system/scan/types'
 import {
   audibleStatusSchema,

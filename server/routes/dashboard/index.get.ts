@@ -1,4 +1,4 @@
-import { DashboardReadModel } from '~/read-model/dashboard/overview'
+import { DashboardReadModel } from '~/domain/dashboard/read-model'
 
 export default defineEventHandler(async () => {
   const dashboard = await DashboardReadModel.get()

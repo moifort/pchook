@@ -18,4 +18,8 @@ import '~/domain/series/graphql/types'
 import '~/domain/series/graphql/book-fields'
 import '~/domain/series/graphql/queries'
 
+// Dashboard domain
+import '~/domain/dashboard/graphql/types'
+import '~/domain/dashboard/graphql/queries'
+
 export const schema = builder.toSchema()
