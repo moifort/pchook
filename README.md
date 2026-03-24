@@ -63,6 +63,51 @@ bun run dev
 
 Server runs at `http://localhost:3000`. Verify: `http://localhost:3000/health`
 
+## Development
+
+### GraphQL API
+
+The backend exposes a GraphQL endpoint alongside the REST API. Once the server is running (`bun run dev`), open:
+
+```
+http://localhost:3000/graphql
+```
+
+This opens **Apollo Sandbox**, an in-browser IDE where you can:
+
+- **Explorer** — browse all types, queries, mutations with auto-generated documentation
+- **Query builder** — construct queries visually with field autocompletion
+- **Run queries** — execute queries and mutations against your local server
+
+Example query to try:
+
+```graphql
+{
+  books(sort: title, order: asc) {
+    id
+    title
+    authors
+    genre
+    status
+    rating
+  }
+}
+```
+
+```graphql
+{
+  book(id: "YOUR-BOOK-ID") {
+    title
+    authors
+    review { rating reviewNotes }
+    series { name position books { title } }
+    coverImageBase64
+  }
+}
+```
+
+> **Note:** Authentication is handled automatically — Apollo Sandbox sends requests to the same origin, and the auth middleware applies. If `NITRO_API_TOKEN` is set, configure the `Authorization: Bearer <token>` header in the Sandbox connection settings.
+
 **4. Run the iOS app**
 
 ```bash
@@ -83,7 +128,7 @@ A [CasaOS](https://casaos.io/)-compatible compose file is also available (`docke
 
 ## Tech stack
 
-**Backend:** Nitro, Bun, TypeScript, Zod, ts-pattern, file-based storage, Sentry
-**iOS:** SwiftUI, iOS 26+, Swift 6, strict concurrency
+**Backend:** Nitro, Bun, TypeScript, Apollo Server, Pothos (GraphQL), Zod, ts-pattern, file-based storage, Sentry
+**iOS:** SwiftUI, iOS 26+, Swift 6, strict concurrency, Apollo iOS (GraphQL)
 **AI:** Claude Vision (cover analysis), Gemini 2.0 Flash (metadata enrichment), Open Library (ISBN lookup)
 **Deploy:** Docker, GitHub Actions CI
