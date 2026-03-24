@@ -49,6 +49,14 @@ server/
 ├── read-model/       # Composite views assembling multiple domains
 │   └── {domain}/     # Mirrors domain/ structure
 │       └── {view}.ts # e.g. wine-list.ts, wine-detail.ts, overview.ts
+├── graphql/          # GraphQL API (Apollo Server + Pothos)
+│   ├── builder.ts           # Pothos SchemaBuilder config
+│   ├── context.ts           # GraphQL context type (H3 event)
+│   ├── schema.ts            # Assembles all types, exports schema
+│   ├── types/               # Pothos object types (book, review, series, enums)
+│   ├── queries/             # Query fields (reuse read models + domain queries)
+│   ├── mutations/           # Mutation fields (reuse domain commands + use-cases)
+│   └── inputs/              # Input types for mutations
 ├── routes/           # HTTP endpoints (auto-scanned by Nitro)
 ├── middleware/        # Request middleware (auth)
 ├── plugins/           # Nitro plugins (sentry, migration, cache)
@@ -78,9 +86,20 @@ Read models answer questions like "what does the wine list look like with rating
 
 > This is the Query Model / read side of CQRS (Command Query Responsibility Segregation). Commands and queries have different data shapes and access patterns — read models optimize for display without polluting domain logic.
 
+### GraphQL Layer (`server/graphql/`)
+
+Code-first GraphQL API using Apollo Server + Pothos. Cohabits with REST routes — both `/graphql` and REST endpoints are available simultaneously.
+
+- **Types** reference domain types as Pothos backing models — no type duplication
+- **Queries** delegate to read models and domain queries (same as REST routes)
+- **Mutations** delegate to domain commands and use-cases (same as REST routes)
+- **Nested resolvers** on object types (e.g. `Book.review`, `Book.series`) allow clients to request only the data they need
+- **Schema SDL** exported to `shared/schema.graphql` for Apollo iOS codegen
+- **Apollo Sandbox** available in dev at `/graphql` for schema exploration and query building
+
 ### Route Layer (`server/routes/`)
 
-HTTP handlers that validate input at the boundary, call domain queries/commands (or use cases/read models), and return responses.
+HTTP handlers that validate input at the boundary, call domain queries/commands (or use cases/read models), and return responses. Includes the `/graphql` endpoint for Apollo Server.
 
 ### System Layer (`server/system/`)
 
@@ -107,6 +126,17 @@ HTTP Request → route → use-case → multiple commands/queries → Response
 **Composite read (cross-domain view):**
 ```
 HTTP Request → route → read-model → multiple domain queries → Response
+```
+
+**GraphQL query (with nested resolvers):**
+```
+GraphQL Request → /graphql → Apollo Server → Pothos resolver → domain query/read-model → Response
+                                           → nested resolver → domain query → merged into Response
+```
+
+**GraphQL mutation:**
+```
+GraphQL Request → /graphql → Apollo Server → Pothos resolver → domain command/use-case → Response
 ```
 
 ## Storage

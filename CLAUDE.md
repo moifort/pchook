@@ -4,6 +4,8 @@
 
 - **Backend typecheck**: `bun tsc --noEmit`
 - **Regenerate types** (if routes changed): `bunx nitro prepare` (run before `bun tsc`)
+- **Regenerate GraphQL schema**: `bun run generate:graphql` (run after modifying Pothos types/queries/mutations)
+- **Regenerate Apollo iOS types**: `cd ios && /tmp/apollo-ios-cli generate` (run after schema changes)
 - **iOS build**:
   ```
   DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project ios/Pchook.xcodeproj -scheme Pchook -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' build
@@ -17,6 +19,7 @@
 
 1. Always verify the build before committing (backend `bun tsc --noEmit` + `xcodebuild` depending on what was touched)
 2. Run `bunx nitro prepare` before `bun tsc` if routes were added/modified
+2b. Run `bun run generate:graphql` if GraphQL schema changed (Pothos types/queries/mutations), then regenerate Apollo iOS types
 3. Run tests before committing: `bun test`
 4. Run `bunx biome check --write` to auto-fix formatting and lint
 5. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
@@ -42,6 +45,24 @@
 - Formatter: Biome (spaces, single quotes, no semicolons, line width 100)
 - **External API files**: `server/domain/{domain}/{api-name}.api.ts` — isolate SDK/HTTP calls + response validation. Returns typed data or throws. Symmetric test: `{api-name}.api.int.test.ts`
 - Logging: `createLogger(tag)` from `~/system/logger` — never use raw `console.log/error`
+
+### GraphQL Layer (`server/graphql/`)
+
+- **Stack**: Apollo Server + Pothos (code-first schema builder)
+- **Endpoint**: `/graphql` — cohabite avec les routes REST
+- **Directory structure**:
+  - `builder.ts` — Pothos SchemaBuilder config + context type
+  - `schema.ts` — assemble tous les types/queries/mutations, exporte le schema
+  - `types/` — Object types Pothos (book, review, series, enums)
+  - `queries/` — Query fields (réutilisent les read models et domain queries)
+  - `mutations/` — Mutation fields (réutilisent les domain commands et use-cases)
+  - `inputs/` — Input types (validation côté GraphQL)
+  - `context.ts` — Type du contexte GraphQL (H3 event)
+- **Documentation**: chaque type, champ, enum, argument reçoit une `description` Pothos (visible dans Apollo Sandbox)
+- **Schema SDL**: exporté dans `shared/schema.graphql` via `bun run generate:graphql`
+- **Apollo Sandbox**: disponible en dev sur `/graphql` (introspection, query builder, documentation)
+- **Enums avec hyphens**: mapper vers des noms GraphQL valides (`to-read` → `TO_READ` via `value:` dans Pothos)
+- **Errors**: `GraphQLError` avec `extensions.code` pour les erreurs métier (`NOT_FOUND`)
 
 See [docs/architecture.md](docs/architecture.md) for full architecture overview.
 See [docs/domain-guide.md](docs/domain-guide.md) for step-by-step domain creation.
@@ -78,6 +99,9 @@ See [docs/migrations.md](docs/migrations.md) for full guide.
 - Xcode uses `fileSystemSynchronizedGroups` (no need to manually add files)
 - `DEVELOPER_DIR` required because `xcode-select` may point to CommandLineTools
 - **Image generation**: use the `/image-gen` skill to generate iOS app icons or any other image assets. Use the same icon for both iOS and CasaOS
+- **GraphQL client**: Apollo iOS via SPM — `GraphQLClient.swift` (singleton with Bearer auth), `GraphQLBooksAPI.swift` (même interface que `BooksAPI.swift`)
+- **Apollo codegen**: `.graphql` operation files dans `Features/{Feature}/GraphQL/`, types générés dans `Generated/GraphQL/`
+- **Codegen config**: `ios/apollo-codegen-config.json` — namespace `PchookGraphQL`, schema from `shared/schema.graphql`
 
 See [docs/ios-guide.md](docs/ios-guide.md) for full iOS guide.
 

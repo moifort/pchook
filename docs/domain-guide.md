@@ -132,9 +132,17 @@ storage: {
 },
 ```
 
-## 8. Add Routes (`server/routes/wines/`)
+## 8. Add Routes (`server/routes/wines/`) and/or GraphQL types
 
-Create route files following the [API patterns](./api-patterns.md).
+Create REST route files following the [API patterns](./api-patterns.md).
+
+For GraphQL, add types/queries/mutations in `server/graphql/`:
+- Object type in `types/{domain}.ts` referencing domain types as backing models
+- Query fields in `queries/{domain}.ts` delegating to read models or domain queries
+- Mutation fields in `mutations/{domain}.ts` delegating to domain commands/use-cases
+- Input types in `inputs/{domain}.ts` for mutation arguments
+- Import all new files in `schema.ts`
+- Run `bun run generate:graphql` to regenerate the SDL schema
 
 ## 9. Update Test Reset
 
@@ -268,9 +276,11 @@ feature('Creating a wine', () => {
 - [ ] `query.ts` (public read namespace)
 - [ ] `command.ts` (public write namespace)
 - [ ] Storage namespace in `nitro.config.ts`
-- [ ] Route handlers in `server/routes/`
-- [ ] Feature tests (`*.feat.test.ts`) for each route
+- [ ] Route handlers in `server/routes/` (REST) and/or GraphQL types/queries/mutations in `server/graphql/`
+- [ ] Feature tests (`*.feat.test.ts`) for each route and/or GraphQL operation
 - [ ] Test reset updated
+- [ ] (if GraphQL) Schema SDL regenerated (`bun run generate:graphql`)
+- [ ] (if GraphQL) Apollo iOS codegen regenerated
 - [ ] `bunx nitro prepare && bun tsc --noEmit` passes
 - [ ] (optional) `use-case.ts` if multi-domain orchestration needed
 - [ ] (optional) `business-rules.ts` with 100% test coverage if complex logic

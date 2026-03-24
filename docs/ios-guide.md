@@ -274,6 +274,30 @@ let response: APIResponse<Wine> = try await APIClient.shared.put("/wines/\(id)",
 try await APIClient.shared.delete("/wines/\(id)")
 ```
 
+## GraphQL Client (Apollo iOS)
+
+For domains migrated to GraphQL, use `GraphQLBooksAPI` (or equivalent) instead of the REST API:
+
+```swift
+// Query — returns existing model types (BookListItem, BookDetailData, etc.)
+let books = try await GraphQLBooksAPI.list(genre: "SF", sort: "title", order: "asc")
+let detail = try await GraphQLBooksAPI.getDetail(id: bookId)
+
+// Mutation
+try await GraphQLBooksAPI.addReview(id: bookId, request)
+try await GraphQLBooksAPI.delete(id: bookId)
+```
+
+**Architecture:**
+- `GraphQLClient.swift` — singleton wrapping Apollo's `ApolloClient` with Bearer token auth
+- `GraphQL{Feature}API.swift` — feature-specific API enum (same interface as REST `{Feature}API.swift`)
+- `.graphql` operation files in `Features/{Feature}/GraphQL/` — queries and mutations
+- Generated types in `Generated/GraphQL/` — Apollo codegen from `shared/schema.graphql`
+
+**Codegen:** `cd ios && /tmp/apollo-ios-cli generate` (config in `ios/apollo-codegen-config.json`)
+
+**Type mapping:** `GraphQL{Feature}API` converts Apollo generated types back to existing model types (`BookListItem`, `Book`, etc.) so ViewModels don't need to change.
+
 ## Model Types
 
 ```swift
