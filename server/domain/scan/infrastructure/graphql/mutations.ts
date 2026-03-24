@@ -56,7 +56,7 @@ builder.mutationField('analyzeISBN', (t) =>
     nullable: true,
     description: 'Scan an ISBN barcode. Returns null if the book already exists.',
     args: {
-      isbn: t.arg.string({ required: true, description: 'ISBN code (10 or 13 digits)' }),
+      isbn: t.arg({ type: 'ISBN', required: true, description: 'ISBN code (10 or 13 digits)' }),
     },
     resolve: async (_, { isbn: rawIsbn }) => {
       const isbn = ISBN(rawIsbn)
@@ -87,7 +87,7 @@ builder.mutationField('analyzeURL', (t) =>
     type: BookPreviewType,
     description: 'Import a book from a URL (Goodreads, Storygraph, etc.)',
     args: {
-      url: t.arg.string({ required: true, description: 'Book URL' }),
+      url: t.arg({ type: 'Url', required: true, description: 'Book URL' }),
       description: t.arg.string({ description: 'Shared description' }),
       rawText: t.arg.string({ description: 'Shared raw text' }),
     },
@@ -125,20 +125,20 @@ const ConfirmBookInput = builder.inputType('ConfirmBookInput', {
   fields: (t) => ({
     previewId: t.string({ required: true, description: 'Preview identifier' }),
     status: t.string({ required: true, description: 'Initial status (to-read or read)' }),
-    replaceBookId: t.string({ description: 'ID of the book to replace (update)' }),
-    title: t.string({ description: 'Title (override)' }),
-    authors: t.stringList({ description: 'Authors (override)' }),
-    publisher: t.string({ description: 'Publisher (override)' }),
-    pageCount: t.int({ description: 'Pages (override)' }),
-    genre: t.string({ description: 'Genre (override)' }),
+    replaceBookId: t.field({ type: 'BookId', description: 'ID of the book to replace (update)' }),
+    title: t.field({ type: 'BookTitle', description: 'Title (override)' }),
+    authors: t.field({ type: ['PersonName'], description: 'Authors (override)' }),
+    publisher: t.field({ type: 'Publisher', description: 'Publisher (override)' }),
+    pageCount: t.field({ type: 'PageCount', description: 'Pages (override)' }),
+    genre: t.field({ type: 'Genre', description: 'Genre (override)' }),
     synopsis: t.string({ description: 'Synopsis (override)' }),
-    language: t.string({ description: 'Language (override)' }),
+    language: t.field({ type: 'Language', description: 'Language (override)' }),
     format: t.string({ description: 'Format (override)' }),
-    translator: t.string({ description: 'Translator (override)' }),
-    estimatedPrice: t.float({ description: 'Price (override)' }),
-    series: t.string({ description: 'Series (override)' }),
-    seriesLabel: t.string({ description: 'Series label (override)' }),
-    seriesNumber: t.float({ description: 'Series position (override)' }),
+    translator: t.field({ type: 'PersonName', description: 'Translator (override)' }),
+    estimatedPrice: t.field({ type: 'Eur', description: 'Price (override)' }),
+    series: t.field({ type: 'SeriesName', description: 'Series (override)' }),
+    seriesLabel: t.field({ type: 'SeriesLabel', description: 'Series label (override)' }),
+    seriesNumber: t.field({ type: 'SeriesPosition', description: 'Series position (override)' }),
   }),
 })
 

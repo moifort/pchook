@@ -19,7 +19,7 @@ builder.queryField('books', (t) =>
     type: [BookType],
     description: 'Book list with filters and sorting',
     args: {
-      genre: t.arg.string({ description: 'Filter by literary genre' }),
+      genre: t.arg({ type: 'Genre', description: 'Filter by literary genre' }),
       status: t.arg.string({ description: 'Filter by reading status (to-read, read)' }),
       sort: t.arg({ type: BookSortEnum, description: 'Sort field' }),
       order: t.arg({ type: SortOrderEnum, description: 'Sort order' }),
@@ -55,7 +55,7 @@ builder.queryField('book', (t) =>
     nullable: true,
     description: 'Book detail by ID',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
       const result = await BookQuery.getById(BookId(id))

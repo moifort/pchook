@@ -18,7 +18,7 @@ feature('GraphQL mutation: updateBook', () => {
 
     when('updateBook mutation is called')
     const result = await execute(
-      `mutation ($id: ID!, $input: UpdateBookInput!) {
+      `mutation ($id: BookId!, $input: UpdateBookInput!) {
         updateBook(id: $id, input: $input) { title genre }
       }`,
       { id: String(book.id), input: { title: 'Germinal', genre: 'Roman naturaliste' } },
@@ -37,7 +37,7 @@ feature('GraphQL mutation: updateBook', () => {
 
     when('updateBook is called with series info')
     const result = await execute(
-      `mutation ($id: ID!, $input: UpdateBookInput!) {
+      `mutation ($id: BookId!, $input: UpdateBookInput!) {
         updateBook(id: $id, input: $input) { title }
       }`,
       {
@@ -118,7 +118,7 @@ feature('GraphQL mutation: addReview', () => {
 
     when('addReview mutation is called')
     const result = await execute(
-      `mutation ($bookId: ID!, $input: CreateReviewInput!) {
+      `mutation ($bookId: BookId!, $input: CreateReviewInput!) {
         addReview(bookId: $bookId, input: $input) { rating readDate reviewNotes }
       }`,
       {

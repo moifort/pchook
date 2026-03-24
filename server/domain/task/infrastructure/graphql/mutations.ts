@@ -12,7 +12,7 @@ builder.mutationField('pauseTask', (t) =>
     type: TaskType,
     description: 'Pause a running task',
     args: {
-      id: t.arg.id({ required: true, description: 'Task identifier' }),
+      id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
       const taskId = TaskId(id)
@@ -34,7 +34,7 @@ builder.mutationField('resumeTask', (t) =>
     type: TaskType,
     description: 'Resume a paused task',
     args: {
-      id: t.arg.id({ required: true, description: 'Task identifier' }),
+      id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
       const taskId = TaskId(id)
@@ -56,7 +56,7 @@ builder.mutationField('cancelTask', (t) =>
     type: TaskType,
     description: 'Cancel a running or paused task',
     args: {
-      id: t.arg.id({ required: true, description: 'Task identifier' }),
+      id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
       const taskId = TaskId(id)

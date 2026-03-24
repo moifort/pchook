@@ -17,7 +17,7 @@ builder.mutationField('addToFavorites', (t) =>
     type: BookType,
     description: 'Add a book to favorites (favorite rating + read status)',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
       const bookId = BookId(id)
@@ -45,7 +45,7 @@ builder.mutationField('addReview', (t) =>
     type: ReviewType,
     description: 'Add a review to a book (marks the book as read)',
     args: {
-      bookId: t.arg.id({ required: true, description: 'Book ID' }),
+      bookId: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
       input: t.arg({ type: CreateReviewInput, required: true }),
     },
     resolve: async (_, { bookId: rawId, input }) => {

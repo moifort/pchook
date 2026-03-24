@@ -99,7 +99,7 @@ builder.mutationField('updateBook', (t) =>
     type: BookType,
     description: 'Update an existing book',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
       input: t.arg({ type: UpdateBookInput, required: true }),
     },
     resolve: async (_, { id, input }) => {
@@ -127,7 +127,7 @@ builder.mutationField('deleteBook', (t) =>
     type: 'Boolean',
     description: 'Delete a book and its associated data (review, series)',
     args: {
-      id: t.arg.id({ required: true, description: 'ID of the book to delete' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'ID of the book to delete' }),
     },
     resolve: async (_, { id }) => {
       const result = await BookUseCase.removeCompletely(BookId(id))
@@ -168,7 +168,7 @@ builder.mutationField('refreshBook', (t) =>
     type: 'Boolean',
     description: 'Re-enrich a book via Gemini (updates metadata)',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
       const bookId = BookId(id)

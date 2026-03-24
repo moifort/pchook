@@ -9,7 +9,7 @@ builder.queryField('task', (t) =>
     nullable: true,
     description: 'Get a task by its identifier',
     args: {
-      id: t.arg.id({ required: true, description: 'Task identifier' }),
+      id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
       const taskId = TaskId(id)
