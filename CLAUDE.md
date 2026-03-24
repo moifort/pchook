@@ -12,17 +12,17 @@
   ```
 - **Unit tests**: `bun test`
 - **Test coverage**: `bun test --coverage`
-- **Linter**: `bunx biome check`
+- **Linter**: `bunx biome lint --fix`
 - **Runtime**: always use `bun`/`bunx`, never `npm`/`npx`
 
 ## Development Workflow
 
-1. Always verify the build before committing (backend `bun tsc --noEmit` + `xcodebuild` depending on what was touched)
+1. Always verify the build before committing (backend `bun tsc --noEmit` + `xcodebuild` if you touch ios file or graphql schemas)
 2. Run `bunx nitro prepare` before `bun tsc` if routes were added/modified
 2b. Run `bun run generate:graphql` if GraphQL schema changed (Pothos types/queries/mutations), then regenerate Apollo iOS types
 3. Run tests before committing: `bun test`
-4. Run `bunx biome check --write` to auto-fix formatting and lint
-5. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
+5. Run `bunx biome check --write` to auto-fix formatting and lint
+6. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
 
 ## Commit Strategy
 
