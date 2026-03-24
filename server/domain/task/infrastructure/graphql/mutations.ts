@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql'
 import { builder } from '~/domain/shared/graphql/builder'
-import { TaskId } from '~/domain/task/primitives'
 import { TaskQuery } from '~/domain/task/query'
 import { TaskRunner } from '~/domain/task/runner'
 import { TaskType } from './types'
@@ -15,15 +14,14 @@ builder.mutationField('pauseTask', (t) =>
       id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
-      const taskId = TaskId(id)
-      const state = await TaskQuery.getById(taskId)
+      const state = await TaskQuery.getById(id)
       if (state === 'not-found') throw taskNotFound()
 
       if (state.phase !== 'running') {
         throw new GraphQLError('Task is not running', { extensions: { code: 'CONFLICT' } })
       }
 
-      TaskRunner.pause(taskId)
+      TaskRunner.pause(id)
       return state
     },
   }),
@@ -37,15 +35,14 @@ builder.mutationField('resumeTask', (t) =>
       id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
-      const taskId = TaskId(id)
-      const state = await TaskQuery.getById(taskId)
+      const state = await TaskQuery.getById(id)
       if (state === 'not-found') throw taskNotFound()
 
       if (state.phase !== 'paused') {
         throw new GraphQLError('Task is not paused', { extensions: { code: 'CONFLICT' } })
       }
 
-      TaskRunner.resume(taskId)
+      TaskRunner.resume(id)
       return state
     },
   }),
@@ -59,8 +56,7 @@ builder.mutationField('cancelTask', (t) =>
       id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
-      const taskId = TaskId(id)
-      const state = await TaskQuery.getById(taskId)
+      const state = await TaskQuery.getById(id)
       if (state === 'not-found') throw taskNotFound()
 
       if (state.phase !== 'running' && state.phase !== 'paused') {
@@ -69,7 +65,7 @@ builder.mutationField('cancelTask', (t) =>
         })
       }
 
-      TaskRunner.cancel(taskId)
+      TaskRunner.cancel(id)
       return state
     },
   }),

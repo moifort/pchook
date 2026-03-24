@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash-es'
 import { awardsCount } from '~/domain/book/business-rules'
-import { BookId, BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/primitives'
+import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { BookSortEnum, SortOrderEnum } from './enums'
@@ -27,7 +27,7 @@ builder.queryField('books', (t) =>
     resolve: async (_, args) => {
       const allBooks = await BookQuery.findAll()
 
-      const genre = args.genre ? Genre(args.genre) : undefined
+      const genre = args.genre ?? undefined
       const status = args.status ? BookStatus(args.status) : undefined
       const sort = args.sort ? BookSort(args.sort) : 'createdAt'
       const desc = (args.order ? SortOrder(args.order) : 'desc') === 'desc'
@@ -58,7 +58,7 @@ builder.queryField('book', (t) =>
       id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
-      const result = await BookQuery.getById(BookId(id))
+      const result = await BookQuery.getById(id)
       return result === 'not-found' ? null : result
     },
   }),

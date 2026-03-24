@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql'
 import { match } from 'ts-pattern'
-import { BookId, ISBN } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { BookUseCase } from '~/domain/book/use-case'
 import * as previewRepository from '~/domain/scan/infrastructure/preview-repository'
@@ -11,7 +10,6 @@ import { scanResultToBookData } from '~/domain/scan/to-book-data'
 import type { ScanResult } from '~/domain/scan/types'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
-import { Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 import { BookPreviewType, ConfirmBookResultType } from './types'
 
@@ -58,9 +56,7 @@ builder.mutationField('analyzeISBN', (t) =>
     args: {
       isbn: t.arg({ type: 'ISBN', required: true, description: 'ISBN code (10 or 13 digits)' }),
     },
-    resolve: async (_, { isbn: rawIsbn }) => {
-      const isbn = ISBN(rawIsbn)
-
+    resolve: async (_, { isbn }) => {
       const existing = await BookQuery.findByISBN(isbn)
       if (existing) return null
 
@@ -95,7 +91,11 @@ builder.mutationField('analyzeURL', (t) =>
       const allSeries = await SeriesQuery.findAll()
       const seriesNames = allSeries.map(({ name }) => String(name))
       const result = await ShareImporter.importFromShare(
-        { url, description: description ?? undefined, rawText: rawText ?? undefined },
+        {
+          url: String(url),
+          description: description ?? undefined,
+          rawText: rawText ?? undefined,
+        },
         seriesNames,
       )
 
@@ -111,7 +111,7 @@ builder.mutationField('analyzeURL', (t) =>
         previewId,
         scanResult: result,
         importSource: 'url',
-        externalUrl: Url(url),
+        externalUrl: url,
         createdAt: new Date(),
       })
 
@@ -175,7 +175,7 @@ builder.mutationField('confirmBook', (t) =>
 
       if (input.replaceBookId) {
         const result = await BookUseCase.replaceFromScan(
-          BookId(input.replaceBookId),
+          input.replaceBookId,
           title,
           {
             ...data,

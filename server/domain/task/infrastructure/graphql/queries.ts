@@ -1,5 +1,4 @@
 import { builder } from '~/domain/shared/graphql/builder'
-import { TaskId } from '~/domain/task/primitives'
 import { TaskQuery } from '~/domain/task/query'
 import { TaskType } from './types'
 
@@ -12,8 +11,7 @@ builder.queryField('task', (t) =>
       id: t.arg({ type: 'TaskId', required: true, description: 'Task identifier' }),
     },
     resolve: async (_, { id }) => {
-      const taskId = TaskId(id)
-      const result = await TaskQuery.getById(taskId)
+      const result = await TaskQuery.getById(id)
       if (result === 'not-found') return null
       return result
     },
