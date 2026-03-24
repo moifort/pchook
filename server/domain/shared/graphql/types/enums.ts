@@ -1,4 +1,4 @@
-import { builder } from '~/graphql/builder'
+import { builder } from '~/domain/shared/graphql/builder'
 
 export const BookFormatEnum = builder.enumType('BookFormat', {
   description: 'Format physique ou numérique du livre',

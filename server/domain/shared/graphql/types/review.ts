@@ -1,5 +1,5 @@
 import type { Review } from '~/domain/review/types'
-import { builder } from '~/graphql/builder'
+import { builder } from '~/domain/shared/graphql/builder'
 
 export const ReviewType = builder.objectRef<Review>('Review').implement({
   description: "Critique et note personnelle d'un livre",

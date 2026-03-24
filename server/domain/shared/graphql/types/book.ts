@@ -1,5 +1,5 @@
 import type { Book, PublicRating as PublicRatingType } from '~/domain/book/types'
-import { builder } from '~/graphql/builder'
+import { builder } from '~/domain/shared/graphql/builder'
 import type { BookListItem as BookListItemModel } from '~/read-model/book-list/types'
 import { BookFormatEnum, BookStatusEnum, ImportSourceEnum } from './enums'
 

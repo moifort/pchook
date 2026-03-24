@@ -5,7 +5,7 @@ import { BookTitle, Genre } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { ReviewQuery } from '~/domain/review/query'
 import { SeriesQuery } from '~/domain/series/query'
-import { schema } from '~/graphql/schema'
+import { schema } from '~/domain/shared/graphql/schema'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 
 const execute = (query: string, variables?: Record<string, unknown>) =>

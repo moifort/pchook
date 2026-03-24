@@ -1,6 +1,6 @@
 import { ApolloServer } from '@apollo/server'
-import type { GraphQLContext } from '~/graphql/context'
-import { schema } from '~/graphql/schema'
+import type { GraphQLContext } from '~/domain/shared/graphql/builder'
+import { schema } from '~/domain/shared/graphql/schema'
 import { setApollo } from '~/utils/apollo'
 
 export default defineNitroPlugin(async () => {

@@ -1,4 +1,4 @@
-import { builder } from '~/graphql/builder'
+import { builder } from '~/domain/shared/graphql/builder'
 import type { SeriesInfo } from '~/read-model/book-detail/types'
 
 const SeriesBookEntryType = builder

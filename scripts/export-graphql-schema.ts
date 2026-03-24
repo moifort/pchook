@@ -1,5 +1,5 @@
 import { printSchema } from 'graphql'
-import { schema } from '~/graphql/schema'
+import { schema } from '../server/domain/shared/graphql/schema'
 
 const sdl = printSchema(schema)
 await Bun.write('shared/schema.graphql', sdl)

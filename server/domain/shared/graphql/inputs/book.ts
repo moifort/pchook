@@ -1,5 +1,5 @@
-import { builder } from '~/graphql/builder'
-import { BookFormatEnum, BookStatusEnum } from '~/graphql/types/enums'
+import { builder } from '~/domain/shared/graphql/builder'
+import { BookFormatEnum, BookStatusEnum } from '~/domain/shared/graphql/types/enums'
 
 const AwardInput = builder.inputType('AwardInput', {
   description: 'Prix littéraire',

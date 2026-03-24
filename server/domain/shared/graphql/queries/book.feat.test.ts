@@ -6,7 +6,7 @@ import { ReviewCommand } from '~/domain/review/command'
 import type { Review } from '~/domain/review/types'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
-import { schema } from '~/graphql/schema'
+import { schema } from '~/domain/shared/graphql/schema'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 
 const execute = (query: string, variables?: Record<string, unknown>) =>

@@ -1,5 +1,5 @@
 import type { ApolloServer } from '@apollo/server'
-import type { GraphQLContext } from '~/graphql/context'
+import type { GraphQLContext } from '~/domain/shared/graphql/builder'
 
 let instance: ApolloServer<GraphQLContext> | null = null
 
