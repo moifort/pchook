@@ -1,5 +1,13 @@
+import { keyBy } from 'lodash-es'
 import * as repository from '~/domain/provider/audible/infrastructure/repository'
-import type { Asin } from '~/domain/provider/audible/types'
+import type { Asin, AudibleSyncState, RawAudibleEntry } from '~/domain/provider/audible/types'
+
+const DEFAULT_SYNC_STATE: AudibleSyncState = {
+  syncStatus: 'disconnected',
+  importStatus: 'init',
+}
+
+export type AudibleLibraryEntry = RawAudibleEntry & { importedBookId?: string }
 
 export namespace AudibleQuery {
   export const hasCredentials = async () => {
@@ -13,11 +21,22 @@ export namespace AudibleQuery {
 
   export const getAllMappings = async () => repository.findAllMappings()
 
-  export const getSyncCompletedAt = async () => repository.findSyncCompletedAt()
-
   export const getAllRawItems = async () => repository.findAllRawItems()
 
-  export const isFetchInProgress = () => repository.isFetchInProgress()
+  export const getSyncState = async () => {
+    const state = await repository.findSyncState()
+    return state ?? DEFAULT_SYNC_STATE
+  }
 
-  export const getLastFetchedAt = async () => repository.findLastFetchedAt()
+  export const getLibrary = async (source?: 'library' | 'wishlist') => {
+    const rawItems = await repository.findAllRawItems()
+    const filtered = source ? rawItems.filter((entry) => entry.source === source) : rawItems
+    const mappings = await repository.findAllMappings()
+    const mappingsByAsin = keyBy(mappings, ({ asin }) => asin)
+
+    return filtered.map((entry): AudibleLibraryEntry => {
+      const mapping = mappingsByAsin[entry.item.asin]
+      return mapping ? { ...entry, importedBookId: String(mapping.bookId) } : entry
+    })
+  }
 }

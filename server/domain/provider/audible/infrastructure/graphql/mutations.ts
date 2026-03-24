@@ -62,6 +62,7 @@ builder.mutationField('audibleAuthCallback', (t) =>
         })
       }
 
+      await AudibleCommand.connect()
       return true
     },
   }),
@@ -76,6 +77,7 @@ builder.mutationField('audibleDisconnect', (t) =>
       await AudibleCommand.removeCredentials()
       await AudibleCommand.clearRawItems()
       await AudibleCommand.clearMappings()
+      await AudibleCommand.disconnect()
       return true
     },
   }),
@@ -93,7 +95,8 @@ builder.mutationField('audibleSyncFetch', (t) =>
         })
       }
 
-      if (AudibleQuery.isFetchInProgress()) {
+      const syncState = await AudibleQuery.getSyncState()
+      if (syncState.syncStatus === 'fetching') {
         throw new GraphQLError('Fetch already in progress', {
           extensions: { code: 'CONFLICT' },
         })
@@ -141,6 +144,7 @@ builder.mutationField('audibleImportStart', (t) =>
         })
       }
 
+      await AudibleCommand.startImport()
       TaskRunner.start(AUDIBLE_IMPORT_TASK_ID, importTaskDefinition).catch((error) => {
         log.error('Background import failed', { error: String(error) })
       })

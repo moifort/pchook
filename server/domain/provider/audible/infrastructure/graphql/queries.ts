@@ -8,11 +8,9 @@ builder.queryField('audibleSync', (t) =>
     type: AudibleSyncType,
     description: 'Audible synchronization status',
     resolve: async () => {
-      const connected = await AudibleQuery.hasCredentials()
+      const syncState = await AudibleQuery.getSyncState()
       const mappings = await AudibleQuery.getAllMappings()
       const rawItems = await AudibleQuery.getAllRawItems()
-      const lastSyncAt = await AudibleQuery.getSyncCompletedAt()
-      const lastFetchedAt = await AudibleQuery.getLastFetchedAt()
 
       const mappedLibrary = mappings.filter(({ source }) => source === 'library').length
       const mappedWishlist = mappings.filter(({ source }) => source === 'wishlist').length
@@ -20,12 +18,12 @@ builder.queryField('audibleSync', (t) =>
       const rawWishlist = rawItems.filter(({ source }) => source === 'wishlist').length
 
       return {
-        connected,
-        fetchInProgress: AudibleQuery.isFetchInProgress(),
+        connected: syncState.syncStatus !== 'disconnected',
+        fetchInProgress: syncState.syncStatus === 'fetching',
         libraryCount: Math.max(mappedLibrary, rawLibrary),
         wishlistCount: Math.max(mappedWishlist, rawWishlist),
-        lastSyncAt: lastSyncAt ?? undefined,
-        lastFetchedAt: lastFetchedAt ?? undefined,
+        lastSyncAt: syncState.importUpdatedAt,
+        lastFetchedAt: syncState.syncUpdatedAt,
         rawItemCount: rawItems.length,
         importTaskId: String(AUDIBLE_IMPORT_TASK_ID),
       }

@@ -65,6 +65,16 @@ export type AudibleSummary = {
   wishlistTotal: number
 }
 
+export type AudibleSyncStatus = 'disconnected' | 'connected' | 'fetching' | 'fetched'
+export type AudibleImportStatus = 'init' | 'importing' | 'imported'
+
+export type AudibleSyncState = {
+  syncStatus: AudibleSyncStatus
+  syncUpdatedAt?: Date
+  importStatus: AudibleImportStatus
+  importUpdatedAt?: Date
+}
+
 export type LocaleConfig = {
   domain: string
   marketplaceId: string

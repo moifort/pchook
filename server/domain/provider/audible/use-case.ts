@@ -161,10 +161,12 @@ export namespace AudibleUseCase {
   export const fetchAndStore = async () => {
     const credentials = await AudibleQuery.getCredentials()
     if (!credentials) return 'no-credentials' as const
-    if (AudibleQuery.isFetchInProgress()) return 'already-fetching' as const
+
+    const syncState = await AudibleQuery.getSyncState()
+    if (syncState.syncStatus === 'fetching') return 'already-fetching' as const
 
     log.info('Starting Audible fetch')
-    AudibleCommand.setFetchInProgress(true)
+    await AudibleCommand.startFetch()
 
     try {
       const { items: libraryItems, credentials: afterLibrary } = await fetchLibrary(credentials)
@@ -179,11 +181,13 @@ export namespace AudibleUseCase {
         ...wishlistItems.map((item) => ({ item, source: 'wishlist' as const })),
       ]
 
-      for (const { item, source } of allEntries) {
-        await AudibleCommand.saveRawItem(item.asin, { item, source, downloadedAt: new Date() })
-      }
+      await Promise.all(
+        allEntries.map(({ item, source }) =>
+          AudibleCommand.saveRawItem(item.asin, { item, source, downloadedAt: new Date() }),
+        ),
+      )
 
-      await AudibleCommand.saveLastFetchedAt(new Date())
+      await AudibleCommand.completeFetch()
 
       const listenedTotal = libraryItems.filter(({ finishedAt }) => finishedAt !== undefined).length
       const summary = {
@@ -193,8 +197,17 @@ export namespace AudibleUseCase {
       }
       log.info('Fetch completed', summary)
       return summary
-    } finally {
-      AudibleCommand.setFetchInProgress(false)
+    } catch (error) {
+      await AudibleCommand.completeFetch()
+      throw error
+    }
+  }
+
+  export const selfHealSyncState = async () => {
+    const state = await AudibleQuery.getSyncState()
+    if (state.syncStatus === 'fetching') {
+      log.warn('Self-healing: sync state was stuck in fetching, resetting to connected')
+      await AudibleCommand.completeFetch()
     }
   }
 }

@@ -3,9 +3,20 @@ import type {
   Asin,
   AsinBookMapping,
   AudibleCredentials,
+  AudibleSyncState,
   AuthSession,
   RawAudibleEntry,
 } from '~/domain/provider/audible/types'
+
+const DEFAULT_SYNC_STATE: AudibleSyncState = {
+  syncStatus: 'disconnected',
+  importStatus: 'init',
+}
+
+const updateSyncState = async (patch: Partial<AudibleSyncState>) => {
+  const current = (await repository.findSyncState()) ?? DEFAULT_SYNC_STATE
+  await repository.saveSyncState({ ...current, ...patch })
+}
 
 export namespace AudibleCommand {
   export const saveCredentials = async (credentials: AudibleCredentials) => {
@@ -25,10 +36,6 @@ export namespace AudibleCommand {
 
   export const saveMapping = async (mapping: AsinBookMapping) => {
     await repository.saveMapping(mapping)
-  }
-
-  export const saveSyncCompletedAt = async (date: Date) => {
-    await repository.saveSyncCompletedAt(date)
   }
 
   export const saveRawItem = async (asin: Asin, entry: RawAudibleEntry) => {
@@ -54,11 +61,32 @@ export namespace AudibleCommand {
     return session
   }
 
-  export const setFetchInProgress = (value: boolean) => {
-    repository.setFetchInProgress(value)
+  export const connect = async () => {
+    await updateSyncState({ syncStatus: 'connected', syncUpdatedAt: new Date() })
   }
 
-  export const saveLastFetchedAt = async (date: Date) => {
-    await repository.saveLastFetchedAt(date)
+  export const startFetch = async () => {
+    await updateSyncState({ syncStatus: 'fetching', syncUpdatedAt: new Date() })
+  }
+
+  export const completeFetch = async () => {
+    await updateSyncState({ syncStatus: 'fetched', syncUpdatedAt: new Date() })
+  }
+
+  export const disconnect = async () => {
+    await updateSyncState({
+      syncStatus: 'disconnected',
+      syncUpdatedAt: new Date(),
+      importStatus: 'init',
+      importUpdatedAt: new Date(),
+    })
+  }
+
+  export const startImport = async () => {
+    await updateSyncState({ importStatus: 'importing', importUpdatedAt: new Date() })
+  }
+
+  export const completeImport = async () => {
+    await updateSyncState({ importStatus: 'imported', importUpdatedAt: new Date() })
   }
 }

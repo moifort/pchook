@@ -2,6 +2,7 @@ import type {
   Asin,
   AsinBookMapping,
   AudibleCredentials,
+  AudibleSyncState,
   AuthSession,
   RawAudibleEntry,
 } from '~/domain/provider/audible/types'
@@ -11,7 +12,7 @@ const credentialsStorage = () => createTypedStorage<AudibleCredentials>('audible
 const mappingsStorage = () => createTypedStorage<AsinBookMapping>('audible-mappings')
 const authSessionsStorage = () => createTypedStorage<AuthSession>('audible-auth-sessions')
 const rawItemsStorage = () => createTypedStorage<RawAudibleEntry>('audible-raw')
-const syncMetaStorage = () => createTypedStorage<Date>('audible-sync-meta')
+const syncStateStorage = () => createTypedStorage<AudibleSyncState>('audible-sync-meta')
 
 export const findCredentials = async () => credentialsStorage().getItem('current')
 
@@ -60,26 +61,13 @@ export const clearRawItems = async () => {
   await Promise.all(keys.map((key) => rawItemsStorage().removeItem(key)))
 }
 
-export const findSyncCompletedAt = async () => syncMetaStorage().getItem('lastCompletedAt')
-
-export const saveSyncCompletedAt = async (date: Date) => {
-  await syncMetaStorage().setItem('lastCompletedAt', date)
-}
-
 export const clearMappings = async () => {
   const keys = await mappingsStorage().getKeys()
   await Promise.all(keys.map((key) => mappingsStorage().removeItem(key)))
 }
 
-// In-memory fetch state
-let fetchInProgress = false
+export const findSyncState = async () => syncStateStorage().getItem('state')
 
-export const isFetchInProgress = () => fetchInProgress
-export const setFetchInProgress = (value: boolean) => {
-  fetchInProgress = value
-}
-
-export const findLastFetchedAt = async () => syncMetaStorage().getItem('lastFetchedAt')
-export const saveLastFetchedAt = async (date: Date) => {
-  await syncMetaStorage().setItem('lastFetchedAt', date)
+export const saveSyncState = async (state: AudibleSyncState) => {
+  await syncStateStorage().setItem('state', state)
 }
