@@ -72,3 +72,8 @@ export const removeAllSeriesBooksForBook = async (bookId: BookId) => {
   const entry = await findSeriesBookByBookId(bookId)
   if (entry) await seriesBooksStorage().removeItem(`${entry.seriesId}:${entry.bookId}`)
 }
+
+export const resetCache = () => {
+  seriesByName.clear()
+  seriesIndexLoaded = false
+}
