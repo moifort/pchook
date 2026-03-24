@@ -14,15 +14,17 @@ export const TaskType = builder.objectRef<TaskState>('Task').implement({
     current: t.exposeInt('current', { description: 'Number of items processed' }),
     total: t.exposeInt('total', { description: 'Total number of items' }),
     message: t.exposeString('message', { description: 'Progress message' }),
-    startedAt: t.string({
+    startedAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Start date (ISO 8601)',
-      resolve: ({ startedAt }) => startedAt?.toISOString() ?? null,
+      description: 'Start date',
+      resolve: ({ startedAt }) => startedAt ?? null,
     }),
-    completedAt: t.string({
+    completedAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Completion date (ISO 8601)',
-      resolve: ({ completedAt }) => completedAt?.toISOString() ?? null,
+      description: 'Completion date',
+      resolve: ({ completedAt }) => completedAt ?? null,
     }),
   }),
 })

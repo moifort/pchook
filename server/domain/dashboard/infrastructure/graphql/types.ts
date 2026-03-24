@@ -25,10 +25,11 @@ const FavoriteBookType = builder.objectRef<FavoriteBook>('FavoriteBook').impleme
       resolve: ({ genre }) => (genre ? String(genre) : null),
     }),
     rating: t.int({ description: 'Rating (0-10)', resolve: ({ rating }) => Number(rating) }),
-    readDate: t.string({
+    readDate: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Read date (ISO 8601)',
-      resolve: ({ readDate }) => readDate?.toISOString() ?? null,
+      description: 'Read date',
+      resolve: ({ readDate }) => readDate ?? null,
     }),
     estimatedPrice: t.float({
       nullable: true,
@@ -52,9 +53,10 @@ const RecentBookType = builder.objectRef<RecentBook>('RecentBook').implement({
       description: 'Genre',
       resolve: ({ genre }) => (genre ? String(genre) : null),
     }),
-    createdAt: t.string({
-      description: 'Date added (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Date added',
+      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })

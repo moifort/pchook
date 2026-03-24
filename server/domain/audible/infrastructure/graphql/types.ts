@@ -56,15 +56,17 @@ export const AudibleStatusType = builder.objectRef<AudibleStatusData>('AudibleSt
     wishlistCount: t.exposeInt('wishlistCount', {
       description: 'Number of books in the wishlist',
     }),
-    lastSyncAt: t.string({
+    lastSyncAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Last sync date (ISO 8601)',
-      resolve: ({ lastSyncAt }) => lastSyncAt?.toISOString() ?? null,
+      description: 'Last sync date',
+      resolve: ({ lastSyncAt }) => lastSyncAt ?? null,
     }),
-    lastFetchedAt: t.string({
+    lastFetchedAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Last fetch date (ISO 8601)',
-      resolve: ({ lastFetchedAt }) => lastFetchedAt?.toISOString() ?? null,
+      description: 'Last fetch date',
+      resolve: ({ lastFetchedAt }) => lastFetchedAt ?? null,
     }),
     rawItemCount: t.exposeInt('rawItemCount', { description: 'Number of raw items' }),
     importTaskId: t.exposeString('importTaskId', {

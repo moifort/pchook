@@ -44,10 +44,11 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Publisher',
       resolve: ({ publisher }) => (publisher ? String(publisher) : null),
     }),
-    publishedDate: t.string({
+    publishedDate: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Publication date (ISO 8601)',
-      resolve: ({ publishedDate }) => publishedDate?.toISOString() ?? null,
+      description: 'Publication date',
+      resolve: ({ publishedDate }) => publishedDate ?? null,
     }),
     pageCount: t.int({
       nullable: true,
@@ -100,10 +101,11 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Reading status',
       resolve: ({ status }) => status,
     }),
-    readDate: t.string({
+    readDate: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Read date (ISO 8601)',
-      resolve: ({ readDate }) => readDate?.toISOString() ?? null,
+      description: 'Read date',
+      resolve: ({ readDate }) => readDate ?? null,
     }),
     awards: t.field({
       type: [AwardType],
@@ -126,13 +128,15 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'External URL (Audible, etc.)',
       resolve: ({ externalUrl }) => (externalUrl ? String(externalUrl) : null),
     }),
-    createdAt: t.string({
-      description: 'Date added to library (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Date added to library',
+      resolve: ({ createdAt }) => createdAt,
     }),
-    updatedAt: t.string({
-      description: 'Last modified date (ISO 8601)',
-      resolve: ({ updatedAt }) => updatedAt.toISOString(),
+    updatedAt: t.field({
+      type: 'DateTime',
+      description: 'Last modified date',
+      resolve: ({ updatedAt }) => updatedAt,
     }),
   }),
 })
@@ -185,9 +189,10 @@ export const BookListItemType = builder.objectRef<BookListItemModel>('BookListIt
       nullable: true,
       description: 'Position in series',
     }),
-    createdAt: t.string({
-      description: 'Date added (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Date added',
+      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })

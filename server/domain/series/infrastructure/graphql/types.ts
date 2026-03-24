@@ -7,9 +7,10 @@ export const SeriesType = builder.objectRef<Series>('Series').implement({
   fields: (t) => ({
     id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
     name: t.string({ description: 'Series name', resolve: ({ name }) => String(name) }),
-    createdAt: t.string({
-      description: 'Creation date (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Creation date',
+      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })

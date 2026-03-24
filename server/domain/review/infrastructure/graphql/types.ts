@@ -12,15 +12,17 @@ export const ReviewType = builder.objectRef<Review>('Review').implement({
       description: 'Personal rating (0-10)',
       resolve: ({ rating }) => Number(rating),
     }),
-    readDate: t.string({
+    readDate: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Read date (ISO 8601)',
-      resolve: ({ readDate }) => readDate?.toISOString() ?? null,
+      description: 'Read date',
+      resolve: ({ readDate }) => readDate ?? null,
     }),
     reviewNotes: t.exposeString('reviewNotes', { nullable: true, description: 'Reading notes' }),
-    createdAt: t.string({
-      description: 'Creation date (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Creation date',
+      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })
