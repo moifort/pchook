@@ -1,5 +1,5 @@
-import * as repository from '~/domain/audible/infrastructure/repository'
-import type { Asin } from '~/domain/audible/types'
+import * as repository from '~/domain/provider/audible/infrastructure/repository'
+import type { Asin } from '~/domain/provider/audible/types'
 
 export namespace AudibleQuery {
   export const hasCredentials = async () => {

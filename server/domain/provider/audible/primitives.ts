@@ -1,6 +1,9 @@
 import { make } from 'ts-brand'
 import { z } from 'zod'
-import type { Asin as AsinType, AudibleLocale as AudibleLocaleType } from '~/domain/audible/types'
+import type {
+  Asin as AsinType,
+  AudibleLocale as AudibleLocaleType,
+} from '~/domain/provider/audible/types'
 
 export const Asin = (value: unknown) => {
   const v = z

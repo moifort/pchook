@@ -1,11 +1,11 @@
-import * as repository from '~/domain/audible/infrastructure/repository'
+import * as repository from '~/domain/provider/audible/infrastructure/repository'
 import type {
   Asin,
   AsinBookMapping,
   AudibleCredentials,
   AuthSession,
   RawAudibleEntry,
-} from '~/domain/audible/types'
+} from '~/domain/provider/audible/types'
 
 export namespace AudibleCommand {
   export const saveCredentials = async (credentials: AudibleCredentials) => {

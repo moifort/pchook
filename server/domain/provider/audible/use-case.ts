@@ -1,19 +1,19 @@
+import { BookCommand } from '~/domain/book/command'
+import type { Book } from '~/domain/book/types'
+import { BookUseCase } from '~/domain/book/use-case'
 import {
   buildGeminiPrompt,
   formatDuration,
   mergeAudibleIntoScanResult,
-} from '~/domain/audible/business-rules'
-import { AudibleCommand } from '~/domain/audible/command'
+} from '~/domain/provider/audible/business-rules'
+import { AudibleCommand } from '~/domain/provider/audible/command'
 import {
   fetchLibrary,
   fetchWishlist,
   verifyConnection,
-} from '~/domain/audible/infrastructure/audible.api'
-import { AudibleQuery } from '~/domain/audible/query'
-import type { AsinBookMapping, AudibleItem, RawAudibleEntry } from '~/domain/audible/types'
-import { BookCommand } from '~/domain/book/command'
-import type { Book } from '~/domain/book/types'
-import { BookUseCase } from '~/domain/book/use-case'
+} from '~/domain/provider/audible/infrastructure/audible.api'
+import { AudibleQuery } from '~/domain/provider/audible/query'
+import type { AsinBookMapping, AudibleItem, RawAudibleEntry } from '~/domain/provider/audible/types'
 import { callGemini } from '~/domain/scan/infrastructure/gemini'
 import { enrichWithHardcover } from '~/domain/scan/scanner'
 import { partialScanResultSchema } from '~/domain/scan/schemas'

@@ -1,14 +1,17 @@
 import { GraphQLError } from 'graphql'
 import { z } from 'zod'
-import { AudibleCommand } from '~/domain/audible/command'
-import { generateLoginUrl, registerDevice } from '~/domain/audible/infrastructure/audible.api'
-import { AudibleLocale } from '~/domain/audible/primitives'
-import { AudibleQuery } from '~/domain/audible/query'
+import { AudibleCommand } from '~/domain/provider/audible/command'
+import {
+  generateLoginUrl,
+  registerDevice,
+} from '~/domain/provider/audible/infrastructure/audible.api'
+import { AudibleLocale } from '~/domain/provider/audible/primitives'
+import { AudibleQuery } from '~/domain/provider/audible/query'
 import {
   AUDIBLE_IMPORT_TASK_ID,
   AudibleUseCase,
   importTaskDefinition,
-} from '~/domain/audible/use-case'
+} from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
 import { TaskType } from '~/domain/task/infrastructure/graphql/types'
 import { TaskQuery } from '~/domain/task/query'

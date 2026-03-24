@@ -1,4 +1,4 @@
-import type { AudibleItem } from '~/domain/audible/types'
+import type { AudibleItem } from '~/domain/provider/audible/types'
 import { buildBookJsonSchema } from '~/domain/scan/infrastructure/gemini'
 import type { ScanResult } from '~/domain/scan/types'
 

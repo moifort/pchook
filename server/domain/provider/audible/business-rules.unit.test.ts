@@ -3,9 +3,9 @@ import {
   buildGeminiPrompt,
   formatDuration,
   mergeAudibleIntoScanResult,
-} from '~/domain/audible/business-rules'
-import { Asin } from '~/domain/audible/primitives'
-import type { AudibleItem } from '~/domain/audible/types'
+} from '~/domain/provider/audible/business-rules'
+import { Asin } from '~/domain/provider/audible/primitives'
+import type { AudibleItem } from '~/domain/provider/audible/types'
 import type { ScanResult } from '~/domain/scan/types'
 
 const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({

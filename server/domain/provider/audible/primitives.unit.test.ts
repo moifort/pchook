@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { Asin, AudibleLocale } from '~/domain/audible/primitives'
+import { Asin, AudibleLocale } from '~/domain/provider/audible/primitives'
 
 describe('Asin', () => {
   test('accepts valid 10-char alphanumeric ASIN', () => {

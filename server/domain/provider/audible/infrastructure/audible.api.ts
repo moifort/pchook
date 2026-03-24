@@ -1,14 +1,14 @@
 import { createHash, createSign, randomBytes, randomUUID } from 'node:crypto'
 import { z } from 'zod'
-import { AudibleCommand } from '~/domain/audible/command'
-import { Asin } from '~/domain/audible/primitives'
+import { AudibleCommand } from '~/domain/provider/audible/command'
+import { Asin } from '~/domain/provider/audible/primitives'
 import type {
   AudibleCredentials,
   AudibleItem,
   AudibleLocale,
   AuthSession,
-} from '~/domain/audible/types'
-import { AUDIBLE_LOCALES } from '~/domain/audible/types'
+} from '~/domain/provider/audible/types'
+import { AUDIBLE_LOCALES } from '~/domain/provider/audible/types'
 import { createLogger } from '~/system/logger'
 
 const log = createLogger('audible-api')

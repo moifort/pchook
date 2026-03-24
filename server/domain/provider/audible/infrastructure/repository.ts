@@ -4,7 +4,7 @@ import type {
   AudibleCredentials,
   AuthSession,
   RawAudibleEntry,
-} from '~/domain/audible/types'
+} from '~/domain/provider/audible/types'
 import { createTypedStorage } from '~/system/storage'
 
 const credentialsStorage = () => createTypedStorage<AudibleCredentials>('audible-credentials')

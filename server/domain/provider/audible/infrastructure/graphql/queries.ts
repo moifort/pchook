@@ -1,5 +1,5 @@
-import { AudibleQuery } from '~/domain/audible/query'
-import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/audible/use-case'
+import { AudibleQuery } from '~/domain/provider/audible/query'
+import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
 import { AudibleSyncType } from './types'
 
