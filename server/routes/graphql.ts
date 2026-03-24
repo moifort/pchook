@@ -1,15 +1,7 @@
-import { ApolloServer, HeaderMap } from '@apollo/server'
-import type { GraphQLContext } from '~/graphql/context'
-import { schema } from '~/graphql/schema'
-
-const apollo = new ApolloServer<GraphQLContext>({
-  schema,
-  introspection: true,
-})
-
-await apollo.start()
+import { type ApolloServer, HeaderMap } from '@apollo/server'
 
 export default defineEventHandler(async (event) => {
+  const apollo = useApollo()
   const method = event.method
   const headerMap = new HeaderMap()
   Object.entries(getHeaders(event)).forEach(([key, value]) => {
