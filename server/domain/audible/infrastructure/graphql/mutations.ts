@@ -10,7 +10,7 @@ import {
   importTaskDefinition,
 } from '~/domain/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
-import { TaskType } from '~/domain/task/graphql/types'
+import { TaskType } from '~/domain/task/infrastructure/graphql/types'
 import { TaskQuery } from '~/domain/task/query'
 import { TaskRunner } from '~/domain/task/runner'
 import { createLogger } from '~/system/logger'

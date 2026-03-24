@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql'
 import { FAVORITE_RATING } from '~/domain/book/business-rules'
 import { BookCommand } from '~/domain/book/command'
-import { BookType } from '~/domain/book/graphql/types'
+import { BookType } from '~/domain/book/infrastructure/graphql/types'
 import { BookId, Note } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { ReviewCommand } from '~/domain/review/command'

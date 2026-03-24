@@ -1,4 +1,4 @@
-import { BookType } from '~/domain/book/graphql/types'
+import { BookType } from '~/domain/book/infrastructure/graphql/types'
 import type { SeriesInfo } from '~/domain/book/read-model/types'
 import { booksInLanguage } from '~/domain/series/business-rules'
 import { SeriesQuery } from '~/domain/series/query'

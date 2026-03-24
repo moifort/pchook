@@ -1,4 +1,4 @@
-import { BookType } from '~/domain/book/graphql/types'
+import { BookType } from '~/domain/book/infrastructure/graphql/types'
 import { ReviewQuery } from '~/domain/review/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { ReviewType } from './types'

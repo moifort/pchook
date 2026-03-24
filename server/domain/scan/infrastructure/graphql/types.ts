@@ -1,4 +1,4 @@
-import { AwardType, BookType, PublicRatingRef } from '~/domain/book/graphql/types'
+import { AwardType, BookType, PublicRatingRef } from '~/domain/book/infrastructure/graphql/types'
 import type { Book } from '~/domain/book/types'
 import type { ScanResult } from '~/domain/scan/types'
 import { builder } from '~/domain/shared/graphql/builder'
