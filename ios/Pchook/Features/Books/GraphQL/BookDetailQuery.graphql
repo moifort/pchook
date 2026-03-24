@@ -33,7 +33,7 @@ query BookDetail($id: ID!) {
     externalUrl
     createdAt
     updatedAt
-    coverImageBase64
+    coverImageUrl
     review {
       bookId
       rating

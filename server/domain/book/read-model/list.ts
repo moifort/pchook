@@ -40,9 +40,21 @@ export namespace BookListReadModel {
     )
 
     let items = books.map(
-      ({ id, title, authors, genre, status, estimatedPrice, language, awards, createdAt }) => ({
+      ({
+        id,
+        title,
+        coverImageId,
+        authors,
+        genre,
+        status,
+        estimatedPrice,
+        language,
+        awards,
+        createdAt,
+      }) => ({
         id,
         title: String(title),
+        coverImageUrl: coverImageId ? `/images/${coverImageId}` : undefined,
         authors,
         genre,
         status,

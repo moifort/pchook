@@ -33,7 +33,7 @@ enum GraphQLBooksAPI {
 
         return BookDetailData(
             book: mapBook(book),
-            coverImageBase64: book.coverImageBase64,
+            coverImageUrl: book.coverImageUrl,
             series: book.series.map { series in
                 SeriesInfo(
                     name: series.name ?? "",
@@ -131,6 +131,7 @@ private extension GraphQLBooksAPI {
         return BookListItem(
             id: book.id ?? "",
             title: book.title ?? "",
+            coverImageUrl: book.coverImageUrl,
             authors: book.authors ?? [],
             genre: book.genre,
             status: mapBookStatus(book.status),

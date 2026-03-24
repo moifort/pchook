@@ -10,8 +10,6 @@ export namespace BookQuery {
     return book
   }
 
-  export const getImageById = (id: BookId) => repository.findImageBy(id)
-
   export const findByISBN = (isbn: ISBN) => repository.findByISBN(isbn)
 
   export const findByTitleAndAuthors = (title: string, authors: string[]) =>

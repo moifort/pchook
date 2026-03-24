@@ -5,11 +5,11 @@ import { builder } from '~/domain/shared/graphql/builder'
 import { BookSortEnum, SortOrderEnum } from './enums'
 import { BookListItemType, BookType } from './types'
 
-builder.objectField(BookType, 'coverImageBase64', (t) =>
+builder.objectField(BookType, 'coverImageUrl', (t) =>
   t.string({
     nullable: true,
-    description: 'Image de couverture encodée en base64',
-    resolve: ({ id }) => BookQuery.getImageById(id),
+    description: "URL de l'image de couverture",
+    resolve: ({ coverImageId }) => (coverImageId ? `/images/${coverImageId}` : null),
   }),
 )
 

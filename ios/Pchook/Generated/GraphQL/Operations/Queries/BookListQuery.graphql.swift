@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookList"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } rating language seriesName seriesLabel seriesPosition createdAt } }"#
+        #"query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } rating language seriesName seriesLabel seriesPosition coverImageUrl createdAt } }"#
       ))
 
     public var genre: GraphQLNullable<String>
@@ -77,6 +77,7 @@ extension PchookGraphQL {
           .field("seriesName", String?.self),
           .field("seriesLabel", String?.self),
           .field("seriesPosition", Int?.self),
+          .field("coverImageUrl", String?.self),
           .field("createdAt", String?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -107,6 +108,8 @@ extension PchookGraphQL {
         var seriesLabel: String? { __data["seriesLabel"] }
         /// Position dans la série
         var seriesPosition: Int? { __data["seriesPosition"] }
+        /// URL de l'image de couverture
+        var coverImageUrl: String? { __data["coverImageUrl"] }
         /// Date d'ajout (ISO 8601)
         var createdAt: String? { __data["createdAt"] }
 

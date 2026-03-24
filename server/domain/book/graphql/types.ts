@@ -142,6 +142,10 @@ export const BookListItemType = builder.objectRef<BookListItemModel>('BookListIt
   fields: (t) => ({
     id: t.id({ description: 'Identifiant unique', resolve: ({ id }) => String(id) }),
     title: t.exposeString('title', { description: 'Titre du livre' }),
+    coverImageUrl: t.exposeString('coverImageUrl', {
+      nullable: true,
+      description: "URL de l'image de couverture",
+    }),
     authors: t.stringList({
       description: 'Auteurs',
       resolve: ({ authors }) => authors.map(String),

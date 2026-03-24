@@ -2,7 +2,6 @@ import type { Book, BookId, ISBN } from '~/domain/book/types'
 import { createTypedStorage } from '~/system/storage'
 
 const storage = () => createTypedStorage<Book>('books')
-const imageStorage = () => useStorage('book-images')
 
 export const findAll = async () => {
   const keys = await storage().getKeys()
@@ -41,19 +40,11 @@ export const findByTitleAndAuthors = async (title: string, authors: string[]) =>
   })
 }
 
-export const findImageBy = async (id: BookId) =>
-  (await imageStorage().getItem<string>(id)) ?? undefined
-
 export const save = async (book: Book) => {
   await storage().setItem(book.id, book)
   return book
 }
 
-export const saveImage = async (id: BookId, imageBase64: string) => {
-  await imageStorage().setItem(id, imageBase64)
-}
-
 export const remove = async (id: BookId) => {
   await storage().removeItem(id)
-  await imageStorage().removeItem(id)
 }

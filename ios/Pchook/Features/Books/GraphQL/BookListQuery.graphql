@@ -15,6 +15,7 @@ query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrd
     seriesName
     seriesLabel
     seriesPosition
+    coverImageUrl
     createdAt
   }
 }

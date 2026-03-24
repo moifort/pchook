@@ -24,7 +24,7 @@ export default defineNitroConfig({
   storage: {
     'migration-meta': { driver: 'fs', base: './.data/db/migration-meta' },
     books: { driver: 'fs', base: './.data/db/books' },
-    'book-images': { driver: 'fs', base: './.data/db/book-images' },
+    images: { driver: 'fs', base: './.data/db/images' },
     series: { driver: 'fs', base: './.data/db/series' },
     'series-books': { driver: 'fs', base: './.data/db/series-books' },
     reviews: { driver: 'fs', base: './.data/db/reviews' },

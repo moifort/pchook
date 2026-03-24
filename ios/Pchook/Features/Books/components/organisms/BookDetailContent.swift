@@ -10,7 +10,7 @@ struct BookDetailContent: View {
             Section {
                 HStack {
                     Spacer()
-                    CoverImageView(base64String: detail.coverImageBase64)
+                    CoverImageView(imageUrl: detail.coverImageUrl)
                     Spacer()
                 }
                 .listRowBackground(Color.clear)

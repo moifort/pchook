@@ -10,8 +10,7 @@ export namespace BookDetailReadModel {
     const book = await BookQuery.getById(id)
     if (book === 'not-found') return 'not-found' as const
 
-    const [coverImageBase64, seriesInfo, reviewResult] = await Promise.all([
-      BookQuery.getImageById(id),
+    const [seriesInfo, reviewResult] = await Promise.all([
       SeriesQuery.getByBookId(id),
       ReviewQuery.getByBookId(id),
     ])
@@ -40,7 +39,6 @@ export namespace BookDetailReadModel {
 
     return {
       book,
-      coverImageBase64,
       series,
       review,
     } satisfies BookDetailView

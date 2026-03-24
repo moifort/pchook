@@ -169,6 +169,10 @@ builder.mutationField('confirmBook', (t) =>
           : preview.scanResult
       const { title, data, seriesInfo } = scanResultToBookData(mergedScanResult as ScanResult)
 
+      const coverImageBuffer = preview.coverImageBase64
+        ? Buffer.from(preview.coverImageBase64, 'base64')
+        : undefined
+
       if (input.replaceBookId) {
         const result = await BookUseCase.replaceFromScan(
           BookId(input.replaceBookId),
@@ -180,7 +184,7 @@ builder.mutationField('confirmBook', (t) =>
             externalUrl: preview.externalUrl,
           },
           seriesInfo,
-          preview.coverImageBase64,
+          coverImageBuffer,
         )
 
         await previewRepository.remove(input.previewId)
@@ -204,7 +208,7 @@ builder.mutationField('confirmBook', (t) =>
           externalUrl: preview.externalUrl,
         },
         seriesInfo,
-        preview.coverImageBase64,
+        coverImageBuffer,
       )
 
       previewRepository.remove(input.previewId)

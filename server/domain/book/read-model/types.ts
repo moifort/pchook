@@ -5,6 +5,7 @@ import type { Eur, PersonName } from '~/domain/shared/types'
 export type BookListItem = {
   id: BookId
   title: string
+  coverImageUrl?: string
   authors: PersonName[]
   genre?: Genre
   status: BookStatus
@@ -32,7 +33,6 @@ export type SeriesInfo = {
 
 export type BookDetailView = {
   book: Book
-  coverImageBase64?: string
   series?: SeriesInfo
   review?: Review
 }

@@ -2,6 +2,7 @@ import { BookCommand } from '~/domain/book/command'
 import type { BookRemovedEvent } from '~/domain/book/events'
 import { BookQuery } from '~/domain/book/query'
 import type { Book, BookId, BookTitle } from '~/domain/book/types'
+import { ImageCommand } from '~/domain/image/command'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { emit } from '~/system/event-bus'
@@ -18,7 +19,7 @@ export namespace BookUseCase {
     title: BookTitle,
     data: Partial<Book>,
     seriesInfo?: SeriesInfo,
-    coverImageBase64?: string,
+    coverImageBuffer?: Buffer,
   ) => {
     const existing =
       (data.isbn ? await BookQuery.findByISBN(data.isbn) : undefined) ??
@@ -26,11 +27,9 @@ export namespace BookUseCase {
 
     if (existing) return { tag: 'duplicate', book: existing } as const
 
-    const book = await BookCommand.add(title, data)
+    const coverImageId = coverImageBuffer ? await ImageCommand.save(coverImageBuffer) : undefined
 
-    if (coverImageBase64) {
-      await BookCommand.saveImage(book.id, coverImageBase64)
-    }
+    const book = await BookCommand.add(title, { ...data, coverImageId })
 
     if (seriesInfo?.name) {
       const series = await SeriesCommand.findOrCreate(seriesInfo.name)
@@ -46,10 +45,16 @@ export namespace BookUseCase {
     title: BookTitle,
     data: Partial<Book>,
     seriesInfo?: SeriesInfo,
-    coverImageBase64?: string,
+    coverImageBuffer?: Buffer,
   ) => {
     const existing = await BookQuery.getById(existingBookId)
     if (existing === 'not-found') return { tag: 'not-found' } as const
+
+    const coverImageId = coverImageBuffer ? await ImageCommand.save(coverImageBuffer) : undefined
+
+    if (existing.coverImageId && coverImageId) {
+      await ImageCommand.remove(existing.coverImageId)
+    }
 
     const updated = await BookCommand.update(existingBookId, {
       title,
@@ -69,13 +74,10 @@ export namespace BookUseCase {
       narrators: data.narrators,
       awards: data.awards,
       publicRatings: data.publicRatings,
+      ...(coverImageId ? { coverImageId } : {}),
     })
 
     if (updated === 'not-found') return { tag: 'not-found' } as const
-
-    if (coverImageBase64) {
-      await BookCommand.saveImage(existingBookId, coverImageBase64)
-    }
 
     await SeriesCommand.removeBook(existingBookId)
     if (seriesInfo?.name) {
@@ -88,6 +90,13 @@ export namespace BookUseCase {
   }
 
   export const removeCompletely = async (id: BookId) => {
+    const book = await BookQuery.getById(id)
+    if (book === 'not-found') return 'not-found' as const
+
+    if (book.coverImageId) {
+      await ImageCommand.remove(book.coverImageId)
+    }
+
     const result = await BookCommand.remove(id)
     if (result === 'not-found') return 'not-found' as const
     await emit<BookRemovedEvent>('book-removed', { bookId: id })

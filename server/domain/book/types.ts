@@ -1,4 +1,5 @@
 import type { Brand } from 'ts-brand'
+import type { ImageId } from '~/domain/image/types'
 import type { Eur, PersonName, Url } from '~/domain/shared/types'
 
 export type BookId = Brand<string, 'BookId'>
@@ -32,6 +33,7 @@ export type PublicRating = {
 export type Book = {
   id: BookId
   title: BookTitle
+  coverImageId?: ImageId
   authors: PersonName[]
   publisher?: Publisher
   publishedDate?: Date

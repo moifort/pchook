@@ -35,8 +35,4 @@ export namespace BookCommand {
     if (!existing) return 'not-found' as const
     return await repository.remove(id)
   }
-
-  export const saveImage = async (id: BookId, imageBase64: string) => {
-    await repository.saveImage(id, imageBase64)
-  }
 }

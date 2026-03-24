@@ -75,8 +75,8 @@ type Book {
   """Prix littéraires"""
   awards: [Award!]
 
-  """Image de couverture encodée en base64"""
-  coverImageBase64: String
+  """URL de l'image de couverture"""
+  coverImageUrl: String
 
   """Date d'ajout à la bibliothèque (ISO 8601)"""
   createdAt: String
@@ -185,6 +185,9 @@ type BookListItem {
 
   """Prix littéraires"""
   awards: [Award!]
+
+  """URL de l'image de couverture"""
+  coverImageUrl: String
 
   """Date d'ajout (ISO 8601)"""
   createdAt: String

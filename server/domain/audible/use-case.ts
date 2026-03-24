@@ -25,8 +25,8 @@ const log = createLogger('audible-use-case')
 
 const downloadCover = async (url: string) => {
   try {
-    const buffer = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
-    return Buffer.from(buffer).toString('base64')
+    const arrayBuffer = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
+    return Buffer.from(arrayBuffer)
   } catch (error) {
     log.warn('Failed to download cover', { url, error: String(error) })
     return undefined
@@ -85,7 +85,7 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
     awards: geminiPartial.awards,
     publicRatings: geminiPartial.publicRatings,
   }
-  const { result: enrichedResult, coverImageBase64: hardcoverCover } =
+  const { result: enrichedResult, coverImageBase64: hardcoverCoverBase64 } =
     await enrichWithHardcover(geminiScanResult)
   const scanResult = mergeAudibleIntoScanResult(enrichedResult, item)
 
@@ -94,14 +94,17 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   const status = isRead ? 'read' : 'to-read'
   const readDate = isRead ? item.finishedAt : undefined
   const audibleCover = item.coverUrl ? await downloadCover(item.coverUrl) : undefined
-  const coverBase64 = audibleCover ?? hardcoverCover
+  const hardcoverCover = hardcoverCoverBase64
+    ? Buffer.from(hardcoverCoverBase64, 'base64')
+    : undefined
+  const coverBuffer = audibleCover ?? hardcoverCover
 
   const externalUrl = Url(await buildAudibleUrl(String(item.asin)))
   const result = await BookUseCase.addFromScan(
     title,
     { ...data, status, readDate, importSource: 'audible', externalUrl },
     seriesInfo,
-    coverBase64,
+    coverBuffer,
   )
 
   if (result.tag === 'duplicate') {

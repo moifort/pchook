@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: ID!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice duration narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageBase64 review { __typename bookId rating readDate reviewNotes createdAt } series { __typename name label position books { __typename id title label position } } } }"#
+        #"query BookDetail($id: ID!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice duration narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename name label position books { __typename id title label position } } } }"#
       ))
 
     public var id: ID
@@ -68,7 +68,7 @@ extension PchookGraphQL {
           .field("externalUrl", String?.self),
           .field("createdAt", String?.self),
           .field("updatedAt", String?.self),
-          .field("coverImageBase64", String?.self),
+          .field("coverImageUrl", String?.self),
           .field("review", Review?.self),
           .field("series", Series?.self),
         ] }
@@ -124,8 +124,8 @@ extension PchookGraphQL {
         var createdAt: String? { __data["createdAt"] }
         /// Date de dernière modification (ISO 8601)
         var updatedAt: String? { __data["updatedAt"] }
-        /// Image de couverture encodée en base64
-        var coverImageBase64: String? { __data["coverImageBase64"] }
+        /// URL de l'image de couverture
+        var coverImageUrl: String? { __data["coverImageUrl"] }
         /// Critique et note personnelle
         var review: Review? { __data["review"] }
         /// Informations sur la série
