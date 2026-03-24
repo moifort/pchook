@@ -1,5 +1,8 @@
 import { builder } from '~/domain/shared/graphql/builder'
 
+// Custom scalars (must be registered before types that reference them)
+import '~/domain/shared/graphql/scalars'
+
 // Book domain
 import '~/domain/book/infrastructure/graphql/enums'
 import '~/domain/book/infrastructure/graphql/types'
