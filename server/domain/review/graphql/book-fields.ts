@@ -7,7 +7,7 @@ builder.objectField(BookType, 'review', (t) =>
   t.field({
     type: ReviewType,
     nullable: true,
-    description: 'Critique et note personnelle',
+    description: 'Personal review and rating',
     resolve: async ({ id }) => {
       const result = await ReviewQuery.getByBookId(id)
       return result === 'not-found' ? null : result

@@ -2,24 +2,24 @@ import type { Review } from '~/domain/review/types'
 import { builder } from '~/domain/shared/graphql/builder'
 
 export const ReviewType = builder.objectRef<Review>('Review').implement({
-  description: "Critique et note personnelle d'un livre",
+  description: 'Personal review and rating of a book',
   fields: (t) => ({
     bookId: t.id({
-      description: 'Identifiant du livre associé',
+      description: 'Associated book ID',
       resolve: ({ bookId }) => String(bookId),
     }),
     rating: t.int({
-      description: 'Note personnelle (0-10)',
+      description: 'Personal rating (0-10)',
       resolve: ({ rating }) => Number(rating),
     }),
     readDate: t.string({
       nullable: true,
-      description: 'Date de lecture (ISO 8601)',
+      description: 'Read date (ISO 8601)',
       resolve: ({ readDate }) => readDate?.toISOString() ?? null,
     }),
-    reviewNotes: t.exposeString('reviewNotes', { nullable: true, description: 'Notes de lecture' }),
+    reviewNotes: t.exposeString('reviewNotes', { nullable: true, description: 'Reading notes' }),
     createdAt: t.string({
-      description: 'Date de création (ISO 8601)',
+      description: 'Creation date (ISO 8601)',
       resolve: ({ createdAt }) => createdAt.toISOString(),
     }),
   }),

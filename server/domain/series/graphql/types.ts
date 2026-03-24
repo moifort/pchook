@@ -3,12 +3,12 @@ import type { Series } from '~/domain/series/types'
 import { builder } from '~/domain/shared/graphql/builder'
 
 export const SeriesType = builder.objectRef<Series>('Series').implement({
-  description: 'Une série de livres',
+  description: 'A book series',
   fields: (t) => ({
-    id: t.id({ description: 'Identifiant unique', resolve: ({ id }) => String(id) }),
-    name: t.string({ description: 'Nom de la série', resolve: ({ name }) => String(name) }),
+    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
+    name: t.string({ description: 'Series name', resolve: ({ name }) => String(name) }),
     createdAt: t.string({
-      description: 'Date de création (ISO 8601)',
+      description: 'Creation date (ISO 8601)',
       resolve: ({ createdAt }) => createdAt.toISOString(),
     }),
   }),
@@ -17,24 +17,24 @@ export const SeriesType = builder.objectRef<Series>('Series').implement({
 const SeriesBookEntryType = builder
   .objectRef<SeriesInfo['books'][number]>('SeriesBookEntry')
   .implement({
-    description: "Entrée d'un livre dans une série",
+    description: 'A book entry within a series',
     fields: (t) => ({
-      id: t.id({ description: 'Identifiant du livre', resolve: ({ id }) => String(id) }),
-      title: t.exposeString('title', { description: 'Titre du livre' }),
-      label: t.exposeString('label', { description: 'Label dans la série (ex: Tome 3)' }),
-      position: t.exposeInt('position', { description: 'Position dans la série' }),
+      id: t.id({ description: 'Book ID', resolve: ({ id }) => String(id) }),
+      title: t.exposeString('title', { description: 'Book title' }),
+      label: t.exposeString('label', { description: 'Label in series (e.g. Volume 3)' }),
+      position: t.exposeInt('position', { description: 'Position in series' }),
     }),
   })
 
 export const SeriesInfoType = builder.objectRef<SeriesInfo>('SeriesInfo').implement({
-  description: 'Informations sur la série à laquelle appartient un livre',
+  description: 'Information about the series a book belongs to',
   fields: (t) => ({
-    name: t.exposeString('name', { description: 'Nom de la série' }),
-    label: t.exposeString('label', { description: 'Label du livre dans la série' }),
-    position: t.exposeInt('position', { description: 'Position du livre dans la série' }),
+    name: t.exposeString('name', { description: 'Series name' }),
+    label: t.exposeString('label', { description: 'Book label in series' }),
+    position: t.exposeInt('position', { description: 'Book position in series' }),
     books: t.field({
       type: [SeriesBookEntryType],
-      description: 'Tous les livres de la série (même langue)',
+      description: 'All books in the series (same language)',
       resolve: ({ books }) => books,
     }),
   }),

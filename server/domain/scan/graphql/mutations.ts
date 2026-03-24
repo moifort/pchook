@@ -20,10 +20,10 @@ const log = createLogger('scan-graphql')
 builder.mutationField('analyzeBookCover', (t) =>
   t.field({
     type: BookPreviewType,
-    description: 'Scanner une couverture de livre pour extraire les métadonnées',
+    description: 'Scan a book cover to extract metadata',
     args: {
-      imageBase64: t.arg.string({ required: true, description: 'Image en base64' }),
-      ocrText: t.arg.string({ description: 'Texte OCR optionnel' }),
+      imageBase64: t.arg.string({ required: true, description: 'Base64-encoded image' }),
+      ocrText: t.arg.string({ description: 'Optional OCR text' }),
     },
     resolve: async (_, { imageBase64, ocrText }) => {
       log.info('Received analyze request', {
@@ -54,9 +54,9 @@ builder.mutationField('analyzeISBN', (t) =>
   t.field({
     type: BookPreviewType,
     nullable: true,
-    description: 'Scanner un code-barres ISBN. Retourne null si le livre existe déjà.',
+    description: 'Scan an ISBN barcode. Returns null if the book already exists.',
     args: {
-      isbn: t.arg.string({ required: true, description: 'Code ISBN (10 ou 13 chiffres)' }),
+      isbn: t.arg.string({ required: true, description: 'ISBN code (10 or 13 digits)' }),
     },
     resolve: async (_, { isbn: rawIsbn }) => {
       const isbn = ISBN(rawIsbn)
@@ -85,11 +85,11 @@ builder.mutationField('analyzeISBN', (t) =>
 builder.mutationField('analyzeURL', (t) =>
   t.field({
     type: BookPreviewType,
-    description: 'Importer un livre depuis une URL (Goodreads, Storygraph, etc.)',
+    description: 'Import a book from a URL (Goodreads, Storygraph, etc.)',
     args: {
-      url: t.arg.string({ required: true, description: 'URL du livre' }),
-      description: t.arg.string({ description: 'Description partagée' }),
-      rawText: t.arg.string({ description: 'Texte brut partagé' }),
+      url: t.arg.string({ required: true, description: 'Book URL' }),
+      description: t.arg.string({ description: 'Shared description' }),
+      rawText: t.arg.string({ description: 'Shared raw text' }),
     },
     resolve: async (_, { url, description, rawText }) => {
       const allSeries = await SeriesQuery.findAll()
@@ -100,7 +100,7 @@ builder.mutationField('analyzeURL', (t) =>
       )
 
       if (result === 'extraction-failed') {
-        throw new GraphQLError("Impossible d'identifier le livre à partir de cette URL", {
+        throw new GraphQLError('Could not identify the book from this URL', {
           extensions: { code: 'EXTRACTION_FAILED' },
         })
       }
@@ -121,31 +121,31 @@ builder.mutationField('analyzeURL', (t) =>
 )
 
 const ConfirmBookInput = builder.inputType('ConfirmBookInput', {
-  description: 'Données pour confirmer et créer un livre depuis un scan',
+  description: 'Data to confirm and create a book from a scan',
   fields: (t) => ({
-    previewId: t.string({ required: true, description: 'Identifiant du preview' }),
-    status: t.string({ required: true, description: 'Statut initial (to-read ou read)' }),
-    replaceBookId: t.string({ description: 'ID du livre à remplacer (mise à jour)' }),
-    title: t.string({ description: 'Titre (override)' }),
-    authors: t.stringList({ description: 'Auteurs (override)' }),
-    publisher: t.string({ description: 'Éditeur (override)' }),
+    previewId: t.string({ required: true, description: 'Preview identifier' }),
+    status: t.string({ required: true, description: 'Initial status (to-read or read)' }),
+    replaceBookId: t.string({ description: 'ID of the book to replace (update)' }),
+    title: t.string({ description: 'Title (override)' }),
+    authors: t.stringList({ description: 'Authors (override)' }),
+    publisher: t.string({ description: 'Publisher (override)' }),
     pageCount: t.int({ description: 'Pages (override)' }),
     genre: t.string({ description: 'Genre (override)' }),
     synopsis: t.string({ description: 'Synopsis (override)' }),
-    language: t.string({ description: 'Langue (override)' }),
+    language: t.string({ description: 'Language (override)' }),
     format: t.string({ description: 'Format (override)' }),
-    translator: t.string({ description: 'Traducteur (override)' }),
-    estimatedPrice: t.float({ description: 'Prix (override)' }),
-    series: t.string({ description: 'Série (override)' }),
-    seriesLabel: t.string({ description: 'Label série (override)' }),
-    seriesNumber: t.float({ description: 'Position série (override)' }),
+    translator: t.string({ description: 'Translator (override)' }),
+    estimatedPrice: t.float({ description: 'Price (override)' }),
+    series: t.string({ description: 'Series (override)' }),
+    seriesLabel: t.string({ description: 'Series label (override)' }),
+    seriesNumber: t.float({ description: 'Series position (override)' }),
   }),
 })
 
 builder.mutationField('confirmBook', (t) =>
   t.field({
     type: ConfirmBookResultType,
-    description: 'Confirmer et créer un livre depuis un preview de scan',
+    description: 'Confirm and create a book from a scan preview',
     args: {
       input: t.arg({ type: ConfirmBookInput, required: true }),
     },

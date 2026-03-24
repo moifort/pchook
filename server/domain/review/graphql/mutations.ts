@@ -15,9 +15,9 @@ const bookNotFound = () => new GraphQLError('Book not found', { extensions: { co
 builder.mutationField('addToFavorites', (t) =>
   t.field({
     type: BookType,
-    description: 'Ajouter un livre aux favoris (note de coup de cœur + statut lu)',
+    description: 'Add a book to favorites (favorite rating + read status)',
     args: {
-      id: t.arg.id({ required: true, description: 'Identifiant du livre' }),
+      id: t.arg.id({ required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
       const bookId = BookId(id)
@@ -43,9 +43,9 @@ builder.mutationField('addToFavorites', (t) =>
 builder.mutationField('addReview', (t) =>
   t.field({
     type: ReviewType,
-    description: 'Ajouter une critique à un livre (marque le livre comme lu)',
+    description: 'Add a review to a book (marks the book as read)',
     args: {
-      bookId: t.arg.id({ required: true, description: 'Identifiant du livre' }),
+      bookId: t.arg.id({ required: true, description: 'Book ID' }),
       input: t.arg({ type: CreateReviewInput, required: true }),
     },
     resolve: async (_, { bookId: rawId, input }) => {

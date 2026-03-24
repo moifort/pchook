@@ -9,26 +9,26 @@ type AuthStartData = {
 const AuthCookieType = builder
   .objectRef<{ name: string; value: string; domain: string }>('AuthCookie')
   .implement({
-    description: "Cookie d'authentification Audible",
+    description: 'Audible authentication cookie',
     fields: (t) => ({
-      name: t.exposeString('name', { description: 'Nom du cookie' }),
-      value: t.exposeString('value', { description: 'Valeur du cookie' }),
-      domain: t.exposeString('domain', { description: 'Domaine du cookie' }),
+      name: t.exposeString('name', { description: 'Cookie name' }),
+      value: t.exposeString('value', { description: 'Cookie value' }),
+      domain: t.exposeString('domain', { description: 'Cookie domain' }),
     }),
   })
 
 export const AuthStartResponseType = builder
   .objectRef<AuthStartData>('AuthStartResponse')
   .implement({
-    description: "Réponse de démarrage de l'authentification Audible",
+    description: 'Audible authentication start response',
     fields: (t) => ({
-      loginUrl: t.exposeString('loginUrl', { description: 'URL de connexion Audible' }),
+      loginUrl: t.exposeString('loginUrl', { description: 'Audible login URL' }),
       sessionId: t.exposeString('sessionId', {
-        description: "Identifiant de session d'authentification",
+        description: 'Authentication session identifier',
       }),
       cookies: t.field({
         type: [AuthCookieType],
-        description: 'Cookies à envoyer avec la requête de connexion',
+        description: 'Cookies to send with the login request',
         resolve: ({ cookies }) => cookies,
       }),
     }),
@@ -46,27 +46,27 @@ type AudibleStatusData = {
 }
 
 export const AudibleStatusType = builder.objectRef<AudibleStatusData>('AudibleStatus').implement({
-  description: "Statut de l'intégration Audible",
+  description: 'Audible integration status',
   fields: (t) => ({
-    connected: t.exposeBoolean('connected', { description: 'Credentials configurées' }),
-    fetchInProgress: t.exposeBoolean('fetchInProgress', { description: 'Fetch en cours' }),
+    connected: t.exposeBoolean('connected', { description: 'Credentials configured' }),
+    fetchInProgress: t.exposeBoolean('fetchInProgress', { description: 'Fetch in progress' }),
     libraryCount: t.exposeInt('libraryCount', {
-      description: 'Nombre de livres dans la bibliothèque',
+      description: 'Number of books in the library',
     }),
     wishlistCount: t.exposeInt('wishlistCount', {
-      description: 'Nombre de livres dans la wishlist',
+      description: 'Number of books in the wishlist',
     }),
     lastSyncAt: t.string({
       nullable: true,
-      description: 'Dernière synchronisation (ISO 8601)',
+      description: 'Last sync date (ISO 8601)',
       resolve: ({ lastSyncAt }) => lastSyncAt?.toISOString() ?? null,
     }),
     lastFetchedAt: t.string({
       nullable: true,
-      description: 'Dernier fetch (ISO 8601)',
+      description: 'Last fetch date (ISO 8601)',
       resolve: ({ lastFetchedAt }) => lastFetchedAt?.toISOString() ?? null,
     }),
-    rawItemCount: t.exposeInt('rawItemCount', { description: "Nombre d'éléments bruts" }),
+    rawItemCount: t.exposeInt('rawItemCount', { description: 'Number of raw items' }),
     importTaskId: t.exposeString('importTaskId', {
       description: 'Identifier of the Audible import task (use task query to get state)',
     }),

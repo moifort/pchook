@@ -9,7 +9,7 @@ builder.objectField(BookType, 'series', (t) =>
   t.field({
     type: SeriesInfoType,
     nullable: true,
-    description: 'Informations sur la série',
+    description: 'Series information',
     resolve: async ({ id, language }) => {
       const seriesInfo = await SeriesQuery.getByBookId(id)
       if (!seriesInfo) return null

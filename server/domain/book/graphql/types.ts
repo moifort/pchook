@@ -4,189 +4,189 @@ import { builder } from '~/domain/shared/graphql/builder'
 import { BookFormatEnum, BookStatusEnum, ImportSourceEnum } from './enums'
 
 export const AwardType = builder.objectRef<{ name: string; year?: number }>('Award').implement({
-  description: 'Prix littéraire reçu par un livre',
+  description: 'Literary award received by a book',
   fields: (t) => ({
-    name: t.exposeString('name', { description: 'Nom du prix' }),
-    year: t.exposeInt('year', { nullable: true, description: "Année d'obtention" }),
+    name: t.exposeString('name', { description: 'Award name' }),
+    year: t.exposeInt('year', { nullable: true, description: 'Year awarded' }),
   }),
 })
 
 export const PublicRatingRef = builder.objectRef<PublicRatingType>('PublicRating').implement({
-  description: "Note communautaire provenant d'une plateforme externe",
+  description: 'Community rating from an external platform',
   fields: (t) => ({
     source: t.exposeString('source', {
-      description: 'Nom de la plateforme (ex: Hardcover, Goodreads)',
+      description: 'Platform name (e.g. Hardcover, Goodreads)',
     }),
-    score: t.float({ description: 'Note obtenue', resolve: ({ score }) => Number(score) }),
+    score: t.float({ description: 'Score received', resolve: ({ score }) => Number(score) }),
     maxScore: t.float({
-      description: 'Note maximale possible',
+      description: 'Maximum possible score',
       resolve: ({ maxScore }) => Number(maxScore),
     }),
-    voterCount: t.exposeInt('voterCount', { description: 'Nombre de votants' }),
+    voterCount: t.exposeInt('voterCount', { description: 'Number of voters' }),
     url: t.string({
-      description: 'Lien vers la page du livre sur la plateforme',
+      description: 'Link to the book page on the platform',
       resolve: ({ url }) => String(url),
     }),
   }),
 })
 
 export const BookType = builder.objectRef<Book>('Book').implement({
-  description: 'Un livre dans la bibliothèque personnelle',
+  description: 'A book in the personal library',
   fields: (t) => ({
-    id: t.id({ description: 'Identifiant unique', resolve: ({ id }) => String(id) }),
-    title: t.string({ description: 'Titre du livre', resolve: ({ title }) => String(title) }),
+    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
+    title: t.string({ description: 'Book title', resolve: ({ title }) => String(title) }),
     authors: t.stringList({
-      description: 'Auteurs du livre',
+      description: 'Book authors',
       resolve: ({ authors }) => authors.map(String),
     }),
     publisher: t.string({
       nullable: true,
-      description: 'Éditeur',
+      description: 'Publisher',
       resolve: ({ publisher }) => (publisher ? String(publisher) : null),
     }),
     publishedDate: t.string({
       nullable: true,
-      description: 'Date de publication (ISO 8601)',
+      description: 'Publication date (ISO 8601)',
       resolve: ({ publishedDate }) => publishedDate?.toISOString() ?? null,
     }),
     pageCount: t.int({
       nullable: true,
-      description: 'Nombre de pages',
+      description: 'Page count',
       resolve: ({ pageCount }) => (pageCount ? Number(pageCount) : null),
     }),
     genre: t.string({
       nullable: true,
-      description: 'Genre littéraire (ex: Romance, SF, Polar)',
+      description: 'Literary genre (e.g. Romance, Sci-Fi, Thriller)',
       resolve: ({ genre }) => (genre ? String(genre) : null),
     }),
-    synopsis: t.exposeString('synopsis', { nullable: true, description: 'Résumé du livre' }),
+    synopsis: t.exposeString('synopsis', { nullable: true, description: 'Book synopsis' }),
     isbn: t.string({
       nullable: true,
-      description: 'Numéro ISBN',
+      description: 'ISBN number',
       resolve: ({ isbn }) => (isbn ? String(isbn) : null),
     }),
     language: t.string({
       nullable: true,
-      description: 'Langue du livre (ex: fr, en)',
+      description: 'Book language (e.g. fr, en)',
       resolve: ({ language }) => (language ? String(language) : null),
     }),
     format: t.field({
       type: BookFormatEnum,
       nullable: true,
-      description: 'Format du livre',
+      description: 'Book format',
       resolve: ({ format }) => format ?? null,
     }),
     translator: t.string({
       nullable: true,
-      description: 'Traducteur',
+      description: 'Translator',
       resolve: ({ translator }) => (translator ? String(translator) : null),
     }),
     estimatedPrice: t.float({
       nullable: true,
-      description: 'Prix estimé en euros',
+      description: 'Estimated price in euros',
       resolve: ({ estimatedPrice }) => (estimatedPrice ? Number(estimatedPrice) : null),
     }),
-    duration: t.exposeString('duration', { nullable: true, description: 'Durée (livre audio)' }),
+    duration: t.exposeString('duration', { nullable: true, description: 'Duration (audiobook)' }),
     narrators: t.stringList({
-      description: 'Narrateurs (livre audio)',
+      description: 'Narrators (audiobook)',
       resolve: ({ narrators }) => narrators.map(String),
     }),
     personalNotes: t.exposeString('personalNotes', {
       nullable: true,
-      description: 'Notes personnelles',
+      description: 'Personal notes',
     }),
     status: t.field({
       type: BookStatusEnum,
-      description: 'Statut de lecture',
+      description: 'Reading status',
       resolve: ({ status }) => status,
     }),
     readDate: t.string({
       nullable: true,
-      description: 'Date de lecture (ISO 8601)',
+      description: 'Read date (ISO 8601)',
       resolve: ({ readDate }) => readDate?.toISOString() ?? null,
     }),
     awards: t.field({
       type: [AwardType],
-      description: 'Prix littéraires',
+      description: 'Literary awards',
       resolve: ({ awards }) => awards,
     }),
     publicRatings: t.field({
       type: [PublicRatingRef],
-      description: 'Notes communautaires',
+      description: 'Community ratings',
       resolve: ({ publicRatings }) => publicRatings,
     }),
     importSource: t.field({
       type: ImportSourceEnum,
       nullable: true,
-      description: "Source d'import",
+      description: 'Import source',
       resolve: ({ importSource }) => importSource ?? null,
     }),
     externalUrl: t.string({
       nullable: true,
-      description: 'URL externe (Audible, etc.)',
+      description: 'External URL (Audible, etc.)',
       resolve: ({ externalUrl }) => (externalUrl ? String(externalUrl) : null),
     }),
     createdAt: t.string({
-      description: "Date d'ajout à la bibliothèque (ISO 8601)",
+      description: 'Date added to library (ISO 8601)',
       resolve: ({ createdAt }) => createdAt.toISOString(),
     }),
     updatedAt: t.string({
-      description: 'Date de dernière modification (ISO 8601)',
+      description: 'Last modified date (ISO 8601)',
       resolve: ({ updatedAt }) => updatedAt.toISOString(),
     }),
   }),
 })
 
 export const BookListItemType = builder.objectRef<BookListItemModel>('BookListItem').implement({
-  description: 'Élément de la liste de livres (vue résumée)',
+  description: 'Book list item (summary view)',
   fields: (t) => ({
-    id: t.id({ description: 'Identifiant unique', resolve: ({ id }) => String(id) }),
-    title: t.exposeString('title', { description: 'Titre du livre' }),
+    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
+    title: t.exposeString('title', { description: 'Book title' }),
     coverImageUrl: t.exposeString('coverImageUrl', {
       nullable: true,
-      description: "URL de l'image de couverture",
+      description: 'Cover image URL',
     }),
     authors: t.stringList({
-      description: 'Auteurs',
+      description: 'Authors',
       resolve: ({ authors }) => authors.map(String),
     }),
     genre: t.string({
       nullable: true,
-      description: 'Genre littéraire',
+      description: 'Literary genre',
       resolve: ({ genre }) => (genre ? String(genre) : null),
     }),
     status: t.field({
       type: BookStatusEnum,
-      description: 'Statut de lecture',
+      description: 'Reading status',
       resolve: ({ status }) => status,
     }),
     estimatedPrice: t.float({
       nullable: true,
-      description: 'Prix estimé en euros',
+      description: 'Estimated price in euros',
       resolve: ({ estimatedPrice }) => (estimatedPrice ? Number(estimatedPrice) : null),
     }),
     awards: t.field({
       type: [AwardType],
-      description: 'Prix littéraires',
+      description: 'Literary awards',
       resolve: ({ awards }) => awards,
     }),
     rating: t.int({
       nullable: true,
-      description: 'Note personnelle (0-10)',
+      description: 'Personal rating (0-10)',
       resolve: ({ rating }) => (rating ? Number(rating) : null),
     }),
-    language: t.exposeString('language', { nullable: true, description: 'Langue' }),
-    seriesName: t.exposeString('seriesName', { nullable: true, description: 'Nom de la série' }),
+    language: t.exposeString('language', { nullable: true, description: 'Language' }),
+    seriesName: t.exposeString('seriesName', { nullable: true, description: 'Series name' }),
     seriesLabel: t.exposeString('seriesLabel', {
       nullable: true,
-      description: 'Label dans la série (ex: Tome 3)',
+      description: 'Label in series (e.g. Volume 3)',
     }),
     seriesPosition: t.exposeInt('seriesPosition', {
       nullable: true,
-      description: 'Position dans la série',
+      description: 'Position in series',
     }),
     createdAt: t.string({
-      description: "Date d'ajout (ISO 8601)",
+      description: 'Date added (ISO 8601)',
       resolve: ({ createdAt }) => createdAt.toISOString(),
     }),
   }),

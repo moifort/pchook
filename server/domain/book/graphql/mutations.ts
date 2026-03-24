@@ -97,9 +97,9 @@ const toBookUpdate = (input: Record<string, unknown>) => ({
 builder.mutationField('updateBook', (t) =>
   t.field({
     type: BookType,
-    description: 'Modifier un livre existant',
+    description: 'Update an existing book',
     args: {
-      id: t.arg.id({ required: true, description: 'Identifiant du livre' }),
+      id: t.arg.id({ required: true, description: 'Book ID' }),
       input: t.arg({ type: UpdateBookInput, required: true }),
     },
     resolve: async (_, { id, input }) => {
@@ -125,9 +125,9 @@ builder.mutationField('updateBook', (t) =>
 builder.mutationField('deleteBook', (t) =>
   t.field({
     type: 'Boolean',
-    description: 'Supprimer un livre et ses données associées (review, série)',
+    description: 'Delete a book and its associated data (review, series)',
     args: {
-      id: t.arg.id({ required: true, description: 'Identifiant du livre à supprimer' }),
+      id: t.arg.id({ required: true, description: 'ID of the book to delete' }),
     },
     resolve: async (_, { id }) => {
       const result = await BookUseCase.removeCompletely(BookId(id))
@@ -166,9 +166,9 @@ const bookToScanResult = (book: Book, seriesName?: string): ScanResult => ({
 builder.mutationField('refreshBook', (t) =>
   t.field({
     type: 'Boolean',
-    description: 'Ré-enrichir un livre via Gemini (met à jour les métadonnées)',
+    description: 'Re-enrich a book via Gemini (updates metadata)',
     args: {
-      id: t.arg.id({ required: true, description: 'Identifiant du livre' }),
+      id: t.arg.id({ required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
       const bookId = BookId(id)

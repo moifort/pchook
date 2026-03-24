@@ -5,7 +5,7 @@ import { SeriesInfoType, SeriesType } from './types'
 builder.queryField('series', (t) =>
   t.field({
     type: [SeriesType],
-    description: 'Liste de toutes les séries',
+    description: 'List of all series',
     resolve: () => SeriesQuery.findAll(),
   }),
 )
@@ -14,9 +14,9 @@ builder.queryField('seriesById', (t) =>
   t.field({
     type: SeriesInfoType,
     nullable: true,
-    description: "Détail d'une série avec ses livres",
+    description: 'Series detail with its books',
     args: {
-      id: t.arg.id({ required: true, description: 'Identifiant de la série' }),
+      id: t.arg.id({ required: true, description: 'Series ID' }),
     },
     resolve: async (_, { id }) => {
       const result = await SeriesQuery.getById(id as never)

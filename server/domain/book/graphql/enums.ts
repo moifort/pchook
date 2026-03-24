@@ -1,48 +1,48 @@
 import { builder } from '~/domain/shared/graphql/builder'
 
 export const BookFormatEnum = builder.enumType('BookFormat', {
-  description: 'Format physique ou numérique du livre',
+  description: 'Physical or digital book format',
   values: {
-    pocket: { description: 'Livre de poche' },
-    paperback: { description: 'Broché' },
-    hardcover: { description: 'Relié' },
-    audiobook: { description: 'Livre audio' },
+    pocket: { description: 'Pocket book' },
+    paperback: { description: 'Paperback' },
+    hardcover: { description: 'Hardcover' },
+    audiobook: { description: 'Audiobook' },
   } as const,
 })
 
 export const BookStatusEnum = builder.enumType('BookStatus', {
-  description: "Statut de lecture d'un livre",
+  description: 'Reading status of a book',
   values: {
-    TO_READ: { value: 'to-read' as const, description: 'À lire' },
-    READ: { value: 'read' as const, description: 'Lu' },
+    TO_READ: { value: 'to-read' as const, description: 'To read' },
+    READ: { value: 'read' as const, description: 'Read' },
   },
 })
 
 export const ImportSourceEnum = builder.enumType('ImportSource', {
-  description: "Source d'import du livre",
+  description: 'Book import source',
   values: {
-    scan: { description: 'Scan de couverture' },
-    isbn: { description: 'Code-barres ISBN' },
-    url: { description: 'URL externe' },
-    audible: { description: 'Import Audible' },
+    scan: { description: 'Cover scan' },
+    isbn: { description: 'ISBN barcode' },
+    url: { description: 'External URL' },
+    audible: { description: 'Audible import' },
   } as const,
 })
 
 export const BookSortEnum = builder.enumType('BookSort', {
-  description: 'Champ de tri pour la liste de livres',
+  description: 'Sort field for the book list',
   values: {
-    createdAt: { description: "Date d'ajout" },
-    title: { description: 'Titre alphabétique' },
-    author: { description: "Nom de l'auteur" },
-    awards: { description: 'Nombre de prix littéraires' },
-    genre: { description: 'Genre littéraire' },
+    createdAt: { description: 'Date added' },
+    title: { description: 'Alphabetical title' },
+    author: { description: 'Author name' },
+    awards: { description: 'Number of literary awards' },
+    genre: { description: 'Literary genre' },
   } as const,
 })
 
 export const SortOrderEnum = builder.enumType('SortOrder', {
-  description: 'Ordre de tri',
+  description: 'Sort order',
   values: {
-    asc: { description: 'Croissant' },
-    desc: { description: 'Décroissant' },
+    asc: { description: 'Ascending' },
+    desc: { description: 'Descending' },
   } as const,
 })

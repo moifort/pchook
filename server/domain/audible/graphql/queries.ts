@@ -6,7 +6,7 @@ import { AudibleStatusType } from './types'
 builder.queryField('audibleStatus', (t) =>
   t.field({
     type: AudibleStatusType,
-    description: "Statut de l'intégration Audible",
+    description: 'Audible integration status',
     resolve: async () => {
       const connected = await AudibleQuery.hasCredentials()
       const mappings = await AudibleQuery.getAllMappings()

@@ -21,9 +21,9 @@ const log = createLogger('audible-graphql')
 builder.mutationField('audibleAuthStart', (t) =>
   t.field({
     type: AuthStartResponseType,
-    description: "Démarrer le flux d'authentification OAuth Audible",
+    description: 'Start the Audible OAuth authentication flow',
     args: {
-      locale: t.arg.string({ required: false, description: 'Locale Audible (par défaut: fr)' }),
+      locale: t.arg.string({ required: false, description: 'Audible locale (default: fr)' }),
     },
     resolve: async (_, { locale }) => {
       const audibleLocale = AudibleLocale(locale ?? 'fr')
@@ -35,10 +35,10 @@ builder.mutationField('audibleAuthStart', (t) =>
 builder.mutationField('audibleAuthCallback', (t) =>
   t.field({
     type: 'Boolean',
-    description: "Finaliser l'authentification OAuth Audible",
+    description: 'Complete the Audible OAuth authentication',
     args: {
-      sessionId: t.arg.string({ required: true, description: 'Identifiant de session' }),
-      redirectUrl: t.arg.string({ required: true, description: 'URL de redirection avec le code' }),
+      sessionId: t.arg.string({ required: true, description: 'Session identifier' }),
+      redirectUrl: t.arg.string({ required: true, description: 'Redirect URL with code' }),
     },
     resolve: async (_, { sessionId, redirectUrl }) => {
       const validSessionId = z.string().uuid().parse(sessionId)
@@ -67,7 +67,7 @@ builder.mutationField('audibleAuthCallback', (t) =>
 builder.mutationField('audibleDisconnect', (t) =>
   t.field({
     type: 'Boolean',
-    description: 'Déconnecter le compte Audible et nettoyer les données',
+    description: 'Disconnect the Audible account and clean up data',
     resolve: async () => {
       await TaskRunner.reset(AUDIBLE_IMPORT_TASK_ID)
       await AudibleCommand.removeCredentials()
@@ -81,7 +81,7 @@ builder.mutationField('audibleDisconnect', (t) =>
 builder.mutationField('audibleSyncFetch', (t) =>
   t.field({
     type: 'Boolean',
-    description: 'Récupérer la bibliothèque et wishlist Audible (tâche de fond)',
+    description: 'Fetch the Audible library and wishlist (background task)',
     resolve: async () => {
       const credentials = await AudibleQuery.getCredentials()
       if (!credentials) {
@@ -108,7 +108,7 @@ builder.mutationField('audibleSyncFetch', (t) =>
 builder.mutationField('audibleSyncVerify', (t) =>
   t.field({
     type: 'Boolean',
-    description: 'Vérifier la validité des credentials Audible',
+    description: 'Verify the Audible credentials validity',
     resolve: async () => {
       const result = await AudibleUseCase.verify()
       if (result === 'no-credentials') {
@@ -129,7 +129,7 @@ builder.mutationField('audibleSyncVerify', (t) =>
 builder.mutationField('audibleImportStart', (t) =>
   t.field({
     type: TaskType,
-    description: "Démarrer l'import des livres Audible (tâche de fond)",
+    description: 'Start importing Audible books (background task)',
     resolve: async () => {
       const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
       if (state !== 'not-found' && (state.phase === 'running' || state.phase === 'paused')) {

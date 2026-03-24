@@ -5,7 +5,7 @@ import { DashboardViewType } from './types'
 builder.queryField('dashboard', (t) =>
   t.field({
     type: DashboardViewType,
-    description: 'Tableau de bord avec statistiques de lecture',
+    description: 'Dashboard with reading statistics',
     resolve: () => DashboardReadModel.get(),
   }),
 )
