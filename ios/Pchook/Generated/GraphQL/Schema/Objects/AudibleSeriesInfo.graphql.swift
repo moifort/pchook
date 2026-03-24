@@ -4,9 +4,9 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Audible synchronization state
-  static let AudibleSync = ApolloAPI.Object(
-    typename: "AudibleSync",
+  /// Series information for an Audible item
+  static let AudibleSeriesInfo = ApolloAPI.Object(
+    typename: "AudibleSeriesInfo",
     implementedInterfaces: [],
     keyFields: nil
   )

@@ -269,15 +269,47 @@ struct AuthStartResponse: Sendable {
     let cookies: [AuthCookie]
 }
 
-struct AudibleStatus: Sendable {
-    let connected: Bool
-    let fetchInProgress: Bool
-    let libraryCount: Int
-    let wishlistCount: Int
-    var lastSyncAt: Date?
-    var lastFetchedAt: Date?
-    let rawItemCount: Int
-    let importTaskId: String
+struct AudibleData: Sendable {
+    var sync: AudibleSyncData?
+    var import_: AudibleImportData?
+}
+
+struct AudibleSyncData: Sendable {
+    let status: String
+    var updatedAt: Date?
+    var library: [AudibleItemData]?
+    var wishlist: [AudibleWishlistItemData]?
+}
+
+struct AudibleImportData: Sendable {
+    let status: String
+    var updatedAt: Date?
+    var taskId: String?
+    let importedCount: Int
+}
+
+struct AudibleItemData: Identifiable, Sendable {
+    let asin: String
+    let title: String
+    let authors: [String]
+    let narrators: [String]
+    let durationMinutes: Int
+    var publisher: String?
+    var language: String?
+    var coverUrl: String?
+    var finishedAt: Date?
+    var importedBookId: String?
+    var seriesName: String?
+    var seriesPosition: Int?
+    var id: String { asin }
+}
+
+struct AudibleWishlistItemData: Identifiable, Sendable {
+    let asin: String
+    let title: String
+    let authors: [String]
+    var importedBookId: String?
+    var id: String { asin }
 }
 
 struct ImportTaskState: Sendable {

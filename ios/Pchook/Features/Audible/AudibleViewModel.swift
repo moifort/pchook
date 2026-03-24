@@ -13,10 +13,10 @@ final class AudibleViewModel {
     private(set) var libraryCount = 0
     private(set) var wishlistCount = 0
     private(set) var lastFetchedAt: Date?
-    private(set) var rawItemCount = 0
 
     // Section 3: Import
     private(set) var importTask: ImportTaskState?
+    private(set) var importedCount = 0
     private(set) var isPausing = false
     private(set) var isCancelling = false
 
@@ -27,7 +27,7 @@ final class AudibleViewModel {
     private var pollingTask: Task<Void, Never>?
     private var importTaskId: String?
 
-    var hasFetchedData: Bool { rawItemCount > 0 }
+    var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
         guard let task = importTask else { return false }
         return task.phase == "running" || task.phase == "paused"
@@ -39,14 +39,8 @@ final class AudibleViewModel {
         isCheckingStatus = true
         defer { isCheckingStatus = false }
         do {
-            let status = try await GraphQLAudibleAPI.status()
-            isConnected = status.connected
-            isFetching = status.fetchInProgress
-            libraryCount = status.libraryCount
-            wishlistCount = status.wishlistCount
-            lastFetchedAt = status.lastFetchedAt
-            rawItemCount = status.rawItemCount
-            importTaskId = status.importTaskId
+            let data = try await GraphQLAudibleAPI.status()
+            applyStatus(data)
 
             if let taskId = importTaskId {
                 await refreshImportTask(taskId: taskId)
@@ -104,13 +98,9 @@ final class AudibleViewModel {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(3))
                 do {
-                    let status = try await GraphQLAudibleAPI.status()
-                    isFetching = status.fetchInProgress
-                    libraryCount = status.libraryCount
-                    wishlistCount = status.wishlistCount
-                    rawItemCount = status.rawItemCount
-                    lastFetchedAt = status.lastFetchedAt
-                    if !status.fetchInProgress { return }
+                    let data = try await GraphQLAudibleAPI.status()
+                    applyStatus(data)
+                    if !isFetching { return }
                 } catch {
                     break
                 }
@@ -123,6 +113,9 @@ final class AudibleViewModel {
     func startImport() async {
         do {
             try await GraphQLAudibleAPI.importStart()
+            // Refresh to get the new taskId
+            let data = try await GraphQLAudibleAPI.status()
+            applyStatus(data)
             if let taskId = importTaskId {
                 await refreshImportTask(taskId: taskId)
             }
@@ -214,12 +207,13 @@ final class AudibleViewModel {
         do {
             try await GraphQLAudibleAPI.disconnect()
             isConnected = false
+            isFetching = false
             libraryCount = 0
             wishlistCount = 0
             lastFetchedAt = nil
-            rawItemCount = 0
             importTask = nil
             importTaskId = nil
+            importedCount = 0
             lastVerifiedAt = nil
             cancelPolling()
         } catch {
@@ -234,13 +228,21 @@ final class AudibleViewModel {
 
     // MARK: - Private
 
+    private func applyStatus(_ data: AudibleData) {
+        let syncStatus = data.sync?.status ?? "DISCONNECTED"
+        isConnected = syncStatus != "DISCONNECTED"
+        isFetching = syncStatus == "FETCHING"
+        libraryCount = data.sync?.library?.count ?? 0
+        wishlistCount = data.sync?.wishlist?.count ?? 0
+        lastFetchedAt = data.sync?.updatedAt
+        importTaskId = data.import_?.taskId
+        importedCount = data.import_?.importedCount ?? 0
+    }
+
     private func refreshStatus() async {
         do {
-            let status = try await GraphQLAudibleAPI.status()
-            libraryCount = status.libraryCount
-            wishlistCount = status.wishlistCount
-            lastFetchedAt = status.lastFetchedAt
-            rawItemCount = status.rawItemCount
+            let data = try await GraphQLAudibleAPI.status()
+            applyStatus(data)
         } catch {}
     }
 }

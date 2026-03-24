@@ -1,13 +1,37 @@
-query AudibleStatus {
-  audibleSync {
-    connected
-    fetchInProgress
-    libraryCount
-    wishlistCount
-    lastSyncAt
-    lastFetchedAt
-    rawItemCount
-    importTaskId
+query Audible {
+  audible {
+    sync {
+      status
+      updatedAt
+      library {
+        asin
+        title
+        authors
+        narrators
+        durationMinutes
+        publisher
+        language
+        coverUrl
+        finishedAt
+        importedBookId
+        series {
+          name
+          position
+        }
+      }
+      wishlist {
+        asin
+        title
+        authors
+        importedBookId
+      }
+    }
+    import {
+      status
+      updatedAt
+      taskId
+      importedCount
+    }
   }
 }
 

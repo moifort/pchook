@@ -40,20 +40,50 @@ enum GraphQLAudibleAPI {
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
-    static func status() async throws -> AudibleStatus {
-        let query = PchookGraphQL.AudibleSyncQuery()
+    static func status() async throws -> AudibleData {
+        let query = PchookGraphQL.AudibleQuery()
         let data = try await GraphQLHelpers.fetch(client, query: query)
 
-        let sync = data.audibleSync
-        return AudibleStatus(
-            connected: sync.connected,
-            fetchInProgress: sync.fetchInProgress,
-            libraryCount: sync.libraryCount,
-            wishlistCount: sync.wishlistCount,
-            lastSyncAt: sync.lastSyncAt.flatMap(GraphQLHelpers.parseISO8601),
-            lastFetchedAt: sync.lastFetchedAt.flatMap(GraphQLHelpers.parseISO8601),
-            rawItemCount: sync.rawItemCount,
-            importTaskId: sync.importTaskId
+        let audible = data.audible
+        return AudibleData(
+            sync: audible.sync.map { sync in
+                AudibleSyncData(
+                    status: sync.status.rawValue,
+                    updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
+                    library: sync.library?.map { item in
+                        AudibleItemData(
+                            asin: item.asin,
+                            title: item.title,
+                            authors: item.authors,
+                            narrators: item.narrators,
+                            durationMinutes: item.durationMinutes,
+                            publisher: item.publisher,
+                            language: item.language,
+                            coverUrl: item.coverUrl,
+                            finishedAt: item.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
+                            importedBookId: item.importedBookId,
+                            seriesName: item.series?.name,
+                            seriesPosition: item.series?.position
+                        )
+                    },
+                    wishlist: sync.wishlist?.map { item in
+                        AudibleWishlistItemData(
+                            asin: item.asin,
+                            title: item.title,
+                            authors: item.authors,
+                            importedBookId: item.importedBookId
+                        )
+                    }
+                )
+            },
+            import_: audible.import.map { imp in
+                AudibleImportData(
+                    status: imp.status.rawValue,
+                    updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
+                    taskId: imp.taskId,
+                    importedCount: imp.importedCount
+                )
+            }
         )
     }
 

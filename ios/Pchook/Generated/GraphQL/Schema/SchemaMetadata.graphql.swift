@@ -29,6 +29,10 @@ extension PchookGraphQL {
 
     static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
+      case "Audible": return PchookGraphQL.Objects.Audible
+      case "AudibleImport": return PchookGraphQL.Objects.AudibleImport
+      case "AudibleItem": return PchookGraphQL.Objects.AudibleItem
+      case "AudibleSeriesInfo": return PchookGraphQL.Objects.AudibleSeriesInfo
       case "AudibleSync": return PchookGraphQL.Objects.AudibleSync
       case "AuthCookie": return PchookGraphQL.Objects.AuthCookie
       case "AuthStartResponse": return PchookGraphQL.Objects.AuthStartResponse
