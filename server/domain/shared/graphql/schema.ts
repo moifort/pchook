@@ -3,9 +3,11 @@ import { builder } from '~/domain/shared/graphql/builder'
 // Book domain
 import '~/domain/book/graphql/enums'
 import '~/domain/book/graphql/types'
+import '~/domain/book/graphql/scan-types'
 import '~/domain/book/graphql/inputs'
 import '~/domain/book/graphql/queries'
 import '~/domain/book/graphql/mutations'
+import '~/domain/book/graphql/scan-mutations'
 
 // Review domain
 import '~/domain/review/graphql/types'
