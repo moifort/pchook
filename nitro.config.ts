@@ -5,6 +5,11 @@ export default defineNitroConfig({
   experimental: { asyncContext: true },
   srcDir: 'server',
   ignore: ['test/**', 'routes/test/**', '**/*.test.ts'],
+  rollupConfig: {
+    treeshake: {
+      moduleSideEffects: (id) => id.includes('/graphql/') || id.includes('node_modules'),
+    },
+  },
   virtual: {
     '#domain-instrumentation': generateDomainInstrumentation,
   },
