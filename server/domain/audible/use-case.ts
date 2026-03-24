@@ -14,12 +14,13 @@ import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { PersonName, Url } from '~/domain/shared/primitives'
+import { TaskId } from '~/domain/task/primitives'
+import type { TaskDefinition } from '~/domain/task/types'
 import { createLogger } from '~/system/logger'
 import { callGemini } from '~/system/scan/gemini'
 import { enrichWithHardcover } from '~/system/scan/index'
 import { partialScanResultSchema } from '~/system/scan/schemas'
 import { scanResultToBookData } from '~/system/scan/to-book-data'
-import { createTaskRunner, type TaskDefinition } from '~/system/task-runner'
 
 const log = createLogger('audible-use-case')
 
@@ -131,7 +132,7 @@ const importItem = async (item: AudibleItem, source: 'library' | 'wishlist') => 
   return result.tag
 }
 
-export const importRunner = createTaskRunner('audible-import')
+export const AUDIBLE_IMPORT_TASK_ID = TaskId('00000000-0000-4000-a000-000000000001')
 
 export const importTaskDefinition: TaskDefinition<RawAudibleEntry> = {
   items: () => AudibleQuery.getAllRawItems(),

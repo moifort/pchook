@@ -1,7 +1,7 @@
 import { AudibleQuery } from '~/domain/audible/query'
-import { importRunner } from '~/domain/audible/use-case'
+import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
-import { AudibleStatusType, ImportTaskStateType } from './types'
+import { AudibleStatusType } from './types'
 
 builder.queryField('audibleStatus', (t) =>
   t.field({
@@ -13,7 +13,6 @@ builder.queryField('audibleStatus', (t) =>
       const rawItems = await AudibleQuery.getAllRawItems()
       const lastSyncAt = await AudibleQuery.getSyncCompletedAt()
       const lastFetchedAt = await AudibleQuery.getLastFetchedAt()
-      const importTask = await importRunner.getState()
 
       const mappedLibrary = mappings.filter(({ source }) => source === 'library').length
       const mappedWishlist = mappings.filter(({ source }) => source === 'wishlist').length
@@ -28,16 +27,8 @@ builder.queryField('audibleStatus', (t) =>
         lastSyncAt: lastSyncAt ?? undefined,
         lastFetchedAt: lastFetchedAt ?? undefined,
         rawItemCount: rawItems.length,
-        importTask,
+        importTaskId: String(AUDIBLE_IMPORT_TASK_ID),
       }
     },
-  }),
-)
-
-builder.queryField('importState', (t) =>
-  t.field({
-    type: ImportTaskStateType,
-    description: "État de la tâche d'import Audible",
-    resolve: () => importRunner.getState(),
   }),
 )

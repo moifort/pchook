@@ -24,6 +24,11 @@ import '~/domain/series/graphql/queries'
 import '~/domain/dashboard/graphql/types'
 import '~/domain/dashboard/graphql/queries'
 
+// Task domain
+import '~/domain/task/graphql/types'
+import '~/domain/task/graphql/queries'
+import '~/domain/task/graphql/mutations'
+
 // Audible domain
 import '~/domain/audible/graphql/types'
 import '~/domain/audible/graphql/queries'

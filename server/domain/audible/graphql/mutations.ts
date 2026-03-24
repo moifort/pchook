@@ -4,8 +4,15 @@ import { generateLoginUrl, registerDevice } from '~/domain/audible/audible.api'
 import { AudibleCommand } from '~/domain/audible/command'
 import { AudibleLocale } from '~/domain/audible/primitives'
 import { AudibleQuery } from '~/domain/audible/query'
-import { AudibleUseCase, importRunner, importTaskDefinition } from '~/domain/audible/use-case'
+import {
+  AUDIBLE_IMPORT_TASK_ID,
+  AudibleUseCase,
+  importTaskDefinition,
+} from '~/domain/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
+import { TaskType } from '~/domain/task/graphql/types'
+import { TaskQuery } from '~/domain/task/query'
+import { TaskRunner } from '~/domain/task/runner'
 import { createLogger } from '~/system/logger'
 import { AuthStartResponseType } from './types'
 
@@ -62,7 +69,7 @@ builder.mutationField('audibleDisconnect', (t) =>
     type: 'Boolean',
     description: 'Déconnecter le compte Audible et nettoyer les données',
     resolve: async () => {
-      await importRunner.reset()
+      await TaskRunner.reset(AUDIBLE_IMPORT_TASK_ID)
       await AudibleCommand.removeCredentials()
       await AudibleCommand.clearRawItems()
       await AudibleCommand.clearMappings()
@@ -121,64 +128,25 @@ builder.mutationField('audibleSyncVerify', (t) =>
 
 builder.mutationField('audibleImportStart', (t) =>
   t.field({
-    type: 'Boolean',
+    type: TaskType,
     description: "Démarrer l'import des livres Audible (tâche de fond)",
     resolve: async () => {
-      const state = await importRunner.getState()
-      if (state.phase === 'running' || state.phase === 'paused') {
+      const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
+      if (state !== 'not-found' && (state.phase === 'running' || state.phase === 'paused')) {
         throw new GraphQLError('Import already in progress', {
           extensions: { code: 'CONFLICT' },
         })
       }
 
-      importRunner.start(importTaskDefinition).catch((error) => {
+      TaskRunner.start(AUDIBLE_IMPORT_TASK_ID, importTaskDefinition).catch((error) => {
         log.error('Background import failed', { error: String(error) })
       })
 
-      return true
-    },
-  }),
-)
-
-builder.mutationField('audibleImportPause', (t) =>
-  t.field({
-    type: 'Boolean',
-    description:
-      "Mettre en pause ou reprendre l'import Audible. Retourne true si mis en pause, false si repris.",
-    resolve: async () => {
-      const state = await importRunner.getState()
-
-      if (state.phase === 'paused') {
-        importRunner.resume()
-        return false
-      }
-
-      if (state.phase !== 'running') {
-        throw new GraphQLError('No import in progress to pause', {
-          extensions: { code: 'CONFLICT' },
-        })
-      }
-
-      importRunner.pause()
-      return true
-    },
-  }),
-)
-
-builder.mutationField('audibleImportCancel', (t) =>
-  t.field({
-    type: 'Boolean',
-    description: "Annuler l'import Audible en cours",
-    resolve: async () => {
-      const state = await importRunner.getState()
-      if (state.phase !== 'running' && state.phase !== 'paused') {
-        throw new GraphQLError('No import in progress to cancel', {
-          extensions: { code: 'CONFLICT' },
-        })
-      }
-
-      importRunner.cancel()
-      return true
+      // Wait a tick for the task state to be initialized
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      const taskState = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
+      if (taskState === 'not-found') throw new Error('Task state not initialized')
+      return taskState
     },
   }),
 )

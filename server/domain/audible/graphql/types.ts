@@ -1,5 +1,4 @@
 import { builder } from '~/domain/shared/graphql/builder'
-import type { TaskState } from '~/system/task-runner'
 
 type AuthStartData = {
   loginUrl: string
@@ -35,28 +34,6 @@ export const AuthStartResponseType = builder
     }),
   })
 
-export const ImportTaskStateType = builder.objectRef<TaskState>('ImportTaskState').implement({
-  description: "État de la tâche d'import Audible",
-  fields: (t) => ({
-    phase: t.exposeString('phase', {
-      description: 'Phase (idle, running, paused, cancelled, completed, failed)',
-    }),
-    current: t.exposeInt('current', { description: "Nombre d'éléments traités" }),
-    total: t.exposeInt('total', { description: "Nombre total d'éléments" }),
-    message: t.exposeString('message', { description: 'Message de progression' }),
-    startedAt: t.string({
-      nullable: true,
-      description: 'Date de début (ISO 8601)',
-      resolve: ({ startedAt }) => startedAt?.toISOString() ?? null,
-    }),
-    completedAt: t.string({
-      nullable: true,
-      description: 'Date de fin (ISO 8601)',
-      resolve: ({ completedAt }) => completedAt?.toISOString() ?? null,
-    }),
-  }),
-})
-
 type AudibleStatusData = {
   connected: boolean
   fetchInProgress: boolean
@@ -65,7 +42,7 @@ type AudibleStatusData = {
   lastSyncAt?: Date
   lastFetchedAt?: Date
   rawItemCount: number
-  importTask: TaskState
+  importTaskId: string
 }
 
 export const AudibleStatusType = builder.objectRef<AudibleStatusData>('AudibleStatus').implement({
@@ -90,10 +67,8 @@ export const AudibleStatusType = builder.objectRef<AudibleStatusData>('AudibleSt
       resolve: ({ lastFetchedAt }) => lastFetchedAt?.toISOString() ?? null,
     }),
     rawItemCount: t.exposeInt('rawItemCount', { description: "Nombre d'éléments bruts" }),
-    importTask: t.field({
-      type: ImportTaskStateType,
-      description: "État de la tâche d'import",
-      resolve: ({ importTask }) => importTask,
+    importTaskId: t.exposeString('importTaskId', {
+      description: 'Identifier of the Audible import task (use task query to get state)',
     }),
   }),
 })
