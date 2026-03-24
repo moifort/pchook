@@ -63,6 +63,7 @@
 - **Apollo Sandbox**: disponible en dev sur `/graphql` (introspection, query builder, documentation)
 - **Enums avec hyphens**: mapper vers des noms GraphQL valides (`to-read` → `TO_READ` via `value:` dans Pothos)
 - **Errors**: `GraphQLError` avec `extensions.code` pour les erreurs métier (`NOT_FOUND`)
+- **Custom scalars**: every branded type in `primitives.ts` must have a corresponding Pothos custom scalar in `builder.ts` (`Scalars` type + `defineScalar()` in `scalars.ts`). Resolvers receive pre-validated branded args — no manual `Primitive(value)` calls needed. When adding a new branded type, also update the Apollo iOS codegen scalar mapping in `ios/Pchook/Generated/GraphQL/Schema/CustomScalars/`
 
 See [docs/architecture.md](docs/architecture.md) for full architecture overview.
 See [docs/domain-guide.md](docs/domain-guide.md) for step-by-step domain creation.
