@@ -10,6 +10,7 @@
 		BF0E01212F5072C10074B393 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = BF0E01222F5072C10074B393 /* Sentry */; };
 		BF0E01232F5072C10074B393 /* SentrySwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = BF0E01242F5072C10074B393 /* SentrySwiftUI */; };
 		BF4DE0C12F6A062C00ACC8D6 /* PchookShare.appex in Embed Extensions */ = {isa = PBXBuildFile; fileRef = BF4DE0B72F6A062C00ACC8D6 /* PchookShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BFA001022F7000000074B393 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = BFA001032F7000000074B393 /* Apollo */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 			files = (
 				BF0E01212F5072C10074B393 /* Sentry in Frameworks */,
 				BF0E01232F5072C10074B393 /* SentrySwiftUI in Frameworks */,
+				BFA001022F7000000074B393 /* Apollo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +170,7 @@
 			packageProductDependencies = (
 				BF0E01222F5072C10074B393 /* Sentry */,
 				BF0E01242F5072C10074B393 /* SentrySwiftUI */,
+				BFA001032F7000000074B393 /* Apollo */,
 			);
 			productName = Pchook;
 			productReference = E10000030000000000000001 /* Pchook.app */;
@@ -227,6 +230,7 @@
 			mainGroup = E10000050000000000000001;
 			packageReferences = (
 				BF0E01202F5072C10074B393 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				BFA001012F7000000074B393 /* XCRemoteSwiftPackageReference "apollo-ios" */,
 			);
 			productRefGroup = E10000050000000000000009 /* Products */;
 			projectDirPath = "";
@@ -645,6 +649,14 @@
 				minimumVersion = 9.5.1;
 			};
 		};
+		BFA001012F7000000074B393 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.18.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -657,6 +669,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BF0E01202F5072C10074B393 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
 			productName = SentrySwiftUI;
+		};
+		BFA001032F7000000074B393 /* Apollo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BFA001012F7000000074B393 /* XCRemoteSwiftPackageReference "apollo-ios" */;
+			productName = Apollo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

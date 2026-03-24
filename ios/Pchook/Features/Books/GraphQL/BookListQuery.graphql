@@ -1,0 +1,20 @@
+query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrder) {
+  books(genre: $genre, status: $status, sort: $sort, order: $order) {
+    id
+    title
+    authors
+    genre
+    status
+    estimatedPrice
+    awards {
+      name
+      year
+    }
+    rating
+    language
+    seriesName
+    seriesLabel
+    seriesPosition
+    createdAt
+  }
+}

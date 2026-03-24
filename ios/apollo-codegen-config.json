@@ -1,0 +1,23 @@
+{
+  "schemaNamespace": "PchookGraphQL",
+  "input": {
+    "schemaSearchPaths": ["../shared/schema.graphql"],
+    "operationSearchPaths": ["Pchook/Features/Books/GraphQL/**/*.graphql"]
+  },
+  "output": {
+    "schemaTypes": {
+      "path": "Pchook/Generated/GraphQL",
+      "moduleType": {
+        "embeddedInTarget": {
+          "name": "Pchook"
+        }
+      }
+    },
+    "operations": {
+      "inSchemaModule": {}
+    },
+    "testMocks": {
+      "none": {}
+    }
+  }
+}

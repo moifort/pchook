@@ -1,0 +1,36 @@
+mutation UpdateBook($id: ID!, $input: UpdateBookInput!) {
+  updateBook(id: $id, input: $input) {
+    id
+    title
+    authors
+    publisher
+    genre
+    status
+    updatedAt
+  }
+}
+
+mutation DeleteBook($id: ID!) {
+  deleteBook(id: $id)
+}
+
+mutation AddToFavorites($id: ID!) {
+  addToFavorites(id: $id) {
+    id
+    status
+  }
+}
+
+mutation AddReview($bookId: ID!, $input: CreateReviewInput!) {
+  addReview(bookId: $bookId, input: $input) {
+    bookId
+    rating
+    readDate
+    reviewNotes
+    createdAt
+  }
+}
+
+mutation RefreshBook($id: ID!) {
+  refreshBook(id: $id)
+}

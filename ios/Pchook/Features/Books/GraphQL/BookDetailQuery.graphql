@@ -1,0 +1,56 @@
+query BookDetail($id: ID!) {
+  book(id: $id) {
+    id
+    title
+    authors
+    publisher
+    publishedDate
+    pageCount
+    genre
+    synopsis
+    isbn
+    language
+    format
+    translator
+    estimatedPrice
+    duration
+    narrators
+    personalNotes
+    status
+    readDate
+    awards {
+      name
+      year
+    }
+    publicRatings {
+      source
+      score
+      maxScore
+      voterCount
+      url
+    }
+    importSource
+    externalUrl
+    createdAt
+    updatedAt
+    coverImageBase64
+    review {
+      bookId
+      rating
+      readDate
+      reviewNotes
+      createdAt
+    }
+    series {
+      name
+      label
+      position
+      books {
+        id
+        title
+        label
+        position
+      }
+    }
+  }
+}
