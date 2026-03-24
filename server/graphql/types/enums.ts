@@ -13,9 +13,9 @@ export const BookFormatEnum = builder.enumType('BookFormat', {
 export const BookStatusEnum = builder.enumType('BookStatus', {
   description: "Statut de lecture d'un livre",
   values: {
-    'to-read': { description: 'À lire' },
-    read: { description: 'Lu' },
-  } as const,
+    TO_READ: { value: 'to-read' as const, description: 'À lire' },
+    READ: { value: 'read' as const, description: 'Lu' },
+  },
 })
 
 export const ImportSourceEnum = builder.enumType('ImportSource', {

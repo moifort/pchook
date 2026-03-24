@@ -10,7 +10,8 @@
     "test:coverage": "bun test --coverage",
     "generate:schema": "bun server/api-schema/export.ts",
     "generate:swift": "bun scripts/generate-swift-types.ts",
-    "generate": "bun run generate:schema && bun run generate:swift"
+    "generate:graphql": "bun scripts/export-graphql-schema.ts",
+    "generate": "bun run generate:schema && bun run generate:swift && bun run generate:graphql"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.14",

@@ -1,0 +1,431 @@
+"""Prix littéraire reçu par un livre"""
+type Award {
+  """Nom du prix"""
+  name: String
+
+  """Année d'obtention"""
+  year: Int
+}
+
+"""Prix littéraire"""
+input AwardInput {
+  """Nom du prix"""
+  name: String!
+
+  """Année d'obtention"""
+  year: Int
+}
+
+"""Un livre dans la bibliothèque personnelle"""
+type Book {
+  """Auteurs du livre"""
+  authors: [String!]
+
+  """Prix littéraires"""
+  awards: [Award!]
+
+  """Image de couverture encodée en base64"""
+  coverImageBase64: String
+
+  """Date d'ajout à la bibliothèque (ISO 8601)"""
+  createdAt: String
+
+  """Durée (livre audio)"""
+  duration: String
+
+  """Prix estimé en euros"""
+  estimatedPrice: Float
+
+  """URL externe (Audible, etc.)"""
+  externalUrl: String
+
+  """Format du livre"""
+  format: BookFormat
+
+  """Genre littéraire (ex: Romance, SF, Polar)"""
+  genre: String
+
+  """Identifiant unique"""
+  id: ID
+
+  """Source d'import"""
+  importSource: ImportSource
+
+  """Numéro ISBN"""
+  isbn: String
+
+  """Langue du livre (ex: fr, en)"""
+  language: String
+
+  """Narrateurs (livre audio)"""
+  narrators: [String!]
+
+  """Nombre de pages"""
+  pageCount: Int
+
+  """Notes personnelles"""
+  personalNotes: String
+
+  """Notes communautaires"""
+  publicRatings: [PublicRating!]
+
+  """Date de publication (ISO 8601)"""
+  publishedDate: String
+
+  """Éditeur"""
+  publisher: String
+
+  """Date de lecture (ISO 8601)"""
+  readDate: String
+
+  """Critique et note personnelle"""
+  review: Review
+
+  """Informations sur la série"""
+  series: SeriesInfo
+
+  """Statut de lecture"""
+  status: BookStatus
+
+  """Résumé du livre"""
+  synopsis: String
+
+  """Titre du livre"""
+  title: String
+
+  """Traducteur"""
+  translator: String
+
+  """Date de dernière modification (ISO 8601)"""
+  updatedAt: String
+}
+
+"""Format physique ou numérique du livre"""
+enum BookFormat {
+  """Livre audio"""
+  audiobook
+
+  """Relié"""
+  hardcover
+
+  """Broché"""
+  paperback
+
+  """Livre de poche"""
+  pocket
+}
+
+"""Élément de la liste de livres (vue résumée)"""
+type BookListItem {
+  """Auteurs"""
+  authors: [String!]
+
+  """Prix littéraires"""
+  awards: [Award!]
+
+  """Date d'ajout (ISO 8601)"""
+  createdAt: String
+
+  """Prix estimé en euros"""
+  estimatedPrice: Float
+
+  """Genre littéraire"""
+  genre: String
+
+  """Identifiant unique"""
+  id: ID
+
+  """Langue"""
+  language: String
+
+  """Note personnelle (0-10)"""
+  rating: Int
+
+  """Label dans la série (ex: Tome 3)"""
+  seriesLabel: String
+
+  """Nom de la série"""
+  seriesName: String
+
+  """Position dans la série"""
+  seriesPosition: Int
+
+  """Statut de lecture"""
+  status: BookStatus
+
+  """Titre du livre"""
+  title: String
+}
+
+"""Champ de tri pour la liste de livres"""
+enum BookSort {
+  """Nom de l'auteur"""
+  author
+
+  """Nombre de prix littéraires"""
+  awards
+
+  """Date d'ajout"""
+  createdAt
+
+  """Genre littéraire"""
+  genre
+
+  """Titre alphabétique"""
+  title
+}
+
+"""Statut de lecture d'un livre"""
+enum BookStatus {
+  """Lu"""
+  READ
+
+  """À lire"""
+  TO_READ
+}
+
+"""Données pour créer une critique"""
+input CreateReviewInput {
+  """Note personnelle (0-10)"""
+  rating: Int!
+
+  """Date de lecture (ISO 8601)"""
+  readDate: String
+
+  """Notes de lecture"""
+  reviewNotes: String
+}
+
+"""Source d'import du livre"""
+enum ImportSource {
+  """Import Audible"""
+  audible
+
+  """Code-barres ISBN"""
+  isbn
+
+  """Scan de couverture"""
+  scan
+
+  """URL externe"""
+  url
+}
+
+type Mutation {
+  """Ajouter une critique à un livre (marque le livre comme lu)"""
+  addReview(
+    """Identifiant du livre"""
+    bookId: ID!
+    input: CreateReviewInput!
+  ): Review
+
+  """Ajouter un livre aux favoris (note de coup de cœur + statut lu)"""
+  addToFavorites(
+    """Identifiant du livre"""
+    id: ID!
+  ): Book
+
+  """Supprimer un livre et ses données associées (review, série)"""
+  deleteBook(
+    """Identifiant du livre à supprimer"""
+    id: ID!
+  ): Boolean
+
+  """Ré-enrichir un livre via Gemini (met à jour les métadonnées)"""
+  refreshBook(
+    """Identifiant du livre"""
+    id: ID!
+  ): Boolean
+
+  """Modifier un livre existant"""
+  updateBook(
+    """Identifiant du livre"""
+    id: ID!
+    input: UpdateBookInput!
+  ): Book
+}
+
+"""Note communautaire provenant d'une plateforme externe"""
+type PublicRating {
+  """Note maximale possible"""
+  maxScore: Float
+
+  """Note obtenue"""
+  score: Float
+
+  """Nom de la plateforme (ex: Hardcover, Goodreads)"""
+  source: String
+
+  """Lien vers la page du livre sur la plateforme"""
+  url: String
+
+  """Nombre de votants"""
+  voterCount: Int
+}
+
+"""Note communautaire externe"""
+input PublicRatingInput {
+  """Note maximale possible"""
+  maxScore: Float!
+
+  """Note obtenue"""
+  score: Float!
+
+  """Nom de la plateforme"""
+  source: String!
+
+  """URL de la page du livre"""
+  url: String!
+
+  """Nombre de votants"""
+  voterCount: Int!
+}
+
+type Query {
+  """Détail d'un livre par son identifiant"""
+  book(
+    """Identifiant du livre"""
+    id: ID!
+  ): Book
+
+  """Liste des livres avec filtres et tri"""
+  books(
+    """Filtrer par genre littéraire"""
+    genre: String
+
+    """Ordre de tri"""
+    order: SortOrder
+
+    """Champ de tri"""
+    sort: BookSort
+
+    """Filtrer par statut de lecture (to-read, read)"""
+    status: String
+  ): [BookListItem!]
+}
+
+"""Critique et note personnelle d'un livre"""
+type Review {
+  """Identifiant du livre associé"""
+  bookId: ID
+
+  """Date de création (ISO 8601)"""
+  createdAt: String
+
+  """Note personnelle (0-10)"""
+  rating: Int
+
+  """Date de lecture (ISO 8601)"""
+  readDate: String
+
+  """Notes de lecture"""
+  reviewNotes: String
+}
+
+"""Entrée d'un livre dans une série"""
+type SeriesBookEntry {
+  """Identifiant du livre"""
+  id: ID
+
+  """Label dans la série (ex: Tome 3)"""
+  label: String
+
+  """Position dans la série"""
+  position: Int
+
+  """Titre du livre"""
+  title: String
+}
+
+"""Informations sur la série à laquelle appartient un livre"""
+type SeriesInfo {
+  """Tous les livres de la série (même langue)"""
+  books: [SeriesBookEntry!]
+
+  """Label du livre dans la série"""
+  label: String
+
+  """Nom de la série"""
+  name: String
+
+  """Position du livre dans la série"""
+  position: Int
+}
+
+"""Ordre de tri"""
+enum SortOrder {
+  """Croissant"""
+  asc
+
+  """Décroissant"""
+  desc
+}
+
+"""Champs modifiables d'un livre (tous optionnels)"""
+input UpdateBookInput {
+  """Auteurs"""
+  authors: [String!]
+
+  """Prix littéraires"""
+  awards: [AwardInput!]
+
+  """Durée (livre audio)"""
+  duration: String
+
+  """Prix estimé en euros (null pour supprimer)"""
+  estimatedPrice: Float
+
+  """Format du livre"""
+  format: BookFormat
+
+  """Genre littéraire (null pour supprimer)"""
+  genre: String
+
+  """Numéro ISBN (null pour supprimer)"""
+  isbn: String
+
+  """Langue (ex: fr, en)"""
+  language: String
+
+  """Narrateurs (livre audio)"""
+  narrators: [String!]
+
+  """Nombre de pages (null pour supprimer)"""
+  pageCount: Int
+
+  """Notes personnelles"""
+  personalNotes: String
+
+  """Notes communautaires"""
+  publicRatings: [PublicRatingInput!]
+
+  """Date de publication (ISO 8601)"""
+  publishedDate: String
+
+  """Éditeur (null pour supprimer)"""
+  publisher: String
+
+  """Date de lecture (ISO 8601)"""
+  readDate: String
+
+  """Nom de la série (null pour retirer de la série)"""
+  series: String
+
+  """Label dans la série"""
+  seriesLabel: String
+
+  """Position dans la série"""
+  seriesNumber: Float
+
+  """Statut de lecture"""
+  status: BookStatus
+
+  """Résumé"""
+  synopsis: String
+
+  """Titre du livre"""
+  title: String
+
+  """Traducteur (null pour supprimer)"""
+  translator: String
+}
