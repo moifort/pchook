@@ -1,4 +1,4 @@
-import type { CachedScanResult, ImageHash } from '~/system/scan/types'
+import type { CachedScanResult, ImageHash } from '~/domain/scan/types'
 import { createTypedStorage } from '~/system/storage'
 
 const storage = () => createTypedStorage<CachedScanResult>('scan-cache')

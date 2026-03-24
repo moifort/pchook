@@ -6,7 +6,7 @@ import {
 } from '~/domain/audible/business-rules'
 import { Asin } from '~/domain/audible/primitives'
 import type { AudibleItem } from '~/domain/audible/types'
-import type { ScanResult } from '~/system/scan/types'
+import type { ScanResult } from '~/domain/scan/types'
 
 const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
   asin: Asin('B08G9PRS1K'),

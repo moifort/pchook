@@ -1,7 +1,7 @@
+import { AwardType, BookType, PublicRatingRef } from '~/domain/book/graphql/types'
 import type { Book } from '~/domain/book/types'
+import type { ScanResult } from '~/domain/scan/types'
 import { builder } from '~/domain/shared/graphql/builder'
-import type { ScanResult } from '~/system/scan/types'
-import { AwardType, BookType, PublicRatingRef } from './types'
 
 type BookPreviewData = { previewId: string } & ScanResult
 

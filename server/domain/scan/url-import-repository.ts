@@ -1,4 +1,4 @@
-import type { CachedUrlImportResult, UrlHash } from '~/system/scan/types'
+import type { CachedUrlImportResult, UrlHash } from '~/domain/scan/types'
 import { createTypedStorage } from '~/system/storage'
 
 const storage = () => createTypedStorage<CachedUrlImportResult>('url-import-cache')

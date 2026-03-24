@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { ScanResult } from '~/system/scan/types'
+import type { ScanResult } from '~/domain/scan/types'
 
 const nullToUndefined = <T>(schema: z.ZodType<T>) =>
   schema.nullish().transform((v) => v ?? undefined)

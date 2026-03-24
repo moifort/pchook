@@ -1,4 +1,4 @@
-import type { BookPreviewData } from '~/system/scan/types'
+import type { BookPreviewData } from '~/domain/scan/types'
 import { createTypedStorage } from '~/system/storage'
 
 const storage = () => createTypedStorage<BookPreviewData>('book-preview')

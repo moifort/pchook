@@ -1,10 +1,10 @@
 import type { ISBN } from '~/domain/book/types'
+import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/domain/scan/gemini'
+import * as repository from '~/domain/scan/isbn-repository'
+import { enrichWithHardcover, type HardcoverEnrichment } from '~/domain/scan/scanner'
+import { scanResultSchema } from '~/domain/scan/schemas'
+import type { ScanResult } from '~/domain/scan/types'
 import { createLogger } from '~/system/logger'
-import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
-import { enrichWithHardcover, type HardcoverEnrichment } from '~/system/scan/index'
-import * as repository from '~/system/scan/isbn-repository'
-import { scanResultSchema } from '~/system/scan/schemas'
-import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('isbn-scanner')
 

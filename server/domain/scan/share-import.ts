@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto'
+import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/domain/scan/gemini'
+import { UrlHash } from '~/domain/scan/primitives'
+import { scanResultSchema } from '~/domain/scan/schemas'
+import type { ScanResult } from '~/domain/scan/types'
+import * as repository from '~/domain/scan/url-import-repository'
 import { createLogger } from '~/system/logger'
-import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
-import { UrlHash } from '~/system/scan/primitives'
-import { scanResultSchema } from '~/system/scan/schemas'
-import type { ScanResult } from '~/system/scan/types'
-import * as repository from '~/system/scan/url-import-repository'
 
 const log = createLogger('share-import')
 

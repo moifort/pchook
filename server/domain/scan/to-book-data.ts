@@ -9,8 +9,8 @@ import {
   Publisher,
 } from '~/domain/book/primitives'
 import type { Award, PublicRating } from '~/domain/book/types'
+import type { ScanResult } from '~/domain/scan/types'
 import { Eur, PersonName, Url } from '~/domain/shared/primitives'
-import type { ScanResult } from '~/system/scan/types'
 
 const ratingUrl = (source: string, isbn: string) => {
   const s = source.toLowerCase()

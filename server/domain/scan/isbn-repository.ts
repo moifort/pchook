@@ -1,5 +1,5 @@
 import type { ISBN } from '~/domain/book/types'
-import type { CachedIsbnResult } from '~/system/scan/types'
+import type { CachedIsbnResult } from '~/domain/scan/types'
 import { createTypedStorage } from '~/system/storage'
 
 const storage = () => createTypedStorage<CachedIsbnResult>('isbn-cache')

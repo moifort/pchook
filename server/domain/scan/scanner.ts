@@ -1,12 +1,12 @@
 import { createHash } from 'node:crypto'
+import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/domain/scan/gemini'
+import { fetchCoverImage, searchByIsbn, searchByTitle } from '~/domain/scan/hardcover.api'
+import { ImageHash } from '~/domain/scan/primitives'
+import * as repository from '~/domain/scan/repository'
+import { partialScanResultSchema, scanResultSchema } from '~/domain/scan/schemas'
+import type { ScanResult } from '~/domain/scan/types'
 import { config } from '~/system/config/index'
 import { createLogger } from '~/system/logger'
-import { buildBookJsonSchema, callGemini, normalizeBookFormat } from '~/system/scan/gemini'
-import { fetchCoverImage, searchByIsbn, searchByTitle } from '~/system/scan/hardcover.api'
-import { ImageHash } from '~/system/scan/primitives'
-import * as repository from '~/system/scan/repository'
-import { partialScanResultSchema, scanResultSchema } from '~/system/scan/schemas'
-import type { ScanResult } from '~/system/scan/types'
 
 const log = createLogger('scan')
 

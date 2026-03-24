@@ -10,6 +10,10 @@ import type { AsinBookMapping, AudibleItem, RawAudibleEntry } from '~/domain/aud
 import { BookCommand } from '~/domain/book/command'
 import type { Book } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
+import { callGemini } from '~/domain/scan/gemini'
+import { enrichWithHardcover } from '~/domain/scan/scanner'
+import { partialScanResultSchema } from '~/domain/scan/schemas'
+import { scanResultToBookData } from '~/domain/scan/to-book-data'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
@@ -17,10 +21,6 @@ import { PersonName, Url } from '~/domain/shared/primitives'
 import { TaskId } from '~/domain/task/primitives'
 import type { TaskDefinition } from '~/domain/task/types'
 import { createLogger } from '~/system/logger'
-import { callGemini } from '~/system/scan/gemini'
-import { enrichWithHardcover } from '~/system/scan/index'
-import { partialScanResultSchema } from '~/system/scan/schemas'
-import { scanResultToBookData } from '~/system/scan/to-book-data'
 
 const log = createLogger('audible-use-case')
 
