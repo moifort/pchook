@@ -13,7 +13,7 @@ extension PchookGraphQL {
     }
 
     init(
-      rating: Int,
+      rating: Note,
       readDate: GraphQLNullable<String> = nil,
       reviewNotes: GraphQLNullable<String> = nil
     ) {
@@ -25,7 +25,7 @@ extension PchookGraphQL {
     }
 
     /// Personal rating (0-10)
-    var rating: Int {
+    var rating: Note {
       get { __data["rating"] }
       set { __data["rating"] = newValue }
     }

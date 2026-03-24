@@ -1,4 +1,4 @@
-query TaskById($id: ID!) {
+query TaskById($id: TaskId!) {
   task(id: $id) {
     id
     phase
@@ -10,21 +10,21 @@ query TaskById($id: ID!) {
   }
 }
 
-mutation PauseTask($id: ID!) {
+mutation PauseTask($id: TaskId!) {
   pauseTask(id: $id) {
     id
     phase
   }
 }
 
-mutation ResumeTask($id: ID!) {
+mutation ResumeTask($id: TaskId!) {
   resumeTask(id: $id) {
     id
     phase
   }
 }
 
-mutation CancelTask($id: ID!) {
+mutation CancelTask($id: TaskId!) {
   cancelTask(id: $id) {
     id
     phase

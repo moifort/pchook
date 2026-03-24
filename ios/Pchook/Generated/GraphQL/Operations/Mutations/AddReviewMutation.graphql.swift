@@ -8,14 +8,14 @@ extension PchookGraphQL {
     static let operationName: String = "AddReview"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AddReview($bookId: ID!, $input: CreateReviewInput!) { addReview(bookId: $bookId, input: $input) { __typename bookId rating readDate reviewNotes createdAt } }"#
+        #"mutation AddReview($bookId: BookId!, $input: CreateReviewInput!) { addReview(bookId: $bookId, input: $input) { __typename bookId rating readDate reviewNotes createdAt } }"#
       ))
 
-    public var bookId: ID
+    public var bookId: BookId
     public var input: CreateReviewInput
 
     public init(
-      bookId: ID,
+      bookId: BookId,
       input: CreateReviewInput
     ) {
       self.bookId = bookId
@@ -55,8 +55,8 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Review }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("bookId", PchookGraphQL.ID.self),
-          .field("rating", Int.self),
+          .field("bookId", PchookGraphQL.BookId.self),
+          .field("rating", PchookGraphQL.Note.self),
           .field("readDate", PchookGraphQL.DateTime?.self),
           .field("reviewNotes", String?.self),
           .field("createdAt", PchookGraphQL.DateTime.self),
@@ -66,9 +66,9 @@ extension PchookGraphQL {
         ] }
 
         /// Associated book ID
-        var bookId: PchookGraphQL.ID { __data["bookId"] }
+        var bookId: PchookGraphQL.BookId { __data["bookId"] }
         /// Personal rating (0-10)
-        var rating: Int { __data["rating"] }
+        var rating: PchookGraphQL.Note { __data["rating"] }
         /// Read date
         var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
         /// Reading notes

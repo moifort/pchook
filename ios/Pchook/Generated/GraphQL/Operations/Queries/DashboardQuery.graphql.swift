@@ -92,32 +92,32 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.FavoriteBook }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("id", PchookGraphQL.ID.self),
+            .field("id", PchookGraphQL.BookId.self),
             .field("title", String.self),
-            .field("authors", [String].self),
-            .field("genre", String?.self),
-            .field("rating", Int.self),
+            .field("authors", [PchookGraphQL.PersonName].self),
+            .field("genre", PchookGraphQL.Genre?.self),
+            .field("rating", PchookGraphQL.Note.self),
             .field("readDate", PchookGraphQL.DateTime?.self),
-            .field("estimatedPrice", Double?.self),
+            .field("estimatedPrice", PchookGraphQL.Eur?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             DashboardQuery.Data.Dashboard.Favorite.self
           ] }
 
           /// Book ID
-          var id: PchookGraphQL.ID { __data["id"] }
+          var id: PchookGraphQL.BookId { __data["id"] }
           /// Title
           var title: String { __data["title"] }
           /// Authors
-          var authors: [String] { __data["authors"] }
+          var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Genre
-          var genre: String? { __data["genre"] }
+          var genre: PchookGraphQL.Genre? { __data["genre"] }
           /// Rating (0-10)
-          var rating: Int { __data["rating"] }
+          var rating: PchookGraphQL.Note { __data["rating"] }
           /// Read date
           var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
           /// Estimated price in euros
-          var estimatedPrice: Double? { __data["estimatedPrice"] }
+          var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
         }
 
         /// Dashboard.RecentBook
@@ -130,10 +130,10 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.RecentBook }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("id", PchookGraphQL.ID.self),
+            .field("id", PchookGraphQL.BookId.self),
             .field("title", String.self),
-            .field("authors", [String].self),
-            .field("genre", String?.self),
+            .field("authors", [PchookGraphQL.PersonName].self),
+            .field("genre", PchookGraphQL.Genre?.self),
             .field("createdAt", PchookGraphQL.DateTime.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -141,13 +141,13 @@ extension PchookGraphQL {
           ] }
 
           /// Book ID
-          var id: PchookGraphQL.ID { __data["id"] }
+          var id: PchookGraphQL.BookId { __data["id"] }
           /// Title
           var title: String { __data["title"] }
           /// Authors
-          var authors: [String] { __data["authors"] }
+          var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Genre
-          var genre: String? { __data["genre"] }
+          var genre: PchookGraphQL.Genre? { __data["genre"] }
           /// Date added
           var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
         }
@@ -163,7 +163,7 @@ extension PchookGraphQL {
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("bookTitle", String.self),
-            .field("authors", [String].self),
+            .field("authors", [PchookGraphQL.PersonName].self),
             .field("awardName", String.self),
             .field("awardYear", Int.self),
           ] }
@@ -174,7 +174,7 @@ extension PchookGraphQL {
           /// Book title
           var bookTitle: String { __data["bookTitle"] }
           /// Authors
-          var authors: [String] { __data["authors"] }
+          var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Award name
           var awardName: String { __data["awardName"] }
           /// Award year

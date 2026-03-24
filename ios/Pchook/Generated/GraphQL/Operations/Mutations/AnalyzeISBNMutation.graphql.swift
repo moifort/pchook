@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "AnalyzeISBN"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AnalyzeISBN($isbn: String!) { analyzeISBN(isbn: $isbn) { __typename previewId title authors publisher genre isbn language awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } } }"#
+        #"mutation AnalyzeISBN($isbn: ISBN!) { analyzeISBN(isbn: $isbn) { __typename previewId title authors publisher genre isbn language awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } } }"#
       ))
 
-    public var isbn: String
+    public var isbn: ISBN
 
-    public init(isbn: String) {
+    public init(isbn: ISBN) {
       self.isbn = isbn
     }
 
@@ -111,10 +111,10 @@ extension PchookGraphQL {
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("source", String.self),
-            .field("score", Double.self),
-            .field("maxScore", Double.self),
+            .field("score", PchookGraphQL.Note.self),
+            .field("maxScore", PchookGraphQL.Note.self),
             .field("voterCount", Int.self),
-            .field("url", String.self),
+            .field("url", PchookGraphQL.Url.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AnalyzeISBNMutation.Data.AnalyzeISBN.PublicRating.self
@@ -123,13 +123,13 @@ extension PchookGraphQL {
           /// Platform name (e.g. Hardcover, Goodreads)
           var source: String { __data["source"] }
           /// Score received
-          var score: Double { __data["score"] }
+          var score: PchookGraphQL.Note { __data["score"] }
           /// Maximum possible score
-          var maxScore: Double { __data["maxScore"] }
+          var maxScore: PchookGraphQL.Note { __data["maxScore"] }
           /// Number of voters
           var voterCount: Int { __data["voterCount"] }
           /// Link to the book page on the platform
-          var url: String { __data["url"] }
+          var url: PchookGraphQL.Url { __data["url"] }
         }
       }
     }

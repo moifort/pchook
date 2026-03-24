@@ -13,10 +13,10 @@ extension PchookGraphQL {
     }
 
     init(
-      maxScore: Double,
-      score: Double,
+      maxScore: Note,
+      score: Note,
       source: String,
-      url: String,
+      url: Url,
       voterCount: Int
     ) {
       __data = InputDict([
@@ -29,13 +29,13 @@ extension PchookGraphQL {
     }
 
     /// Maximum possible score
-    var maxScore: Double {
+    var maxScore: Note {
       get { __data["maxScore"] }
       set { __data["maxScore"] = newValue }
     }
 
     /// Score received
-    var score: Double {
+    var score: Note {
       get { __data["score"] }
       set { __data["score"] = newValue }
     }
@@ -47,7 +47,7 @@ extension PchookGraphQL {
     }
 
     /// URL of the book page
-    var url: String {
+    var url: Url {
       get { __data["url"] }
       set { __data["url"] = newValue }
     }

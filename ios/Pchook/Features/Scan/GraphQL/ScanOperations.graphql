@@ -32,7 +32,7 @@ mutation AnalyzeBookCover($imageBase64: String!, $ocrText: String) {
   }
 }
 
-mutation AnalyzeISBN($isbn: String!) {
+mutation AnalyzeISBN($isbn: ISBN!) {
   analyzeISBN(isbn: $isbn) {
     previewId
     title
@@ -55,7 +55,7 @@ mutation AnalyzeISBN($isbn: String!) {
   }
 }
 
-mutation AnalyzeURL($url: String!, $description: String, $rawText: String) {
+mutation AnalyzeURL($url: Url!, $description: String, $rawText: String) {
   analyzeURL(url: $url, description: $description, rawText: $rawText) {
     previewId
     title

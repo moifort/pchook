@@ -1,4 +1,4 @@
-mutation UpdateBook($id: ID!, $input: UpdateBookInput!) {
+mutation UpdateBook($id: BookId!, $input: UpdateBookInput!) {
   updateBook(id: $id, input: $input) {
     id
     title
@@ -10,18 +10,18 @@ mutation UpdateBook($id: ID!, $input: UpdateBookInput!) {
   }
 }
 
-mutation DeleteBook($id: ID!) {
+mutation DeleteBook($id: BookId!) {
   deleteBook(id: $id)
 }
 
-mutation AddToFavorites($id: ID!) {
+mutation AddToFavorites($id: BookId!) {
   addToFavorites(id: $id) {
     id
     status
   }
 }
 
-mutation AddReview($bookId: ID!, $input: CreateReviewInput!) {
+mutation AddReview($bookId: BookId!, $input: CreateReviewInput!) {
   addReview(bookId: $bookId, input: $input) {
     bookId
     rating
@@ -31,6 +31,6 @@ mutation AddReview($bookId: ID!, $input: CreateReviewInput!) {
   }
 }
 
-mutation RefreshBook($id: ID!) {
+mutation RefreshBook($id: BookId!) {
   refreshBook(id: $id)
 }

@@ -8,16 +8,16 @@ extension PchookGraphQL {
     static let operationName: String = "BookList"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } language coverImageUrl createdAt review { __typename rating } series { __typename name label position } } }"#
+        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name label position } coverImageUrl createdAt } }"#
       ))
 
-    public var genre: GraphQLNullable<String>
+    public var genre: GraphQLNullable<Genre>
     public var status: GraphQLNullable<String>
     public var sort: GraphQLNullable<GraphQLEnum<BookSort>>
     public var order: GraphQLNullable<GraphQLEnum<SortOrder>>
 
     public init(
-      genre: GraphQLNullable<String>,
+      genre: GraphQLNullable<Genre>,
       status: GraphQLNullable<String>,
       sort: GraphQLNullable<GraphQLEnum<BookSort>>,
       order: GraphQLNullable<GraphQLEnum<SortOrder>>
@@ -65,47 +65,47 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID.self),
-          .field("title", String.self),
-          .field("authors", [String].self),
-          .field("genre", String?.self),
+          .field("id", PchookGraphQL.BookId.self),
+          .field("title", PchookGraphQL.BookTitle.self),
+          .field("authors", [PchookGraphQL.PersonName].self),
+          .field("genre", PchookGraphQL.Genre?.self),
           .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
-          .field("estimatedPrice", Double?.self),
+          .field("estimatedPrice", PchookGraphQL.Eur?.self),
           .field("awards", [Award].self),
-          .field("language", String?.self),
+          .field("review", Review?.self),
+          .field("language", PchookGraphQL.Language?.self),
+          .field("series", Series?.self),
           .field("coverImageUrl", String?.self),
           .field("createdAt", PchookGraphQL.DateTime.self),
-          .field("review", Review?.self),
-          .field("series", Series?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           BookListQuery.Data.Book.self
         ] }
 
         /// Unique identifier
-        var id: PchookGraphQL.ID { __data["id"] }
+        var id: PchookGraphQL.BookId { __data["id"] }
         /// Book title
-        var title: String { __data["title"] }
+        var title: PchookGraphQL.BookTitle { __data["title"] }
         /// Book authors
-        var authors: [String] { __data["authors"] }
+        var authors: [PchookGraphQL.PersonName] { __data["authors"] }
         /// Literary genre (e.g. Romance, Sci-Fi, Thriller)
-        var genre: String? { __data["genre"] }
+        var genre: PchookGraphQL.Genre? { __data["genre"] }
         /// Reading status
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
         /// Estimated price in euros
-        var estimatedPrice: Double? { __data["estimatedPrice"] }
+        var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
         /// Literary awards
         var awards: [Award] { __data["awards"] }
+        /// Personal review and rating
+        var review: Review? { __data["review"] }
         /// Book language (e.g. fr, en)
-        var language: String? { __data["language"] }
+        var language: PchookGraphQL.Language? { __data["language"] }
+        /// Series information
+        var series: Series? { __data["series"] }
         /// Cover image URL
         var coverImageUrl: String? { __data["coverImageUrl"] }
         /// Date added to library
         var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
-        /// Personal review and rating
-        var review: Review? { __data["review"] }
-        /// Series information
-        var series: Series? { __data["series"] }
 
         /// Book.Award
         ///
@@ -140,14 +140,14 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Review }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("rating", Int.self),
+            .field("rating", PchookGraphQL.Note.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookListQuery.Data.Book.Review.self
           ] }
 
           /// Personal rating (0-10)
-          var rating: Int { __data["rating"] }
+          var rating: PchookGraphQL.Note { __data["rating"] }
         }
 
         /// Book.Series

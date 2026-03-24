@@ -66,9 +66,9 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("id", PchookGraphQL.ID.self),
-            .field("title", String.self),
-            .field("authors", [String].self),
+            .field("id", PchookGraphQL.BookId.self),
+            .field("title", PchookGraphQL.BookTitle.self),
+            .field("authors", [PchookGraphQL.PersonName].self),
             .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -76,11 +76,11 @@ extension PchookGraphQL {
           ] }
 
           /// Unique identifier
-          var id: PchookGraphQL.ID { __data["id"] }
+          var id: PchookGraphQL.BookId { __data["id"] }
           /// Book title
-          var title: String { __data["title"] }
+          var title: PchookGraphQL.BookTitle { __data["title"] }
           /// Book authors
-          var authors: [String] { __data["authors"] }
+          var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Reading status
           var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
         }

@@ -4,11 +4,11 @@
 @_exported import ApolloAPI
 
 extension PchookGraphQL {
-  class AudibleSyncQuery: GraphQLQuery {
-    static let operationName: String = "AudibleSync"
+  class AudibleStatusQuery: GraphQLQuery {
+    static let operationName: String = "AudibleStatus"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query AudibleSync { audibleSync { __typename connected fetchInProgress libraryCount wishlistCount lastSyncAt lastFetchedAt rawItemCount importTaskId } }"#
+        #"query AudibleStatus { audibleSync { __typename connected fetchInProgress libraryCount wishlistCount lastSyncAt lastFetchedAt rawItemCount importTaskId } }"#
       ))
 
     public init() {}
@@ -22,7 +22,7 @@ extension PchookGraphQL {
         .field("audibleSync", AudibleSync.self),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-        AudibleSyncQuery.Data.self
+        AudibleStatusQuery.Data.self
       ] }
 
       /// Audible synchronization status
@@ -48,7 +48,7 @@ extension PchookGraphQL {
           .field("importTaskId", String.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          AudibleSyncQuery.Data.AudibleSync.self
+          AudibleStatusQuery.Data.AudibleSync.self
         ] }
 
         /// Credentials configured

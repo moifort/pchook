@@ -8,14 +8,14 @@ extension PchookGraphQL {
     static let operationName: String = "UpdateBook"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation UpdateBook($id: ID!, $input: UpdateBookInput!) { updateBook(id: $id, input: $input) { __typename id title authors publisher genre status updatedAt } }"#
+        #"mutation UpdateBook($id: BookId!, $input: UpdateBookInput!) { updateBook(id: $id, input: $input) { __typename id title authors publisher genre status updatedAt } }"#
       ))
 
-    public var id: ID
+    public var id: BookId
     public var input: UpdateBookInput
 
     public init(
-      id: ID,
+      id: BookId,
       input: UpdateBookInput
     ) {
       self.id = id
@@ -55,11 +55,11 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID.self),
-          .field("title", String.self),
-          .field("authors", [String].self),
-          .field("publisher", String?.self),
-          .field("genre", String?.self),
+          .field("id", PchookGraphQL.BookId.self),
+          .field("title", PchookGraphQL.BookTitle.self),
+          .field("authors", [PchookGraphQL.PersonName].self),
+          .field("publisher", PchookGraphQL.Publisher?.self),
+          .field("genre", PchookGraphQL.Genre?.self),
           .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
           .field("updatedAt", PchookGraphQL.DateTime.self),
         ] }
@@ -68,15 +68,15 @@ extension PchookGraphQL {
         ] }
 
         /// Unique identifier
-        var id: PchookGraphQL.ID { __data["id"] }
+        var id: PchookGraphQL.BookId { __data["id"] }
         /// Book title
-        var title: String { __data["title"] }
+        var title: PchookGraphQL.BookTitle { __data["title"] }
         /// Book authors
-        var authors: [String] { __data["authors"] }
+        var authors: [PchookGraphQL.PersonName] { __data["authors"] }
         /// Publisher
-        var publisher: String? { __data["publisher"] }
+        var publisher: PchookGraphQL.Publisher? { __data["publisher"] }
         /// Literary genre (e.g. Romance, Sci-Fi, Thriller)
-        var genre: String? { __data["genre"] }
+        var genre: PchookGraphQL.Genre? { __data["genre"] }
         /// Reading status
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
         /// Last modified date

@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "AddToFavorites"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AddToFavorites($id: ID!) { addToFavorites(id: $id) { __typename id status } }"#
+        #"mutation AddToFavorites($id: BookId!) { addToFavorites(id: $id) { __typename id status } }"#
       ))
 
-    public var id: ID
+    public var id: BookId
 
-    public init(id: ID) {
+    public init(id: BookId) {
       self.id = id
     }
 
@@ -44,7 +44,7 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID.self),
+          .field("id", PchookGraphQL.BookId.self),
           .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -52,7 +52,7 @@ extension PchookGraphQL {
         ] }
 
         /// Unique identifier
-        var id: PchookGraphQL.ID { __data["id"] }
+        var id: PchookGraphQL.BookId { __data["id"] }
         /// Reading status
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
       }

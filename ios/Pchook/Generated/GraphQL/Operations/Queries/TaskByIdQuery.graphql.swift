@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "TaskById"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query TaskById($id: ID!) { task(id: $id) { __typename id phase current total message startedAt completedAt } }"#
+        #"query TaskById($id: TaskId!) { task(id: $id) { __typename id phase current total message startedAt completedAt } }"#
       ))
 
-    public var id: ID
+    public var id: TaskId
 
-    public init(id: ID) {
+    public init(id: TaskId) {
       self.id = id
     }
 
@@ -44,7 +44,7 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Task }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID.self),
+          .field("id", PchookGraphQL.TaskId.self),
           .field("phase", String.self),
           .field("current", Int.self),
           .field("total", Int.self),
@@ -57,7 +57,7 @@ extension PchookGraphQL {
         ] }
 
         /// Unique task identifier
-        var id: PchookGraphQL.ID { __data["id"] }
+        var id: PchookGraphQL.TaskId { __data["id"] }
         /// Current phase (idle, running, paused, cancelled, completed, failed)
         var phase: String { __data["phase"] }
         /// Number of items processed

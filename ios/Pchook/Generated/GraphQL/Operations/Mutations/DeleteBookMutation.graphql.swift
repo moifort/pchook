@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "DeleteBook"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation DeleteBook($id: ID!) { deleteBook(id: $id) }"#
+        #"mutation DeleteBook($id: BookId!) { deleteBook(id: $id) }"#
       ))
 
-    public var id: ID
+    public var id: BookId
 
-    public init(id: ID) {
+    public init(id: BookId) {
       self.id = id
     }
 

@@ -38,7 +38,7 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Task }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID.self),
+          .field("id", PchookGraphQL.TaskId.self),
           .field("phase", String.self),
           .field("current", Int.self),
           .field("total", Int.self),
@@ -49,7 +49,7 @@ extension PchookGraphQL {
         ] }
 
         /// Unique task identifier
-        var id: PchookGraphQL.ID { __data["id"] }
+        var id: PchookGraphQL.TaskId { __data["id"] }
         /// Current phase (idle, running, paused, cancelled, completed, failed)
         var phase: String { __data["phase"] }
         /// Number of items processed

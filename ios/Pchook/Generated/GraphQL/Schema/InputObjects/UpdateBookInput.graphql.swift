@@ -13,28 +13,28 @@ extension PchookGraphQL {
     }
 
     init(
-      authors: GraphQLNullable<[String]> = nil,
+      authors: GraphQLNullable<[PersonName]> = nil,
       awards: GraphQLNullable<[AwardInput]> = nil,
       duration: GraphQLNullable<String> = nil,
-      estimatedPrice: GraphQLNullable<Double> = nil,
+      estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<GraphQLEnum<BookFormat>> = nil,
-      genre: GraphQLNullable<String> = nil,
-      isbn: GraphQLNullable<String> = nil,
-      language: GraphQLNullable<String> = nil,
-      narrators: GraphQLNullable<[String]> = nil,
-      pageCount: GraphQLNullable<Int> = nil,
+      genre: GraphQLNullable<Genre> = nil,
+      isbn: GraphQLNullable<ISBN> = nil,
+      language: GraphQLNullable<Language> = nil,
+      narrators: GraphQLNullable<[PersonName]> = nil,
+      pageCount: GraphQLNullable<PageCount> = nil,
       personalNotes: GraphQLNullable<String> = nil,
       publicRatings: GraphQLNullable<[PublicRatingInput]> = nil,
       publishedDate: GraphQLNullable<String> = nil,
-      publisher: GraphQLNullable<String> = nil,
+      publisher: GraphQLNullable<Publisher> = nil,
       readDate: GraphQLNullable<String> = nil,
-      series: GraphQLNullable<String> = nil,
-      seriesLabel: GraphQLNullable<String> = nil,
-      seriesNumber: GraphQLNullable<Double> = nil,
+      series: GraphQLNullable<SeriesName> = nil,
+      seriesLabel: GraphQLNullable<SeriesLabel> = nil,
+      seriesNumber: GraphQLNullable<SeriesPosition> = nil,
       status: GraphQLNullable<GraphQLEnum<BookStatus>> = nil,
       synopsis: GraphQLNullable<String> = nil,
-      title: GraphQLNullable<String> = nil,
-      translator: GraphQLNullable<String> = nil
+      title: GraphQLNullable<BookTitle> = nil,
+      translator: GraphQLNullable<PersonName> = nil
     ) {
       __data = InputDict([
         "authors": authors,
@@ -63,7 +63,7 @@ extension PchookGraphQL {
     }
 
     /// Authors
-    var authors: GraphQLNullable<[String]> {
+    var authors: GraphQLNullable<[PersonName]> {
       get { __data["authors"] }
       set { __data["authors"] = newValue }
     }
@@ -81,7 +81,7 @@ extension PchookGraphQL {
     }
 
     /// Estimated price in euros (null to remove)
-    var estimatedPrice: GraphQLNullable<Double> {
+    var estimatedPrice: GraphQLNullable<Eur> {
       get { __data["estimatedPrice"] }
       set { __data["estimatedPrice"] = newValue }
     }
@@ -93,31 +93,31 @@ extension PchookGraphQL {
     }
 
     /// Literary genre (null to remove)
-    var genre: GraphQLNullable<String> {
+    var genre: GraphQLNullable<Genre> {
       get { __data["genre"] }
       set { __data["genre"] = newValue }
     }
 
     /// ISBN number (null to remove)
-    var isbn: GraphQLNullable<String> {
+    var isbn: GraphQLNullable<ISBN> {
       get { __data["isbn"] }
       set { __data["isbn"] = newValue }
     }
 
     /// Language (e.g. fr, en)
-    var language: GraphQLNullable<String> {
+    var language: GraphQLNullable<Language> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }
 
     /// Narrators (audiobook)
-    var narrators: GraphQLNullable<[String]> {
+    var narrators: GraphQLNullable<[PersonName]> {
       get { __data["narrators"] }
       set { __data["narrators"] = newValue }
     }
 
     /// Page count (null to remove)
-    var pageCount: GraphQLNullable<Int> {
+    var pageCount: GraphQLNullable<PageCount> {
       get { __data["pageCount"] }
       set { __data["pageCount"] = newValue }
     }
@@ -141,7 +141,7 @@ extension PchookGraphQL {
     }
 
     /// Publisher (null to remove)
-    var publisher: GraphQLNullable<String> {
+    var publisher: GraphQLNullable<Publisher> {
       get { __data["publisher"] }
       set { __data["publisher"] = newValue }
     }
@@ -153,19 +153,19 @@ extension PchookGraphQL {
     }
 
     /// Series name (null to remove from series)
-    var series: GraphQLNullable<String> {
+    var series: GraphQLNullable<SeriesName> {
       get { __data["series"] }
       set { __data["series"] = newValue }
     }
 
     /// Label in series
-    var seriesLabel: GraphQLNullable<String> {
+    var seriesLabel: GraphQLNullable<SeriesLabel> {
       get { __data["seriesLabel"] }
       set { __data["seriesLabel"] = newValue }
     }
 
     /// Position in series
-    var seriesNumber: GraphQLNullable<Double> {
+    var seriesNumber: GraphQLNullable<SeriesPosition> {
       get { __data["seriesNumber"] }
       set { __data["seriesNumber"] = newValue }
     }
@@ -183,13 +183,13 @@ extension PchookGraphQL {
     }
 
     /// Book title
-    var title: GraphQLNullable<String> {
+    var title: GraphQLNullable<BookTitle> {
       get { __data["title"] }
       set { __data["title"] = newValue }
     }
 
     /// Translator (null to remove)
-    var translator: GraphQLNullable<String> {
+    var translator: GraphQLNullable<PersonName> {
       get { __data["translator"] }
       set { __data["translator"] = newValue }
     }

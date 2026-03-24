@@ -1,4 +1,4 @@
-query AudibleSync {
+query AudibleStatus {
   audibleSync {
     connected
     fetchInProgress

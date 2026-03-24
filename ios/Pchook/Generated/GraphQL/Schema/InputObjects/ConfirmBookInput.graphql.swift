@@ -13,22 +13,22 @@ extension PchookGraphQL {
     }
 
     init(
-      authors: GraphQLNullable<[String]> = nil,
-      estimatedPrice: GraphQLNullable<Double> = nil,
+      authors: GraphQLNullable<[PersonName]> = nil,
+      estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<String> = nil,
-      genre: GraphQLNullable<String> = nil,
-      language: GraphQLNullable<String> = nil,
-      pageCount: GraphQLNullable<Int> = nil,
+      genre: GraphQLNullable<Genre> = nil,
+      language: GraphQLNullable<Language> = nil,
+      pageCount: GraphQLNullable<PageCount> = nil,
       previewId: String,
-      publisher: GraphQLNullable<String> = nil,
-      replaceBookId: GraphQLNullable<String> = nil,
-      series: GraphQLNullable<String> = nil,
-      seriesLabel: GraphQLNullable<String> = nil,
-      seriesNumber: GraphQLNullable<Double> = nil,
+      publisher: GraphQLNullable<Publisher> = nil,
+      replaceBookId: GraphQLNullable<BookId> = nil,
+      series: GraphQLNullable<SeriesName> = nil,
+      seriesLabel: GraphQLNullable<SeriesLabel> = nil,
+      seriesNumber: GraphQLNullable<SeriesPosition> = nil,
       status: String,
       synopsis: GraphQLNullable<String> = nil,
-      title: GraphQLNullable<String> = nil,
-      translator: GraphQLNullable<String> = nil
+      title: GraphQLNullable<BookTitle> = nil,
+      translator: GraphQLNullable<PersonName> = nil
     ) {
       __data = InputDict([
         "authors": authors,
@@ -51,13 +51,13 @@ extension PchookGraphQL {
     }
 
     /// Authors (override)
-    var authors: GraphQLNullable<[String]> {
+    var authors: GraphQLNullable<[PersonName]> {
       get { __data["authors"] }
       set { __data["authors"] = newValue }
     }
 
     /// Price (override)
-    var estimatedPrice: GraphQLNullable<Double> {
+    var estimatedPrice: GraphQLNullable<Eur> {
       get { __data["estimatedPrice"] }
       set { __data["estimatedPrice"] = newValue }
     }
@@ -69,19 +69,19 @@ extension PchookGraphQL {
     }
 
     /// Genre (override)
-    var genre: GraphQLNullable<String> {
+    var genre: GraphQLNullable<Genre> {
       get { __data["genre"] }
       set { __data["genre"] = newValue }
     }
 
     /// Language (override)
-    var language: GraphQLNullable<String> {
+    var language: GraphQLNullable<Language> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }
 
     /// Pages (override)
-    var pageCount: GraphQLNullable<Int> {
+    var pageCount: GraphQLNullable<PageCount> {
       get { __data["pageCount"] }
       set { __data["pageCount"] = newValue }
     }
@@ -93,31 +93,31 @@ extension PchookGraphQL {
     }
 
     /// Publisher (override)
-    var publisher: GraphQLNullable<String> {
+    var publisher: GraphQLNullable<Publisher> {
       get { __data["publisher"] }
       set { __data["publisher"] = newValue }
     }
 
     /// ID of the book to replace (update)
-    var replaceBookId: GraphQLNullable<String> {
+    var replaceBookId: GraphQLNullable<BookId> {
       get { __data["replaceBookId"] }
       set { __data["replaceBookId"] = newValue }
     }
 
     /// Series (override)
-    var series: GraphQLNullable<String> {
+    var series: GraphQLNullable<SeriesName> {
       get { __data["series"] }
       set { __data["series"] = newValue }
     }
 
     /// Series label (override)
-    var seriesLabel: GraphQLNullable<String> {
+    var seriesLabel: GraphQLNullable<SeriesLabel> {
       get { __data["seriesLabel"] }
       set { __data["seriesLabel"] = newValue }
     }
 
     /// Series position (override)
-    var seriesNumber: GraphQLNullable<Double> {
+    var seriesNumber: GraphQLNullable<SeriesPosition> {
       get { __data["seriesNumber"] }
       set { __data["seriesNumber"] = newValue }
     }
@@ -135,13 +135,13 @@ extension PchookGraphQL {
     }
 
     /// Title (override)
-    var title: GraphQLNullable<String> {
+    var title: GraphQLNullable<BookTitle> {
       get { __data["title"] }
       set { __data["title"] = newValue }
     }
 
     /// Translator (override)
-    var translator: GraphQLNullable<String> {
+    var translator: GraphQLNullable<PersonName> {
       get { __data["translator"] }
       set { __data["translator"] = newValue }
     }

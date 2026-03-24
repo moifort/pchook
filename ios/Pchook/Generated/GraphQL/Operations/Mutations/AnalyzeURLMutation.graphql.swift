@@ -8,15 +8,15 @@ extension PchookGraphQL {
     static let operationName: String = "AnalyzeURL"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AnalyzeURL($url: String!, $description: String, $rawText: String) { analyzeURL(url: $url, description: $description, rawText: $rawText) { __typename previewId title authors publisher genre isbn language awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } } }"#
+        #"mutation AnalyzeURL($url: Url!, $description: String, $rawText: String) { analyzeURL(url: $url, description: $description, rawText: $rawText) { __typename previewId title authors publisher genre isbn language awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } } }"#
       ))
 
-    public var url: String
+    public var url: Url
     public var description: GraphQLNullable<String>
     public var rawText: GraphQLNullable<String>
 
     public init(
-      url: String,
+      url: Url,
       description: GraphQLNullable<String>,
       rawText: GraphQLNullable<String>
     ) {
@@ -127,10 +127,10 @@ extension PchookGraphQL {
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("source", String.self),
-            .field("score", Double.self),
-            .field("maxScore", Double.self),
+            .field("score", PchookGraphQL.Note.self),
+            .field("maxScore", PchookGraphQL.Note.self),
             .field("voterCount", Int.self),
-            .field("url", String.self),
+            .field("url", PchookGraphQL.Url.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AnalyzeURLMutation.Data.AnalyzeURL.PublicRating.self
@@ -139,13 +139,13 @@ extension PchookGraphQL {
           /// Platform name (e.g. Hardcover, Goodreads)
           var source: String { __data["source"] }
           /// Score received
-          var score: Double { __data["score"] }
+          var score: PchookGraphQL.Note { __data["score"] }
           /// Maximum possible score
-          var maxScore: Double { __data["maxScore"] }
+          var maxScore: PchookGraphQL.Note { __data["maxScore"] }
           /// Number of voters
           var voterCount: Int { __data["voterCount"] }
           /// Link to the book page on the platform
-          var url: String { __data["url"] }
+          var url: PchookGraphQL.Url { __data["url"] }
         }
       }
     }
