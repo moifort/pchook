@@ -1,0 +1,35 @@
+import { BookType } from '~/domain/book/graphql/types'
+import type { SeriesInfo } from '~/domain/book/read-model/types'
+import { booksInLanguage } from '~/domain/series/business-rules'
+import { SeriesQuery } from '~/domain/series/query'
+import { builder } from '~/domain/shared/graphql/builder'
+import { SeriesInfoType } from './types'
+
+builder.objectField(BookType, 'series', (t) =>
+  t.field({
+    type: SeriesInfoType,
+    nullable: true,
+    description: 'Informations sur la série',
+    resolve: async ({ id, language }) => {
+      const seriesInfo = await SeriesQuery.getByBookId(id)
+      if (!seriesInfo) return null
+
+      const fullSeries = await SeriesQuery.getById(seriesInfo.id)
+      if (fullSeries === 'not-found') return null
+
+      return {
+        name: String(fullSeries.name),
+        label: String(seriesInfo.label),
+        position: Number(seriesInfo.position),
+        books: booksInLanguage(fullSeries.books, language).map(
+          ({ id, title, label, position }) => ({
+            id,
+            title: String(title),
+            label: String(label),
+            position: Number(position),
+          }),
+        ),
+      } satisfies SeriesInfo
+    },
+  }),
+)

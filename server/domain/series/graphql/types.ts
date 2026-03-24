@@ -1,5 +1,18 @@
-import { builder } from '~/domain/shared/graphql/builder'
 import type { SeriesInfo } from '~/domain/book/read-model/types'
+import type { Series } from '~/domain/series/types'
+import { builder } from '~/domain/shared/graphql/builder'
+
+export const SeriesType = builder.objectRef<Series>('Series').implement({
+  description: 'Une série de livres',
+  fields: (t) => ({
+    id: t.id({ description: 'Identifiant unique', resolve: ({ id }) => String(id) }),
+    name: t.string({ description: 'Nom de la série', resolve: ({ name }) => String(name) }),
+    createdAt: t.string({
+      description: 'Date de création (ISO 8601)',
+      resolve: ({ createdAt }) => createdAt.toISOString(),
+    }),
+  }),
+})
 
 const SeriesBookEntryType = builder
   .objectRef<SeriesInfo['books'][number]>('SeriesBookEntry')
