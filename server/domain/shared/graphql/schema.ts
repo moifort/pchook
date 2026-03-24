@@ -22,4 +22,9 @@ import '~/domain/series/graphql/queries'
 import '~/domain/dashboard/graphql/types'
 import '~/domain/dashboard/graphql/queries'
 
+// Audible domain
+import '~/domain/audible/graphql/types'
+import '~/domain/audible/graphql/queries'
+import '~/domain/audible/graphql/mutations'
+
 export const schema = builder.toSchema()
