@@ -115,27 +115,27 @@ builder.mutationField('deleteBook', (t) =>
 )
 
 const bookToScanResult = (book: Book, seriesName?: string): ScanResult => ({
-  title: String(book.title),
-  authors: book.authors.map(String),
-  publisher: book.publisher ? String(book.publisher) : undefined,
+  title: book.title,
+  authors: [...book.authors],
+  publisher: book.publisher ?? undefined,
   publishedDate: book.publishedDate ? book.publishedDate.toISOString().split('T')[0] : undefined,
-  pageCount: book.pageCount ? Number(book.pageCount) : undefined,
-  genre: book.genre ? String(book.genre) : undefined,
+  pageCount: book.pageCount ?? undefined,
+  genre: book.genre ?? undefined,
   synopsis: book.synopsis,
-  isbn: book.isbn ? String(book.isbn) : undefined,
-  language: book.language ? String(book.language) : undefined,
+  isbn: book.isbn ?? undefined,
+  language: book.language ?? undefined,
   format: book.format,
   series: seriesName,
   seriesNumber: undefined,
-  translator: book.translator ? String(book.translator) : undefined,
-  estimatedPrice: book.estimatedPrice ? Number(book.estimatedPrice) : undefined,
+  translator: book.translator ?? undefined,
+  estimatedPrice: book.estimatedPrice ?? undefined,
   duration: book.duration,
-  narrators: book.narrators.length > 0 ? book.narrators.map(String) : undefined,
+  narrators: book.narrators.length > 0 ? [...book.narrators] : undefined,
   awards: book.awards,
   publicRatings: book.publicRatings.map(({ source, score, maxScore, voterCount }) => ({
     source,
-    score: Number(score),
-    maxScore: Number(maxScore),
+    score,
+    maxScore,
     voterCount,
   })),
 })
@@ -152,12 +152,9 @@ builder.mutationField('refreshBook', (t) =>
       if (book === 'not-found') throw bookNotFound()
 
       const existingSeries = await SeriesQuery.getByBookId(book.id)
-      const scanResult = bookToScanResult(
-        book,
-        existingSeries?.name ? String(existingSeries.name) : undefined,
-      )
+      const scanResult = bookToScanResult(book, existingSeries?.name ?? undefined)
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const enriched = await enrichWithGemini(scanResult, seriesNames)
       const { title, data, seriesInfo } = scanResultToBookData(enriched)
 

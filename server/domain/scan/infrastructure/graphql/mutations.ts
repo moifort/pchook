@@ -31,7 +31,7 @@ builder.mutationField('analyzeBookCover', (t) =>
 
       const imageBuffer = Buffer.from(imageBase64, 'base64')
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const scanOutput = await BookScanner.scan(imageBuffer, ocrText ?? undefined, seriesNames)
       const previewId = crypto.randomUUID()
 
@@ -61,7 +61,7 @@ builder.mutationField('analyzeISBN', (t) =>
       if (existing) return null
 
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const scanOutput = await IsbnScanner.scan(isbn, seriesNames)
       const previewId = crypto.randomUUID()
 
@@ -89,13 +89,9 @@ builder.mutationField('analyzeURL', (t) =>
     },
     resolve: async (_, { url, description, rawText }) => {
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const result = await ShareImporter.importFromShare(
-        {
-          url: String(url),
-          description: description ?? undefined,
-          rawText: rawText ?? undefined,
-        },
+        { url, description: description ?? undefined, rawText: rawText ?? undefined },
         seriesNames,
       )
 

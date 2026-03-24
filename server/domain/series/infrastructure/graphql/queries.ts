@@ -12,9 +12,9 @@ builder.objectField(SeriesType, 'books', (t) =>
 
       return result.books.map(({ id, title, label, position }) => ({
         id,
-        title: String(title),
-        label: String(label),
-        position: Number(position),
+        title,
+        label,
+        position,
       }))
     },
   }),
@@ -38,7 +38,7 @@ builder.queryField('seriesById', (t) =>
     },
     resolve: async (_, { id }) => {
       const allSeries = await SeriesQuery.findAll()
-      return allSeries.find((series) => String(series.id) === id) ?? null
+      return allSeries.find((series) => series.id === id) ?? null
     },
   }),
 )

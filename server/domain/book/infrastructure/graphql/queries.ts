@@ -37,10 +37,10 @@ builder.queryField('books', (t) =>
         .filter((book) => (status ? book.status === status : true))
 
       const sorted = sortBy(filtered, (book) => {
-        if (sort === 'title') return String(book.title).toLowerCase()
-        if (sort === 'author') return book.authors[0] ? String(book.authors[0]).toLowerCase() : ''
+        if (sort === 'title') return book.title.toLowerCase()
+        if (sort === 'author') return book.authors[0] ? book.authors[0].toLowerCase() : ''
         if (sort === 'awards') return awardsCount(book.awards)
-        if (sort === 'genre') return (book.genre ? String(book.genre) : '').toLowerCase()
+        if (sort === 'genre') return (book.genre ?? '').toLowerCase()
         return book.createdAt.getTime()
       })
 

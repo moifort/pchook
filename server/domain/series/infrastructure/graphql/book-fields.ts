@@ -18,15 +18,15 @@ builder.objectField(BookType, 'series', (t) =>
       if (fullSeries === 'not-found') return null
 
       return {
-        name: String(fullSeries.name),
-        label: String(seriesInfo.label),
-        position: Number(seriesInfo.position),
+        name: fullSeries.name,
+        label: seriesInfo.label,
+        position: seriesInfo.position,
         books: booksInLanguage(fullSeries.books, language).map(
           ({ id, title, label, position }) => ({
             id,
-            title: String(title),
-            label: String(label),
-            position: Number(position),
+            title,
+            label,
+            position,
           }),
         ),
       } satisfies SeriesInfo
