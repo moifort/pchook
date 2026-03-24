@@ -4,13 +4,15 @@ import { builder } from '~/domain/shared/graphql/builder'
 export const ReviewType = builder.objectRef<Review>('Review').implement({
   description: 'Personal review and rating of a book',
   fields: (t) => ({
-    bookId: t.id({
+    bookId: t.field({
+      type: 'BookId',
       description: 'Associated book ID',
-      resolve: ({ bookId }) => String(bookId),
+      resolve: ({ bookId }) => bookId,
     }),
-    rating: t.int({
+    rating: t.field({
+      type: 'Note',
       description: 'Personal rating (0-10)',
-      resolve: ({ rating }) => Number(rating),
+      resolve: ({ rating }) => rating,
     }),
     readDate: t.field({
       type: 'DateTime',

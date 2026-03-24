@@ -4,9 +4,10 @@ import type { TaskState } from '~/domain/task/types'
 export const TaskType = builder.objectRef<TaskState>('Task').implement({
   description: 'A background task with progress tracking',
   fields: (t) => ({
-    id: t.id({
+    id: t.field({
+      type: 'TaskId',
       description: 'Unique task identifier',
-      resolve: ({ id }) => String(id),
+      resolve: ({ id }) => id,
     }),
     phase: t.exposeString('phase', {
       description: 'Current phase (idle, running, paused, cancelled, completed, failed)',

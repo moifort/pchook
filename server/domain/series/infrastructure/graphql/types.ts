@@ -6,7 +6,11 @@ export const SeriesType = builder.objectRef<Series>('Series').implement({
   description: 'A book series',
   fields: (t) => ({
     id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
-    name: t.string({ description: 'Series name', resolve: ({ name }) => String(name) }),
+    name: t.field({
+      type: 'SeriesName',
+      description: 'Series name',
+      resolve: ({ name }) => name,
+    }),
     createdAt: t.field({
       type: 'DateTime',
       description: 'Creation date',

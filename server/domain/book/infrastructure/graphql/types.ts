@@ -16,15 +16,21 @@ export const PublicRatingRef = builder.objectRef<PublicRatingType>('PublicRating
     source: t.exposeString('source', {
       description: 'Platform name (e.g. Hardcover, Goodreads)',
     }),
-    score: t.float({ description: 'Score received', resolve: ({ score }) => Number(score) }),
-    maxScore: t.float({
+    score: t.field({
+      type: 'Note',
+      description: 'Score received',
+      resolve: ({ score }) => score,
+    }),
+    maxScore: t.field({
+      type: 'Note',
       description: 'Maximum possible score',
-      resolve: ({ maxScore }) => Number(maxScore),
+      resolve: ({ maxScore }) => maxScore,
     }),
     voterCount: t.exposeInt('voterCount', { description: 'Number of voters' }),
-    url: t.string({
+    url: t.field({
+      type: 'Url',
       description: 'Link to the book page on the platform',
-      resolve: ({ url }) => String(url),
+      resolve: ({ url }) => url,
     }),
   }),
 })
@@ -32,16 +38,26 @@ export const PublicRatingRef = builder.objectRef<PublicRatingType>('PublicRating
 export const BookType = builder.objectRef<Book>('Book').implement({
   description: 'A book in the personal library',
   fields: (t) => ({
-    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
-    title: t.string({ description: 'Book title', resolve: ({ title }) => String(title) }),
-    authors: t.stringList({
-      description: 'Book authors',
-      resolve: ({ authors }) => authors.map(String),
+    id: t.field({
+      type: 'BookId',
+      description: 'Unique identifier',
+      resolve: ({ id }) => id,
     }),
-    publisher: t.string({
+    title: t.field({
+      type: 'BookTitle',
+      description: 'Book title',
+      resolve: ({ title }) => title,
+    }),
+    authors: t.field({
+      type: ['PersonName'],
+      description: 'Book authors',
+      resolve: ({ authors }) => authors,
+    }),
+    publisher: t.field({
+      type: 'Publisher',
       nullable: true,
       description: 'Publisher',
-      resolve: ({ publisher }) => (publisher ? String(publisher) : null),
+      resolve: ({ publisher }) => publisher ?? null,
     }),
     publishedDate: t.field({
       type: 'DateTime',
@@ -49,26 +65,30 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Publication date',
       resolve: ({ publishedDate }) => publishedDate ?? null,
     }),
-    pageCount: t.int({
+    pageCount: t.field({
+      type: 'PageCount',
       nullable: true,
       description: 'Page count',
-      resolve: ({ pageCount }) => (pageCount ? Number(pageCount) : null),
+      resolve: ({ pageCount }) => pageCount ?? null,
     }),
-    genre: t.string({
+    genre: t.field({
+      type: 'Genre',
       nullable: true,
       description: 'Literary genre (e.g. Romance, Sci-Fi, Thriller)',
-      resolve: ({ genre }) => (genre ? String(genre) : null),
+      resolve: ({ genre }) => genre ?? null,
     }),
     synopsis: t.exposeString('synopsis', { nullable: true, description: 'Book synopsis' }),
-    isbn: t.string({
+    isbn: t.field({
+      type: 'ISBN',
       nullable: true,
       description: 'ISBN number',
-      resolve: ({ isbn }) => (isbn ? String(isbn) : null),
+      resolve: ({ isbn }) => isbn ?? null,
     }),
-    language: t.string({
+    language: t.field({
+      type: 'Language',
       nullable: true,
       description: 'Book language (e.g. fr, en)',
-      resolve: ({ language }) => (language ? String(language) : null),
+      resolve: ({ language }) => language ?? null,
     }),
     format: t.field({
       type: BookFormatEnum,
@@ -76,20 +96,23 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Book format',
       resolve: ({ format }) => format ?? null,
     }),
-    translator: t.string({
+    translator: t.field({
+      type: 'PersonName',
       nullable: true,
       description: 'Translator',
-      resolve: ({ translator }) => (translator ? String(translator) : null),
+      resolve: ({ translator }) => translator ?? null,
     }),
-    estimatedPrice: t.float({
+    estimatedPrice: t.field({
+      type: 'Eur',
       nullable: true,
       description: 'Estimated price in euros',
-      resolve: ({ estimatedPrice }) => (estimatedPrice ? Number(estimatedPrice) : null),
+      resolve: ({ estimatedPrice }) => estimatedPrice ?? null,
     }),
     duration: t.exposeString('duration', { nullable: true, description: 'Duration (audiobook)' }),
-    narrators: t.stringList({
+    narrators: t.field({
+      type: ['PersonName'],
       description: 'Narrators (audiobook)',
-      resolve: ({ narrators }) => narrators.map(String),
+      resolve: ({ narrators }) => narrators,
     }),
     personalNotes: t.exposeString('personalNotes', {
       nullable: true,
@@ -122,10 +145,11 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Import source',
       resolve: ({ importSource }) => importSource ?? null,
     }),
-    externalUrl: t.string({
+    externalUrl: t.field({
+      type: 'Url',
       nullable: true,
       description: 'External URL (Audible, etc.)',
-      resolve: ({ externalUrl }) => (externalUrl ? String(externalUrl) : null),
+      resolve: ({ externalUrl }) => externalUrl ?? null,
     }),
     createdAt: t.field({
       type: 'DateTime',
