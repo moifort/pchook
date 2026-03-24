@@ -56,7 +56,7 @@ struct AddReviewSheet: View {
                 readDate: formatter.string(from: Date()),
                 reviewNotes: reviewNotes.isEmpty ? nil : reviewNotes
             )
-            try await BooksAPI.addReview(id: bookId, request)
+            try await GraphQLBooksAPI.addReview(id: bookId, request)
             await onSaved()
         } catch {
             self.error = reportError(error)

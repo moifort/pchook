@@ -134,7 +134,7 @@ final class BooksViewModel {
         error = nil
         do {
             let apiSort = sort == .myRating ? "createdAt" : sort.rawValue
-            books = try await BooksAPI.list(
+            books = try await GraphQLBooksAPI.list(
                 status: nil,
                 sort: apiSort,
                 order: sortDescending ? "desc" : "asc"

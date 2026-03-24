@@ -25,8 +25,8 @@ struct BookDetailView: View {
                     BookEditForm(
                         initial: BookEditForm.Fields(from: detail),
                         onSave: { request in
-                            _ = try await BooksAPI.update(id: bookId, request)
-                            self.detail = try await BooksAPI.getDetail(id: bookId)
+                            _ = try await GraphQLBooksAPI.update(id: bookId, request)
+                            self.detail = try await GraphQLBooksAPI.getDetail(id: bookId)
                             isEditing = false
                             onUpdated()
                         },
@@ -71,7 +71,7 @@ struct BookDetailView: View {
         if let detail, detail.book.status == "to-read" {
             ToolbarItemGroup {
                 AsyncToolbarButton(title: "Marquer comme lu", systemImage: "checkmark.circle") {
-                    _ = try? await BooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))
+                    _ = try? await GraphQLBooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))
                     await loadDetail()
                     onUpdated()
                 }
@@ -80,7 +80,7 @@ struct BookDetailView: View {
         if let detail, detail.review?.rating != 5 {
             ToolbarItemGroup {
                 AsyncToolbarButton(title: "Ajouter aux favoris", systemImage: "heart") {
-                    try? await BooksAPI.addToFavorites(id: bookId)
+                    try? await GraphQLBooksAPI.addToFavorites(id: bookId)
                     await loadDetail()
                     onUpdated()
                 }
@@ -122,7 +122,7 @@ struct BookDetailView: View {
     private func loadDetail() async {
         error = nil
         do {
-            detail = try await BooksAPI.getDetail(id: bookId)
+            detail = try await GraphQLBooksAPI.getDetail(id: bookId)
         } catch {
             self.error = reportError(error)
         }
@@ -131,8 +131,8 @@ struct BookDetailView: View {
     private func refreshEnrichment() async {
         isRefreshing = true
         do {
-            try await BooksAPI.refresh(id: bookId)
-            detail = try await BooksAPI.getDetail(id: bookId)
+            try await GraphQLBooksAPI.refresh(id: bookId)
+            detail = try await GraphQLBooksAPI.getDetail(id: bookId)
             onUpdated()
         } catch {
             self.error = reportError(error)
@@ -143,7 +143,7 @@ struct BookDetailView: View {
     private func deleteBook() async {
         isDeleting = true
         do {
-            try await BooksAPI.delete(id: bookId)
+            try await GraphQLBooksAPI.delete(id: bookId)
             onDeleted()
             dismiss()
         } catch {
