@@ -4,15 +4,15 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Source d'import du livre
+  /// Book import source
   enum ImportSource: String, EnumType {
-    /// Import Audible
+    /// Audible import
     case audible = "audible"
-    /// Code-barres ISBN
+    /// ISBN barcode
     case isbn = "isbn"
-    /// Scan de couverture
+    /// Cover scan
     case scan = "scan"
-    /// URL externe
+    /// External URL
     case url = "url"
   }
 

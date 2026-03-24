@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Entrée d'un livre dans une série
+  /// A book entry within a series
   static let SeriesBookEntry = ApolloAPI.Object(
     typename: "SeriesBookEntry",
     implementedInterfaces: [],

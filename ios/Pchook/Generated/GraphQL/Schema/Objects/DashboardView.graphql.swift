@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Vue tableau de bord avec statistiques de lecture
+  /// Dashboard view with reading statistics
   static let DashboardView = ApolloAPI.Object(
     typename: "DashboardView",
     implementedInterfaces: [],

@@ -1,5 +1,5 @@
-query AudibleStatus {
-  audibleStatus {
+query AudibleSync {
+  audibleSync {
     connected
     fetchInProgress
     libraryCount
@@ -7,25 +7,7 @@ query AudibleStatus {
     lastSyncAt
     lastFetchedAt
     rawItemCount
-    importTask {
-      phase
-      current
-      total
-      message
-      startedAt
-      completedAt
-    }
-  }
-}
-
-query ImportState {
-  importState {
-    phase
-    current
-    total
-    message
-    startedAt
-    completedAt
+    importTaskId
   }
 }
 
@@ -58,13 +40,11 @@ mutation AudibleSyncVerify {
 }
 
 mutation AudibleImportStart {
-  audibleImportStart
-}
-
-mutation AudibleImportPause {
-  audibleImportPause
-}
-
-mutation AudibleImportCancel {
-  audibleImportCancel
+  audibleImportStart {
+    id
+    phase
+    current
+    total
+    message
+  }
 }

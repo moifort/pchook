@@ -25,14 +25,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("refreshBook", Bool?.self, arguments: ["id": .variable("id")]),
+        .field("refreshBook", Bool.self, arguments: ["id": .variable("id")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         RefreshBookMutation.Data.self
       ] }
 
-      /// Ré-enrichir un livre via Gemini (met à jour les métadonnées)
-      var refreshBook: Bool? { __data["refreshBook"] }
+      /// Re-enrich a book via Gemini (updates metadata)
+      var refreshBook: Bool { __data["refreshBook"] }
     }
   }
 

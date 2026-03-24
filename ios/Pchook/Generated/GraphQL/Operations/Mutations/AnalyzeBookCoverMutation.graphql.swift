@@ -33,7 +33,7 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("analyzeBookCover", AnalyzeBookCover?.self, arguments: [
+        .field("analyzeBookCover", AnalyzeBookCover.self, arguments: [
           "imageBase64": .variable("imageBase64"),
           "ocrText": .variable("ocrText")
         ]),
@@ -42,8 +42,8 @@ extension PchookGraphQL {
         AnalyzeBookCoverMutation.Data.self
       ] }
 
-      /// Scanner une couverture de livre pour extraire les métadonnées
-      var analyzeBookCover: AnalyzeBookCover? { __data["analyzeBookCover"] }
+      /// Scan a book cover to extract metadata
+      var analyzeBookCover: AnalyzeBookCover { __data["analyzeBookCover"] }
 
       /// AnalyzeBookCover
       ///
@@ -55,9 +55,9 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.BookPreview }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("previewId", String?.self),
-          .field("title", String?.self),
-          .field("authors", [String]?.self),
+          .field("previewId", String.self),
+          .field("title", String.self),
+          .field("authors", [String].self),
           .field("publisher", String?.self),
           .field("publishedDate", String?.self),
           .field("pageCount", Int?.self),
@@ -73,24 +73,24 @@ extension PchookGraphQL {
           .field("estimatedPrice", Double?.self),
           .field("duration", String?.self),
           .field("narrators", [String]?.self),
-          .field("awards", [Award]?.self),
-          .field("publicRatings", [PublicRating]?.self),
+          .field("awards", [Award].self),
+          .field("publicRatings", [PublicRating].self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AnalyzeBookCoverMutation.Data.AnalyzeBookCover.self
         ] }
 
-        /// Identifiant du preview
-        var previewId: String? { __data["previewId"] }
-        /// Titre extrait
-        var title: String? { __data["title"] }
-        /// Auteurs extraits
-        var authors: [String]? { __data["authors"] }
-        /// Éditeur
+        /// Preview identifier
+        var previewId: String { __data["previewId"] }
+        /// Extracted title
+        var title: String { __data["title"] }
+        /// Extracted authors
+        var authors: [String] { __data["authors"] }
+        /// Publisher
         var publisher: String? { __data["publisher"] }
-        /// Date de publication
+        /// Publication date
         var publishedDate: String? { __data["publishedDate"] }
-        /// Nombre de pages
+        /// Page count
         var pageCount: Int? { __data["pageCount"] }
         /// Genre
         var genre: String? { __data["genre"] }
@@ -98,28 +98,28 @@ extension PchookGraphQL {
         var synopsis: String? { __data["synopsis"] }
         /// ISBN
         var isbn: String? { __data["isbn"] }
-        /// Langue
+        /// Language
         var language: String? { __data["language"] }
         /// Format
         var format: String? { __data["format"] }
-        /// Série
+        /// Series
         var series: String? { __data["series"] }
-        /// Label série
+        /// Series label
         var seriesLabel: String? { __data["seriesLabel"] }
-        /// Position série
+        /// Series position
         var seriesNumber: Double? { __data["seriesNumber"] }
-        /// Traducteur
+        /// Translator
         var translator: String? { __data["translator"] }
-        /// Prix estimé
+        /// Estimated price
         var estimatedPrice: Double? { __data["estimatedPrice"] }
-        /// Durée (audio)
+        /// Duration (audio)
         var duration: String? { __data["duration"] }
-        /// Narrateurs
+        /// Narrators
         var narrators: [String]? { __data["narrators"] }
-        /// Prix littéraires
-        var awards: [Award]? { __data["awards"] }
-        /// Notes communautaires
-        var publicRatings: [PublicRating]? { __data["publicRatings"] }
+        /// Literary awards
+        var awards: [Award] { __data["awards"] }
+        /// Community ratings
+        var publicRatings: [PublicRating] { __data["publicRatings"] }
 
         /// AnalyzeBookCover.Award
         ///
@@ -131,16 +131,16 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Award }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("name", String?.self),
+            .field("name", String.self),
             .field("year", Int?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AnalyzeBookCoverMutation.Data.AnalyzeBookCover.Award.self
           ] }
 
-          /// Nom du prix
-          var name: String? { __data["name"] }
-          /// Année d'obtention
+          /// Award name
+          var name: String { __data["name"] }
+          /// Year awarded
           var year: Int? { __data["year"] }
         }
 
@@ -154,26 +154,26 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.PublicRating }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("source", String?.self),
-            .field("score", Double?.self),
-            .field("maxScore", Double?.self),
-            .field("voterCount", Int?.self),
-            .field("url", String?.self),
+            .field("source", String.self),
+            .field("score", Double.self),
+            .field("maxScore", Double.self),
+            .field("voterCount", Int.self),
+            .field("url", String.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AnalyzeBookCoverMutation.Data.AnalyzeBookCover.PublicRating.self
           ] }
 
-          /// Nom de la plateforme (ex: Hardcover, Goodreads)
-          var source: String? { __data["source"] }
-          /// Note obtenue
-          var score: Double? { __data["score"] }
-          /// Note maximale possible
-          var maxScore: Double? { __data["maxScore"] }
-          /// Nombre de votants
-          var voterCount: Int? { __data["voterCount"] }
-          /// Lien vers la page du livre sur la plateforme
-          var url: String? { __data["url"] }
+          /// Platform name (e.g. Hardcover, Goodreads)
+          var source: String { __data["source"] }
+          /// Score received
+          var score: Double { __data["score"] }
+          /// Maximum possible score
+          var maxScore: Double { __data["maxScore"] }
+          /// Number of voters
+          var voterCount: Int { __data["voterCount"] }
+          /// Link to the book page on the platform
+          var url: String { __data["url"] }
         }
       }
     }

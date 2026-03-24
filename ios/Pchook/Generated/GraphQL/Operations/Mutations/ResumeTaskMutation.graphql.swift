@@ -4,11 +4,11 @@
 @_exported import ApolloAPI
 
 extension PchookGraphQL {
-  class AddToFavoritesMutation: GraphQLMutation {
-    static let operationName: String = "AddToFavorites"
+  class ResumeTaskMutation: GraphQLMutation {
+    static let operationName: String = "ResumeTask"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AddToFavorites($id: ID!) { addToFavorites(id: $id) { __typename id status } }"#
+        #"mutation ResumeTask($id: ID!) { resumeTask(id: $id) { __typename id phase } }"#
       ))
 
     public var id: ID
@@ -25,36 +25,36 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("addToFavorites", AddToFavorites.self, arguments: ["id": .variable("id")]),
+        .field("resumeTask", ResumeTask.self, arguments: ["id": .variable("id")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-        AddToFavoritesMutation.Data.self
+        ResumeTaskMutation.Data.self
       ] }
 
-      /// Add a book to favorites (favorite rating + read status)
-      var addToFavorites: AddToFavorites { __data["addToFavorites"] }
+      /// Resume a paused task
+      var resumeTask: ResumeTask { __data["resumeTask"] }
 
-      /// AddToFavorites
+      /// ResumeTask
       ///
-      /// Parent Type: `Book`
-      struct AddToFavorites: PchookGraphQL.SelectionSet {
+      /// Parent Type: `Task`
+      struct ResumeTask: PchookGraphQL.SelectionSet {
         let __data: DataDict
         init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
+        static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Task }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
           .field("id", PchookGraphQL.ID.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("phase", String.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          AddToFavoritesMutation.Data.AddToFavorites.self
+          ResumeTaskMutation.Data.ResumeTask.self
         ] }
 
-        /// Unique identifier
+        /// Unique task identifier
         var id: PchookGraphQL.ID { __data["id"] }
-        /// Reading status
-        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Current phase (idle, running, paused, cancelled, completed, failed)
+        var phase: String { __data["phase"] }
       }
     }
   }

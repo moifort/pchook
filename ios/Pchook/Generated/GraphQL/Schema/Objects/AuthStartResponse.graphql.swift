@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Réponse de démarrage de l'authentification Audible
+  /// Audible authentication start response
   static let AuthStartResponse = ApolloAPI.Object(
     typename: "AuthStartResponse",
     implementedInterfaces: [],

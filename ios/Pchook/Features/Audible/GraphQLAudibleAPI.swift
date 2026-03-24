@@ -41,57 +41,24 @@ enum GraphQLAudibleAPI {
     }
 
     static func status() async throws -> AudibleStatus {
-        let query = PchookGraphQL.AudibleStatusQuery()
+        let query = PchookGraphQL.AudibleSyncQuery()
         let data = try await GraphQLHelpers.fetch(client, query: query)
 
-        let status = data.audibleStatus
-        let task = status.importTask
+        let sync = data.audibleSync
         return AudibleStatus(
-            connected: status.connected,
-            fetchInProgress: status.fetchInProgress,
-            libraryCount: status.libraryCount,
-            wishlistCount: status.wishlistCount,
-            lastSyncAt: status.lastSyncAt.flatMap(GraphQLHelpers.parseISO8601),
-            lastFetchedAt: status.lastFetchedAt.flatMap(GraphQLHelpers.parseISO8601),
-            rawItemCount: status.rawItemCount,
-            importTask: ImportTaskState(
-                phase: task.phase ?? "idle",
-                current: task.current,
-                total: task.total,
-                message: task.message ?? "",
-                startedAt: task.startedAt.flatMap(GraphQLHelpers.parseISO8601),
-                completedAt: task.completedAt.flatMap(GraphQLHelpers.parseISO8601)
-            )
+            connected: sync.connected,
+            fetchInProgress: sync.fetchInProgress,
+            libraryCount: sync.libraryCount,
+            wishlistCount: sync.wishlistCount,
+            lastSyncAt: sync.lastSyncAt.flatMap(GraphQLHelpers.parseISO8601),
+            lastFetchedAt: sync.lastFetchedAt.flatMap(GraphQLHelpers.parseISO8601),
+            rawItemCount: sync.rawItemCount,
+            importTaskId: sync.importTaskId
         )
     }
 
     static func importStart() async throws {
         let mutation = PchookGraphQL.AudibleImportStartMutation()
-        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
-    }
-
-    static func importState() async throws -> ImportTaskState {
-        let query = PchookGraphQL.ImportStateQuery()
-        let data = try await GraphQLHelpers.fetch(client, query: query)
-        let task = data.importState
-        return ImportTaskState(
-            phase: task.phase ?? "idle",
-            current: task.current,
-            total: task.total,
-            message: task.message ?? "",
-            startedAt: task.startedAt.flatMap(GraphQLHelpers.parseISO8601),
-            completedAt: task.completedAt.flatMap(GraphQLHelpers.parseISO8601)
-        )
-    }
-
-    static func importPause() async throws -> Bool {
-        let mutation = PchookGraphQL.AudibleImportPauseMutation()
-        let data = try await GraphQLHelpers.perform(client, mutation: mutation)
-        return data.audibleImportPause ?? true
-    }
-
-    static func importCancel() async throws {
-        let mutation = PchookGraphQL.AudibleImportCancelMutation()
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 

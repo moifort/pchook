@@ -33,7 +33,7 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleAuthCallback", Bool?.self, arguments: [
+        .field("audibleAuthCallback", Bool.self, arguments: [
           "sessionId": .variable("sessionId"),
           "redirectUrl": .variable("redirectUrl")
         ]),
@@ -42,8 +42,8 @@ extension PchookGraphQL {
         AudibleAuthCallbackMutation.Data.self
       ] }
 
-      /// Finaliser l'authentification OAuth Audible
-      var audibleAuthCallback: Bool? { __data["audibleAuthCallback"] }
+      /// Complete the Audible OAuth authentication
+      var audibleAuthCallback: Bool { __data["audibleAuthCallback"] }
     }
   }
 

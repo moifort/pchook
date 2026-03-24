@@ -33,7 +33,7 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("addReview", AddReview?.self, arguments: [
+        .field("addReview", AddReview.self, arguments: [
           "bookId": .variable("bookId"),
           "input": .variable("input")
         ]),
@@ -42,8 +42,8 @@ extension PchookGraphQL {
         AddReviewMutation.Data.self
       ] }
 
-      /// Ajouter une critique à un livre (marque le livre comme lu)
-      var addReview: AddReview? { __data["addReview"] }
+      /// Add a review to a book (marks the book as read)
+      var addReview: AddReview { __data["addReview"] }
 
       /// AddReview
       ///
@@ -55,26 +55,26 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Review }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("bookId", PchookGraphQL.ID?.self),
-          .field("rating", Int?.self),
-          .field("readDate", String?.self),
+          .field("bookId", PchookGraphQL.ID.self),
+          .field("rating", Int.self),
+          .field("readDate", PchookGraphQL.DateTime?.self),
           .field("reviewNotes", String?.self),
-          .field("createdAt", String?.self),
+          .field("createdAt", PchookGraphQL.DateTime.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AddReviewMutation.Data.AddReview.self
         ] }
 
-        /// Identifiant du livre associé
-        var bookId: PchookGraphQL.ID? { __data["bookId"] }
-        /// Note personnelle (0-10)
-        var rating: Int? { __data["rating"] }
-        /// Date de lecture (ISO 8601)
-        var readDate: String? { __data["readDate"] }
-        /// Notes de lecture
+        /// Associated book ID
+        var bookId: PchookGraphQL.ID { __data["bookId"] }
+        /// Personal rating (0-10)
+        var rating: Int { __data["rating"] }
+        /// Read date
+        var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
+        /// Reading notes
         var reviewNotes: String? { __data["reviewNotes"] }
-        /// Date de création (ISO 8601)
-        var createdAt: String? { __data["createdAt"] }
+        /// Creation date
+        var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
       }
     }
   }

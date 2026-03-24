@@ -4,34 +4,40 @@
 @_exported import ApolloAPI
 
 extension PchookGraphQL {
-  class AudibleImportStartMutation: GraphQLMutation {
-    static let operationName: String = "AudibleImportStart"
+  class TaskByIdQuery: GraphQLQuery {
+    static let operationName: String = "TaskById"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AudibleImportStart { audibleImportStart { __typename id phase current total message } }"#
+        #"query TaskById($id: ID!) { task(id: $id) { __typename id phase current total message startedAt completedAt } }"#
       ))
 
-    public init() {}
+    public var id: ID
+
+    public init(id: ID) {
+      self.id = id
+    }
+
+    public var __variables: Variables? { ["id": id] }
 
     struct Data: PchookGraphQL.SelectionSet {
       let __data: DataDict
       init(_dataDict: DataDict) { __data = _dataDict }
 
-      static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
+      static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Query }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleImportStart", AudibleImportStart.self),
+        .field("task", Task?.self, arguments: ["id": .variable("id")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-        AudibleImportStartMutation.Data.self
+        TaskByIdQuery.Data.self
       ] }
 
-      /// Start importing Audible books (background task)
-      var audibleImportStart: AudibleImportStart { __data["audibleImportStart"] }
+      /// Get a task by its identifier
+      var task: Task? { __data["task"] }
 
-      /// AudibleImportStart
+      /// Task
       ///
       /// Parent Type: `Task`
-      struct AudibleImportStart: PchookGraphQL.SelectionSet {
+      struct Task: PchookGraphQL.SelectionSet {
         let __data: DataDict
         init(_dataDict: DataDict) { __data = _dataDict }
 
@@ -43,9 +49,11 @@ extension PchookGraphQL {
           .field("current", Int.self),
           .field("total", Int.self),
           .field("message", String.self),
+          .field("startedAt", PchookGraphQL.DateTime?.self),
+          .field("completedAt", PchookGraphQL.DateTime?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          AudibleImportStartMutation.Data.AudibleImportStart.self
+          TaskByIdQuery.Data.Task.self
         ] }
 
         /// Unique task identifier
@@ -58,6 +66,10 @@ extension PchookGraphQL {
         var total: Int { __data["total"] }
         /// Progress message
         var message: String { __data["message"] }
+        /// Start date
+        var startedAt: PchookGraphQL.DateTime? { __data["startedAt"] }
+        /// Completion date
+        var completedAt: PchookGraphQL.DateTime? { __data["completedAt"] }
       }
     }
   }

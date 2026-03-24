@@ -51,22 +51,22 @@ enum GraphQLScanAPI {
         replaceBookId: String? = nil
     ) async throws -> ConfirmResult {
         let input = PchookGraphQL.ConfirmBookInput(
-            previewId: previewId,
-            status: status,
-            replaceBookId: replaceBookId.map { .some($0) } ?? .none,
-            title: overrides?.title.map { .some($0) } ?? .none,
             authors: overrides?.authors.map { .some($0) } ?? .none,
-            publisher: overrides?.publisher.map { .some($0) } ?? .none,
-            pageCount: overrides?.pageCount.map { .some($0) } ?? .none,
-            genre: overrides?.genre.map { .some($0) } ?? .none,
-            synopsis: overrides?.synopsis.map { .some($0) } ?? .none,
-            language: overrides?.language.map { .some($0) } ?? .none,
-            format: overrides?.format.map { .some($0) } ?? .none,
-            translator: overrides?.translator.map { .some($0) } ?? .none,
             estimatedPrice: overrides?.estimatedPrice.map { .some($0) } ?? .none,
+            format: overrides?.format.map { .some($0) } ?? .none,
+            genre: overrides?.genre.map { .some($0) } ?? .none,
+            language: overrides?.language.map { .some($0) } ?? .none,
+            pageCount: overrides?.pageCount.map { .some($0) } ?? .none,
+            previewId: previewId,
+            publisher: overrides?.publisher.map { .some($0) } ?? .none,
+            replaceBookId: replaceBookId.map { .some($0) } ?? .none,
             series: overrides?.series.map { .some($0) } ?? .none,
             seriesLabel: overrides?.seriesLabel.map { .some($0) } ?? .none,
-            seriesNumber: overrides?.seriesNumber.map { .some(Double($0)) } ?? .none
+            seriesNumber: overrides?.seriesNumber.map { .some(Double($0)) } ?? .none,
+            status: status,
+            synopsis: overrides?.synopsis.map { .some($0) } ?? .none,
+            title: overrides?.title.map { .some($0) } ?? .none,
+            translator: overrides?.translator.map { .some($0) } ?? .none
         )
 
         let mutation = PchookGraphQL.ConfirmBookMutation(input: input)
@@ -74,11 +74,11 @@ enum GraphQLScanAPI {
 
         let result = data.confirmBook
         let book = Book(
-            id: result.book?.id ?? "",
-            title: result.book?.title ?? "",
-            authors: result.book?.authors ?? [],
+            id: result.book.id,
+            title: result.book.title,
+            authors: result.book.authors,
             narrators: [],
-            status: result.book?.status?.rawValue ?? "to-read",
+            status: result.book.status.rawValue,
             awards: [],
             publicRatings: [],
             createdAt: Date(),

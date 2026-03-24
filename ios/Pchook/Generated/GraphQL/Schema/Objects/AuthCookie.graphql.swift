@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Cookie d'authentification Audible
+  /// Audible authentication cookie
   static let AuthCookie = ApolloAPI.Object(
     typename: "AuthCookie",
     implementedInterfaces: [],

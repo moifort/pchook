@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Note communautaire externe
+  /// External community rating
   struct PublicRatingInput: InputObject {
     private(set) var __data: InputDict
 
@@ -28,31 +28,31 @@ extension PchookGraphQL {
       ])
     }
 
-    /// Note maximale possible
+    /// Maximum possible score
     var maxScore: Double {
       get { __data["maxScore"] }
       set { __data["maxScore"] = newValue }
     }
 
-    /// Note obtenue
+    /// Score received
     var score: Double {
       get { __data["score"] }
       set { __data["score"] = newValue }
     }
 
-    /// Nom de la plateforme
+    /// Platform name
     var source: String {
       get { __data["source"] }
       set { __data["source"] = newValue }
     }
 
-    /// URL de la page du livre
+    /// URL of the book page
     var url: String {
       get { __data["url"] }
       set { __data["url"] = newValue }
     }
 
-    /// Nombre de votants
+    /// Number of voters
     var voterCount: Int {
       get { __data["voterCount"] }
       set { __data["voterCount"] = newValue }

@@ -10,12 +10,16 @@ query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrd
       name
       year
     }
-    rating
     language
-    seriesName
-    seriesLabel
-    seriesPosition
     coverImageUrl
     createdAt
+    review {
+      rating
+    }
+    series {
+      name
+      label
+      position
+    }
   }
 }

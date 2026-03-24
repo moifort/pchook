@@ -25,14 +25,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("deleteBook", Bool?.self, arguments: ["id": .variable("id")]),
+        .field("deleteBook", Bool.self, arguments: ["id": .variable("id")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         DeleteBookMutation.Data.self
       ] }
 
-      /// Supprimer un livre et ses données associées (review, série)
-      var deleteBook: Bool? { __data["deleteBook"] }
+      /// Delete a book and its associated data (review, series)
+      var deleteBook: Bool { __data["deleteBook"] }
     }
   }
 

@@ -36,26 +36,26 @@ enum GraphQLBooksAPI {
             coverImageUrl: book.coverImageUrl,
             series: book.series.map { series in
                 SeriesInfo(
-                    name: series.name ?? "",
-                    label: series.label ?? "",
-                    position: Double(series.position ?? 0),
-                    books: (series.books ?? []).map { entry in
+                    name: series.name,
+                    label: series.label,
+                    position: Double(series.position),
+                    books: series.books.map { entry in
                         SeriesBookEntry(
-                            id: entry.id ?? "",
-                            title: entry.title ?? "",
-                            label: entry.label ?? "",
-                            position: Double(entry.position ?? 0)
+                            id: entry.id,
+                            title: entry.title,
+                            label: entry.label,
+                            position: Double(entry.position)
                         )
                     }
                 )
             },
             review: book.review.map { review in
                 ReviewInfo(
-                    bookId: review.bookId ?? "",
-                    rating: review.rating ?? 0,
+                    bookId: review.bookId,
+                    rating: review.rating,
                     readDate: review.readDate.flatMap(GraphQLHelpers.parseISO8601),
                     reviewNotes: review.reviewNotes,
-                    createdAt: GraphQLHelpers.parseISO8601(review.createdAt ?? "") ?? Date()
+                    createdAt: GraphQLHelpers.parseISO8601(review.createdAt) ?? Date()
                 )
             }
         )
@@ -126,31 +126,30 @@ private extension GraphQLBooksAPI {
     }
 
     static func mapBookListItem(_ book: PchookGraphQL.BookListQuery.Data.Book) -> BookListItem {
-        let awards = (book.awards ?? []).map { Award(name: $0.name ?? "", year: $0.year) }
-        let position: Double? = book.seriesPosition.map { Double($0) }
+        let awards = (book.awards).map { Award(name: $0.name, year: $0.year) }
         return BookListItem(
-            id: book.id ?? "",
-            title: book.title ?? "",
+            id: book.id,
+            title: book.title,
             coverImageUrl: book.coverImageUrl,
-            authors: book.authors ?? [],
+            authors: book.authors,
             genre: book.genre,
             status: mapBookStatus(book.status),
             estimatedPrice: book.estimatedPrice,
-            language: book.language,
             awards: awards,
-            rating: book.rating,
-            seriesName: book.seriesName,
-            seriesLabel: book.seriesLabel,
-            seriesPosition: position,
-            createdAt: GraphQLHelpers.parseISO8601(book.createdAt ?? "") ?? Date()
+            rating: book.review?.rating,
+            language: book.language,
+            seriesName: book.series?.name,
+            seriesLabel: book.series?.label,
+            seriesPosition: book.series.map { Double($0.position) },
+            createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date()
         )
     }
 
     static func mapBook(_ book: PchookGraphQL.BookDetailQuery.Data.Book) -> Book {
         Book(
-            id: book.id ?? "",
-            title: book.title ?? "",
-            authors: book.authors ?? [],
+            id: book.id,
+            title: book.title,
+            authors: book.authors,
             publisher: book.publisher,
             publishedDate: book.publishedDate.flatMap(GraphQLHelpers.parseISO8601),
             pageCount: book.pageCount,
@@ -162,24 +161,24 @@ private extension GraphQLBooksAPI {
             translator: book.translator,
             estimatedPrice: book.estimatedPrice,
             duration: book.duration,
-            narrators: book.narrators ?? [],
+            narrators: book.narrators,
             personalNotes: book.personalNotes,
             status: mapBookStatus(book.status),
             readDate: book.readDate.flatMap(GraphQLHelpers.parseISO8601),
-            awards: (book.awards ?? []).map { Award(name: $0.name ?? "", year: $0.year) },
-            publicRatings: (book.publicRatings ?? []).map {
+            awards: book.awards.map { Award(name: $0.name, year: $0.year) },
+            publicRatings: book.publicRatings.map {
                 PublicRating(
-                    source: $0.source ?? "",
-                    score: $0.score ?? 0,
-                    maxScore: $0.maxScore ?? 0,
-                    voterCount: $0.voterCount ?? 0,
+                    source: $0.source,
+                    score: $0.score,
+                    maxScore: $0.maxScore,
+                    voterCount: $0.voterCount,
                     url: $0.url
                 )
             },
             importSource: book.importSource?.rawValue,
             externalUrl: book.externalUrl,
-            createdAt: GraphQLHelpers.parseISO8601(book.createdAt ?? "") ?? Date(),
-            updatedAt: GraphQLHelpers.parseISO8601(book.updatedAt ?? "") ?? Date()
+            createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date(),
+            updatedAt: GraphQLHelpers.parseISO8601(book.updatedAt) ?? Date()
         )
     }
 }

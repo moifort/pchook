@@ -4,11 +4,11 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Ordre de tri
+  /// Sort order
   enum SortOrder: String, EnumType {
-    /// Croissant
+    /// Ascending
     case asc = "asc"
-    /// Décroissant
+    /// Descending
     case desc = "desc"
   }
 

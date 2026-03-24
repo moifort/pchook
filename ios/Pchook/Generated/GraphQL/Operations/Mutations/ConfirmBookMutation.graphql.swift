@@ -25,14 +25,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("confirmBook", ConfirmBook?.self, arguments: ["input": .variable("input")]),
+        .field("confirmBook", ConfirmBook.self, arguments: ["input": .variable("input")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         ConfirmBookMutation.Data.self
       ] }
 
-      /// Confirmer et créer un livre depuis un preview de scan
-      var confirmBook: ConfirmBook? { __data["confirmBook"] }
+      /// Confirm and create a book from a scan preview
+      var confirmBook: ConfirmBook { __data["confirmBook"] }
 
       /// ConfirmBook
       ///
@@ -44,17 +44,17 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.ConfirmBookResult }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("tag", String?.self),
-          .field("book", Book?.self),
+          .field("tag", String.self),
+          .field("book", Book.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           ConfirmBookMutation.Data.ConfirmBook.self
         ] }
 
-        /// Résultat: created, duplicate, ou replaced
-        var tag: String? { __data["tag"] }
-        /// Livre créé ou trouvé
-        var book: Book? { __data["book"] }
+        /// Result: created, duplicate, or replaced
+        var tag: String { __data["tag"] }
+        /// Created or found book
+        var book: Book { __data["book"] }
 
         /// ConfirmBook.Book
         ///
@@ -66,23 +66,23 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("id", PchookGraphQL.ID?.self),
-            .field("title", String?.self),
-            .field("authors", [String]?.self),
-            .field("status", GraphQLEnum<PchookGraphQL.BookStatus>?.self),
+            .field("id", PchookGraphQL.ID.self),
+            .field("title", String.self),
+            .field("authors", [String].self),
+            .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             ConfirmBookMutation.Data.ConfirmBook.Book.self
           ] }
 
-          /// Identifiant unique
-          var id: PchookGraphQL.ID? { __data["id"] }
-          /// Titre du livre
-          var title: String? { __data["title"] }
-          /// Auteurs du livre
-          var authors: [String]? { __data["authors"] }
-          /// Statut de lecture
-          var status: GraphQLEnum<PchookGraphQL.BookStatus>? { __data["status"] }
+          /// Unique identifier
+          var id: PchookGraphQL.ID { __data["id"] }
+          /// Book title
+          var title: String { __data["title"] }
+          /// Book authors
+          var authors: [String] { __data["authors"] }
+          /// Reading status
+          var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
         }
       }
     }

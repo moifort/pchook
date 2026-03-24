@@ -4,17 +4,17 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Champ de tri pour la liste de livres
+  /// Sort field for the book list
   enum BookSort: String, EnumType {
-    /// Nom de l'auteur
+    /// Author name
     case author = "author"
-    /// Nombre de prix littéraires
+    /// Number of literary awards
     case awards = "awards"
-    /// Date d'ajout
+    /// Date added
     case createdAt = "createdAt"
-    /// Genre littéraire
+    /// Literary genre
     case genre = "genre"
-    /// Titre alphabétique
+    /// Alphabetical title
     case title = "title"
   }
 

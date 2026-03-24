@@ -19,14 +19,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleDisconnect", Bool?.self),
+        .field("audibleDisconnect", Bool.self),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         AudibleDisconnectMutation.Data.self
       ] }
 
-      /// Déconnecter le compte Audible et nettoyer les données
-      var audibleDisconnect: Bool? { __data["audibleDisconnect"] }
+      /// Disconnect the Audible account and clean up data
+      var audibleDisconnect: Bool { __data["audibleDisconnect"] }
     }
   }
 

@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Livre favori (note coup de cœur)
+  /// Favorite book (top-rated)
   static let FavoriteBook = ApolloAPI.Object(
     typename: "FavoriteBook",
     implementedInterfaces: [],
