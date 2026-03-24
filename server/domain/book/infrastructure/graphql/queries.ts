@@ -1,9 +1,10 @@
+import { sortBy } from 'lodash-es'
+import { awardsCount } from '~/domain/book/business-rules'
 import { BookId, BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
-import { BookListReadModel } from '~/domain/book/read-model/list'
 import { builder } from '~/domain/shared/graphql/builder'
 import { BookSortEnum, SortOrderEnum } from './enums'
-import { BookListItemType, BookType } from './types'
+import { BookType } from './types'
 
 builder.objectField(BookType, 'coverImageUrl', (t) =>
   t.string({
@@ -15,7 +16,7 @@ builder.objectField(BookType, 'coverImageUrl', (t) =>
 
 builder.queryField('books', (t) =>
   t.field({
-    type: [BookListItemType],
+    type: [BookType],
     description: 'Book list with filters and sorting',
     args: {
       genre: t.arg.string({ description: 'Filter by literary genre' }),
@@ -23,13 +24,28 @@ builder.queryField('books', (t) =>
       sort: t.arg({ type: BookSortEnum, description: 'Sort field' }),
       order: t.arg({ type: SortOrderEnum, description: 'Sort order' }),
     },
-    resolve: (_, args) =>
-      BookListReadModel.all({
-        genre: args.genre ? Genre(args.genre) : undefined,
-        status: args.status ? BookStatus(args.status) : undefined,
-        sort: args.sort ? BookSort(args.sort) : undefined,
-        order: args.order ? SortOrder(args.order) : undefined,
-      }),
+    resolve: async (_, args) => {
+      const allBooks = await BookQuery.findAll()
+
+      const genre = args.genre ? Genre(args.genre) : undefined
+      const status = args.status ? BookStatus(args.status) : undefined
+      const sort = args.sort ? BookSort(args.sort) : 'createdAt'
+      const desc = (args.order ? SortOrder(args.order) : 'desc') === 'desc'
+
+      const filtered = allBooks
+        .filter((book) => (genre ? book.genre === genre : true))
+        .filter((book) => (status ? book.status === status : true))
+
+      const sorted = sortBy(filtered, (book) => {
+        if (sort === 'title') return String(book.title).toLowerCase()
+        if (sort === 'author') return book.authors[0] ? String(book.authors[0]).toLowerCase() : ''
+        if (sort === 'awards') return awardsCount(book.awards)
+        if (sort === 'genre') return (book.genre ? String(book.genre) : '').toLowerCase()
+        return book.createdAt.getTime()
+      })
+
+      return desc ? sorted.reverse() : sorted
+    },
   }),
 )
 

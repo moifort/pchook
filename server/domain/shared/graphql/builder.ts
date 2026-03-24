@@ -15,13 +15,16 @@ const DateTimeScalar = new GraphQLScalarType({
 
 export const builder = new SchemaBuilder<{
   Context: GraphQLContext
+  DefaultFieldNullability: false
   Scalars: {
     DateTime: {
       Input: Date
       Output: Date
     }
   }
-}>({})
+}>({
+  defaultFieldNullability: false,
+})
 
 builder.addScalarType('DateTime', DateTimeScalar)
 builder.queryType({})

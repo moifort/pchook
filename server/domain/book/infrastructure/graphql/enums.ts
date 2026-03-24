@@ -7,6 +7,7 @@ export const BookFormatEnum = builder.enumType('BookFormat', {
     paperback: { description: 'Paperback' },
     hardcover: { description: 'Hardcover' },
     audiobook: { description: 'Audiobook' },
+    digital: { description: 'E-book' },
   } as const,
 })
 

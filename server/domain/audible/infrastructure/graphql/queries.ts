@@ -1,12 +1,12 @@
 import { AudibleQuery } from '~/domain/audible/query'
 import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
-import { AudibleStatusType } from './types'
+import { AudibleSyncType } from './types'
 
-builder.queryField('audibleStatus', (t) =>
+builder.queryField('audibleSync', (t) =>
   t.field({
-    type: AudibleStatusType,
-    description: 'Audible integration status',
+    type: AudibleSyncType,
+    description: 'Audible synchronization status',
     resolve: async () => {
       const connected = await AudibleQuery.hasCredentials()
       const mappings = await AudibleQuery.getAllMappings()

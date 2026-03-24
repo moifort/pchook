@@ -15,7 +15,7 @@ export const SeriesType = builder.objectRef<Series>('Series').implement({
   }),
 })
 
-const SeriesBookEntryType = builder
+export const SeriesBookEntryType = builder
   .objectRef<SeriesInfo['books'][number]>('SeriesBookEntry')
   .implement({
     description: 'A book entry within a series',

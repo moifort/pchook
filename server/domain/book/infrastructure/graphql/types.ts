@@ -1,4 +1,3 @@
-import type { BookListItem as BookListItemModel } from '~/domain/book/read-model/types'
 import type { Book, PublicRating as PublicRatingType } from '~/domain/book/types'
 import { builder } from '~/domain/shared/graphql/builder'
 import { BookFormatEnum, BookStatusEnum, ImportSourceEnum } from './enums'
@@ -137,62 +136,6 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       type: 'DateTime',
       description: 'Last modified date',
       resolve: ({ updatedAt }) => updatedAt,
-    }),
-  }),
-})
-
-export const BookListItemType = builder.objectRef<BookListItemModel>('BookListItem').implement({
-  description: 'Book list item (summary view)',
-  fields: (t) => ({
-    id: t.id({ description: 'Unique identifier', resolve: ({ id }) => String(id) }),
-    title: t.exposeString('title', { description: 'Book title' }),
-    coverImageUrl: t.exposeString('coverImageUrl', {
-      nullable: true,
-      description: 'Cover image URL',
-    }),
-    authors: t.stringList({
-      description: 'Authors',
-      resolve: ({ authors }) => authors.map(String),
-    }),
-    genre: t.string({
-      nullable: true,
-      description: 'Literary genre',
-      resolve: ({ genre }) => (genre ? String(genre) : null),
-    }),
-    status: t.field({
-      type: BookStatusEnum,
-      description: 'Reading status',
-      resolve: ({ status }) => status,
-    }),
-    estimatedPrice: t.float({
-      nullable: true,
-      description: 'Estimated price in euros',
-      resolve: ({ estimatedPrice }) => (estimatedPrice ? Number(estimatedPrice) : null),
-    }),
-    awards: t.field({
-      type: [AwardType],
-      description: 'Literary awards',
-      resolve: ({ awards }) => awards,
-    }),
-    rating: t.int({
-      nullable: true,
-      description: 'Personal rating (0-10)',
-      resolve: ({ rating }) => (rating ? Number(rating) : null),
-    }),
-    language: t.exposeString('language', { nullable: true, description: 'Language' }),
-    seriesName: t.exposeString('seriesName', { nullable: true, description: 'Series name' }),
-    seriesLabel: t.exposeString('seriesLabel', {
-      nullable: true,
-      description: 'Label in series (e.g. Volume 3)',
-    }),
-    seriesPosition: t.exposeInt('seriesPosition', {
-      nullable: true,
-      description: 'Position in series',
-    }),
-    createdAt: t.field({
-      type: 'DateTime',
-      description: 'Date added',
-      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })

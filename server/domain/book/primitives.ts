@@ -65,7 +65,9 @@ export const Note = (value: unknown) => {
 }
 
 export const BookFormat = (value: unknown) =>
-  z.enum(['pocket', 'paperback', 'hardcover', 'audiobook']).parse(value) as BookFormatType
+  z
+    .enum(['pocket', 'paperback', 'hardcover', 'audiobook', 'digital'])
+    .parse(value) as BookFormatType
 
 export const BookStatus = (value: unknown) =>
   z.enum(['to-read', 'read']).parse(value) as BookStatusType

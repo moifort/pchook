@@ -45,8 +45,8 @@ type AudibleStatusData = {
   importTaskId: string
 }
 
-export const AudibleStatusType = builder.objectRef<AudibleStatusData>('AudibleStatus').implement({
-  description: 'Audible integration status',
+export const AudibleSyncType = builder.objectRef<AudibleStatusData>('AudibleSync').implement({
+  description: 'Audible synchronization status',
   fields: (t) => ({
     connected: t.exposeBoolean('connected', { description: 'Credentials configured' }),
     fetchInProgress: t.exposeBoolean('fetchInProgress', { description: 'Fetch in progress' }),

@@ -11,7 +11,7 @@ export type Language = Brand<string, 'Language'>
 export type PageCount = Brand<number, 'PageCount'>
 export type Note = Brand<number, 'Note'>
 
-export type BookFormat = 'pocket' | 'paperback' | 'hardcover' | 'audiobook'
+export type BookFormat = 'pocket' | 'paperback' | 'hardcover' | 'audiobook' | 'digital'
 export type BookStatus = 'to-read' | 'read'
 export type ImportSource = 'scan' | 'isbn' | 'url' | 'audible'
 export type BookSort = 'createdAt' | 'title' | 'author' | 'awards' | 'genre'
