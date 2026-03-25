@@ -45,6 +45,7 @@ struct BookDetailContent: View {
             if let series = detail.series {
                 SeriesSection(
                     name: series.name,
+                    flag: detail.book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
                     currentBookId: detail.book.id,
                     items: series.volumes.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
                     onSelectBook: onSelectBook

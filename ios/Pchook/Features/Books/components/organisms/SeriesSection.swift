@@ -2,12 +2,13 @@ import SwiftUI
 
 struct SeriesSection: View {
     let name: String
+    var flag: String?
     let currentBookId: String
     let items: [Item]
     let onSelectBook: (String) -> Void
 
     var body: some View {
-        Section("Série : \(name)") {
+        Section("Série : \(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces)) {
             ForEach(items) { (book: Item) in
                 if book.id == currentBookId {
                     seriesRow(book)
@@ -53,6 +54,7 @@ extension SeriesSection {
     List {
         SeriesSection(
             name: "Les Rougon-Macquart",
+            flag: "🇫🇷",
             currentBookId: "3",
             items: [
                 .init(id: "1", title: "La Fortune des Rougon", label: "1", position: 1),
