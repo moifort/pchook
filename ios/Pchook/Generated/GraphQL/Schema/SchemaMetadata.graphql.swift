@@ -49,8 +49,8 @@ extension PchookGraphQL {
       case "RecentAward": return PchookGraphQL.Objects.RecentAward
       case "RecentBook": return PchookGraphQL.Objects.RecentBook
       case "Review": return PchookGraphQL.Objects.Review
-      case "SeriesBookEntry": return PchookGraphQL.Objects.SeriesBookEntry
       case "SeriesInfo": return PchookGraphQL.Objects.SeriesInfo
+      case "SeriesVolume": return PchookGraphQL.Objects.SeriesVolume
       case "Task": return PchookGraphQL.Objects.Task
       default: return nil
       }

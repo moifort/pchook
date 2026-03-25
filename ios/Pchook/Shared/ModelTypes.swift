@@ -3,8 +3,12 @@ import Foundation
 // MARK: - UI Enums
 
 enum BookLanguage: String, CaseIterable, Identifiable {
-    case fr = "FR"
-    case en = "EN"
+    case fr
+    case en
+    case es
+    case de
+    case it
+    case pt
 
     var id: String { rawValue }
 
@@ -12,11 +16,15 @@ enum BookLanguage: String, CaseIterable, Identifiable {
         switch self {
         case .fr: "Français"
         case .en: "English"
+        case .es: "Español"
+        case .de: "Deutsch"
+        case .it: "Italiano"
+        case .pt: "Português"
         }
     }
 
     init?(apiValue: String?) {
-        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).uppercased() else { return nil }
+        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).lowercased() else { return nil }
         self.init(rawValue: value)
     }
 }
@@ -75,7 +83,7 @@ struct Book: Identifiable, Sendable {
     var format: String?
     var translator: String?
     var estimatedPrice: Double?
-    var duration: String?
+    var durationMinutes: Int?
     let narrators: [String]
     var personalNotes: String?
     let status: String
@@ -107,7 +115,7 @@ struct BookListItem: Identifiable, Sendable {
 
 // MARK: - Book Detail
 
-struct SeriesBookEntry: Identifiable, Sendable {
+struct SeriesVolume: Identifiable, Sendable {
     let id: String
     let title: String
     let label: String
@@ -115,10 +123,11 @@ struct SeriesBookEntry: Identifiable, Sendable {
 }
 
 struct SeriesInfo: Sendable {
+    let id: String
     let name: String
     let label: String
     let position: Double
-    let books: [SeriesBookEntry]
+    let volumes: [SeriesVolume]
 }
 
 struct ReviewInfo: Sendable {
@@ -183,7 +192,7 @@ struct UpdateBookRequest: Encodable, Sendable {
     var format: String?
     var translator: String?
     var estimatedPrice: Double?
-    var duration: String?
+    var durationMinutes: Int?
     var narrators: [String]?
     var personalNotes: String?
     var status: String?

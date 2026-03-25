@@ -15,12 +15,12 @@ extension PchookGraphQL {
     init(
       authors: GraphQLNullable<[PersonName]> = nil,
       awards: GraphQLNullable<[AwardInput]> = nil,
-      duration: GraphQLNullable<String> = nil,
+      durationMinutes: GraphQLNullable<Int> = nil,
       estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<GraphQLEnum<BookFormat>> = nil,
       genre: GraphQLNullable<Genre> = nil,
       isbn: GraphQLNullable<ISBN> = nil,
-      language: GraphQLNullable<Language> = nil,
+      language: GraphQLNullable<GraphQLEnum<Language>> = nil,
       narrators: GraphQLNullable<[PersonName]> = nil,
       pageCount: GraphQLNullable<PageCount> = nil,
       personalNotes: GraphQLNullable<String> = nil,
@@ -39,7 +39,7 @@ extension PchookGraphQL {
       __data = InputDict([
         "authors": authors,
         "awards": awards,
-        "duration": duration,
+        "durationMinutes": durationMinutes,
         "estimatedPrice": estimatedPrice,
         "format": format,
         "genre": genre,
@@ -74,10 +74,10 @@ extension PchookGraphQL {
       set { __data["awards"] = newValue }
     }
 
-    /// Duration (audiobook)
-    var duration: GraphQLNullable<String> {
-      get { __data["duration"] }
-      set { __data["duration"] = newValue }
+    /// Duration in minutes (audiobook)
+    var durationMinutes: GraphQLNullable<Int> {
+      get { __data["durationMinutes"] }
+      set { __data["durationMinutes"] = newValue }
     }
 
     /// Estimated price in euros (null to remove)
@@ -104,8 +104,8 @@ extension PchookGraphQL {
       set { __data["isbn"] = newValue }
     }
 
-    /// Language (e.g. fr, en)
-    var language: GraphQLNullable<Language> {
+    /// Language (ISO 639-1)
+    var language: GraphQLNullable<GraphQLEnum<Language>> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }

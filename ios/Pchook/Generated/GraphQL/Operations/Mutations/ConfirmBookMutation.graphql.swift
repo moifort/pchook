@@ -81,7 +81,7 @@ extension PchookGraphQL {
           var title: PchookGraphQL.BookTitle { __data["title"] }
           /// Book authors
           var authors: [PchookGraphQL.PersonName] { __data["authors"] }
-          /// Reading status
+          /// Reading status: TO_READ or READ
           var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
         }
       }

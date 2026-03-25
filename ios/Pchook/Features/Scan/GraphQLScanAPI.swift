@@ -35,8 +35,8 @@ enum GraphQLScanAPI {
             publicRatings: (preview.publicRatings ?? []).map {
                 PublicRating(
                     source: $0.source ?? "",
-                    score: $0.score ?? 0,
-                    maxScore: $0.maxScore ?? 0,
+                    score: Double($0.score ?? 0),
+                    maxScore: Double($0.maxScore ?? 0),
                     voterCount: $0.voterCount ?? 0,
                     url: $0.url
                 )
@@ -55,7 +55,9 @@ enum GraphQLScanAPI {
             estimatedPrice: overrides?.estimatedPrice.map { .some($0) } ?? .none,
             format: overrides?.format.map { .some($0) } ?? .none,
             genre: overrides?.genre.map { .some($0) } ?? .none,
-            language: overrides?.language.map { .some($0) } ?? .none,
+            language: overrides?.language
+                .flatMap { PchookGraphQL.Language(rawValue: $0.uppercased()) }
+                .map { .some(.case($0)) } ?? .none,
             pageCount: overrides?.pageCount.map { .some($0) } ?? .none,
             previewId: previewId,
             publisher: overrides?.publisher.map { .some($0) } ?? .none,

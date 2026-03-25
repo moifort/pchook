@@ -73,7 +73,7 @@ extension PchookGraphQL {
           .field("estimatedPrice", PchookGraphQL.Eur?.self),
           .field("awards", [Award].self),
           .field("review", Review?.self),
-          .field("language", PchookGraphQL.Language?.self),
+          .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
           .field("series", Series?.self),
           .field("coverImageUrl", String?.self),
           .field("createdAt", PchookGraphQL.DateTime.self),
@@ -88,23 +88,23 @@ extension PchookGraphQL {
         var title: PchookGraphQL.BookTitle { __data["title"] }
         /// Book authors
         var authors: [PchookGraphQL.PersonName] { __data["authors"] }
-        /// Literary genre (e.g. Romance, Sci-Fi, Thriller)
+        /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
         var genre: PchookGraphQL.Genre? { __data["genre"] }
-        /// Reading status
+        /// Reading status: TO_READ or READ
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
-        /// Estimated price in euros
+        /// Estimated retail price in euros. Null if unknown
         var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
-        /// Literary awards
+        /// Literary awards received. Empty array if none
         var awards: [Award] { __data["awards"] }
         /// Personal review and rating
         var review: Review? { __data["review"] }
-        /// Book language (e.g. fr, en)
-        var language: PchookGraphQL.Language? { __data["language"] }
+        /// Book language as ISO 639-1 code. Null if unknown
+        var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
         /// Series information
         var series: Series? { __data["series"] }
-        /// Cover image URL
+        /// Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
         var coverImageUrl: String? { __data["coverImageUrl"] }
-        /// Date added to library
+        /// Date the book was added to the library
         var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
 
         /// Book.Award
@@ -124,9 +124,9 @@ extension PchookGraphQL {
             BookListQuery.Data.Book.Award.self
           ] }
 
-          /// Award name
+          /// Short award name (e.g. "Prix Hugo", "Prix Goncourt")
           var name: String { __data["name"] }
-          /// Year awarded
+          /// Year awarded (e.g. 2023)
           var year: Int? { __data["year"] }
         }
 
@@ -170,9 +170,9 @@ extension PchookGraphQL {
 
           /// Series name
           var name: String { __data["name"] }
-          /// Book label in series
+          /// This book display label in the series (e.g. "Tome 3")
           var label: String { __data["label"] }
-          /// Book position in series
+          /// This book sort position in the series
           var position: Int { __data["position"] }
         }
       }

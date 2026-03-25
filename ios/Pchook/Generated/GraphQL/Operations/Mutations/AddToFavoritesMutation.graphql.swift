@@ -53,7 +53,7 @@ extension PchookGraphQL {
 
         /// Unique identifier
         var id: PchookGraphQL.BookId { __data["id"] }
-        /// Reading status
+        /// Reading status: TO_READ or READ
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
       }
     }

@@ -13,7 +13,7 @@ query BookDetail($id: BookId!) {
     format
     translator
     estimatedPrice
-    duration
+    durationMinutes
     narrators
     personalNotes
     status
@@ -42,10 +42,11 @@ query BookDetail($id: BookId!) {
       createdAt
     }
     series {
+      id
       name
       label
       position
-      books {
+      volumes {
         id
         title
         label

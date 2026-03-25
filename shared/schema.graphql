@@ -138,10 +138,10 @@ type AuthStartResponse {
 
 """Literary award received by a book"""
 type Award {
-  """Award name"""
+  """Short award name (e.g. "Prix Hugo", "Prix Goncourt")"""
   name: String!
 
-  """Year awarded"""
+  """Year awarded (e.g. 2023)"""
   year: Int
 }
 
@@ -159,61 +159,73 @@ type Book {
   """Book authors"""
   authors: [PersonName!]!
 
-  """Literary awards"""
+  """Literary awards received. Empty array if none"""
   awards: [Award!]!
 
-  """Cover image URL"""
+  """
+  Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
+  """
   coverImageUrl: String
 
-  """Date added to library"""
+  """Date the book was added to the library"""
   createdAt: DateTime!
 
-  """Duration (audiobook)"""
-  duration: String
+  """
+  Duration in minutes for audiobooks (e.g. 510 for 8h30). Null for non-audio
+  """
+  durationMinutes: Int
 
-  """Estimated price in euros"""
+  """Estimated retail price in euros. Null if unknown"""
   estimatedPrice: Eur
 
-  """External URL (Audible, etc.)"""
+  """
+  Link to the book on the import source (e.g. Audible page). Null if none
+  """
   externalUrl: Url
 
-  """Book format"""
+  """Physical or digital format. Null if unknown"""
   format: BookFormat
 
-  """Literary genre (e.g. Romance, Sci-Fi, Thriller)"""
+  """
+  Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
+  """
   genre: Genre
 
   """Unique identifier"""
   id: BookId!
 
-  """Import source"""
+  """
+  How the book was added (scan, isbn, url, audible). Null if added manually
+  """
   importSource: ImportSource
 
-  """ISBN number"""
+  """ISBN-13 or ISBN-10 (e.g. "978-2-07-036822-8"). Null if not available"""
   isbn: ISBN
 
-  """Book language (e.g. fr, en)"""
+  """Book language as ISO 639-1 code. Null if unknown"""
   language: Language
 
-  """Narrators (audiobook)"""
+  """Audiobook narrators. Empty array for non-audio formats"""
   narrators: [PersonName!]!
 
-  """Page count"""
+  """Number of pages. Null for audiobooks or if unknown"""
   pageCount: PageCount
 
-  """Personal notes"""
+  """Free-form personal notes about the book"""
   personalNotes: String
 
-  """Community ratings"""
+  """
+  Community ratings from external platforms (Hardcover, Goodreads). Empty array if none
+  """
   publicRatings: [PublicRating!]!
 
-  """Publication date"""
+  """First publication date. Null if unknown"""
   publishedDate: DateTime
 
-  """Publisher"""
+  """Publisher (e.g. "Gallimard", "Folio"). Null if unknown"""
   publisher: Publisher
 
-  """Read date"""
+  """Date the book was finished reading. Null if not read yet"""
   readDate: DateTime
 
   """Personal review and rating"""
@@ -222,19 +234,19 @@ type Book {
   """Series information"""
   series: SeriesInfo
 
-  """Reading status"""
+  """Reading status: TO_READ or READ"""
   status: BookStatus!
 
-  """Book synopsis"""
+  """Short summary of the book content (3-5 sentences)"""
   synopsis: String
 
   """Book title"""
   title: BookTitle!
 
-  """Translator"""
+  """Translator name, if the book is a translation. Null otherwise"""
   translator: PersonName
 
-  """Last modified date"""
+  """Date of last modification"""
   updatedAt: DateTime!
 }
 
@@ -502,8 +514,98 @@ enum ImportSource {
   url
 }
 
-"""Language code (e.g. fr, en)"""
-scalar Language
+"""ISO 639-1 language code"""
+enum Language {
+  """Arabic"""
+  AR
+
+  """Catalan"""
+  CA
+
+  """Czech"""
+  CS
+
+  """Danish"""
+  DA
+
+  """German"""
+  DE
+
+  """Greek"""
+  EL
+
+  """English"""
+  EN
+
+  """Spanish"""
+  ES
+
+  """Finnish"""
+  FI
+
+  """French"""
+  FR
+
+  """Hebrew"""
+  HE
+
+  """Hindi"""
+  HI
+
+  """Hungarian"""
+  HU
+
+  """Indonesian"""
+  ID
+
+  """Italian"""
+  IT
+
+  """Japanese"""
+  JA
+
+  """Korean"""
+  KO
+
+  """Latin"""
+  LA
+
+  """Dutch"""
+  NL
+
+  """Norwegian"""
+  NO
+
+  """Polish"""
+  PL
+
+  """Portuguese"""
+  PT
+
+  """Romanian"""
+  RO
+
+  """Russian"""
+  RU
+
+  """Swedish"""
+  SV
+
+  """Thai"""
+  TH
+
+  """Turkish"""
+  TR
+
+  """Ukrainian"""
+  UK
+
+  """Vietnamese"""
+  VI
+
+  """Chinese"""
+  ZH
+}
 
 type Mutation {
   """Add a review to a book (marks the book as read)"""
@@ -625,19 +727,19 @@ scalar PersonName
 
 """Community rating from an external platform"""
 type PublicRating {
-  """Maximum possible score"""
+  """Maximum possible score on this platform (e.g. 10)"""
   maxScore: Note!
 
-  """Score received"""
+  """Score received (0-10 scale, e.g. 8)"""
   score: Note!
 
   """Platform name (e.g. Hardcover, Goodreads)"""
   source: String!
 
-  """Link to the book page on the platform"""
+  """Direct link to the book page on the platform"""
   url: Url!
 
-  """Number of voters"""
+  """Number of voters who rated the book"""
   voterCount: Int!
 }
 
@@ -757,49 +859,39 @@ type Review {
   reviewNotes: String
 }
 
-"""A book series"""
+"""A book series, saga, or cycle (e.g. "Les Rougon-Macquart")"""
 type Series {
-  """All books in this series"""
-  books: [SeriesBookEntry!]!
-
-  """Creation date"""
+  """Date the series was first added to the library"""
   createdAt: DateTime!
 
   """Unique identifier"""
   id: ID!
 
-  """Series name"""
+  """Series name (e.g. "Le Sorceleur", "Fondation")"""
   name: SeriesName!
+
+  """All volumes in this series"""
+  volumes: [SeriesVolume!]!
 }
 
-"""A book entry within a series"""
-type SeriesBookEntry {
-  """Book ID"""
+"""
+Series context for a specific book, including its position and sibling volumes
+"""
+type SeriesInfo {
+  """Series ID"""
   id: ID!
 
-  """Label in series (e.g. Volume 3)"""
-  label: String!
-
-  """Position in series"""
-  position: Int!
-
-  """Book title"""
-  title: String!
-}
-
-"""Information about the series a book belongs to"""
-type SeriesInfo {
-  """All books in the series (same language)"""
-  books: [SeriesBookEntry!]!
-
-  """Book label in series"""
+  """This book display label in the series (e.g. "Tome 3")"""
   label: String!
 
   """Series name"""
   name: String!
 
-  """Book position in series"""
+  """This book sort position in the series"""
   position: Int!
+
+  """All volumes in the series, filtered to the same language as this book"""
+  volumes: [SeriesVolume!]!
 }
 
 """Label in series (non-empty)"""
@@ -810,6 +902,21 @@ scalar SeriesName
 
 """Position in series (positive number)"""
 scalar SeriesPosition
+
+"""A volume within a series, representing a single book"""
+type SeriesVolume {
+  """Book ID (can be used to fetch full Book details)"""
+  id: ID!
+
+  """Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")"""
+  label: String!
+
+  """Sort position in series (e.g. 1, 2, 99 for hors-série)"""
+  position: Int!
+
+  """Book title"""
+  title: String!
+}
 
 """Sort order"""
 enum SortOrder {
@@ -855,8 +962,8 @@ input UpdateBookInput {
   """Literary awards"""
   awards: [AwardInput!]
 
-  """Duration (audiobook)"""
-  duration: String
+  """Duration in minutes (audiobook)"""
+  durationMinutes: Int
 
   """Estimated price in euros (null to remove)"""
   estimatedPrice: Eur
@@ -870,7 +977,7 @@ input UpdateBookInput {
   """ISBN number (null to remove)"""
   isbn: ISBN
 
-  """Language (e.g. fr, en)"""
+  """Language (ISO 639-1)"""
   language: Language
 
   """Narrators (audiobook)"""

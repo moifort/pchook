@@ -17,7 +17,7 @@ extension PchookGraphQL {
       estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<String> = nil,
       genre: GraphQLNullable<Genre> = nil,
-      language: GraphQLNullable<Language> = nil,
+      language: GraphQLNullable<GraphQLEnum<Language>> = nil,
       pageCount: GraphQLNullable<PageCount> = nil,
       previewId: String,
       publisher: GraphQLNullable<Publisher> = nil,
@@ -75,7 +75,7 @@ extension PchookGraphQL {
     }
 
     /// Language (override)
-    var language: GraphQLNullable<Language> {
+    var language: GraphQLNullable<GraphQLEnum<Language>> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }

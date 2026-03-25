@@ -36,11 +36,12 @@ enum GraphQLBooksAPI {
             coverImageUrl: book.coverImageUrl,
             series: book.series.map { series in
                 SeriesInfo(
+                    id: series.id,
                     name: series.name,
                     label: series.label,
                     position: Double(series.position),
-                    books: series.books.map { entry in
-                        SeriesBookEntry(
+                    volumes: series.volumes.map { entry in
+                        SeriesVolume(
                             id: entry.id,
                             title: entry.title,
                             label: entry.label,
@@ -66,9 +67,16 @@ enum GraphQLBooksAPI {
             .flatMap { PchookGraphQL.BookStatus(rawValue: statusToGraphQL($0)) }
             .map { .some(.case($0)) } ?? .none
 
+        let languageEnum: GraphQLNullable<GraphQLEnum<PchookGraphQL.Language>> = request.language
+            .flatMap { PchookGraphQL.Language(rawValue: $0.uppercased()) }
+            .map { .some(.case($0)) } ?? .none
+
         let input = PchookGraphQL.UpdateBookInput(
             authors: graphQLNullable(request.authors),
+            durationMinutes: request.durationMinutes.map { .some($0) } ?? .none,
             genre: graphQLNullable(request.genre),
+            language: languageEnum,
+            narrators: graphQLNullable(request.narrators),
             publisher: graphQLNullable(request.publisher),
             series: graphQLNullable(request.series),
             seriesLabel: graphQLNullable(request.seriesLabel),
@@ -137,7 +145,7 @@ private extension GraphQLBooksAPI {
             estimatedPrice: book.estimatedPrice,
             awards: awards,
             rating: book.review?.rating,
-            language: book.language,
+            language: book.language?.rawValue,
             seriesName: book.series?.name,
             seriesLabel: book.series?.label,
             seriesPosition: book.series.map { Double($0.position) },
@@ -156,11 +164,11 @@ private extension GraphQLBooksAPI {
             genre: book.genre,
             synopsis: book.synopsis,
             isbn: book.isbn,
-            language: book.language,
+            language: book.language?.rawValue,
             format: book.format?.rawValue,
             translator: book.translator,
             estimatedPrice: book.estimatedPrice,
-            duration: book.duration,
+            durationMinutes: book.durationMinutes,
             narrators: book.narrators,
             personalNotes: book.personalNotes,
             status: mapBookStatus(book.status),
@@ -169,8 +177,8 @@ private extension GraphQLBooksAPI {
             publicRatings: book.publicRatings.map {
                 PublicRating(
                     source: $0.source,
-                    score: $0.score,
-                    maxScore: $0.maxScore,
+                    score: Double($0.score),
+                    maxScore: Double($0.maxScore),
                     voterCount: $0.voterCount,
                     url: $0.url
                 )

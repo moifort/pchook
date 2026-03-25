@@ -110,9 +110,9 @@ extension PchookGraphQL {
             AnalyzeURLMutation.Data.AnalyzeURL.Award.self
           ] }
 
-          /// Award name
+          /// Short award name (e.g. "Prix Hugo", "Prix Goncourt")
           var name: String { __data["name"] }
-          /// Year awarded
+          /// Year awarded (e.g. 2023)
           var year: Int? { __data["year"] }
         }
 
@@ -138,13 +138,13 @@ extension PchookGraphQL {
 
           /// Platform name (e.g. Hardcover, Goodreads)
           var source: String { __data["source"] }
-          /// Score received
+          /// Score received (0-10 scale, e.g. 8)
           var score: PchookGraphQL.Note { __data["score"] }
-          /// Maximum possible score
+          /// Maximum possible score on this platform (e.g. 10)
           var maxScore: PchookGraphQL.Note { __data["maxScore"] }
-          /// Number of voters
+          /// Number of voters who rated the book
           var voterCount: Int { __data["voterCount"] }
-          /// Link to the book page on the platform
+          /// Direct link to the book page on the platform
           var url: PchookGraphQL.Url { __data["url"] }
         }
       }

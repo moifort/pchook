@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Information about the series a book belongs to
+  /// Series context for a specific book, including its position and sibling volumes
   static let SeriesInfo = ApolloAPI.Object(
     typename: "SeriesInfo",
     implementedInterfaces: [],

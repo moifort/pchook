@@ -73,13 +73,13 @@ extension PchookGraphQL {
         var title: PchookGraphQL.BookTitle { __data["title"] }
         /// Book authors
         var authors: [PchookGraphQL.PersonName] { __data["authors"] }
-        /// Publisher
+        /// Publisher (e.g. "Gallimard", "Folio"). Null if unknown
         var publisher: PchookGraphQL.Publisher? { __data["publisher"] }
-        /// Literary genre (e.g. Romance, Sci-Fi, Thriller)
+        /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
         var genre: PchookGraphQL.Genre? { __data["genre"] }
-        /// Reading status
+        /// Reading status: TO_READ or READ
         var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
-        /// Last modified date
+        /// Date of last modification
         var updatedAt: PchookGraphQL.DateTime { __data["updatedAt"] }
       }
     }
