@@ -1,36 +1,37 @@
 query Audible {
   audible {
     sync {
-      status
-      updatedAt
-      library {
-        asin
-        title
-        authors
-        narrators
-        durationMinutes
-        publisher
-        language
-        coverUrl
-        finishedAt
-        importedBookId
-        series {
-          name
-          position
+      syncStatus
+      syncUpdatedAt
+      entries {
+        item {
+          asin
+          title
+          authors
+          narrators
+          durationMinutes
+          publisher
+          language
+          coverUrl
+          finishedAt
+          series {
+            name
+            position
+          }
         }
-      }
-      wishlist {
-        asin
-        title
-        authors
-        importedBookId
+        source
+        downloadedAt
       }
     }
     import {
-      status
-      updatedAt
+      importStatus
+      importUpdatedAt
       taskId
       importedCount
+      mappings {
+        asin
+        bookId
+      }
     }
   }
 }

@@ -118,3 +118,35 @@ builder.scalarType('TaskId', {
   serialize: (value) => String(value),
   parseValue: validatedParse('TaskId', TaskId),
 })
+
+// Audible domain
+import {
+  Asin,
+  AudibleImportStatus,
+  AudibleSource,
+  AudibleSyncStatus,
+} from '~/domain/provider/audible/primitives'
+
+builder.scalarType('Asin', {
+  description: 'Amazon Standard Identification Number (10 alphanumeric characters)',
+  serialize: (value) => String(value),
+  parseValue: validatedParse('Asin', Asin),
+})
+
+builder.scalarType('AudibleSyncStatus', {
+  description: 'Audible sync status (disconnected | connected | fetching | fetched)',
+  serialize: (value) => String(value),
+  parseValue: validatedParse('AudibleSyncStatus', AudibleSyncStatus),
+})
+
+builder.scalarType('AudibleImportStatus', {
+  description: 'Audible import status (init | importing | imported)',
+  serialize: (value) => String(value),
+  parseValue: validatedParse('AudibleImportStatus', AudibleImportStatus),
+})
+
+builder.scalarType('AudibleSource', {
+  description: 'Audible item source (library | wishlist)',
+  serialize: (value) => String(value),
+  parseValue: validatedParse('AudibleSource', AudibleSource),
+})

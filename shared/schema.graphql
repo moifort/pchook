@@ -1,43 +1,67 @@
+"""Amazon Standard Identification Number (10 alphanumeric characters)"""
+scalar Asin
+
+"""Mapping between an Audible ASIN and an imported book"""
+type AsinBookMapping {
+  """Amazon Standard Identification Number"""
+  asin: Asin!
+
+  """Imported book identifier"""
+  bookId: BookId!
+
+  """Item source"""
+  source: AudibleSource!
+
+  """Sync timestamp"""
+  syncedAt: DateTime!
+}
+
 """Audible integration"""
 type Audible {
-  """Import state (null if never imported)"""
-  import: AudibleImport
+  """Import state"""
+  import: AudibleImport!
 
-  """Synchronization state (null if never synced)"""
-  sync: AudibleSync
+  """Synchronization state"""
+  sync: AudibleSync!
+}
+
+"""A raw Audible entry with metadata"""
+type AudibleEntry {
+  """Download timestamp"""
+  downloadedAt: DateTime!
+
+  """Audible item data"""
+  item: AudibleItem!
+
+  """Item source"""
+  source: AudibleSource!
 }
 
 """Audible import state"""
 type AudibleImport {
+  """Current import status"""
+  importStatus: AudibleImportStatus!
+
+  """Last import state update"""
+  importUpdatedAt: DateTime
+
   """Number of books imported so far"""
   importedCount: Int!
 
-  """Current import status"""
-  status: AudibleImportStatus!
+  """ASIN to book mappings"""
+  mappings: [AsinBookMapping!]!
 
   """Background task identifier"""
-  taskId: ID
-
-  """Last import state update"""
-  updatedAt: DateTime
+  taskId: TaskId!
 }
 
-"""Audible import status"""
-enum AudibleImportStatus {
-  """Import completed"""
-  IMPORTED
-
-  """Import in progress"""
-  IMPORTING
-
-  """Not started"""
-  INIT
-}
+"""Audible import status (init | importing | imported)"""
+scalar AudibleImportStatus
 
 """An Audible library or wishlist item"""
 type AudibleItem {
   """Amazon Standard Identification Number"""
-  asin: String!
+  asin: Asin!
 
   """Author names"""
   authors: [String!]!
@@ -50,9 +74,6 @@ type AudibleItem {
 
   """Date the book was finished listening"""
   finishedAt: DateTime
-
-  """ID of the imported book, if already imported"""
-  importedBookId: ID
 
   """Language"""
   language: String
@@ -82,35 +103,26 @@ type AudibleSeriesInfo {
   position: Int
 }
 
+"""Audible item source (library | wishlist)"""
+scalar AudibleSource
+
 """Audible synchronization state"""
 type AudibleSync {
-  """Library items (null if not yet fetched)"""
-  library: [AudibleItem!]
+  """Fetched Audible entries"""
+  entries(
+    """Filter by source"""
+    source: AudibleSource
+  ): [AudibleEntry!]!
 
   """Current sync status"""
-  status: AudibleSyncStatus!
+  syncStatus: AudibleSyncStatus!
 
   """Last sync state update"""
-  updatedAt: DateTime
-
-  """Wishlist items (null if not yet fetched)"""
-  wishlist: [AudibleItem!]
+  syncUpdatedAt: DateTime
 }
 
-"""Audible synchronization status"""
-enum AudibleSyncStatus {
-  """Connected, not yet fetched"""
-  CONNECTED
-
-  """Not connected to Audible"""
-  DISCONNECTED
-
-  """Library data fetched"""
-  FETCHED
-
-  """Currently fetching library data"""
-  FETCHING
-}
+"""Audible sync status (disconnected | connected | fetching | fetched)"""
+scalar AudibleSyncStatus
 
 """Audible authentication cookie"""
 type AuthCookie {

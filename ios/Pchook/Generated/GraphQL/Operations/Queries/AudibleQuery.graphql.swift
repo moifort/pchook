@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Audible"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Audible { audible { __typename sync { __typename status updatedAt library { __typename asin title authors narrators durationMinutes publisher language coverUrl finishedAt importedBookId series { __typename name position } } wishlist { __typename asin title authors importedBookId } } import { __typename status updatedAt taskId importedCount } } }"#
+        #"query Audible { audible { __typename sync { __typename syncStatus syncUpdatedAt entries { __typename item { __typename asin title authors narrators durationMinutes publisher language coverUrl finishedAt series { __typename name position } } source downloadedAt } } import { __typename importStatus importUpdatedAt taskId importedCount mappings { __typename asin bookId } } } }"#
       ))
 
     public init() {}
@@ -38,17 +38,17 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Audible }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("sync", Sync?.self),
-          .field("import", Import?.self),
+          .field("sync", Sync.self),
+          .field("import", Import.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AudibleQuery.Data.Audible.self
         ] }
 
-        /// Synchronization state (null if never synced)
-        var sync: Sync? { __data["sync"] }
-        /// Import state (null if never imported)
-        var `import`: Import? { __data["import"] }
+        /// Synchronization state
+        var sync: Sync { __data["sync"] }
+        /// Import state
+        var `import`: Import { __data["import"] }
 
         /// Audible.Sync
         ///
@@ -60,124 +60,115 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleSync }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("status", GraphQLEnum<PchookGraphQL.AudibleSyncStatus>.self),
-            .field("updatedAt", PchookGraphQL.DateTime?.self),
-            .field("library", [Library]?.self),
-            .field("wishlist", [Wishlist]?.self),
+            .field("syncStatus", PchookGraphQL.AudibleSyncStatus.self),
+            .field("syncUpdatedAt", PchookGraphQL.DateTime?.self),
+            .field("entries", [Entry].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AudibleQuery.Data.Audible.Sync.self
           ] }
 
           /// Current sync status
-          var status: GraphQLEnum<PchookGraphQL.AudibleSyncStatus> { __data["status"] }
+          var syncStatus: PchookGraphQL.AudibleSyncStatus { __data["syncStatus"] }
           /// Last sync state update
-          var updatedAt: PchookGraphQL.DateTime? { __data["updatedAt"] }
-          /// Library items (null if not yet fetched)
-          var library: [Library]? { __data["library"] }
-          /// Wishlist items (null if not yet fetched)
-          var wishlist: [Wishlist]? { __data["wishlist"] }
+          var syncUpdatedAt: PchookGraphQL.DateTime? { __data["syncUpdatedAt"] }
+          /// Fetched Audible entries
+          var entries: [Entry] { __data["entries"] }
 
-          /// Audible.Sync.Library
+          /// Audible.Sync.Entry
           ///
-          /// Parent Type: `AudibleItem`
-          struct Library: PchookGraphQL.SelectionSet {
+          /// Parent Type: `AudibleEntry`
+          struct Entry: PchookGraphQL.SelectionSet {
             let __data: DataDict
             init(_dataDict: DataDict) { __data = _dataDict }
 
-            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleItem }
+            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleEntry }
             static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
-              .field("asin", String.self),
-              .field("title", String.self),
-              .field("authors", [String].self),
-              .field("narrators", [String].self),
-              .field("durationMinutes", Int.self),
-              .field("publisher", String?.self),
-              .field("language", String?.self),
-              .field("coverUrl", PchookGraphQL.Url?.self),
-              .field("finishedAt", PchookGraphQL.DateTime?.self),
-              .field("importedBookId", PchookGraphQL.ID?.self),
-              .field("series", Series?.self),
+              .field("item", Item.self),
+              .field("source", PchookGraphQL.AudibleSource.self),
+              .field("downloadedAt", PchookGraphQL.DateTime.self),
             ] }
             static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-              AudibleQuery.Data.Audible.Sync.Library.self
+              AudibleQuery.Data.Audible.Sync.Entry.self
             ] }
 
-            /// Amazon Standard Identification Number
-            var asin: String { __data["asin"] }
-            /// Book title
-            var title: String { __data["title"] }
-            /// Author names
-            var authors: [String] { __data["authors"] }
-            /// Narrator names
-            var narrators: [String] { __data["narrators"] }
-            /// Duration in minutes
-            var durationMinutes: Int { __data["durationMinutes"] }
-            /// Publisher name
-            var publisher: String? { __data["publisher"] }
-            /// Language
-            var language: String? { __data["language"] }
-            /// Cover image URL
-            var coverUrl: PchookGraphQL.Url? { __data["coverUrl"] }
-            /// Date the book was finished listening
-            var finishedAt: PchookGraphQL.DateTime? { __data["finishedAt"] }
-            /// ID of the imported book, if already imported
-            var importedBookId: PchookGraphQL.ID? { __data["importedBookId"] }
-            /// Series information
-            var series: Series? { __data["series"] }
+            /// Audible item data
+            var item: Item { __data["item"] }
+            /// Item source
+            var source: PchookGraphQL.AudibleSource { __data["source"] }
+            /// Download timestamp
+            var downloadedAt: PchookGraphQL.DateTime { __data["downloadedAt"] }
 
-            /// Audible.Sync.Library.Series
+            /// Audible.Sync.Entry.Item
             ///
-            /// Parent Type: `AudibleSeriesInfo`
-            struct Series: PchookGraphQL.SelectionSet {
+            /// Parent Type: `AudibleItem`
+            struct Item: PchookGraphQL.SelectionSet {
               let __data: DataDict
               init(_dataDict: DataDict) { __data = _dataDict }
 
-              static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleSeriesInfo }
+              static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleItem }
               static var __selections: [ApolloAPI.Selection] { [
                 .field("__typename", String.self),
-                .field("name", String.self),
-                .field("position", Int?.self),
+                .field("asin", PchookGraphQL.Asin.self),
+                .field("title", String.self),
+                .field("authors", [String].self),
+                .field("narrators", [String].self),
+                .field("durationMinutes", Int.self),
+                .field("publisher", String?.self),
+                .field("language", String?.self),
+                .field("coverUrl", PchookGraphQL.Url?.self),
+                .field("finishedAt", PchookGraphQL.DateTime?.self),
+                .field("series", Series?.self),
               ] }
               static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-                AudibleQuery.Data.Audible.Sync.Library.Series.self
+                AudibleQuery.Data.Audible.Sync.Entry.Item.self
               ] }
 
-              /// Series name
-              var name: String { __data["name"] }
-              /// Position in the series
-              var position: Int? { __data["position"] }
+              /// Amazon Standard Identification Number
+              var asin: PchookGraphQL.Asin { __data["asin"] }
+              /// Book title
+              var title: String { __data["title"] }
+              /// Author names
+              var authors: [String] { __data["authors"] }
+              /// Narrator names
+              var narrators: [String] { __data["narrators"] }
+              /// Duration in minutes
+              var durationMinutes: Int { __data["durationMinutes"] }
+              /// Publisher name
+              var publisher: String? { __data["publisher"] }
+              /// Language
+              var language: String? { __data["language"] }
+              /// Cover image URL
+              var coverUrl: PchookGraphQL.Url? { __data["coverUrl"] }
+              /// Date the book was finished listening
+              var finishedAt: PchookGraphQL.DateTime? { __data["finishedAt"] }
+              /// Series information
+              var series: Series? { __data["series"] }
+
+              /// Audible.Sync.Entry.Item.Series
+              ///
+              /// Parent Type: `AudibleSeriesInfo`
+              struct Series: PchookGraphQL.SelectionSet {
+                let __data: DataDict
+                init(_dataDict: DataDict) { __data = _dataDict }
+
+                static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleSeriesInfo }
+                static var __selections: [ApolloAPI.Selection] { [
+                  .field("__typename", String.self),
+                  .field("name", String.self),
+                  .field("position", Int?.self),
+                ] }
+                static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+                  AudibleQuery.Data.Audible.Sync.Entry.Item.Series.self
+                ] }
+
+                /// Series name
+                var name: String { __data["name"] }
+                /// Position in the series
+                var position: Int? { __data["position"] }
+              }
             }
-          }
-
-          /// Audible.Sync.Wishlist
-          ///
-          /// Parent Type: `AudibleItem`
-          struct Wishlist: PchookGraphQL.SelectionSet {
-            let __data: DataDict
-            init(_dataDict: DataDict) { __data = _dataDict }
-
-            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleItem }
-            static var __selections: [ApolloAPI.Selection] { [
-              .field("__typename", String.self),
-              .field("asin", String.self),
-              .field("title", String.self),
-              .field("authors", [String].self),
-              .field("importedBookId", PchookGraphQL.ID?.self),
-            ] }
-            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-              AudibleQuery.Data.Audible.Sync.Wishlist.self
-            ] }
-
-            /// Amazon Standard Identification Number
-            var asin: String { __data["asin"] }
-            /// Book title
-            var title: String { __data["title"] }
-            /// Author names
-            var authors: [String] { __data["authors"] }
-            /// ID of the imported book, if already imported
-            var importedBookId: PchookGraphQL.ID? { __data["importedBookId"] }
           }
         }
 
@@ -191,23 +182,49 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("status", GraphQLEnum<PchookGraphQL.AudibleImportStatus>.self),
-            .field("updatedAt", PchookGraphQL.DateTime?.self),
-            .field("taskId", PchookGraphQL.ID?.self),
+            .field("importStatus", PchookGraphQL.AudibleImportStatus.self),
+            .field("importUpdatedAt", PchookGraphQL.DateTime?.self),
+            .field("taskId", PchookGraphQL.TaskId.self),
             .field("importedCount", Int.self),
+            .field("mappings", [Mapping].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AudibleQuery.Data.Audible.Import.self
           ] }
 
           /// Current import status
-          var status: GraphQLEnum<PchookGraphQL.AudibleImportStatus> { __data["status"] }
+          var importStatus: PchookGraphQL.AudibleImportStatus { __data["importStatus"] }
           /// Last import state update
-          var updatedAt: PchookGraphQL.DateTime? { __data["updatedAt"] }
+          var importUpdatedAt: PchookGraphQL.DateTime? { __data["importUpdatedAt"] }
           /// Background task identifier
-          var taskId: PchookGraphQL.ID? { __data["taskId"] }
+          var taskId: PchookGraphQL.TaskId { __data["taskId"] }
           /// Number of books imported so far
           var importedCount: Int { __data["importedCount"] }
+          /// ASIN to book mappings
+          var mappings: [Mapping] { __data["mappings"] }
+
+          /// Audible.Import.Mapping
+          ///
+          /// Parent Type: `AsinBookMapping`
+          struct Mapping: PchookGraphQL.SelectionSet {
+            let __data: DataDict
+            init(_dataDict: DataDict) { __data = _dataDict }
+
+            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AsinBookMapping }
+            static var __selections: [ApolloAPI.Selection] { [
+              .field("__typename", String.self),
+              .field("asin", PchookGraphQL.Asin.self),
+              .field("bookId", PchookGraphQL.BookId.self),
+            ] }
+            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+              AudibleQuery.Data.Audible.Import.Mapping.self
+            ] }
+
+            /// Amazon Standard Identification Number
+            var asin: PchookGraphQL.Asin { __data["asin"] }
+            /// Imported book identifier
+            var bookId: PchookGraphQL.BookId { __data["bookId"] }
+          }
         }
       }
     }

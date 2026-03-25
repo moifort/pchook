@@ -1,12 +1,14 @@
-import type { AudibleLibraryEntry } from '~/domain/provider/audible/query'
 import { AudibleQuery } from '~/domain/provider/audible/query'
 import type {
-  AudibleImportStatus,
+  AsinBookMapping,
+  AudibleItem,
   AudibleSyncState,
-  AudibleSyncStatus,
+  RawAudibleEntry,
 } from '~/domain/provider/audible/types'
 import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
+
+// --- Auth (infrastructure only, not domain) ---
 
 type AuthStartData = {
   loginUrl: string
@@ -42,24 +44,7 @@ export const AuthStartResponseType = builder
     }),
   })
 
-export const AudibleSyncStatusEnum = builder.enumType('AudibleSyncStatus', {
-  description: 'Audible synchronization status',
-  values: {
-    DISCONNECTED: { value: 'disconnected' as const, description: 'Not connected to Audible' },
-    CONNECTED: { value: 'connected' as const, description: 'Connected, not yet fetched' },
-    FETCHING: { value: 'fetching' as const, description: 'Currently fetching library data' },
-    FETCHED: { value: 'fetched' as const, description: 'Library data fetched' },
-  },
-})
-
-export const AudibleImportStatusEnum = builder.enumType('AudibleImportStatus', {
-  description: 'Audible import status',
-  values: {
-    INIT: { value: 'init' as const, description: 'Not started' },
-    IMPORTING: { value: 'importing' as const, description: 'Import in progress' },
-    IMPORTED: { value: 'imported' as const, description: 'Import completed' },
-  },
-})
+// --- Domain types ---
 
 const AudibleSeriesInfoType = builder
   .objectRef<{ name: string; position?: number }>('AudibleSeriesInfo')
@@ -76,145 +61,176 @@ const AudibleSeriesInfoType = builder
     }),
   })
 
-const AudibleItemType = builder.objectRef<AudibleLibraryEntry>('AudibleItem').implement({
+const AudibleItemType = builder.objectRef<AudibleItem>('AudibleItem').implement({
   description: 'An Audible library or wishlist item',
   fields: (t) => ({
     asin: t.field({
-      type: 'String',
+      type: 'Asin',
       description: 'Amazon Standard Identification Number',
-      resolve: ({ item }) => String(item.asin),
+      resolve: ({ asin }) => asin,
     }),
-    title: t.field({
-      type: 'String',
-      description: 'Book title',
-      resolve: ({ item }) => item.title,
-    }),
+    title: t.exposeString('title', { description: 'Book title' }),
     authors: t.field({
       type: ['String'],
       description: 'Author names',
-      resolve: ({ item }) => item.authors,
+      resolve: ({ authors }) => authors,
     }),
     narrators: t.field({
       type: ['String'],
       description: 'Narrator names',
-      resolve: ({ item }) => item.narrators,
+      resolve: ({ narrators }) => narrators,
     }),
-    durationMinutes: t.field({
-      type: 'Int',
-      description: 'Duration in minutes',
-      resolve: ({ item }) => item.durationMinutes,
-    }),
+    durationMinutes: t.exposeInt('durationMinutes', { description: 'Duration in minutes' }),
     publisher: t.field({
       type: 'String',
       nullable: true,
       description: 'Publisher name',
-      resolve: ({ item }) => item.publisher ?? null,
+      resolve: ({ publisher }) => publisher ?? null,
     }),
     language: t.field({
       type: 'String',
       nullable: true,
       description: 'Language',
-      resolve: ({ item }) => item.language ?? null,
+      resolve: ({ language }) => language ?? null,
     }),
     releaseDate: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Release date',
-      resolve: ({ item }) => item.releaseDate ?? null,
+      resolve: ({ releaseDate }) => releaseDate ?? null,
     }),
     coverUrl: t.field({
       type: 'Url',
       nullable: true,
       description: 'Cover image URL',
-      resolve: ({ item }) => item.coverUrl ?? null,
+      resolve: ({ coverUrl }) => coverUrl ?? null,
     }),
     series: t.field({
       type: AudibleSeriesInfoType,
       nullable: true,
       description: 'Series information',
-      resolve: ({ item }) => item.series ?? null,
+      resolve: ({ series }) => series ?? null,
     }),
     finishedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Date the book was finished listening',
-      resolve: ({ item }) => item.finishedAt ?? null,
-    }),
-    importedBookId: t.field({
-      type: 'ID',
-      nullable: true,
-      description: 'ID of the imported book, if already imported',
-      resolve: ({ importedBookId }) => importedBookId ?? null,
+      resolve: ({ finishedAt }) => finishedAt ?? null,
     }),
   }),
 })
 
-type AudibleSyncData = AudibleSyncState
+const AudibleEntryType = builder.objectRef<RawAudibleEntry>('AudibleEntry').implement({
+  description: 'A raw Audible entry with metadata',
+  fields: (t) => ({
+    item: t.field({
+      type: AudibleItemType,
+      description: 'Audible item data',
+      resolve: ({ item }) => item,
+    }),
+    source: t.field({
+      type: 'AudibleSource',
+      description: 'Item source',
+      resolve: ({ source }) => source,
+    }),
+    downloadedAt: t.field({
+      type: 'DateTime',
+      description: 'Download timestamp',
+      resolve: ({ downloadedAt }) => downloadedAt,
+    }),
+  }),
+})
+
+const AsinBookMappingType = builder.objectRef<AsinBookMapping>('AsinBookMapping').implement({
+  description: 'Mapping between an Audible ASIN and an imported book',
+  fields: (t) => ({
+    asin: t.field({
+      type: 'Asin',
+      description: 'Amazon Standard Identification Number',
+      resolve: ({ asin }) => asin,
+    }),
+    bookId: t.field({
+      type: 'BookId',
+      description: 'Imported book identifier',
+      resolve: ({ bookId }) => bookId,
+    }),
+    source: t.field({
+      type: 'AudibleSource',
+      description: 'Item source',
+      resolve: ({ source }) => source,
+    }),
+    syncedAt: t.field({
+      type: 'DateTime',
+      description: 'Sync timestamp',
+      resolve: ({ syncedAt }) => syncedAt,
+    }),
+  }),
+})
+
+// --- Composite types ---
+
+type AudibleSyncData = Pick<AudibleSyncState, 'syncStatus' | 'syncUpdatedAt'>
 
 export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync').implement({
   description: 'Audible synchronization state',
   fields: (t) => ({
-    status: t.field({
-      type: AudibleSyncStatusEnum,
+    syncStatus: t.field({
+      type: 'AudibleSyncStatus',
       description: 'Current sync status',
-      resolve: ({ syncStatus }) => syncStatus as AudibleSyncStatus,
+      resolve: ({ syncStatus }) => syncStatus,
     }),
-    updatedAt: t.field({
+    syncUpdatedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Last sync state update',
       resolve: ({ syncUpdatedAt }) => syncUpdatedAt ?? null,
     }),
-    library: t.field({
-      type: [AudibleItemType],
-      nullable: true,
-      description: 'Library items (null if not yet fetched)',
-      resolve: async ({ syncStatus }) => {
-        if (syncStatus !== 'fetched') return null
-        return AudibleQuery.getLibrary('library')
+    entries: t.field({
+      type: [AudibleEntryType],
+      description: 'Fetched Audible entries',
+      args: {
+        source: t.arg({ type: 'AudibleSource', required: false, description: 'Filter by source' }),
       },
-    }),
-    wishlist: t.field({
-      type: [AudibleItemType],
-      nullable: true,
-      description: 'Wishlist items (null if not yet fetched)',
-      resolve: async ({ syncStatus }) => {
-        if (syncStatus !== 'fetched') return null
-        return AudibleQuery.getLibrary('wishlist')
+      resolve: async ({ syncStatus }, { source }) => {
+        if (syncStatus !== 'fetched') return []
+        const rawItems = await AudibleQuery.getAllRawItems()
+        return source ? rawItems.filter((entry) => entry.source === source) : rawItems
       },
     }),
   }),
 })
 
-type AudibleImportData = {
-  importStatus: AudibleImportStatus
-  importUpdatedAt?: Date
-  taskId?: string
+type AudibleImportData = Pick<AudibleSyncState, 'importStatus' | 'importUpdatedAt'> & {
   importedCount: number
+  mappings: AsinBookMapping[]
 }
 
 export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleImport').implement({
   description: 'Audible import state',
   fields: (t) => ({
-    status: t.field({
-      type: AudibleImportStatusEnum,
+    importStatus: t.field({
+      type: 'AudibleImportStatus',
       description: 'Current import status',
-      resolve: ({ importStatus }) => importStatus as AudibleImportStatus,
+      resolve: ({ importStatus }) => importStatus,
     }),
-    updatedAt: t.field({
+    importUpdatedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Last import state update',
       resolve: ({ importUpdatedAt }) => importUpdatedAt ?? null,
     }),
     taskId: t.field({
-      type: 'ID',
-      nullable: true,
+      type: 'TaskId',
       description: 'Background task identifier',
-      resolve: ({ taskId }) => taskId ?? null,
+      resolve: () => AUDIBLE_IMPORT_TASK_ID,
     }),
     importedCount: t.exposeInt('importedCount', {
       description: 'Number of books imported so far',
+    }),
+    mappings: t.field({
+      type: [AsinBookMappingType],
+      description: 'ASIN to book mappings',
+      resolve: ({ mappings }) => mappings,
     }),
   }),
 })
@@ -224,28 +240,23 @@ export const AudibleType = builder.objectRef<Record<string, never>>('Audible').i
   fields: (t) => ({
     sync: t.field({
       type: AudibleSyncType,
-      nullable: true,
-      description: 'Synchronization state (null if never synced)',
+      description: 'Synchronization state',
       resolve: async () => {
-        const syncState = await AudibleQuery.getSyncState()
-        const rawItems = await AudibleQuery.getAllRawItems()
-        if (syncState.syncStatus === 'disconnected' && rawItems.length === 0) return null
-        return syncState
+        const state = await AudibleQuery.getSyncState()
+        return { syncStatus: state.syncStatus, syncUpdatedAt: state.syncUpdatedAt }
       },
     }),
     import: t.field({
       type: AudibleImportType,
-      nullable: true,
-      description: 'Import state (null if never imported)',
+      description: 'Import state',
       resolve: async () => {
-        const syncState = await AudibleQuery.getSyncState()
+        const state = await AudibleQuery.getSyncState()
         const mappings = await AudibleQuery.getAllMappings()
-        if (syncState.importStatus === 'init' && mappings.length === 0) return null
         return {
-          importStatus: syncState.importStatus,
-          importUpdatedAt: syncState.importUpdatedAt,
-          taskId: String(AUDIBLE_IMPORT_TASK_ID),
+          importStatus: state.importStatus,
+          importUpdatedAt: state.importUpdatedAt,
           importedCount: mappings.length,
+          mappings,
         }
       },
     }),

@@ -26,12 +26,15 @@ final class AudibleViewModel {
     private var lastVerifiedAt: Date?
     private var pollingTask: Task<Void, Never>?
     private var importTaskId: String?
+    private var importedAsins: Set<String> = []
 
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
         guard let task = importTask else { return false }
         return task.phase == "running" || task.phase == "paused"
     }
+
+    func isImported(asin: String) -> Bool { importedAsins.contains(asin) }
 
     // MARK: - Load status on page open
 
@@ -214,6 +217,7 @@ final class AudibleViewModel {
             importTask = nil
             importTaskId = nil
             importedCount = 0
+            importedAsins = []
             lastVerifiedAt = nil
             cancelPolling()
         } catch {
@@ -229,14 +233,19 @@ final class AudibleViewModel {
     // MARK: - Private
 
     private func applyStatus(_ data: AudibleData) {
-        let syncStatus = data.sync?.status ?? "DISCONNECTED"
-        isConnected = syncStatus != "DISCONNECTED"
-        isFetching = syncStatus == "FETCHING"
-        libraryCount = data.sync?.library?.count ?? 0
-        wishlistCount = data.sync?.wishlist?.count ?? 0
-        lastFetchedAt = data.sync?.updatedAt
-        importTaskId = data.import_?.taskId
-        importedCount = data.import_?.importedCount ?? 0
+        let syncStatus = data.sync.syncStatus
+        isConnected = syncStatus != "disconnected"
+        isFetching = syncStatus == "fetching"
+
+        let libraryEntries = data.sync.entries.filter { $0.source == "library" }
+        let wishlistEntries = data.sync.entries.filter { $0.source == "wishlist" }
+        libraryCount = libraryEntries.count
+        wishlistCount = wishlistEntries.count
+        lastFetchedAt = data.sync.syncUpdatedAt
+
+        importTaskId = data.import_.taskId
+        importedCount = data.import_.importedCount
+        importedAsins = Set(data.import_.mappings.map(\.asin))
     }
 
     private func refreshStatus() async {

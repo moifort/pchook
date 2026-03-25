@@ -279,22 +279,29 @@ struct AuthStartResponse: Sendable {
 }
 
 struct AudibleData: Sendable {
-    var sync: AudibleSyncData?
-    var import_: AudibleImportData?
+    let sync: AudibleSyncData
+    let import_: AudibleImportData
 }
 
 struct AudibleSyncData: Sendable {
-    let status: String
-    var updatedAt: Date?
-    var library: [AudibleItemData]?
-    var wishlist: [AudibleWishlistItemData]?
+    let syncStatus: String
+    var syncUpdatedAt: Date?
+    let entries: [AudibleEntryData]
 }
 
 struct AudibleImportData: Sendable {
-    let status: String
-    var updatedAt: Date?
-    var taskId: String?
+    let importStatus: String
+    var importUpdatedAt: Date?
+    let taskId: String
     let importedCount: Int
+    let mappings: [AsinBookMappingData]
+}
+
+struct AudibleEntryData: Identifiable, Sendable {
+    let item: AudibleItemData
+    let source: String
+    let downloadedAt: Date
+    var id: String { item.asin }
 }
 
 struct AudibleItemData: Identifiable, Sendable {
@@ -307,18 +314,14 @@ struct AudibleItemData: Identifiable, Sendable {
     var language: String?
     var coverUrl: String?
     var finishedAt: Date?
-    var importedBookId: String?
     var seriesName: String?
     var seriesPosition: Int?
     var id: String { asin }
 }
 
-struct AudibleWishlistItemData: Identifiable, Sendable {
+struct AsinBookMappingData: Sendable {
     let asin: String
-    let title: String
-    let authors: [String]
-    var importedBookId: String?
-    var id: String { asin }
+    let bookId: String
 }
 
 struct ImportTaskState: Sendable {

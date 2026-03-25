@@ -45,45 +45,45 @@ enum GraphQLAudibleAPI {
         let data = try await GraphQLHelpers.fetch(client, query: query)
 
         let audible = data.audible
+        let sync = audible.sync
+        let imp = audible.import
+
         return AudibleData(
-            sync: audible.sync.map { sync in
-                AudibleSyncData(
-                    status: sync.status.rawValue,
-                    updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
-                    library: sync.library?.map { item in
-                        AudibleItemData(
-                            asin: item.asin,
-                            title: item.title,
-                            authors: item.authors,
-                            narrators: item.narrators,
-                            durationMinutes: item.durationMinutes,
-                            publisher: item.publisher,
-                            language: item.language,
-                            coverUrl: item.coverUrl,
-                            finishedAt: item.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
-                            importedBookId: item.importedBookId,
-                            seriesName: item.series?.name,
-                            seriesPosition: item.series?.position
-                        )
-                    },
-                    wishlist: sync.wishlist?.map { item in
-                        AudibleWishlistItemData(
-                            asin: item.asin,
-                            title: item.title,
-                            authors: item.authors,
-                            importedBookId: item.importedBookId
-                        )
-                    }
-                )
-            },
-            import_: audible.import.map { imp in
-                AudibleImportData(
-                    status: imp.status.rawValue,
-                    updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
-                    taskId: imp.taskId,
-                    importedCount: imp.importedCount
-                )
-            }
+            sync: AudibleSyncData(
+                syncStatus: sync.syncStatus,
+                syncUpdatedAt: sync.syncUpdatedAt.flatMap(GraphQLHelpers.parseISO8601),
+                entries: sync.entries.map { entry in
+                    AudibleEntryData(
+                        item: AudibleItemData(
+                            asin: entry.item.asin,
+                            title: entry.item.title,
+                            authors: entry.item.authors,
+                            narrators: entry.item.narrators,
+                            durationMinutes: entry.item.durationMinutes,
+                            publisher: entry.item.publisher,
+                            language: entry.item.language,
+                            coverUrl: entry.item.coverUrl,
+                            finishedAt: entry.item.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
+                            seriesName: entry.item.series?.name,
+                            seriesPosition: entry.item.series?.position
+                        ),
+                        source: entry.source,
+                        downloadedAt: GraphQLHelpers.parseISO8601(entry.downloadedAt) ?? Date()
+                    )
+                }
+            ),
+            import_: AudibleImportData(
+                importStatus: imp.importStatus,
+                importUpdatedAt: imp.importUpdatedAt.flatMap(GraphQLHelpers.parseISO8601),
+                taskId: imp.taskId,
+                importedCount: imp.importedCount,
+                mappings: imp.mappings.map { mapping in
+                    AsinBookMappingData(
+                        asin: mapping.asin,
+                        bookId: mapping.bookId
+                    )
+                }
+            )
         )
     }
 

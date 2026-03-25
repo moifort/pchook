@@ -24,13 +24,13 @@ export type AudibleItem = {
 export type AsinBookMapping = {
   asin: Asin
   bookId: BookId
-  source: 'library' | 'wishlist'
+  source: AudibleSource
   syncedAt: Date
 }
 
 export type RawAudibleEntry = {
   item: AudibleItem
-  source: 'library' | 'wishlist'
+  source: AudibleSource
   downloadedAt: Date
 }
 
@@ -40,6 +40,7 @@ export type AudibleSummary = {
   wishlistTotal: number
 }
 
+export type AudibleSource = 'library' | 'wishlist'
 export type AudibleSyncStatus = 'disconnected' | 'connected' | 'fetching' | 'fetched'
 export type AudibleImportStatus = 'init' | 'importing' | 'imported'
 
