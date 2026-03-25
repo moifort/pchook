@@ -211,7 +211,7 @@ extension PchookGraphQL {
 
           /// Associated book ID
           var bookId: PchookGraphQL.BookId { __data["bookId"] }
-          /// Personal rating (0-10)
+          /// Personal rating (0-5)
           var rating: PchookGraphQL.Note { __data["rating"] }
           /// Read date
           var readDate: PchookGraphQL.DateTime? { __data["readDate"] }

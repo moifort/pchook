@@ -133,6 +133,21 @@ enum GraphQLBooksAPI {
         let mutation = PchookGraphQL.RateSeriesMutation(id: id, rating: rating)
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
+
+    static func favoriteSeries() async throws -> [FavoriteSeriesItem] {
+        let query = PchookGraphQL.FavoriteSeriesQuery()
+        let data = try await GraphQLHelpers.fetch(client, query: query)
+        return data.series.map { series in
+            let volumes = series.volumes.sorted { $0.position < $1.position }
+            return FavoriteSeriesItem(
+                id: series.id,
+                name: series.name,
+                rating: series.rating ?? 0,
+                volumeCount: volumes.count,
+                firstBookId: volumes.first?.id
+            )
+        }
+    }
 }
 
 // MARK: - Type mapping

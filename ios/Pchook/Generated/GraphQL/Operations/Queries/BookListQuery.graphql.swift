@@ -194,7 +194,7 @@ extension PchookGraphQL {
               BookListQuery.Data.Books.Item.Review.self
             ] }
 
-            /// Personal rating (0-10)
+            /// Personal rating (0-5)
             var rating: PchookGraphQL.Note { __data["rating"] }
           }
 

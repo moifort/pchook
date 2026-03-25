@@ -32,7 +32,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
         case .all: "Tous vos livres ajoutés"
         case .toRead: "Livres en attente de lecture"
         case .series: "Vos livres regroupés par série"
-        case .favorites: "Vos livres notés 5 étoiles"
+        case .favorites: "Vos favoris"
         }
     }
 }
@@ -65,6 +65,7 @@ enum BookSort: String, CaseIterable, Identifiable {
 @MainActor @Observable
 final class BooksViewModel {
     var books: [BookListItem] = []
+    var favoriteSeries: [FavoriteSeriesItem] = []
     var isLoading = false
     var isLoadingMore = false
     var hasBooks = false
@@ -76,6 +77,10 @@ final class BooksViewModel {
     var mode: BookListMode = .all
 
     private let pageSize = 20
+
+    var isEmpty: Bool {
+        books.isEmpty && favoriteSeries.isEmpty
+    }
 
     var usesGrouping: Bool {
         sort != .title || mode == .series
@@ -108,7 +113,14 @@ final class BooksViewModel {
     }
 
     var navigationSubtitle: String {
-        "\(mode.subtitle) · \(totalCount) \(totalCount <= 1 ? "livre" : "livres")"
+        if mode == .favorites {
+            let parts = [
+                favoriteSeries.isEmpty ? nil : "\(favoriteSeries.count) \(favoriteSeries.count <= 1 ? "série" : "séries")",
+                totalCount == 0 ? nil : "\(totalCount) \(totalCount <= 1 ? "livre" : "livres")",
+            ].compactMap { $0 }
+            return parts.isEmpty ? mode.subtitle : "\(mode.subtitle) · \(parts.joined(separator: ", "))"
+        }
+        return "\(mode.subtitle) · \(totalCount) \(totalCount <= 1 ? "livre" : "livres")"
     }
 
     var filterKey: String {
@@ -119,11 +131,22 @@ final class BooksViewModel {
         isLoading = true
         error = nil
         do {
-            let page = try await fetchPage(offset: 0)
-            books = page.items
-            totalCount = page.totalCount
-            hasMore = page.hasMore
-            if !books.isEmpty { hasBooks = true }
+            if mode == .favorites {
+                async let booksTask = fetchPage(offset: 0)
+                async let seriesTask = GraphQLBooksAPI.favoriteSeries()
+                let (page, series) = try await (booksTask, seriesTask)
+                books = page.items
+                totalCount = page.totalCount
+                hasMore = page.hasMore
+                favoriteSeries = series
+            } else {
+                favoriteSeries = []
+                let page = try await fetchPage(offset: 0)
+                books = page.items
+                totalCount = page.totalCount
+                hasMore = page.hasMore
+            }
+            if !books.isEmpty || !favoriteSeries.isEmpty { hasBooks = true }
         } catch is CancellationError {
             // Ignored — task cancelled by SwiftUI (e.g. refreshTrigger changed)
         } catch {

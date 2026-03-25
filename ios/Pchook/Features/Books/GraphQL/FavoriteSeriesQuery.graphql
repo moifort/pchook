@@ -1,0 +1,13 @@
+query FavoriteSeries {
+  series(isFavorite: true) {
+    id
+    name
+    rating
+    volumes {
+      id
+      title
+      label
+      position
+    }
+  }
+}

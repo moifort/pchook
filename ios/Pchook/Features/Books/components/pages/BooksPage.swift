@@ -15,10 +15,12 @@ struct BooksPage: View {
                     ProgressView("Chargement...")
                 } else if let error = viewModel.error {
                     ContentUnavailableView("Erreur", systemImage: "exclamationmark.triangle", description: Text(error))
-                } else if viewModel.books.isEmpty {
+                } else if viewModel.isEmpty {
                     emptyState
                 } else {
                     List {
+                        favoriteSeriesSection
+
                         if viewModel.usesGrouping {
                             ForEach(viewModel.groupedBooks) { section in
                                 Section {
@@ -58,8 +60,8 @@ struct BooksPage: View {
                     }
                 }
             }
-            .navigationTitle(viewModel.books.isEmpty ? "" : viewModel.mode.title)
-            .navigationSubtitle(viewModel.books.isEmpty ? "" : viewModel.navigationSubtitle)
+            .navigationTitle(viewModel.isEmpty ? "" : viewModel.mode.title)
+            .navigationSubtitle(viewModel.isEmpty ? "" : viewModel.navigationSubtitle)
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }
@@ -107,6 +109,34 @@ struct BooksPage: View {
     }
 
     @ViewBuilder
+    private var favoriteSeriesSection: some View {
+        if !viewModel.favoriteSeries.isEmpty {
+            Section {
+                ForEach(viewModel.favoriteSeries) { series in
+                    Button {
+                        selectedBookId = series.firstBookId
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(series.name)
+                                Text("\(series.volumeCount) \(series.volumeCount <= 1 ? "tome" : "tomes")")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                    .tint(.primary)
+                }
+            } header: {
+                Text("Séries")
+            }
+        }
+    }
+
+    @ViewBuilder
     private var emptyState: some View {
         switch viewModel.mode {
         case .all:
@@ -131,7 +161,7 @@ struct BooksPage: View {
             ContentUnavailableView(
                 "Aucun favori",
                 systemImage: "heart",
-                description: Text("Les livres notés 5 étoiles apparaîtront ici")
+                description: Text("Notez des livres ou séries 5 étoiles")
             )
         }
     }
