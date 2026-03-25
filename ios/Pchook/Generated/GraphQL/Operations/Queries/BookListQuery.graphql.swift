@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookList"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name label position } coverImageUrl createdAt } }"#
+        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder) { books(genre: $genre, status: $status, sort: $sort, order: $order) { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name } seriesVolume { __typename label position } coverImageUrl createdAt } }"#
       ))
 
     public var genre: GraphQLNullable<Genre>
@@ -75,7 +75,8 @@ extension PchookGraphQL {
           .field("review", Review?.self),
           .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
           .field("series", Series?.self),
-          .field("coverImageUrl", String?.self),
+          .field("seriesVolume", SeriesVolume?.self),
+          .field("coverImageUrl", PchookGraphQL.Url?.self),
           .field("createdAt", PchookGraphQL.DateTime.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -100,10 +101,12 @@ extension PchookGraphQL {
         var review: Review? { __data["review"] }
         /// Book language as ISO 639-1 code. Null if unknown
         var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
-        /// Series information
+        /// Series this book belongs to
         var series: Series? { __data["series"] }
-        /// Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
-        var coverImageUrl: String? { __data["coverImageUrl"] }
+        /// This book's volume entry in its series (label and position)
+        var seriesVolume: SeriesVolume? { __data["seriesVolume"] }
+        /// Absolute URL to the cover image. Null if no cover
+        var coverImageUrl: PchookGraphQL.Url? { __data["coverImageUrl"] }
         /// Date the book was added to the library
         var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
 
@@ -152,27 +155,44 @@ extension PchookGraphQL {
 
         /// Book.Series
         ///
-        /// Parent Type: `SeriesInfo`
+        /// Parent Type: `Series`
         struct Series: PchookGraphQL.SelectionSet {
           let __data: DataDict
           init(_dataDict: DataDict) { __data = _dataDict }
 
-          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesInfo }
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Series }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("name", String.self),
-            .field("label", String.self),
-            .field("position", Int.self),
+            .field("name", PchookGraphQL.SeriesName.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookListQuery.Data.Book.Series.self
           ] }
 
-          /// Series name
-          var name: String { __data["name"] }
-          /// This book display label in the series (e.g. "Tome 3")
+          /// Series name (e.g. "Le Sorceleur", "Fondation")
+          var name: PchookGraphQL.SeriesName { __data["name"] }
+        }
+
+        /// Book.SeriesVolume
+        ///
+        /// Parent Type: `SeriesVolume`
+        struct SeriesVolume: PchookGraphQL.SelectionSet {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
+
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesVolume }
+          static var __selections: [ApolloAPI.Selection] { [
+            .field("__typename", String.self),
+            .field("label", String.self),
+            .field("position", Int.self),
+          ] }
+          static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            BookListQuery.Data.Book.SeriesVolume.self
+          ] }
+
+          /// Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")
           var label: String { __data["label"] }
-          /// This book sort position in the series
+          /// Sort position in series (e.g. 1, 2, 99 for hors-série)
           var position: Int { __data["position"] }
         }
       }

@@ -306,7 +306,7 @@ extension BookEditForm {
         }
 
         init(from detail: BookDetailData) {
-            let position = detail.series?.position
+            let position = detail.seriesVolume?.position
             let positionString = position.map {
                 $0.truncatingRemainder(dividingBy: 1) == 0
                     ? String(Int($0))
@@ -333,7 +333,7 @@ extension BookEditForm {
                 durationMinutes: durationStr,
                 narrators: detail.book.narrators.joined(separator: ", "),
                 series: detail.series?.name ?? "",
-                seriesLabel: detail.series?.label ?? "",
+                seriesLabel: detail.seriesVolume?.label ?? "",
                 seriesNumber: positionString,
                 synopsis: detail.book.synopsis ?? "",
                 personalNotes: detail.book.personalNotes ?? ""

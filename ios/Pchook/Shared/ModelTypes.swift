@@ -192,11 +192,9 @@ struct SeriesVolume: Identifiable, Sendable {
     let position: Double
 }
 
-struct SeriesInfo: Sendable {
+struct Series: Sendable {
     let id: String
     let name: String
-    let label: String
-    let position: Double
     let volumes: [SeriesVolume]
 }
 
@@ -211,7 +209,8 @@ struct ReviewInfo: Sendable {
 struct BookDetailData: Sendable {
     let book: Book
     var coverImageUrl: String?
-    var series: SeriesInfo?
+    var series: Series?
+    var seriesVolume: SeriesVolume?
     var review: ReviewInfo?
 }
 

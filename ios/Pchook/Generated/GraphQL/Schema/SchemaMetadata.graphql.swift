@@ -25,7 +25,7 @@ extension PchookGraphQL {
   typealias MutableInlineFragment = PchookGraphQL_MutableInlineFragment
 
   enum SchemaMetadata: ApolloAPI.SchemaMetadata {
-    nonisolated(unsafe) static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
+    static let configuration: any ApolloAPI.SchemaConfiguration.Type = SchemaConfiguration.self
 
     static func objectType(forTypename typename: String) -> ApolloAPI.Object? {
       switch typename {
@@ -48,7 +48,7 @@ extension PchookGraphQL {
       case "RecentAward": return PchookGraphQL.Objects.RecentAward
       case "RecentBook": return PchookGraphQL.Objects.RecentBook
       case "Review": return PchookGraphQL.Objects.Review
-      case "SeriesInfo": return PchookGraphQL.Objects.SeriesInfo
+      case "Series": return PchookGraphQL.Objects.Series
       case "SeriesVolume": return PchookGraphQL.Objects.SeriesVolume
       case "Task": return PchookGraphQL.Objects.Task
       default: return nil

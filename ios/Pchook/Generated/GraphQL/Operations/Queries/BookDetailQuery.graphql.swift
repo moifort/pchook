@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name label position volumes { __typename id title label position } } } }"#
+        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name volumes { __typename id title label position } } seriesVolume { __typename id title label position } } }"#
       ))
 
     public var id: BookId
@@ -68,9 +68,10 @@ extension PchookGraphQL {
           .field("externalUrl", PchookGraphQL.Url?.self),
           .field("createdAt", PchookGraphQL.DateTime.self),
           .field("updatedAt", PchookGraphQL.DateTime.self),
-          .field("coverImageUrl", String?.self),
+          .field("coverImageUrl", PchookGraphQL.Url?.self),
           .field("review", Review?.self),
           .field("series", Series?.self),
+          .field("seriesVolume", SeriesVolume?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           BookDetailQuery.Data.Book.self
@@ -124,12 +125,14 @@ extension PchookGraphQL {
         var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
         /// Date of last modification
         var updatedAt: PchookGraphQL.DateTime { __data["updatedAt"] }
-        /// Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
-        var coverImageUrl: String? { __data["coverImageUrl"] }
+        /// Absolute URL to the cover image. Null if no cover
+        var coverImageUrl: PchookGraphQL.Url? { __data["coverImageUrl"] }
         /// Personal review and rating
         var review: Review? { __data["review"] }
-        /// Series information
+        /// Series this book belongs to
         var series: Series? { __data["series"] }
+        /// This book's volume entry in its series (label and position)
+        var seriesVolume: SeriesVolume? { __data["seriesVolume"] }
 
         /// Book.Award
         ///
@@ -220,33 +223,27 @@ extension PchookGraphQL {
 
         /// Book.Series
         ///
-        /// Parent Type: `SeriesInfo`
+        /// Parent Type: `Series`
         struct Series: PchookGraphQL.SelectionSet {
           let __data: DataDict
           init(_dataDict: DataDict) { __data = _dataDict }
 
-          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesInfo }
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Series }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("id", PchookGraphQL.ID.self),
-            .field("name", String.self),
-            .field("label", String.self),
-            .field("position", Int.self),
+            .field("name", PchookGraphQL.SeriesName.self),
             .field("volumes", [Volume].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookDetailQuery.Data.Book.Series.self
           ] }
 
-          /// Series ID
+          /// Unique identifier
           var id: PchookGraphQL.ID { __data["id"] }
-          /// Series name
-          var name: String { __data["name"] }
-          /// This book display label in the series (e.g. "Tome 3")
-          var label: String { __data["label"] }
-          /// This book sort position in the series
-          var position: Int { __data["position"] }
-          /// All volumes in the series, filtered to the same language as this book
+          /// Series name (e.g. "Le Sorceleur", "Fondation")
+          var name: PchookGraphQL.SeriesName { __data["name"] }
+          /// All volumes in this series (filtered by language when accessed from a book)
           var volumes: [Volume] { __data["volumes"] }
 
           /// Book.Series.Volume
@@ -277,6 +274,35 @@ extension PchookGraphQL {
             /// Sort position in series (e.g. 1, 2, 99 for hors-série)
             var position: Int { __data["position"] }
           }
+        }
+
+        /// Book.SeriesVolume
+        ///
+        /// Parent Type: `SeriesVolume`
+        struct SeriesVolume: PchookGraphQL.SelectionSet {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
+
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesVolume }
+          static var __selections: [ApolloAPI.Selection] { [
+            .field("__typename", String.self),
+            .field("id", PchookGraphQL.ID.self),
+            .field("title", String.self),
+            .field("label", String.self),
+            .field("position", Int.self),
+          ] }
+          static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            BookDetailQuery.Data.Book.SeriesVolume.self
+          ] }
+
+          /// Book ID (can be used to fetch full Book details)
+          var id: PchookGraphQL.ID { __data["id"] }
+          /// Book title
+          var title: String { __data["title"] }
+          /// Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")
+          var label: String { __data["label"] }
+          /// Sort position in series (e.g. 1, 2, 99 for hors-série)
+          var position: Int { __data["position"] }
         }
       }
     }

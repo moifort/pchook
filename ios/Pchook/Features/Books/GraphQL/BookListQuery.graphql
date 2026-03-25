@@ -16,6 +16,8 @@ query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrde
     language
     series {
       name
+    }
+    seriesVolume {
       label
       position
     }

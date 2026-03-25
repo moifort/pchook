@@ -35,11 +35,9 @@ enum GraphQLBooksAPI {
             book: mapBook(book),
             coverImageUrl: book.coverImageUrl,
             series: book.series.map { series in
-                SeriesInfo(
+                Series(
                     id: series.id,
                     name: series.name,
-                    label: series.label,
-                    position: Double(series.position),
                     volumes: series.volumes.map { entry in
                         SeriesVolume(
                             id: entry.id,
@@ -48,6 +46,14 @@ enum GraphQLBooksAPI {
                             position: Double(entry.position)
                         )
                     }
+                )
+            },
+            seriesVolume: book.seriesVolume.map { volume in
+                SeriesVolume(
+                    id: volume.id,
+                    title: volume.title,
+                    label: volume.label,
+                    position: Double(volume.position)
                 )
             },
             review: book.review.map { review in
@@ -144,8 +150,8 @@ private extension GraphQLBooksAPI {
             rating: book.review?.rating,
             language: book.language?.rawValue,
             seriesName: book.series?.name,
-            seriesLabel: book.series?.label,
-            seriesPosition: book.series.map { Double($0.position) },
+            seriesLabel: book.seriesVolume?.label,
+            seriesPosition: book.seriesVolume.map { Double($0.position) },
             createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date()
         )
     }

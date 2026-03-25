@@ -29,7 +29,7 @@ struct BookDetailContent: View {
                     .split(separator: ",")
                     .map { $0.trimmingCharacters(in: .whitespaces) } ?? [],
                 status: detail.book.status,
-                seriesLabel: detail.series?.label
+                seriesLabel: detail.seriesVolume?.label
             )
 
             RatingsSection(
@@ -114,17 +114,16 @@ struct BookDetailContent: View {
                 updatedAt: Date()
             ),
             coverImageUrl: nil,
-            series: SeriesInfo(
+            series: Series(
                 id: "s1",
                 name: "Sprawl",
-                label: "Tome 1",
-                position: 1,
                 volumes: [
                     SeriesVolume(id: "1", title: "Neuromancien", label: "1", position: 1),
                     SeriesVolume(id: "2", title: "Compté zéro", label: "2", position: 2),
                     SeriesVolume(id: "3", title: "Mona Lisa s'éclate", label: "3", position: 3),
                 ]
             ),
+            seriesVolume: SeriesVolume(id: "1", title: "Neuromancien", label: "Tome 1", position: 1),
             review: ReviewInfo(bookId: "1", rating: 4, readDate: Date(), createdAt: Date())
         ),
         onAddReview: {},
