@@ -6,16 +6,11 @@ struct AwardsSection: View {
     var body: some View {
         Section("Prix littéraires") {
             ForEach(awards) { award in
-                HStack {
-                    Image(systemName: "trophy").foregroundStyle(.secondary)
-                    Text(award.name)
-                    Spacer()
-                    if let year = award.year {
-                        Text(verbatim: String(year))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+                LabeledInfoRow(
+                    title: award.name,
+                    value: award.year.map { String($0) } ?? "",
+                    icon: "trophy"
+                )
             }
         }
     }

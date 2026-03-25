@@ -15,11 +15,7 @@ struct BookDetailHeader: View {
             }
             LabeledInfoRow(title: "Auteurs", value: authors, icon: "person.2")
             if !genres.isEmpty {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "tag")
-                        .foregroundStyle(.secondary)
-                    LabeledContent("Genre", value: genres.joined(separator: " • "))
-                }
+                LabeledInfoRow(title: "Genre", value: genres.joined(separator: " • "), icon: "tag")
             }
             LabeledInfoRow(title: "Statut", value: status.label, icon: status == .toRead ? "bookmark" : "checkmark.circle")
         }

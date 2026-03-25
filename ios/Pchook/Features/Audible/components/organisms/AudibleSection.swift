@@ -68,12 +68,11 @@ struct AudibleSection: View {
                 Image(systemName: "books.vertical")
             }
             if let lastFetched = state.lastFetchedAt {
-                HStack {
-                    Label("Dernière mise à jour", systemImage: "clock")
-                    Spacer()
-                    Text(lastFetched, style: .relative)
-                        .foregroundStyle(.secondary)
-                }
+                LabeledInfoRow(
+                    title: "Dernière mise à jour",
+                    value: lastFetched.formatted(.dateTime.day(.twoDigits).month(.twoDigits).year().hour().minute()),
+                    icon: "clock"
+                )
             }
             Button {
                 Task { await onFetch() }
