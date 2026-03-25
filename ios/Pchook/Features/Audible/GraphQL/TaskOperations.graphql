@@ -1,0 +1,32 @@
+query TaskById($id: TaskId!) {
+  task(id: $id) {
+    id
+    phase
+    current
+    total
+    message
+    startedAt
+    completedAt
+  }
+}
+
+mutation PauseTask($id: TaskId!) {
+  pauseTask(id: $id) {
+    id
+    phase
+  }
+}
+
+mutation ResumeTask($id: TaskId!) {
+  resumeTask(id: $id) {
+    id
+    phase
+  }
+}
+
+mutation CancelTask($id: TaskId!) {
+  cancelTask(id: $id) {
+    id
+    phase
+  }
+}

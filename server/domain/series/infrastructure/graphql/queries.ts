@@ -1,6 +1,24 @@
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
-import { SeriesInfoType, SeriesType } from './types'
+import { SeriesType, SeriesVolumeType } from './types'
+
+builder.objectField(SeriesType, 'volumes', (t) =>
+  t.field({
+    type: [SeriesVolumeType],
+    description: 'All volumes in this series',
+    resolve: async ({ id }) => {
+      const result = await SeriesQuery.getById(id)
+      if (result === 'not-found') return []
+
+      return result.books.map(({ id, title, label, position }) => ({
+        id,
+        title,
+        label,
+        position,
+      }))
+    },
+  }),
+)
 
 builder.queryField('series', (t) =>
   t.field({
@@ -12,27 +30,15 @@ builder.queryField('series', (t) =>
 
 builder.queryField('seriesById', (t) =>
   t.field({
-    type: SeriesInfoType,
+    type: SeriesType,
     nullable: true,
-    description: 'Series detail with its books',
+    description: 'Series detail by ID',
     args: {
       id: t.arg.id({ required: true, description: 'Series ID' }),
     },
     resolve: async (_, { id }) => {
-      const result = await SeriesQuery.getById(id as never)
-      if (result === 'not-found') return null
-
-      return {
-        name: String(result.name),
-        label: '',
-        position: 0,
-        books: result.books.map(({ id, title, label, position }) => ({
-          id,
-          title: String(title),
-          label: String(label),
-          position: Number(position),
-        })),
-      }
+      const allSeries = await SeriesQuery.findAll()
+      return allSeries.find((series) => series.id === id) ?? null
     },
   }),
 )

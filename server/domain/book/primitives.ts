@@ -8,12 +8,12 @@ import type {
   BookTitle as BookTitleType,
   Genre as GenreType,
   ISBN as ISBNType,
-  Language as LanguageType,
   Note as NoteType,
   PageCount as PageCountType,
   Publisher as PublisherType,
   SortOrder as SortOrderType,
 } from '~/domain/book/types'
+import { type Language as LanguageType, languageValues } from '~/domain/book/types'
 
 export const BookId = (value: unknown) => {
   const v = z.string().uuid().parse(value)
@@ -43,8 +43,12 @@ export const ISBN = (value: unknown) => {
 }
 
 export const Language = (value: unknown) => {
-  const v = z.string().min(1).parse(value)
-  return make<LanguageType>()(v)
+  const normalized = z
+    .string()
+    .min(1)
+    .transform((v) => v.toLowerCase())
+    .parse(value)
+  return z.enum(languageValues).parse(normalized) as LanguageType
 }
 
 export const PageCount = (value: unknown) => {
@@ -65,7 +69,9 @@ export const Note = (value: unknown) => {
 }
 
 export const BookFormat = (value: unknown) =>
-  z.enum(['pocket', 'paperback', 'hardcover', 'audiobook']).parse(value) as BookFormatType
+  z
+    .enum(['pocket', 'paperback', 'hardcover', 'audiobook', 'digital'])
+    .parse(value) as BookFormatType
 
 export const BookStatus = (value: unknown) =>
   z.enum(['to-read', 'read']).parse(value) as BookStatusType

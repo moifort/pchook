@@ -1,4 +1,4 @@
-query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrder) {
+query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder) {
   books(genre: $genre, status: $status, sort: $sort, order: $order) {
     id
     title
@@ -10,11 +10,15 @@ query BookList($genre: String, $status: String, $sort: BookSort, $order: SortOrd
       name
       year
     }
-    rating
+    review {
+      rating
+    }
     language
-    seriesName
-    seriesLabel
-    seriesPosition
+    series {
+      name
+      label
+      position
+    }
     coverImageUrl
     createdAt
   }

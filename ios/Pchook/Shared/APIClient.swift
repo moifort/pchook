@@ -20,9 +20,9 @@ final class APIClient: Sendable {
     private let session = URLSession.shared
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
-        let withFraction = ISO8601DateFormatter()
+        nonisolated(unsafe) let withFraction = ISO8601DateFormatter()
         withFraction.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let withoutFraction = ISO8601DateFormatter()
+        nonisolated(unsafe) let withoutFraction = ISO8601DateFormatter()
         withoutFraction.formatOptions = [.withInternetDateTime]
         d.dateDecodingStrategy = .custom { decoder in
             let s = try decoder.singleValueContainer().decode(String.self)

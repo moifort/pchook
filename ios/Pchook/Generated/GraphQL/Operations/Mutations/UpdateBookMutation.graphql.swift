@@ -8,14 +8,14 @@ extension PchookGraphQL {
     static let operationName: String = "UpdateBook"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation UpdateBook($id: ID!, $input: UpdateBookInput!) { updateBook(id: $id, input: $input) { __typename id title authors publisher genre status updatedAt } }"#
+        #"mutation UpdateBook($id: BookId!, $input: UpdateBookInput!) { updateBook(id: $id, input: $input) { __typename id title authors publisher genre status updatedAt } }"#
       ))
 
-    public var id: ID
+    public var id: BookId
     public var input: UpdateBookInput
 
     public init(
-      id: ID,
+      id: BookId,
       input: UpdateBookInput
     ) {
       self.id = id
@@ -33,7 +33,7 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("updateBook", UpdateBook?.self, arguments: [
+        .field("updateBook", UpdateBook.self, arguments: [
           "id": .variable("id"),
           "input": .variable("input")
         ]),
@@ -42,8 +42,8 @@ extension PchookGraphQL {
         UpdateBookMutation.Data.self
       ] }
 
-      /// Modifier un livre existant
-      var updateBook: UpdateBook? { __data["updateBook"] }
+      /// Update an existing book
+      var updateBook: UpdateBook { __data["updateBook"] }
 
       /// UpdateBook
       ///
@@ -55,32 +55,32 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID?.self),
-          .field("title", String?.self),
-          .field("authors", [String]?.self),
-          .field("publisher", String?.self),
-          .field("genre", String?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>?.self),
-          .field("updatedAt", String?.self),
+          .field("id", PchookGraphQL.BookId.self),
+          .field("title", PchookGraphQL.BookTitle.self),
+          .field("authors", [PchookGraphQL.PersonName].self),
+          .field("publisher", PchookGraphQL.Publisher?.self),
+          .field("genre", PchookGraphQL.Genre?.self),
+          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("updatedAt", PchookGraphQL.DateTime.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           UpdateBookMutation.Data.UpdateBook.self
         ] }
 
-        /// Identifiant unique
-        var id: PchookGraphQL.ID? { __data["id"] }
-        /// Titre du livre
-        var title: String? { __data["title"] }
-        /// Auteurs du livre
-        var authors: [String]? { __data["authors"] }
-        /// Éditeur
-        var publisher: String? { __data["publisher"] }
-        /// Genre littéraire (ex: Romance, SF, Polar)
-        var genre: String? { __data["genre"] }
-        /// Statut de lecture
-        var status: GraphQLEnum<PchookGraphQL.BookStatus>? { __data["status"] }
-        /// Date de dernière modification (ISO 8601)
-        var updatedAt: String? { __data["updatedAt"] }
+        /// Unique identifier
+        var id: PchookGraphQL.BookId { __data["id"] }
+        /// Book title
+        var title: PchookGraphQL.BookTitle { __data["title"] }
+        /// Book authors
+        var authors: [PchookGraphQL.PersonName] { __data["authors"] }
+        /// Publisher (e.g. "Gallimard", "Folio"). Null if unknown
+        var publisher: PchookGraphQL.Publisher? { __data["publisher"] }
+        /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
+        var genre: PchookGraphQL.Genre? { __data["genre"] }
+        /// Reading status: TO_READ or READ
+        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Date of last modification
+        var updatedAt: PchookGraphQL.DateTime { __data["updatedAt"] }
       }
     }
   }

@@ -4,7 +4,7 @@ export default defineNitroConfig({
   compatibilityDate: '2026-02-06',
   experimental: { asyncContext: true },
   srcDir: 'server',
-  ignore: ['test/**', 'routes/test/**', '**/*.test.ts'],
+  ignore: ['test/**', '**/*.test.ts'],
   rollupConfig: {
     treeshake: {
       moduleSideEffects: (id) => id.includes('/graphql/') || id.includes('node_modules'),

@@ -1,35 +1,51 @@
-import { BookId, BookSort, BookStatus, Genre, SortOrder } from '~/domain/book/primitives'
+import { sortBy } from 'lodash-es'
+import { awardsCount } from '~/domain/book/business-rules'
+import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
-import { BookListReadModel } from '~/domain/book/read-model/list'
 import { builder } from '~/domain/shared/graphql/builder'
 import { BookSortEnum, SortOrderEnum } from './enums'
-import { BookListItemType, BookType } from './types'
+import { BookType } from './types'
 
 builder.objectField(BookType, 'coverImageUrl', (t) =>
   t.string({
     nullable: true,
-    description: 'Cover image URL',
+    description: 'Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover',
     resolve: ({ coverImageId }) => (coverImageId ? `/images/${coverImageId}` : null),
   }),
 )
 
 builder.queryField('books', (t) =>
   t.field({
-    type: [BookListItemType],
+    type: [BookType],
     description: 'Book list with filters and sorting',
     args: {
-      genre: t.arg.string({ description: 'Filter by literary genre' }),
+      genre: t.arg({ type: 'Genre', description: 'Filter by literary genre' }),
       status: t.arg.string({ description: 'Filter by reading status (to-read, read)' }),
       sort: t.arg({ type: BookSortEnum, description: 'Sort field' }),
       order: t.arg({ type: SortOrderEnum, description: 'Sort order' }),
     },
-    resolve: (_, args) =>
-      BookListReadModel.all({
-        genre: args.genre ? Genre(args.genre) : undefined,
-        status: args.status ? BookStatus(args.status) : undefined,
-        sort: args.sort ? BookSort(args.sort) : undefined,
-        order: args.order ? SortOrder(args.order) : undefined,
-      }),
+    resolve: async (_, args) => {
+      const allBooks = await BookQuery.findAll()
+
+      const genre = args.genre ?? undefined
+      const status = args.status ? BookStatus(args.status) : undefined
+      const sort = args.sort ? BookSort(args.sort) : 'createdAt'
+      const desc = (args.order ? SortOrder(args.order) : 'desc') === 'desc'
+
+      const filtered = allBooks
+        .filter((book) => (genre ? book.genre === genre : true))
+        .filter((book) => (status ? book.status === status : true))
+
+      const sorted = sortBy(filtered, (book) => {
+        if (sort === 'title') return book.title.toLowerCase()
+        if (sort === 'author') return book.authors[0] ? book.authors[0].toLowerCase() : ''
+        if (sort === 'awards') return awardsCount(book.awards)
+        if (sort === 'genre') return (book.genre ?? '').toLowerCase()
+        return book.createdAt.getTime()
+      })
+
+      return desc ? sorted.reverse() : sorted
+    },
   }),
 )
 
@@ -39,10 +55,10 @@ builder.queryField('book', (t) =>
     nullable: true,
     description: 'Book detail by ID',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
-      const result = await BookQuery.getById(BookId(id))
+      const result = await BookQuery.getById(id)
       return result === 'not-found' ? null : result
     },
   }),

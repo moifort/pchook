@@ -13,27 +13,39 @@ const BookCountType = builder.objectRef<DashboardView['bookCount']>('BookCount')
 const FavoriteBookType = builder.objectRef<FavoriteBook>('FavoriteBook').implement({
   description: 'Favorite book (top-rated)',
   fields: (t) => ({
-    id: t.id({ description: 'Book ID', resolve: ({ id }) => String(id) }),
-    title: t.exposeString('title', { description: 'Title' }),
-    authors: t.stringList({
-      description: 'Authors',
-      resolve: ({ authors }) => authors.map(String),
+    id: t.field({
+      type: 'BookId',
+      description: 'Book ID',
+      resolve: ({ id }) => id,
     }),
-    genre: t.string({
+    title: t.exposeString('title', { description: 'Title' }),
+    authors: t.field({
+      type: ['PersonName'],
+      description: 'Authors',
+      resolve: ({ authors }) => authors,
+    }),
+    genre: t.field({
+      type: 'Genre',
       nullable: true,
       description: 'Genre',
-      resolve: ({ genre }) => (genre ? String(genre) : null),
+      resolve: ({ genre }) => genre ?? null,
     }),
-    rating: t.int({ description: 'Rating (0-10)', resolve: ({ rating }) => Number(rating) }),
-    readDate: t.string({
+    rating: t.field({
+      type: 'Note',
+      description: 'Rating (0-10)',
+      resolve: ({ rating }) => rating,
+    }),
+    readDate: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Read date (ISO 8601)',
-      resolve: ({ readDate }) => readDate?.toISOString() ?? null,
+      description: 'Read date',
+      resolve: ({ readDate }) => readDate ?? null,
     }),
-    estimatedPrice: t.float({
+    estimatedPrice: t.field({
+      type: 'Eur',
       nullable: true,
       description: 'Estimated price in euros',
-      resolve: ({ estimatedPrice }) => (estimatedPrice ? Number(estimatedPrice) : null),
+      resolve: ({ estimatedPrice }) => estimatedPrice ?? null,
     }),
   }),
 })
@@ -41,20 +53,27 @@ const FavoriteBookType = builder.objectRef<FavoriteBook>('FavoriteBook').impleme
 const RecentBookType = builder.objectRef<RecentBook>('RecentBook').implement({
   description: 'Recently added book',
   fields: (t) => ({
-    id: t.id({ description: 'Book ID', resolve: ({ id }) => String(id) }),
-    title: t.exposeString('title', { description: 'Title' }),
-    authors: t.stringList({
-      description: 'Authors',
-      resolve: ({ authors }) => authors.map(String),
+    id: t.field({
+      type: 'BookId',
+      description: 'Book ID',
+      resolve: ({ id }) => id,
     }),
-    genre: t.string({
+    title: t.exposeString('title', { description: 'Title' }),
+    authors: t.field({
+      type: ['PersonName'],
+      description: 'Authors',
+      resolve: ({ authors }) => authors,
+    }),
+    genre: t.field({
+      type: 'Genre',
       nullable: true,
       description: 'Genre',
-      resolve: ({ genre }) => (genre ? String(genre) : null),
+      resolve: ({ genre }) => genre ?? null,
     }),
-    createdAt: t.string({
-      description: 'Date added (ISO 8601)',
-      resolve: ({ createdAt }) => createdAt.toISOString(),
+    createdAt: t.field({
+      type: 'DateTime',
+      description: 'Date added',
+      resolve: ({ createdAt }) => createdAt,
     }),
   }),
 })
@@ -63,9 +82,10 @@ const RecentAwardType = builder.objectRef<RecentAward>('RecentAward').implement(
   description: 'Recent literary award',
   fields: (t) => ({
     bookTitle: t.exposeString('bookTitle', { description: 'Book title' }),
-    authors: t.stringList({
+    authors: t.field({
+      type: ['PersonName'],
       description: 'Authors',
-      resolve: ({ authors }) => authors.map(String),
+      resolve: ({ authors }) => authors,
     }),
     awardName: t.exposeString('awardName', { description: 'Award name' }),
     awardYear: t.exposeInt('awardYear', { description: 'Award year' }),

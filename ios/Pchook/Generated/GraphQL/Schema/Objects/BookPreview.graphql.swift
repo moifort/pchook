@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Preview d'un livre après scan (avant confirmation)
+  /// Book preview after scan (before confirmation)
   static let BookPreview = ApolloAPI.Object(
     typename: "BookPreview",
     implementedInterfaces: [],

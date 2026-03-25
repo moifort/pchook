@@ -70,13 +70,13 @@ struct AudibleSection: View {
                 }
             }
             Button {
-                Task { await viewModel.fetch() }
+                Task { await viewModel.fetchLibrary() }
             } label: {
                 Label("Actualiser les données", systemImage: "arrow.triangle.2.circlepath")
             }
         } else if !viewModel.isImportActive {
             Button {
-                Task { await viewModel.fetch() }
+                Task { await viewModel.fetchLibrary() }
             } label: {
                 Label("Récupérer les données Audible", systemImage: "arrow.triangle.2.circlepath")
             }

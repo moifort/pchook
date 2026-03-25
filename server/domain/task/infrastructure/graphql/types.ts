@@ -4,9 +4,10 @@ import type { TaskState } from '~/domain/task/types'
 export const TaskType = builder.objectRef<TaskState>('Task').implement({
   description: 'A background task with progress tracking',
   fields: (t) => ({
-    id: t.id({
+    id: t.field({
+      type: 'TaskId',
       description: 'Unique task identifier',
-      resolve: ({ id }) => String(id),
+      resolve: ({ id }) => id,
     }),
     phase: t.exposeString('phase', {
       description: 'Current phase (idle, running, paused, cancelled, completed, failed)',
@@ -14,15 +15,17 @@ export const TaskType = builder.objectRef<TaskState>('Task').implement({
     current: t.exposeInt('current', { description: 'Number of items processed' }),
     total: t.exposeInt('total', { description: 'Total number of items' }),
     message: t.exposeString('message', { description: 'Progress message' }),
-    startedAt: t.string({
+    startedAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Start date (ISO 8601)',
-      resolve: ({ startedAt }) => startedAt?.toISOString() ?? null,
+      description: 'Start date',
+      resolve: ({ startedAt }) => startedAt ?? null,
     }),
-    completedAt: t.string({
+    completedAt: t.field({
+      type: 'DateTime',
       nullable: true,
-      description: 'Completion date (ISO 8601)',
-      resolve: ({ completedAt }) => completedAt?.toISOString() ?? null,
+      description: 'Completion date',
+      resolve: ({ completedAt }) => completedAt ?? null,
     }),
   }),
 })

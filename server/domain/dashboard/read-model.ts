@@ -22,7 +22,7 @@ export namespace DashboardReadModel {
         if (review && isFavorite(review.rating)) {
           acc.push({
             id,
-            title: String(title),
+            title,
             authors,
             genre,
             rating: review.rating,
@@ -39,7 +39,7 @@ export namespace DashboardReadModel {
       .slice(0, RECENT_BOOKS_LIMIT)
       .map(({ id, title, authors, genre, createdAt }) => ({
         id,
-        title: String(title),
+        title,
         authors,
         genre,
         createdAt,
@@ -53,7 +53,7 @@ export namespace DashboardReadModel {
             award.year !== undefined && award.year >= currentYear - 1,
         )
         .map(({ name, year }) => ({
-          bookTitle: String(title),
+          bookTitle: title,
           authors,
           awardName: name,
           awardYear: year,

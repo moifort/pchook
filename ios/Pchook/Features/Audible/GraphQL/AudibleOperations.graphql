@@ -1,31 +1,37 @@
-query AudibleStatus {
-  audibleStatus {
-    connected
-    fetchInProgress
-    libraryCount
-    wishlistCount
-    lastSyncAt
-    lastFetchedAt
-    rawItemCount
-    importTask {
-      phase
-      current
-      total
-      message
-      startedAt
-      completedAt
+query Audible {
+  audible {
+    sync {
+      status
+      updatedAt
+      library {
+        asin
+        title
+        authors
+        narrators
+        durationMinutes
+        publisher
+        language
+        coverUrl
+        finishedAt
+        importedBookId
+        series {
+          name
+          position
+        }
+      }
+      wishlist {
+        asin
+        title
+        authors
+        importedBookId
+      }
     }
-  }
-}
-
-query ImportState {
-  importState {
-    phase
-    current
-    total
-    message
-    startedAt
-    completedAt
+    import {
+      status
+      updatedAt
+      taskId
+      importedCount
+    }
   }
 }
 
@@ -58,13 +64,11 @@ mutation AudibleSyncVerify {
 }
 
 mutation AudibleImportStart {
-  audibleImportStart
-}
-
-mutation AudibleImportPause {
-  audibleImportPause
-}
-
-mutation AudibleImportCancel {
-  audibleImportCancel
+  audibleImportStart {
+    id
+    phase
+    current
+    total
+    message
+  }
 }

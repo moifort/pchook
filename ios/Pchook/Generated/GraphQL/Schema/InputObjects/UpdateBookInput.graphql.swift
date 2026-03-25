@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Champs modifiables d'un livre (tous optionnels)
+  /// Editable book fields (all optional)
   struct UpdateBookInput: InputObject {
     private(set) var __data: InputDict
 
@@ -13,33 +13,33 @@ extension PchookGraphQL {
     }
 
     init(
-      authors: GraphQLNullable<[String]> = nil,
+      authors: GraphQLNullable<[PersonName]> = nil,
       awards: GraphQLNullable<[AwardInput]> = nil,
-      duration: GraphQLNullable<String> = nil,
-      estimatedPrice: GraphQLNullable<Double> = nil,
+      durationMinutes: GraphQLNullable<Int> = nil,
+      estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<GraphQLEnum<BookFormat>> = nil,
-      genre: GraphQLNullable<String> = nil,
-      isbn: GraphQLNullable<String> = nil,
-      language: GraphQLNullable<String> = nil,
-      narrators: GraphQLNullable<[String]> = nil,
-      pageCount: GraphQLNullable<Int> = nil,
+      genre: GraphQLNullable<Genre> = nil,
+      isbn: GraphQLNullable<ISBN> = nil,
+      language: GraphQLNullable<GraphQLEnum<Language>> = nil,
+      narrators: GraphQLNullable<[PersonName]> = nil,
+      pageCount: GraphQLNullable<PageCount> = nil,
       personalNotes: GraphQLNullable<String> = nil,
       publicRatings: GraphQLNullable<[PublicRatingInput]> = nil,
       publishedDate: GraphQLNullable<String> = nil,
-      publisher: GraphQLNullable<String> = nil,
+      publisher: GraphQLNullable<Publisher> = nil,
       readDate: GraphQLNullable<String> = nil,
-      series: GraphQLNullable<String> = nil,
-      seriesLabel: GraphQLNullable<String> = nil,
-      seriesNumber: GraphQLNullable<Double> = nil,
+      series: GraphQLNullable<SeriesName> = nil,
+      seriesLabel: GraphQLNullable<SeriesLabel> = nil,
+      seriesNumber: GraphQLNullable<SeriesPosition> = nil,
       status: GraphQLNullable<GraphQLEnum<BookStatus>> = nil,
       synopsis: GraphQLNullable<String> = nil,
-      title: GraphQLNullable<String> = nil,
-      translator: GraphQLNullable<String> = nil
+      title: GraphQLNullable<BookTitle> = nil,
+      translator: GraphQLNullable<PersonName> = nil
     ) {
       __data = InputDict([
         "authors": authors,
         "awards": awards,
-        "duration": duration,
+        "durationMinutes": durationMinutes,
         "estimatedPrice": estimatedPrice,
         "format": format,
         "genre": genre,
@@ -62,134 +62,134 @@ extension PchookGraphQL {
       ])
     }
 
-    /// Auteurs
-    var authors: GraphQLNullable<[String]> {
+    /// Authors
+    var authors: GraphQLNullable<[PersonName]> {
       get { __data["authors"] }
       set { __data["authors"] = newValue }
     }
 
-    /// Prix littéraires
+    /// Literary awards
     var awards: GraphQLNullable<[AwardInput]> {
       get { __data["awards"] }
       set { __data["awards"] = newValue }
     }
 
-    /// Durée (livre audio)
-    var duration: GraphQLNullable<String> {
-      get { __data["duration"] }
-      set { __data["duration"] = newValue }
+    /// Duration in minutes (audiobook)
+    var durationMinutes: GraphQLNullable<Int> {
+      get { __data["durationMinutes"] }
+      set { __data["durationMinutes"] = newValue }
     }
 
-    /// Prix estimé en euros (null pour supprimer)
-    var estimatedPrice: GraphQLNullable<Double> {
+    /// Estimated price in euros (null to remove)
+    var estimatedPrice: GraphQLNullable<Eur> {
       get { __data["estimatedPrice"] }
       set { __data["estimatedPrice"] = newValue }
     }
 
-    /// Format du livre
+    /// Book format
     var format: GraphQLNullable<GraphQLEnum<BookFormat>> {
       get { __data["format"] }
       set { __data["format"] = newValue }
     }
 
-    /// Genre littéraire (null pour supprimer)
-    var genre: GraphQLNullable<String> {
+    /// Literary genre (null to remove)
+    var genre: GraphQLNullable<Genre> {
       get { __data["genre"] }
       set { __data["genre"] = newValue }
     }
 
-    /// Numéro ISBN (null pour supprimer)
-    var isbn: GraphQLNullable<String> {
+    /// ISBN number (null to remove)
+    var isbn: GraphQLNullable<ISBN> {
       get { __data["isbn"] }
       set { __data["isbn"] = newValue }
     }
 
-    /// Langue (ex: fr, en)
-    var language: GraphQLNullable<String> {
+    /// Language (ISO 639-1)
+    var language: GraphQLNullable<GraphQLEnum<Language>> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }
 
-    /// Narrateurs (livre audio)
-    var narrators: GraphQLNullable<[String]> {
+    /// Narrators (audiobook)
+    var narrators: GraphQLNullable<[PersonName]> {
       get { __data["narrators"] }
       set { __data["narrators"] = newValue }
     }
 
-    /// Nombre de pages (null pour supprimer)
-    var pageCount: GraphQLNullable<Int> {
+    /// Page count (null to remove)
+    var pageCount: GraphQLNullable<PageCount> {
       get { __data["pageCount"] }
       set { __data["pageCount"] = newValue }
     }
 
-    /// Notes personnelles
+    /// Personal notes
     var personalNotes: GraphQLNullable<String> {
       get { __data["personalNotes"] }
       set { __data["personalNotes"] = newValue }
     }
 
-    /// Notes communautaires
+    /// Community ratings
     var publicRatings: GraphQLNullable<[PublicRatingInput]> {
       get { __data["publicRatings"] }
       set { __data["publicRatings"] = newValue }
     }
 
-    /// Date de publication (ISO 8601)
+    /// Publication date (ISO 8601)
     var publishedDate: GraphQLNullable<String> {
       get { __data["publishedDate"] }
       set { __data["publishedDate"] = newValue }
     }
 
-    /// Éditeur (null pour supprimer)
-    var publisher: GraphQLNullable<String> {
+    /// Publisher (null to remove)
+    var publisher: GraphQLNullable<Publisher> {
       get { __data["publisher"] }
       set { __data["publisher"] = newValue }
     }
 
-    /// Date de lecture (ISO 8601)
+    /// Read date (ISO 8601)
     var readDate: GraphQLNullable<String> {
       get { __data["readDate"] }
       set { __data["readDate"] = newValue }
     }
 
-    /// Nom de la série (null pour retirer de la série)
-    var series: GraphQLNullable<String> {
+    /// Series name (null to remove from series)
+    var series: GraphQLNullable<SeriesName> {
       get { __data["series"] }
       set { __data["series"] = newValue }
     }
 
-    /// Label dans la série
-    var seriesLabel: GraphQLNullable<String> {
+    /// Label in series
+    var seriesLabel: GraphQLNullable<SeriesLabel> {
       get { __data["seriesLabel"] }
       set { __data["seriesLabel"] = newValue }
     }
 
-    /// Position dans la série
-    var seriesNumber: GraphQLNullable<Double> {
+    /// Position in series
+    var seriesNumber: GraphQLNullable<SeriesPosition> {
       get { __data["seriesNumber"] }
       set { __data["seriesNumber"] = newValue }
     }
 
-    /// Statut de lecture
+    /// Reading status
     var status: GraphQLNullable<GraphQLEnum<BookStatus>> {
       get { __data["status"] }
       set { __data["status"] = newValue }
     }
 
-    /// Résumé
+    /// Synopsis
     var synopsis: GraphQLNullable<String> {
       get { __data["synopsis"] }
       set { __data["synopsis"] = newValue }
     }
 
-    /// Titre du livre
-    var title: GraphQLNullable<String> {
+    /// Book title
+    var title: GraphQLNullable<BookTitle> {
       get { __data["title"] }
       set { __data["title"] = newValue }
     }
 
-    /// Traducteur (null pour supprimer)
-    var translator: GraphQLNullable<String> {
+    /// Translator (null to remove)
+    var translator: GraphQLNullable<PersonName> {
       get { __data["translator"] }
       set { __data["translator"] = newValue }
     }

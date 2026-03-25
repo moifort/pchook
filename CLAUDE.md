@@ -12,17 +12,17 @@
   ```
 - **Unit tests**: `bun test`
 - **Test coverage**: `bun test --coverage`
-- **Linter**: `bunx biome check`
+- **Linter**: `bunx biome lint --fix`
 - **Runtime**: always use `bun`/`bunx`, never `npm`/`npx`
 
 ## Development Workflow
 
-1. Always verify the build before committing (backend `bun tsc --noEmit` + `xcodebuild` depending on what was touched)
+1. Always verify the build before committing (backend `bun tsc --noEmit` + `xcodebuild` if you touch ios file or graphql schemas)
 2. Run `bunx nitro prepare` before `bun tsc` if routes were added/modified
 2b. Run `bun run generate:graphql` if GraphQL schema changed (Pothos types/queries/mutations), then regenerate Apollo iOS types
 3. Run tests before committing: `bun test`
-4. Run `bunx biome check --write` to auto-fix formatting and lint
-5. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
+5. Run `bunx biome check --write` to auto-fix formatting and lint
+6. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
 
 ## Commit Strategy
 
@@ -63,6 +63,7 @@
 - **Apollo Sandbox**: disponible en dev sur `/graphql` (introspection, query builder, documentation)
 - **Enums avec hyphens**: mapper vers des noms GraphQL valides (`to-read` → `TO_READ` via `value:` dans Pothos)
 - **Errors**: `GraphQLError` avec `extensions.code` pour les erreurs métier (`NOT_FOUND`)
+- **Custom scalars**: every branded type in `primitives.ts` must have a corresponding Pothos custom scalar in `builder.ts` (`Scalars` type + `defineScalar()` in `scalars.ts`). Resolvers receive pre-validated branded args — no manual `Primitive(value)` calls needed. When adding a new branded type, also update the Apollo iOS codegen scalar mapping in `ios/Pchook/Generated/GraphQL/Schema/CustomScalars/`
 
 See [docs/architecture.md](docs/architecture.md) for full architecture overview.
 See [docs/domain-guide.md](docs/domain-guide.md) for step-by-step domain creation.

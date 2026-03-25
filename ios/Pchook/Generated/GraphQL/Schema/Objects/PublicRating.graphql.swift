@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Note communautaire provenant d'une plateforme externe
+  /// Community rating from an external platform
   static let PublicRating = ApolloAPI.Object(
     typename: "PublicRating",
     implementedInterfaces: [],

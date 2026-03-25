@@ -4,11 +4,11 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Statut de lecture d'un livre
+  /// Reading status of a book
   enum BookStatus: String, EnumType {
-    /// Lu
+    /// Read
     case read = "READ"
-    /// À lire
+    /// To read
     case toRead = "TO_READ"
   }
 

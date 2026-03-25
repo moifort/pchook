@@ -1,15 +1,15 @@
-name: my-app
+name: pchook
 services:
   server:
-    image: ghcr.io/username/my-app:main
-    container_name: my-app-server
+    image: ghcr.io/moifort/pchook:main
+    container_name: pchook-server
     restart: unless-stopped
     cpu_shares: 50
     deploy:
       resources:
         limits:
           memory: 256M
-    hostname: my-app
+    hostname: pchook
     pull_policy: always
     logging:
       driver: json-file
@@ -28,23 +28,23 @@ services:
       retries: 3
     volumes:
       - type: bind
-        source: /DATA/AppData/my-app
+        source: /DATA/AppData/pchook
         target: /app/.data
     network_mode: bridge
     labels:
-      icon: https://raw.githubusercontent.com/username/my-app/main/icon.png
+      icon: https://raw.githubusercontent.com/moifort/pchook/main/icon.png
     ports:
       - target: 3000
         published: "3000"
         protocol: tcp
 
 x-casaos:
-  author: username
+  author: moifort
   category: Utilities
-  icon: https://raw.githubusercontent.com/username/my-app/main/icon.png
+  icon: https://raw.githubusercontent.com/moifort/pchook/main/icon.png
   index: /
   port_map: "3000"
   scheme: http
-  store_app_id: my-app
+  store_app_id: pchook
   title:
-    en_us: My App
+    en_us: Pchook

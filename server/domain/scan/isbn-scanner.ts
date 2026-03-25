@@ -23,7 +23,7 @@ Recherche les données les plus récentes et précises possibles sur Wikipedia, 
   const parsed = scanResultSchema.parse(raw)
   return {
     ...parsed,
-    isbn: parsed.isbn ?? String(isbn),
+    isbn: parsed.isbn ?? isbn,
     format: normalizeBookFormat(parsed.format),
   }
 }
@@ -40,12 +40,12 @@ export namespace IsbnScanner {
   ): Promise<IsbnScanOutput> => {
     const cached = await repository.findBy(isbn)
     if (cached) {
-      log.info('Cache hit for ISBN', String(isbn))
+      log.info('Cache hit for ISBN', isbn)
       const hardcover = await enrichWithHardcover(cached.result)
       return { result: cached.result, coverImageBase64: hardcover.coverImageBase64 }
     }
 
-    log.info('Looking up ISBN with Gemini + Hardcover...', String(isbn))
+    log.info('Looking up ISBN with Gemini + Hardcover...', isbn)
     const geminiResult = await lookupWithGemini(isbn, existingSeriesNames)
 
     const hardcover = await enrichWithHardcover(geminiResult)

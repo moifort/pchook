@@ -6,7 +6,4 @@ type WithLanguage = {
 }
 
 export const booksInLanguage = <T extends WithLanguage>(books: T[], language?: Language) =>
-  books.filter(({ language: bookLanguage }) => {
-    const lang = bookLanguage ? String(bookLanguage) : undefined
-    return lang === (language ? String(language) : undefined)
-  })
+  books.filter(({ language: bookLanguage }) => bookLanguage === language)

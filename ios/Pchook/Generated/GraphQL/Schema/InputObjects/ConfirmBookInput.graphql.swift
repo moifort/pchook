@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Données pour confirmer et créer un livre depuis un scan
+  /// Data to confirm and create a book from a scan
   struct ConfirmBookInput: InputObject {
     private(set) var __data: InputDict
 
@@ -13,22 +13,22 @@ extension PchookGraphQL {
     }
 
     init(
-      authors: GraphQLNullable<[String]> = nil,
-      estimatedPrice: GraphQLNullable<Double> = nil,
+      authors: GraphQLNullable<[PersonName]> = nil,
+      estimatedPrice: GraphQLNullable<Eur> = nil,
       format: GraphQLNullable<String> = nil,
-      genre: GraphQLNullable<String> = nil,
-      language: GraphQLNullable<String> = nil,
-      pageCount: GraphQLNullable<Int> = nil,
+      genre: GraphQLNullable<Genre> = nil,
+      language: GraphQLNullable<GraphQLEnum<Language>> = nil,
+      pageCount: GraphQLNullable<PageCount> = nil,
       previewId: String,
-      publisher: GraphQLNullable<String> = nil,
-      replaceBookId: GraphQLNullable<String> = nil,
-      series: GraphQLNullable<String> = nil,
-      seriesLabel: GraphQLNullable<String> = nil,
-      seriesNumber: GraphQLNullable<Double> = nil,
+      publisher: GraphQLNullable<Publisher> = nil,
+      replaceBookId: GraphQLNullable<BookId> = nil,
+      series: GraphQLNullable<SeriesName> = nil,
+      seriesLabel: GraphQLNullable<SeriesLabel> = nil,
+      seriesNumber: GraphQLNullable<SeriesPosition> = nil,
       status: String,
       synopsis: GraphQLNullable<String> = nil,
-      title: GraphQLNullable<String> = nil,
-      translator: GraphQLNullable<String> = nil
+      title: GraphQLNullable<BookTitle> = nil,
+      translator: GraphQLNullable<PersonName> = nil
     ) {
       __data = InputDict([
         "authors": authors,
@@ -50,14 +50,14 @@ extension PchookGraphQL {
       ])
     }
 
-    /// Auteurs (override)
-    var authors: GraphQLNullable<[String]> {
+    /// Authors (override)
+    var authors: GraphQLNullable<[PersonName]> {
       get { __data["authors"] }
       set { __data["authors"] = newValue }
     }
 
-    /// Prix (override)
-    var estimatedPrice: GraphQLNullable<Double> {
+    /// Price (override)
+    var estimatedPrice: GraphQLNullable<Eur> {
       get { __data["estimatedPrice"] }
       set { __data["estimatedPrice"] = newValue }
     }
@@ -69,60 +69,60 @@ extension PchookGraphQL {
     }
 
     /// Genre (override)
-    var genre: GraphQLNullable<String> {
+    var genre: GraphQLNullable<Genre> {
       get { __data["genre"] }
       set { __data["genre"] = newValue }
     }
 
-    /// Langue (override)
-    var language: GraphQLNullable<String> {
+    /// Language (override)
+    var language: GraphQLNullable<GraphQLEnum<Language>> {
       get { __data["language"] }
       set { __data["language"] = newValue }
     }
 
     /// Pages (override)
-    var pageCount: GraphQLNullable<Int> {
+    var pageCount: GraphQLNullable<PageCount> {
       get { __data["pageCount"] }
       set { __data["pageCount"] = newValue }
     }
 
-    /// Identifiant du preview
+    /// Preview identifier
     var previewId: String {
       get { __data["previewId"] }
       set { __data["previewId"] = newValue }
     }
 
-    /// Éditeur (override)
-    var publisher: GraphQLNullable<String> {
+    /// Publisher (override)
+    var publisher: GraphQLNullable<Publisher> {
       get { __data["publisher"] }
       set { __data["publisher"] = newValue }
     }
 
-    /// ID du livre à remplacer (mise à jour)
-    var replaceBookId: GraphQLNullable<String> {
+    /// ID of the book to replace (update)
+    var replaceBookId: GraphQLNullable<BookId> {
       get { __data["replaceBookId"] }
       set { __data["replaceBookId"] = newValue }
     }
 
-    /// Série (override)
-    var series: GraphQLNullable<String> {
+    /// Series (override)
+    var series: GraphQLNullable<SeriesName> {
       get { __data["series"] }
       set { __data["series"] = newValue }
     }
 
-    /// Label série (override)
-    var seriesLabel: GraphQLNullable<String> {
+    /// Series label (override)
+    var seriesLabel: GraphQLNullable<SeriesLabel> {
       get { __data["seriesLabel"] }
       set { __data["seriesLabel"] = newValue }
     }
 
-    /// Position série (override)
-    var seriesNumber: GraphQLNullable<Double> {
+    /// Series position (override)
+    var seriesNumber: GraphQLNullable<SeriesPosition> {
       get { __data["seriesNumber"] }
       set { __data["seriesNumber"] = newValue }
     }
 
-    /// Statut initial (to-read ou read)
+    /// Initial status (to-read or read)
     var status: String {
       get { __data["status"] }
       set { __data["status"] = newValue }
@@ -134,14 +134,14 @@ extension PchookGraphQL {
       set { __data["synopsis"] = newValue }
     }
 
-    /// Titre (override)
-    var title: GraphQLNullable<String> {
+    /// Title (override)
+    var title: GraphQLNullable<BookTitle> {
       get { __data["title"] }
       set { __data["title"] = newValue }
     }
 
-    /// Traducteur (override)
-    var translator: GraphQLNullable<String> {
+    /// Translator (override)
+    var translator: GraphQLNullable<PersonName> {
       get { __data["translator"] }
       set { __data["translator"] = newValue }
     }

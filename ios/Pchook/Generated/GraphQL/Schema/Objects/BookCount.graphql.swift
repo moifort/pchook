@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Compteur de livres par statut
+  /// Book count by status
   static let BookCount = ApolloAPI.Object(
     typename: "BookCount",
     implementedInterfaces: [],

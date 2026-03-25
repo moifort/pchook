@@ -19,14 +19,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleSyncFetch", Bool?.self),
+        .field("audibleSyncFetch", Bool.self),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         AudibleSyncFetchMutation.Data.self
       ] }
 
-      /// Récupérer la bibliothèque et wishlist Audible (tâche de fond)
-      var audibleSyncFetch: Bool? { __data["audibleSyncFetch"] }
+      /// Fetch the Audible library and wishlist (background task)
+      var audibleSyncFetch: Bool { __data["audibleSyncFetch"] }
     }
   }
 

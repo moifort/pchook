@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Critique et note personnelle d'un livre
+  /// Personal review and rating of a book
   static let Review = ApolloAPI.Object(
     typename: "Review",
     implementedInterfaces: [],

@@ -31,11 +31,11 @@ export const findByTitleAndAuthors = async (title: string, authors: string[]) =>
   const normalizedAuthors = authors.map(normalizeForMatch).sort()
   const books = await findAll()
   return books.find((book) => {
-    const bookAuthors = book.authors.map((a) => normalizeForMatch(String(a))).sort()
+    const bookAuthors = book.authors.map((a) => normalizeForMatch(a)).sort()
     if (bookAuthors.length !== normalizedAuthors.length) return false
     if (!bookAuthors.every((a, i) => a === normalizedAuthors[i])) return false
-    const bookTitle = normalizeForMatch(String(book.title))
-    const bookCore = normalizeForMatch(coreTitle(String(book.title)))
+    const bookTitle = normalizeForMatch(book.title)
+    const bookCore = normalizeForMatch(coreTitle(book.title))
     return bookTitle === normalizedTitle || bookCore === normalizedCore
   })
 }

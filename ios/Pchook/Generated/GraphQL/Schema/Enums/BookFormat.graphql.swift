@@ -4,15 +4,17 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Format physique ou numérique du livre
+  /// Physical or digital book format
   enum BookFormat: String, EnumType {
-    /// Livre audio
+    /// Audiobook
     case audiobook = "audiobook"
-    /// Relié
+    /// E-book
+    case digital = "digital"
+    /// Hardcover
     case hardcover = "hardcover"
-    /// Broché
+    /// Paperback
     case paperback = "paperback"
-    /// Livre de poche
+    /// Pocket book
     case pocket = "pocket"
   }
 

@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: ID!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice duration narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename name label position books { __typename id title label position } } } }"#
+        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name label position volumes { __typename id title label position } } } }"#
       ))
 
-    public var id: ID
+    public var id: BookId
 
-    public init(id: ID) {
+    public init(id: BookId) {
       self.id = id
     }
 
@@ -31,7 +31,7 @@ extension PchookGraphQL {
         BookDetailQuery.Data.self
       ] }
 
-      /// Détail d'un livre par son identifiant
+      /// Book detail by ID
       var book: Book? { __data["book"] }
 
       /// Book
@@ -44,30 +44,30 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID?.self),
-          .field("title", String?.self),
-          .field("authors", [String]?.self),
-          .field("publisher", String?.self),
-          .field("publishedDate", String?.self),
-          .field("pageCount", Int?.self),
-          .field("genre", String?.self),
+          .field("id", PchookGraphQL.BookId.self),
+          .field("title", PchookGraphQL.BookTitle.self),
+          .field("authors", [PchookGraphQL.PersonName].self),
+          .field("publisher", PchookGraphQL.Publisher?.self),
+          .field("publishedDate", PchookGraphQL.DateTime?.self),
+          .field("pageCount", PchookGraphQL.PageCount?.self),
+          .field("genre", PchookGraphQL.Genre?.self),
           .field("synopsis", String?.self),
-          .field("isbn", String?.self),
-          .field("language", String?.self),
+          .field("isbn", PchookGraphQL.ISBN?.self),
+          .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
           .field("format", GraphQLEnum<PchookGraphQL.BookFormat>?.self),
-          .field("translator", String?.self),
-          .field("estimatedPrice", Double?.self),
-          .field("duration", String?.self),
-          .field("narrators", [String]?.self),
+          .field("translator", PchookGraphQL.PersonName?.self),
+          .field("estimatedPrice", PchookGraphQL.Eur?.self),
+          .field("durationMinutes", Int?.self),
+          .field("narrators", [PchookGraphQL.PersonName].self),
           .field("personalNotes", String?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>?.self),
-          .field("readDate", String?.self),
-          .field("awards", [Award]?.self),
-          .field("publicRatings", [PublicRating]?.self),
+          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("readDate", PchookGraphQL.DateTime?.self),
+          .field("awards", [Award].self),
+          .field("publicRatings", [PublicRating].self),
           .field("importSource", GraphQLEnum<PchookGraphQL.ImportSource>?.self),
-          .field("externalUrl", String?.self),
-          .field("createdAt", String?.self),
-          .field("updatedAt", String?.self),
+          .field("externalUrl", PchookGraphQL.Url?.self),
+          .field("createdAt", PchookGraphQL.DateTime.self),
+          .field("updatedAt", PchookGraphQL.DateTime.self),
           .field("coverImageUrl", String?.self),
           .field("review", Review?.self),
           .field("series", Series?.self),
@@ -76,59 +76,59 @@ extension PchookGraphQL {
           BookDetailQuery.Data.Book.self
         ] }
 
-        /// Identifiant unique
-        var id: PchookGraphQL.ID? { __data["id"] }
-        /// Titre du livre
-        var title: String? { __data["title"] }
-        /// Auteurs du livre
-        var authors: [String]? { __data["authors"] }
-        /// Éditeur
-        var publisher: String? { __data["publisher"] }
-        /// Date de publication (ISO 8601)
-        var publishedDate: String? { __data["publishedDate"] }
-        /// Nombre de pages
-        var pageCount: Int? { __data["pageCount"] }
-        /// Genre littéraire (ex: Romance, SF, Polar)
-        var genre: String? { __data["genre"] }
-        /// Résumé du livre
+        /// Unique identifier
+        var id: PchookGraphQL.BookId { __data["id"] }
+        /// Book title
+        var title: PchookGraphQL.BookTitle { __data["title"] }
+        /// Book authors
+        var authors: [PchookGraphQL.PersonName] { __data["authors"] }
+        /// Publisher (e.g. "Gallimard", "Folio"). Null if unknown
+        var publisher: PchookGraphQL.Publisher? { __data["publisher"] }
+        /// First publication date. Null if unknown
+        var publishedDate: PchookGraphQL.DateTime? { __data["publishedDate"] }
+        /// Number of pages. Null for audiobooks or if unknown
+        var pageCount: PchookGraphQL.PageCount? { __data["pageCount"] }
+        /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
+        var genre: PchookGraphQL.Genre? { __data["genre"] }
+        /// Short summary of the book content (3-5 sentences)
         var synopsis: String? { __data["synopsis"] }
-        /// Numéro ISBN
-        var isbn: String? { __data["isbn"] }
-        /// Langue du livre (ex: fr, en)
-        var language: String? { __data["language"] }
-        /// Format du livre
+        /// ISBN-13 or ISBN-10 (e.g. "978-2-07-036822-8"). Null if not available
+        var isbn: PchookGraphQL.ISBN? { __data["isbn"] }
+        /// Book language as ISO 639-1 code. Null if unknown
+        var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
+        /// Physical or digital format. Null if unknown
         var format: GraphQLEnum<PchookGraphQL.BookFormat>? { __data["format"] }
-        /// Traducteur
-        var translator: String? { __data["translator"] }
-        /// Prix estimé en euros
-        var estimatedPrice: Double? { __data["estimatedPrice"] }
-        /// Durée (livre audio)
-        var duration: String? { __data["duration"] }
-        /// Narrateurs (livre audio)
-        var narrators: [String]? { __data["narrators"] }
-        /// Notes personnelles
+        /// Translator name, if the book is a translation. Null otherwise
+        var translator: PchookGraphQL.PersonName? { __data["translator"] }
+        /// Estimated retail price in euros. Null if unknown
+        var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
+        /// Duration in minutes for audiobooks (e.g. 510 for 8h30). Null for non-audio
+        var durationMinutes: Int? { __data["durationMinutes"] }
+        /// Audiobook narrators. Empty array for non-audio formats
+        var narrators: [PchookGraphQL.PersonName] { __data["narrators"] }
+        /// Free-form personal notes about the book
         var personalNotes: String? { __data["personalNotes"] }
-        /// Statut de lecture
-        var status: GraphQLEnum<PchookGraphQL.BookStatus>? { __data["status"] }
-        /// Date de lecture (ISO 8601)
-        var readDate: String? { __data["readDate"] }
-        /// Prix littéraires
-        var awards: [Award]? { __data["awards"] }
-        /// Notes communautaires
-        var publicRatings: [PublicRating]? { __data["publicRatings"] }
-        /// Source d'import
+        /// Reading status: TO_READ or READ
+        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Date the book was finished reading. Null if not read yet
+        var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
+        /// Literary awards received. Empty array if none
+        var awards: [Award] { __data["awards"] }
+        /// Community ratings from external platforms (Hardcover, Goodreads). Empty array if none
+        var publicRatings: [PublicRating] { __data["publicRatings"] }
+        /// How the book was added (scan, isbn, url, audible). Null if added manually
         var importSource: GraphQLEnum<PchookGraphQL.ImportSource>? { __data["importSource"] }
-        /// URL externe (Audible, etc.)
-        var externalUrl: String? { __data["externalUrl"] }
-        /// Date d'ajout à la bibliothèque (ISO 8601)
-        var createdAt: String? { __data["createdAt"] }
-        /// Date de dernière modification (ISO 8601)
-        var updatedAt: String? { __data["updatedAt"] }
-        /// URL de l'image de couverture
+        /// Link to the book on the import source (e.g. Audible page). Null if none
+        var externalUrl: PchookGraphQL.Url? { __data["externalUrl"] }
+        /// Date the book was added to the library
+        var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
+        /// Date of last modification
+        var updatedAt: PchookGraphQL.DateTime { __data["updatedAt"] }
+        /// Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
         var coverImageUrl: String? { __data["coverImageUrl"] }
-        /// Critique et note personnelle
+        /// Personal review and rating
         var review: Review? { __data["review"] }
-        /// Informations sur la série
+        /// Series information
         var series: Series? { __data["series"] }
 
         /// Book.Award
@@ -141,16 +141,16 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Award }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("name", String?.self),
+            .field("name", String.self),
             .field("year", Int?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookDetailQuery.Data.Book.Award.self
           ] }
 
-          /// Nom du prix
-          var name: String? { __data["name"] }
-          /// Année d'obtention
+          /// Short award name (e.g. "Prix Hugo", "Prix Goncourt")
+          var name: String { __data["name"] }
+          /// Year awarded (e.g. 2023)
           var year: Int? { __data["year"] }
         }
 
@@ -164,26 +164,26 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.PublicRating }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("source", String?.self),
-            .field("score", Double?.self),
-            .field("maxScore", Double?.self),
-            .field("voterCount", Int?.self),
-            .field("url", String?.self),
+            .field("source", String.self),
+            .field("score", PchookGraphQL.Note.self),
+            .field("maxScore", PchookGraphQL.Note.self),
+            .field("voterCount", Int.self),
+            .field("url", PchookGraphQL.Url.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookDetailQuery.Data.Book.PublicRating.self
           ] }
 
-          /// Nom de la plateforme (ex: Hardcover, Goodreads)
-          var source: String? { __data["source"] }
-          /// Note obtenue
-          var score: Double? { __data["score"] }
-          /// Note maximale possible
-          var maxScore: Double? { __data["maxScore"] }
-          /// Nombre de votants
-          var voterCount: Int? { __data["voterCount"] }
-          /// Lien vers la page du livre sur la plateforme
-          var url: String? { __data["url"] }
+          /// Platform name (e.g. Hardcover, Goodreads)
+          var source: String { __data["source"] }
+          /// Score received (0-10 scale, e.g. 8)
+          var score: PchookGraphQL.Note { __data["score"] }
+          /// Maximum possible score on this platform (e.g. 10)
+          var maxScore: PchookGraphQL.Note { __data["maxScore"] }
+          /// Number of voters who rated the book
+          var voterCount: Int { __data["voterCount"] }
+          /// Direct link to the book page on the platform
+          var url: PchookGraphQL.Url { __data["url"] }
         }
 
         /// Book.Review
@@ -196,26 +196,26 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Review }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("bookId", PchookGraphQL.ID?.self),
-            .field("rating", Int?.self),
-            .field("readDate", String?.self),
+            .field("bookId", PchookGraphQL.BookId.self),
+            .field("rating", PchookGraphQL.Note.self),
+            .field("readDate", PchookGraphQL.DateTime?.self),
             .field("reviewNotes", String?.self),
-            .field("createdAt", String?.self),
+            .field("createdAt", PchookGraphQL.DateTime.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookDetailQuery.Data.Book.Review.self
           ] }
 
-          /// Identifiant du livre associé
-          var bookId: PchookGraphQL.ID? { __data["bookId"] }
-          /// Note personnelle (0-10)
-          var rating: Int? { __data["rating"] }
-          /// Date de lecture (ISO 8601)
-          var readDate: String? { __data["readDate"] }
-          /// Notes de lecture
+          /// Associated book ID
+          var bookId: PchookGraphQL.BookId { __data["bookId"] }
+          /// Personal rating (0-10)
+          var rating: PchookGraphQL.Note { __data["rating"] }
+          /// Read date
+          var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
+          /// Reading notes
           var reviewNotes: String? { __data["reviewNotes"] }
-          /// Date de création (ISO 8601)
-          var createdAt: String? { __data["createdAt"] }
+          /// Creation date
+          var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
         }
 
         /// Book.Series
@@ -228,51 +228,54 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesInfo }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("name", String?.self),
-            .field("label", String?.self),
-            .field("position", Int?.self),
-            .field("books", [Book]?.self),
+            .field("id", PchookGraphQL.ID.self),
+            .field("name", String.self),
+            .field("label", String.self),
+            .field("position", Int.self),
+            .field("volumes", [Volume].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookDetailQuery.Data.Book.Series.self
           ] }
 
-          /// Nom de la série
-          var name: String? { __data["name"] }
-          /// Label du livre dans la série
-          var label: String? { __data["label"] }
-          /// Position du livre dans la série
-          var position: Int? { __data["position"] }
-          /// Tous les livres de la série (même langue)
-          var books: [Book]? { __data["books"] }
+          /// Series ID
+          var id: PchookGraphQL.ID { __data["id"] }
+          /// Series name
+          var name: String { __data["name"] }
+          /// This book display label in the series (e.g. "Tome 3")
+          var label: String { __data["label"] }
+          /// This book sort position in the series
+          var position: Int { __data["position"] }
+          /// All volumes in the series, filtered to the same language as this book
+          var volumes: [Volume] { __data["volumes"] }
 
-          /// Book.Series.Book
+          /// Book.Series.Volume
           ///
-          /// Parent Type: `SeriesBookEntry`
-          struct Book: PchookGraphQL.SelectionSet {
+          /// Parent Type: `SeriesVolume`
+          struct Volume: PchookGraphQL.SelectionSet {
             let __data: DataDict
             init(_dataDict: DataDict) { __data = _dataDict }
 
-            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesBookEntry }
+            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.SeriesVolume }
             static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
-              .field("id", PchookGraphQL.ID?.self),
-              .field("title", String?.self),
-              .field("label", String?.self),
-              .field("position", Int?.self),
+              .field("id", PchookGraphQL.ID.self),
+              .field("title", String.self),
+              .field("label", String.self),
+              .field("position", Int.self),
             ] }
             static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-              BookDetailQuery.Data.Book.Series.Book.self
+              BookDetailQuery.Data.Book.Series.Volume.self
             ] }
 
-            /// Identifiant du livre
-            var id: PchookGraphQL.ID? { __data["id"] }
-            /// Titre du livre
-            var title: String? { __data["title"] }
-            /// Label dans la série (ex: Tome 3)
-            var label: String? { __data["label"] }
-            /// Position dans la série
-            var position: Int? { __data["position"] }
+            /// Book ID (can be used to fetch full Book details)
+            var id: PchookGraphQL.ID { __data["id"] }
+            /// Book title
+            var title: String { __data["title"] }
+            /// Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")
+            var label: String { __data["label"] }
+            /// Sort position in series (e.g. 1, 2, 99 for hors-série)
+            var position: Int { __data["position"] }
           }
         }
       }

@@ -98,7 +98,7 @@ struct BookInfoSection: View {
         BookInfoSection(
             publisher: "Gallimard",
             pageCount: 320,
-            language: "FR",
+            language: "fr",
             format: "pocket",
             translator: nil,
             estimatedPrice: 8.50,

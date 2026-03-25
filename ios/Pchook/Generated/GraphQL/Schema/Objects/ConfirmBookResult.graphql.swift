@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Résultat de la confirmation de scan
+  /// Scan confirmation result
   static let ConfirmBookResult = ApolloAPI.Object(
     typename: "ConfirmBookResult",
     implementedInterfaces: [],

@@ -1,5 +1,11 @@
 import SwiftUI
 
+private func formatDuration(_ minutes: Int) -> String {
+    let hours = minutes / 60
+    let remainingMinutes = minutes % 60
+    return "\(hours)h \(remainingMinutes)min"
+}
+
 struct BookDetailContent: View {
     let detail: BookDetailData
     let onAddReview: () -> Void
@@ -38,7 +44,7 @@ struct BookDetailContent: View {
                 SeriesSection(
                     name: series.name,
                     currentBookId: detail.book.id,
-                    items: series.books.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
+                    items: series.volumes.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
                     onSelectBook: onSelectBook
                 )
             }
@@ -57,7 +63,7 @@ struct BookDetailContent: View {
                 translator: detail.book.translator,
                 estimatedPrice: detail.book.estimatedPrice,
                 publishedDate: detail.book.publishedDate,
-                duration: detail.book.duration,
+                duration: detail.book.durationMinutes.map { formatDuration($0) },
                 narrators: detail.book.narrators,
                 importSource: detail.book.importSource,
                 externalUrl: detail.book.externalUrl

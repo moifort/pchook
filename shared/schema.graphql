@@ -1,60 +1,147 @@
-"""Audible integration status"""
-type AudibleStatus {
-  """Credentials configured"""
-  connected: Boolean
+"""Audible integration"""
+type Audible {
+  """Import state (null if never imported)"""
+  import: AudibleImport
 
-  """Fetch in progress"""
-  fetchInProgress: Boolean
+  """Synchronization state (null if never synced)"""
+  sync: AudibleSync
+}
 
-  """Identifier of the Audible import task (use task query to get state)"""
-  importTaskId: String
+"""Audible import state"""
+type AudibleImport {
+  """Number of books imported so far"""
+  importedCount: Int!
 
-  """Last fetch date (ISO 8601)"""
-  lastFetchedAt: String
+  """Current import status"""
+  status: AudibleImportStatus!
 
-  """Last sync date (ISO 8601)"""
-  lastSyncAt: String
+  """Background task identifier"""
+  taskId: ID
 
-  """Number of books in the library"""
-  libraryCount: Int
+  """Last import state update"""
+  updatedAt: DateTime
+}
 
-  """Number of raw items"""
-  rawItemCount: Int
+"""Audible import status"""
+enum AudibleImportStatus {
+  """Import completed"""
+  IMPORTED
 
-  """Number of books in the wishlist"""
-  wishlistCount: Int
+  """Import in progress"""
+  IMPORTING
+
+  """Not started"""
+  INIT
+}
+
+"""An Audible library or wishlist item"""
+type AudibleItem {
+  """Amazon Standard Identification Number"""
+  asin: String!
+
+  """Author names"""
+  authors: [String!]!
+
+  """Cover image URL"""
+  coverUrl: String
+
+  """Duration in minutes"""
+  durationMinutes: Int!
+
+  """Date the book was finished listening"""
+  finishedAt: DateTime
+
+  """ID of the imported book, if already imported"""
+  importedBookId: ID
+
+  """Language"""
+  language: String
+
+  """Narrator names"""
+  narrators: [String!]!
+
+  """Publisher name"""
+  publisher: String
+
+  """Release date"""
+  releaseDate: DateTime
+
+  """Series information"""
+  series: AudibleSeriesInfo
+
+  """Book title"""
+  title: String!
+}
+
+"""Series information for an Audible item"""
+type AudibleSeriesInfo {
+  """Series name"""
+  name: String!
+
+  """Position in the series"""
+  position: Int
+}
+
+"""Audible synchronization state"""
+type AudibleSync {
+  """Library items (null if not yet fetched)"""
+  library: [AudibleItem!]
+
+  """Current sync status"""
+  status: AudibleSyncStatus!
+
+  """Last sync state update"""
+  updatedAt: DateTime
+
+  """Wishlist items (null if not yet fetched)"""
+  wishlist: [AudibleItem!]
+}
+
+"""Audible synchronization status"""
+enum AudibleSyncStatus {
+  """Connected, not yet fetched"""
+  CONNECTED
+
+  """Not connected to Audible"""
+  DISCONNECTED
+
+  """Library data fetched"""
+  FETCHED
+
+  """Currently fetching library data"""
+  FETCHING
 }
 
 """Audible authentication cookie"""
 type AuthCookie {
   """Cookie domain"""
-  domain: String
+  domain: String!
 
   """Cookie name"""
-  name: String
+  name: String!
 
   """Cookie value"""
-  value: String
+  value: String!
 }
 
 """Audible authentication start response"""
 type AuthStartResponse {
   """Cookies to send with the login request"""
-  cookies: [AuthCookie!]
+  cookies: [AuthCookie!]!
 
   """Audible login URL"""
-  loginUrl: String
+  loginUrl: String!
 
   """Authentication session identifier"""
-  sessionId: String
+  sessionId: String!
 }
 
 """Literary award received by a book"""
 type Award {
-  """Award name"""
-  name: String
+  """Short award name (e.g. "Prix Hugo", "Prix Goncourt")"""
+  name: String!
 
-  """Year awarded"""
+  """Year awarded (e.g. 2023)"""
   year: Int
 }
 
@@ -70,64 +157,76 @@ input AwardInput {
 """A book in the personal library"""
 type Book {
   """Book authors"""
-  authors: [String!]
+  authors: [PersonName!]!
 
-  """Literary awards"""
-  awards: [Award!]
+  """Literary awards received. Empty array if none"""
+  awards: [Award!]!
 
-  """Cover image URL"""
+  """
+  Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
+  """
   coverImageUrl: String
 
-  """Date added to library (ISO 8601)"""
-  createdAt: String
+  """Date the book was added to the library"""
+  createdAt: DateTime!
 
-  """Duration (audiobook)"""
-  duration: String
+  """
+  Duration in minutes for audiobooks (e.g. 510 for 8h30). Null for non-audio
+  """
+  durationMinutes: Int
 
-  """Estimated price in euros"""
-  estimatedPrice: Float
+  """Estimated retail price in euros. Null if unknown"""
+  estimatedPrice: Eur
 
-  """External URL (Audible, etc.)"""
-  externalUrl: String
+  """
+  Link to the book on the import source (e.g. Audible page). Null if none
+  """
+  externalUrl: Url
 
-  """Book format"""
+  """Physical or digital format. Null if unknown"""
   format: BookFormat
 
-  """Literary genre (e.g. Romance, Sci-Fi, Thriller)"""
-  genre: String
+  """
+  Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
+  """
+  genre: Genre
 
   """Unique identifier"""
-  id: ID
+  id: BookId!
 
-  """Import source"""
+  """
+  How the book was added (scan, isbn, url, audible). Null if added manually
+  """
   importSource: ImportSource
 
-  """ISBN number"""
-  isbn: String
+  """ISBN-13 or ISBN-10 (e.g. "978-2-07-036822-8"). Null if not available"""
+  isbn: ISBN
 
-  """Book language (e.g. fr, en)"""
-  language: String
+  """Book language as ISO 639-1 code. Null if unknown"""
+  language: Language
 
-  """Narrators (audiobook)"""
-  narrators: [String!]
+  """Audiobook narrators. Empty array for non-audio formats"""
+  narrators: [PersonName!]!
 
-  """Page count"""
-  pageCount: Int
+  """Number of pages. Null for audiobooks or if unknown"""
+  pageCount: PageCount
 
-  """Personal notes"""
+  """Free-form personal notes about the book"""
   personalNotes: String
 
-  """Community ratings"""
-  publicRatings: [PublicRating!]
+  """
+  Community ratings from external platforms (Hardcover, Goodreads). Empty array if none
+  """
+  publicRatings: [PublicRating!]!
 
-  """Publication date (ISO 8601)"""
-  publishedDate: String
+  """First publication date. Null if unknown"""
+  publishedDate: DateTime
 
-  """Publisher"""
-  publisher: String
+  """Publisher (e.g. "Gallimard", "Folio"). Null if unknown"""
+  publisher: Publisher
 
-  """Read date (ISO 8601)"""
-  readDate: String
+  """Date the book was finished reading. Null if not read yet"""
+  readDate: DateTime
 
   """Personal review and rating"""
   review: Review
@@ -135,38 +234,41 @@ type Book {
   """Series information"""
   series: SeriesInfo
 
-  """Reading status"""
-  status: BookStatus
+  """Reading status: TO_READ or READ"""
+  status: BookStatus!
 
-  """Book synopsis"""
+  """Short summary of the book content (3-5 sentences)"""
   synopsis: String
 
   """Book title"""
-  title: String
+  title: BookTitle!
 
-  """Translator"""
-  translator: String
+  """Translator name, if the book is a translation. Null otherwise"""
+  translator: PersonName
 
-  """Last modified date (ISO 8601)"""
-  updatedAt: String
+  """Date of last modification"""
+  updatedAt: DateTime!
 }
 
 """Book count by status"""
 type BookCount {
   """Books read"""
-  read: Int
+  read: Int!
 
   """Books to read"""
-  toRead: Int
+  toRead: Int!
 
   """Total number of books"""
-  total: Int
+  total: Int!
 }
 
 """Physical or digital book format"""
 enum BookFormat {
   """Audiobook"""
   audiobook
+
+  """E-book"""
+  digital
 
   """Hardcover"""
   hardcover
@@ -178,58 +280,16 @@ enum BookFormat {
   pocket
 }
 
-"""Book list item (summary view)"""
-type BookListItem {
-  """Authors"""
-  authors: [String!]
-
-  """Literary awards"""
-  awards: [Award!]
-
-  """Cover image URL"""
-  coverImageUrl: String
-
-  """Date added (ISO 8601)"""
-  createdAt: String
-
-  """Estimated price in euros"""
-  estimatedPrice: Float
-
-  """Literary genre"""
-  genre: String
-
-  """Unique identifier"""
-  id: ID
-
-  """Language"""
-  language: String
-
-  """Personal rating (0-10)"""
-  rating: Int
-
-  """Label in series (e.g. Volume 3)"""
-  seriesLabel: String
-
-  """Series name"""
-  seriesName: String
-
-  """Position in series"""
-  seriesPosition: Int
-
-  """Reading status"""
-  status: BookStatus
-
-  """Book title"""
-  title: String
-}
+"""Book unique identifier (UUID)"""
+scalar BookId
 
 """Book preview after scan (before confirmation)"""
 type BookPreview {
   """Extracted authors"""
-  authors: [String!]
+  authors: [String!]!
 
   """Literary awards"""
-  awards: [Award!]
+  awards: [Award!]!
 
   """Duration (audio)"""
   duration: String
@@ -256,10 +316,10 @@ type BookPreview {
   pageCount: Int
 
   """Preview identifier"""
-  previewId: String
+  previewId: String!
 
   """Community ratings"""
-  publicRatings: [PublicRating!]
+  publicRatings: [PublicRating!]!
 
   """Publication date"""
   publishedDate: String
@@ -280,7 +340,7 @@ type BookPreview {
   synopsis: String
 
   """Extracted title"""
-  title: String
+  title: String!
 
   """Translator"""
   translator: String
@@ -313,43 +373,46 @@ enum BookStatus {
   TO_READ
 }
 
+"""Book title (non-empty)"""
+scalar BookTitle
+
 """Data to confirm and create a book from a scan"""
 input ConfirmBookInput {
   """Authors (override)"""
-  authors: [String!]
+  authors: [PersonName!]
 
   """Price (override)"""
-  estimatedPrice: Float
+  estimatedPrice: Eur
 
   """Format (override)"""
   format: String
 
   """Genre (override)"""
-  genre: String
+  genre: Genre
 
   """Language (override)"""
-  language: String
+  language: Language
 
   """Pages (override)"""
-  pageCount: Int
+  pageCount: PageCount
 
   """Preview identifier"""
   previewId: String!
 
   """Publisher (override)"""
-  publisher: String
+  publisher: Publisher
 
   """ID of the book to replace (update)"""
-  replaceBookId: String
+  replaceBookId: BookId
 
   """Series (override)"""
-  series: String
+  series: SeriesName
 
   """Series label (override)"""
-  seriesLabel: String
+  seriesLabel: SeriesLabel
 
   """Series position (override)"""
-  seriesNumber: Float
+  seriesNumber: SeriesPosition
 
   """Initial status (to-read or read)"""
   status: String!
@@ -358,25 +421,25 @@ input ConfirmBookInput {
   synopsis: String
 
   """Title (override)"""
-  title: String
+  title: BookTitle
 
   """Translator (override)"""
-  translator: String
+  translator: PersonName
 }
 
 """Scan confirmation result"""
 type ConfirmBookResult {
   """Created or found book"""
-  book: Book
+  book: Book!
 
   """Result: created, duplicate, or replaced"""
-  tag: String
+  tag: String!
 }
 
 """Data to create a review"""
 input CreateReviewInput {
   """Personal rating (0-10)"""
-  rating: Int!
+  rating: Note!
 
   """Read date (ISO 8601)"""
   readDate: String
@@ -388,41 +451,53 @@ input CreateReviewInput {
 """Dashboard view with reading statistics"""
 type DashboardView {
   """Book count"""
-  bookCount: BookCount
+  bookCount: BookCount!
 
   """Favorite books"""
-  favorites: [FavoriteBook!]
+  favorites: [FavoriteBook!]!
 
   """Recent literary awards"""
-  recentAwards: [RecentAward!]
+  recentAwards: [RecentAward!]!
 
   """Recently added books"""
-  recentBooks: [RecentBook!]
+  recentBooks: [RecentBook!]!
 }
+
+"""ISO 8601 date-time string"""
+scalar DateTime
+
+"""Price in euros (non-negative number)"""
+scalar Eur
 
 """Favorite book (top-rated)"""
 type FavoriteBook {
   """Authors"""
-  authors: [String!]
+  authors: [PersonName!]!
 
   """Estimated price in euros"""
-  estimatedPrice: Float
+  estimatedPrice: Eur
 
   """Genre"""
-  genre: String
+  genre: Genre
 
   """Book ID"""
-  id: ID
+  id: BookId!
 
   """Rating (0-10)"""
-  rating: Int
+  rating: Note!
 
-  """Read date (ISO 8601)"""
-  readDate: String
+  """Read date"""
+  readDate: DateTime
 
   """Title"""
-  title: String
+  title: String!
 }
+
+"""Literary genre (non-empty)"""
+scalar Genre
+
+"""ISBN number (10-17 characters)"""
+scalar ISBN
 
 """Book import source"""
 enum ImportSource {
@@ -439,19 +514,112 @@ enum ImportSource {
   url
 }
 
+"""ISO 639-1 language code"""
+enum Language {
+  """Arabic"""
+  AR
+
+  """Catalan"""
+  CA
+
+  """Czech"""
+  CS
+
+  """Danish"""
+  DA
+
+  """German"""
+  DE
+
+  """Greek"""
+  EL
+
+  """English"""
+  EN
+
+  """Spanish"""
+  ES
+
+  """Finnish"""
+  FI
+
+  """French"""
+  FR
+
+  """Hebrew"""
+  HE
+
+  """Hindi"""
+  HI
+
+  """Hungarian"""
+  HU
+
+  """Indonesian"""
+  ID
+
+  """Italian"""
+  IT
+
+  """Japanese"""
+  JA
+
+  """Korean"""
+  KO
+
+  """Latin"""
+  LA
+
+  """Dutch"""
+  NL
+
+  """Norwegian"""
+  NO
+
+  """Polish"""
+  PL
+
+  """Portuguese"""
+  PT
+
+  """Romanian"""
+  RO
+
+  """Russian"""
+  RU
+
+  """Swedish"""
+  SV
+
+  """Thai"""
+  TH
+
+  """Turkish"""
+  TR
+
+  """Ukrainian"""
+  UK
+
+  """Vietnamese"""
+  VI
+
+  """Chinese"""
+  ZH
+}
+
 type Mutation {
   """Add a review to a book (marks the book as read)"""
   addReview(
     """Book ID"""
-    bookId: ID!
+    bookId: BookId!
     input: CreateReviewInput!
-  ): Review
+  ): Review!
 
   """Add a book to favorites (favorite rating + read status)"""
   addToFavorites(
     """Book ID"""
-    id: ID!
-  ): Book
+    id: BookId!
+  ): Book!
 
   """Scan a book cover to extract metadata"""
   analyzeBookCover(
@@ -460,12 +628,12 @@ type Mutation {
 
     """Optional OCR text"""
     ocrText: String
-  ): BookPreview
+  ): BookPreview!
 
   """Scan an ISBN barcode. Returns null if the book already exists."""
   analyzeISBN(
     """ISBN code (10 or 13 digits)"""
-    isbn: String!
+    isbn: ISBN!
   ): BookPreview
 
   """Import a book from a URL (Goodreads, Storygraph, etc.)"""
@@ -477,8 +645,8 @@ type Mutation {
     rawText: String
 
     """Book URL"""
-    url: String!
-  ): BookPreview
+    url: Url!
+  ): BookPreview!
 
   """Complete the Audible OAuth authentication"""
   audibleAuthCallback(
@@ -487,117 +655,129 @@ type Mutation {
 
     """Session identifier"""
     sessionId: String!
-  ): Boolean
+  ): Boolean!
 
   """Start the Audible OAuth authentication flow"""
   audibleAuthStart(
     """Audible locale (default: fr)"""
     locale: String
-  ): AuthStartResponse
+  ): AuthStartResponse!
 
   """Disconnect the Audible account and clean up data"""
-  audibleDisconnect: Boolean
+  audibleDisconnect: Boolean!
 
   """Start importing Audible books (background task)"""
-  audibleImportStart: Task
+  audibleImportStart: Task!
 
   """Fetch the Audible library and wishlist (background task)"""
-  audibleSyncFetch: Boolean
+  audibleSyncFetch: Boolean!
 
   """Verify the Audible credentials validity"""
-  audibleSyncVerify: Boolean
+  audibleSyncVerify: Boolean!
 
   """Cancel a running or paused task"""
   cancelTask(
     """Task identifier"""
-    id: ID!
-  ): Task
+    id: TaskId!
+  ): Task!
 
   """Confirm and create a book from a scan preview"""
-  confirmBook(input: ConfirmBookInput!): ConfirmBookResult
+  confirmBook(input: ConfirmBookInput!): ConfirmBookResult!
 
   """Delete a book and its associated data (review, series)"""
   deleteBook(
     """ID of the book to delete"""
-    id: ID!
-  ): Boolean
+    id: BookId!
+  ): Boolean!
 
   """Pause a running task"""
   pauseTask(
     """Task identifier"""
-    id: ID!
-  ): Task
+    id: TaskId!
+  ): Task!
 
   """Re-enrich a book via Gemini (updates metadata)"""
   refreshBook(
     """Book ID"""
-    id: ID!
-  ): Boolean
+    id: BookId!
+  ): Boolean!
 
   """Resume a paused task"""
   resumeTask(
     """Task identifier"""
-    id: ID!
-  ): Task
+    id: TaskId!
+  ): Task!
 
   """Update an existing book"""
   updateBook(
     """Book ID"""
-    id: ID!
+    id: BookId!
     input: UpdateBookInput!
-  ): Book
+  ): Book!
 }
+
+"""Rating score (integer 0-10)"""
+scalar Note
+
+"""Page count (positive integer)"""
+scalar PageCount
+
+"""Person name (1-200 characters)"""
+scalar PersonName
 
 """Community rating from an external platform"""
 type PublicRating {
-  """Maximum possible score"""
-  maxScore: Float
+  """Maximum possible score on this platform (e.g. 10)"""
+  maxScore: Note!
 
-  """Score received"""
-  score: Float
+  """Score received (0-10 scale, e.g. 8)"""
+  score: Note!
 
   """Platform name (e.g. Hardcover, Goodreads)"""
-  source: String
+  source: String!
 
-  """Link to the book page on the platform"""
-  url: String
+  """Direct link to the book page on the platform"""
+  url: Url!
 
-  """Number of voters"""
-  voterCount: Int
+  """Number of voters who rated the book"""
+  voterCount: Int!
 }
 
 """External community rating"""
 input PublicRatingInput {
   """Maximum possible score"""
-  maxScore: Float!
+  maxScore: Note!
 
   """Score received"""
-  score: Float!
+  score: Note!
 
   """Platform name"""
   source: String!
 
   """URL of the book page"""
-  url: String!
+  url: Url!
 
   """Number of voters"""
   voterCount: Int!
 }
 
+"""Publisher name (non-empty)"""
+scalar Publisher
+
 type Query {
-  """Audible integration status"""
-  audibleStatus: AudibleStatus
+  """Audible integration"""
+  audible: Audible!
 
   """Book detail by ID"""
   book(
     """Book ID"""
-    id: ID!
+    id: BookId!
   ): Book
 
   """Book list with filters and sorting"""
   books(
     """Filter by literary genre"""
-    genre: String
+    genre: Genre
 
     """Sort order"""
     order: SortOrder
@@ -607,118 +787,135 @@ type Query {
 
     """Filter by reading status (to-read, read)"""
     status: String
-  ): [BookListItem!]
+  ): [Book!]!
 
   """Dashboard with reading statistics"""
-  dashboard: DashboardView
+  dashboard: DashboardView!
 
   """List of all series"""
-  series: [Series!]
+  series: [Series!]!
 
-  """Series detail with its books"""
+  """Series detail by ID"""
   seriesById(
     """Series ID"""
     id: ID!
-  ): SeriesInfo
+  ): Series
 
   """Get a task by its identifier"""
   task(
     """Task identifier"""
-    id: ID!
+    id: TaskId!
   ): Task
 }
 
 """Recent literary award"""
 type RecentAward {
   """Authors"""
-  authors: [String!]
+  authors: [PersonName!]!
 
   """Award name"""
-  awardName: String
+  awardName: String!
 
   """Award year"""
-  awardYear: Int
+  awardYear: Int!
 
   """Book title"""
-  bookTitle: String
+  bookTitle: String!
 }
 
 """Recently added book"""
 type RecentBook {
   """Authors"""
-  authors: [String!]
+  authors: [PersonName!]!
 
-  """Date added (ISO 8601)"""
-  createdAt: String
+  """Date added"""
+  createdAt: DateTime!
 
   """Genre"""
-  genre: String
+  genre: Genre
 
   """Book ID"""
-  id: ID
+  id: BookId!
 
   """Title"""
-  title: String
+  title: String!
 }
 
 """Personal review and rating of a book"""
 type Review {
   """Associated book ID"""
-  bookId: ID
+  bookId: BookId!
 
-  """Creation date (ISO 8601)"""
-  createdAt: String
+  """Creation date"""
+  createdAt: DateTime!
 
   """Personal rating (0-10)"""
-  rating: Int
+  rating: Note!
 
-  """Read date (ISO 8601)"""
-  readDate: String
+  """Read date"""
+  readDate: DateTime
 
   """Reading notes"""
   reviewNotes: String
 }
 
-"""A book series"""
+"""A book series, saga, or cycle (e.g. "Les Rougon-Macquart")"""
 type Series {
-  """Creation date (ISO 8601)"""
-  createdAt: String
+  """Date the series was first added to the library"""
+  createdAt: DateTime!
 
   """Unique identifier"""
-  id: ID
+  id: ID!
 
-  """Series name"""
-  name: String
+  """Series name (e.g. "Le Sorceleur", "Fondation")"""
+  name: SeriesName!
+
+  """All volumes in this series"""
+  volumes: [SeriesVolume!]!
 }
 
-"""A book entry within a series"""
-type SeriesBookEntry {
-  """Book ID"""
-  id: ID
+"""
+Series context for a specific book, including its position and sibling volumes
+"""
+type SeriesInfo {
+  """Series ID"""
+  id: ID!
 
-  """Label in series (e.g. Volume 3)"""
-  label: String
+  """This book display label in the series (e.g. "Tome 3")"""
+  label: String!
 
-  """Position in series"""
-  position: Int
+  """Series name"""
+  name: String!
+
+  """This book sort position in the series"""
+  position: Int!
+
+  """All volumes in the series, filtered to the same language as this book"""
+  volumes: [SeriesVolume!]!
+}
+
+"""Label in series (non-empty)"""
+scalar SeriesLabel
+
+"""Series name (non-empty)"""
+scalar SeriesName
+
+"""Position in series (positive number)"""
+scalar SeriesPosition
+
+"""A volume within a series, representing a single book"""
+type SeriesVolume {
+  """Book ID (can be used to fetch full Book details)"""
+  id: ID!
+
+  """Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")"""
+  label: String!
+
+  """Sort position in series (e.g. 1, 2, 99 for hors-série)"""
+  position: Int!
 
   """Book title"""
-  title: String
-}
-
-"""Information about the series a book belongs to"""
-type SeriesInfo {
-  """All books in the series (same language)"""
-  books: [SeriesBookEntry!]
-
-  """Book label in series"""
-  label: String
-
-  """Series name"""
-  name: String
-
-  """Book position in series"""
-  position: Int
+  title: String!
 }
 
 """Sort order"""
@@ -732,59 +929,62 @@ enum SortOrder {
 
 """A background task with progress tracking"""
 type Task {
-  """Completion date (ISO 8601)"""
-  completedAt: String
+  """Completion date"""
+  completedAt: DateTime
 
   """Number of items processed"""
-  current: Int
+  current: Int!
 
   """Unique task identifier"""
-  id: ID
+  id: TaskId!
 
   """Progress message"""
-  message: String
+  message: String!
 
   """Current phase (idle, running, paused, cancelled, completed, failed)"""
-  phase: String
+  phase: String!
 
-  """Start date (ISO 8601)"""
-  startedAt: String
+  """Start date"""
+  startedAt: DateTime
 
   """Total number of items"""
-  total: Int
+  total: Int!
 }
+
+"""Task unique identifier (UUID)"""
+scalar TaskId
 
 """Editable book fields (all optional)"""
 input UpdateBookInput {
   """Authors"""
-  authors: [String!]
+  authors: [PersonName!]
 
   """Literary awards"""
   awards: [AwardInput!]
 
-  """Duration (audiobook)"""
-  duration: String
+  """Duration in minutes (audiobook)"""
+  durationMinutes: Int
 
   """Estimated price in euros (null to remove)"""
-  estimatedPrice: Float
+  estimatedPrice: Eur
 
   """Book format"""
   format: BookFormat
 
   """Literary genre (null to remove)"""
-  genre: String
+  genre: Genre
 
   """ISBN number (null to remove)"""
-  isbn: String
+  isbn: ISBN
 
-  """Language (e.g. fr, en)"""
-  language: String
+  """Language (ISO 639-1)"""
+  language: Language
 
   """Narrators (audiobook)"""
-  narrators: [String!]
+  narrators: [PersonName!]
 
   """Page count (null to remove)"""
-  pageCount: Int
+  pageCount: PageCount
 
   """Personal notes"""
   personalNotes: String
@@ -796,19 +996,19 @@ input UpdateBookInput {
   publishedDate: String
 
   """Publisher (null to remove)"""
-  publisher: String
+  publisher: Publisher
 
   """Read date (ISO 8601)"""
   readDate: String
 
   """Series name (null to remove from series)"""
-  series: String
+  series: SeriesName
 
   """Label in series"""
-  seriesLabel: String
+  seriesLabel: SeriesLabel
 
   """Position in series"""
-  seriesNumber: Float
+  seriesNumber: SeriesPosition
 
   """Reading status"""
   status: BookStatus
@@ -817,8 +1017,11 @@ input UpdateBookInput {
   synopsis: String
 
   """Book title"""
-  title: String
+  title: BookTitle
 
   """Translator (null to remove)"""
-  translator: String
+  translator: PersonName
 }
+
+"""Valid URL"""
+scalar Url

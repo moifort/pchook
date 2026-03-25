@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Un livre dans la bibliothèque personnelle
+  /// A book in the personal library
   static let Book = ApolloAPI.Object(
     typename: "Book",
     implementedInterfaces: [],

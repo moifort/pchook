@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql'
 import { FAVORITE_RATING } from '~/domain/book/business-rules'
 import { BookCommand } from '~/domain/book/command'
 import { BookType } from '~/domain/book/infrastructure/graphql/types'
-import { BookId, Note } from '~/domain/book/primitives'
+import { Note } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { ReviewCommand } from '~/domain/review/command'
 import type { Review } from '~/domain/review/types'
@@ -17,22 +17,21 @@ builder.mutationField('addToFavorites', (t) =>
     type: BookType,
     description: 'Add a book to favorites (favorite rating + read status)',
     args: {
-      id: t.arg.id({ required: true, description: 'Book ID' }),
+      id: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
     },
     resolve: async (_, { id }) => {
-      const bookId = BookId(id)
-      const book = await BookQuery.getById(bookId)
+      const book = await BookQuery.getById(id)
       if (book === 'not-found') throw bookNotFound()
 
       const review: Review = {
-        bookId,
+        bookId: id,
         rating: Note(FAVORITE_RATING),
         readDate: new Date(),
         createdAt: new Date(),
       }
 
       await ReviewCommand.create(review)
-      const updated = await BookCommand.update(bookId, { status: 'read', readDate: new Date() })
+      const updated = await BookCommand.update(id, { status: 'read', readDate: new Date() })
       if (updated === 'not-found') throw bookNotFound()
 
       return updated
@@ -45,17 +44,16 @@ builder.mutationField('addReview', (t) =>
     type: ReviewType,
     description: 'Add a review to a book (marks the book as read)',
     args: {
-      bookId: t.arg.id({ required: true, description: 'Book ID' }),
+      bookId: t.arg({ type: 'BookId', required: true, description: 'Book ID' }),
       input: t.arg({ type: CreateReviewInput, required: true }),
     },
-    resolve: async (_, { bookId: rawId, input }) => {
-      const bookId = BookId(rawId)
+    resolve: async (_, { bookId, input }) => {
       const book = await BookQuery.getById(bookId)
       if (book === 'not-found') throw bookNotFound()
 
       const review: Review = {
         bookId,
-        rating: Note(input.rating),
+        rating: input.rating,
         readDate: input.readDate ? new Date(input.readDate) : undefined,
         reviewNotes: input.reviewNotes ?? undefined,
         createdAt: new Date(),

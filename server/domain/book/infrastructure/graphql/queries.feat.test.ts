@@ -80,11 +80,11 @@ feature('GraphQL query: book', () => {
 
     when('book query is called with nested fields')
     const result = await execute(`{
-      book(id: "${String(book.id)}") {
+      book(id: "${book.id}") {
         title
         genre
         review { rating readDate reviewNotes }
-        series { name label position books { title } }
+        series { id name label position volumes { title } }
       }
     }`)
 
@@ -123,7 +123,7 @@ feature('GraphQL query: book', () => {
 
     when('book query requests only title')
     const result = await execute(`{
-      book(id: "${String(book.id)}") { title }
+      book(id: "${book.id}") { title }
     }`)
 
     then('only the requested field is returned')

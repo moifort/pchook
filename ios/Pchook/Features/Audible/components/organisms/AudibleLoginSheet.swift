@@ -75,7 +75,7 @@ struct AudibleLoginSheet: View {
 
     private func prepareLogin() async {
         do {
-            let response = try await AudibleAPI.authStart()
+            let response = try await GraphQLAudibleAPI.authStart()
             sessionId = response.sessionId
             guard let url = URL(string: response.loginUrl) else {
                 error = "URL de connexion invalide"
@@ -97,7 +97,7 @@ struct AudibleLoginSheet: View {
 
         step = .processing
         do {
-            try await AudibleAPI.authCallback(sessionId: sessionId, redirectUrl: pastedUrl)
+            try await GraphQLAudibleAPI.authCallback(sessionId: sessionId, redirectUrl: pastedUrl)
             await onComplete()
         } catch {
             step = .waitingForUrl

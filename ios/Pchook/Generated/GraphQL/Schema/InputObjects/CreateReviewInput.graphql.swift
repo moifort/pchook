@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Données pour créer une critique
+  /// Data to create a review
   struct CreateReviewInput: InputObject {
     private(set) var __data: InputDict
 
@@ -13,7 +13,7 @@ extension PchookGraphQL {
     }
 
     init(
-      rating: Int,
+      rating: Note,
       readDate: GraphQLNullable<String> = nil,
       reviewNotes: GraphQLNullable<String> = nil
     ) {
@@ -24,19 +24,19 @@ extension PchookGraphQL {
       ])
     }
 
-    /// Note personnelle (0-10)
-    var rating: Int {
+    /// Personal rating (0-10)
+    var rating: Note {
       get { __data["rating"] }
       set { __data["rating"] = newValue }
     }
 
-    /// Date de lecture (ISO 8601)
+    /// Read date (ISO 8601)
     var readDate: GraphQLNullable<String> {
       get { __data["readDate"] }
       set { __data["readDate"] = newValue }
     }
 
-    /// Notes de lecture
+    /// Reading notes
     var reviewNotes: GraphQLNullable<String> {
       get { __data["reviewNotes"] }
       set { __data["reviewNotes"] = newValue }

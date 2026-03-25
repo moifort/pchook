@@ -25,14 +25,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleAuthStart", AudibleAuthStart?.self, arguments: ["locale": .variable("locale")]),
+        .field("audibleAuthStart", AudibleAuthStart.self, arguments: ["locale": .variable("locale")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         AudibleAuthStartMutation.Data.self
       ] }
 
-      /// Démarrer le flux d'authentification OAuth Audible
-      var audibleAuthStart: AudibleAuthStart? { __data["audibleAuthStart"] }
+      /// Start the Audible OAuth authentication flow
+      var audibleAuthStart: AudibleAuthStart { __data["audibleAuthStart"] }
 
       /// AudibleAuthStart
       ///
@@ -44,20 +44,20 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AuthStartResponse }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("loginUrl", String?.self),
-          .field("sessionId", String?.self),
-          .field("cookies", [Cooky]?.self),
+          .field("loginUrl", String.self),
+          .field("sessionId", String.self),
+          .field("cookies", [Cooky].self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AudibleAuthStartMutation.Data.AudibleAuthStart.self
         ] }
 
-        /// URL de connexion Audible
-        var loginUrl: String? { __data["loginUrl"] }
-        /// Identifiant de session d'authentification
-        var sessionId: String? { __data["sessionId"] }
-        /// Cookies à envoyer avec la requête de connexion
-        var cookies: [Cooky]? { __data["cookies"] }
+        /// Audible login URL
+        var loginUrl: String { __data["loginUrl"] }
+        /// Authentication session identifier
+        var sessionId: String { __data["sessionId"] }
+        /// Cookies to send with the login request
+        var cookies: [Cooky] { __data["cookies"] }
 
         /// AudibleAuthStart.Cooky
         ///
@@ -69,20 +69,20 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AuthCookie }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("name", String?.self),
-            .field("value", String?.self),
-            .field("domain", String?.self),
+            .field("name", String.self),
+            .field("value", String.self),
+            .field("domain", String.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AudibleAuthStartMutation.Data.AudibleAuthStart.Cooky.self
           ] }
 
-          /// Nom du cookie
-          var name: String? { __data["name"] }
-          /// Valeur du cookie
-          var value: String? { __data["value"] }
-          /// Domaine du cookie
-          var domain: String? { __data["domain"] }
+          /// Cookie name
+          var name: String { __data["name"] }
+          /// Cookie value
+          var value: String { __data["value"] }
+          /// Cookie domain
+          var domain: String { __data["domain"] }
         }
       }
     }

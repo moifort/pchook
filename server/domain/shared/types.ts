@@ -4,3 +4,4 @@ export type Eur = Brand<number, 'Eur'>
 export type PersonName = Brand<string, 'PersonName'>
 export type Count = Brand<number, 'Count'>
 export type Url = Brand<string, 'Url'>
+export type Minutes = Brand<number, 'Minutes'>

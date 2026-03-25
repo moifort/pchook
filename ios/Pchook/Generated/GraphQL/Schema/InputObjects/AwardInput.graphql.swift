@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL {
-  /// Prix littéraire
+  /// Literary award
   struct AwardInput: InputObject {
     private(set) var __data: InputDict
 
@@ -22,13 +22,13 @@ extension PchookGraphQL {
       ])
     }
 
-    /// Nom du prix
+    /// Award name
     var name: String {
       get { __data["name"] }
       set { __data["name"] = newValue }
     }
 
-    /// Année d'obtention
+    /// Year awarded
     var year: GraphQLNullable<Int> {
       get { __data["year"] }
       set { __data["year"] = newValue }

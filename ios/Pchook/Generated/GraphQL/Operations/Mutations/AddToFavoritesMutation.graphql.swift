@@ -8,12 +8,12 @@ extension PchookGraphQL {
     static let operationName: String = "AddToFavorites"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AddToFavorites($id: ID!) { addToFavorites(id: $id) { __typename id status } }"#
+        #"mutation AddToFavorites($id: BookId!) { addToFavorites(id: $id) { __typename id status } }"#
       ))
 
-    public var id: ID
+    public var id: BookId
 
-    public init(id: ID) {
+    public init(id: BookId) {
       self.id = id
     }
 
@@ -25,14 +25,14 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("addToFavorites", AddToFavorites?.self, arguments: ["id": .variable("id")]),
+        .field("addToFavorites", AddToFavorites.self, arguments: ["id": .variable("id")]),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
         AddToFavoritesMutation.Data.self
       ] }
 
-      /// Ajouter un livre aux favoris (note de coup de cœur + statut lu)
-      var addToFavorites: AddToFavorites? { __data["addToFavorites"] }
+      /// Add a book to favorites (favorite rating + read status)
+      var addToFavorites: AddToFavorites { __data["addToFavorites"] }
 
       /// AddToFavorites
       ///
@@ -44,17 +44,17 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Book }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.ID?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>?.self),
+          .field("id", PchookGraphQL.BookId.self),
+          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AddToFavoritesMutation.Data.AddToFavorites.self
         ] }
 
-        /// Identifiant unique
-        var id: PchookGraphQL.ID? { __data["id"] }
-        /// Statut de lecture
-        var status: GraphQLEnum<PchookGraphQL.BookStatus>? { __data["status"] }
+        /// Unique identifier
+        var id: PchookGraphQL.BookId { __data["id"] }
+        /// Reading status: TO_READ or READ
+        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
       }
     }
   }

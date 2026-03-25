@@ -1,5 +1,8 @@
 import { builder } from '~/domain/shared/graphql/builder'
 
+// Custom scalars (must be registered before types that reference them)
+import '~/domain/shared/graphql/scalars'
+
 // Book domain
 import '~/domain/book/infrastructure/graphql/enums'
 import '~/domain/book/infrastructure/graphql/types'
@@ -32,8 +35,8 @@ import '~/domain/task/infrastructure/graphql/queries'
 import '~/domain/task/infrastructure/graphql/mutations'
 
 // Audible domain
-import '~/domain/audible/infrastructure/graphql/types'
-import '~/domain/audible/infrastructure/graphql/queries'
-import '~/domain/audible/infrastructure/graphql/mutations'
+import '~/domain/provider/audible/infrastructure/graphql/types'
+import '~/domain/provider/audible/infrastructure/graphql/queries'
+import '~/domain/provider/audible/infrastructure/graphql/mutations'
 
 export const schema = builder.toSchema()

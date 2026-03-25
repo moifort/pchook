@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { match } from 'ts-pattern'
-import { BookId, ISBN } from '~/domain/book/primitives'
+import { LanguageEnum } from '~/domain/book/infrastructure/graphql/enums'
 import { BookQuery } from '~/domain/book/query'
 import { BookUseCase } from '~/domain/book/use-case'
 import * as previewRepository from '~/domain/scan/infrastructure/preview-repository'
@@ -11,7 +11,6 @@ import { scanResultToBookData } from '~/domain/scan/to-book-data'
 import type { ScanResult } from '~/domain/scan/types'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
-import { Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 import { BookPreviewType, ConfirmBookResultType } from './types'
 
@@ -33,7 +32,7 @@ builder.mutationField('analyzeBookCover', (t) =>
 
       const imageBuffer = Buffer.from(imageBase64, 'base64')
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const scanOutput = await BookScanner.scan(imageBuffer, ocrText ?? undefined, seriesNames)
       const previewId = crypto.randomUUID()
 
@@ -56,16 +55,14 @@ builder.mutationField('analyzeISBN', (t) =>
     nullable: true,
     description: 'Scan an ISBN barcode. Returns null if the book already exists.',
     args: {
-      isbn: t.arg.string({ required: true, description: 'ISBN code (10 or 13 digits)' }),
+      isbn: t.arg({ type: 'ISBN', required: true, description: 'ISBN code (10 or 13 digits)' }),
     },
-    resolve: async (_, { isbn: rawIsbn }) => {
-      const isbn = ISBN(rawIsbn)
-
+    resolve: async (_, { isbn }) => {
       const existing = await BookQuery.findByISBN(isbn)
       if (existing) return null
 
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const scanOutput = await IsbnScanner.scan(isbn, seriesNames)
       const previewId = crypto.randomUUID()
 
@@ -87,13 +84,13 @@ builder.mutationField('analyzeURL', (t) =>
     type: BookPreviewType,
     description: 'Import a book from a URL (Goodreads, Storygraph, etc.)',
     args: {
-      url: t.arg.string({ required: true, description: 'Book URL' }),
+      url: t.arg({ type: 'Url', required: true, description: 'Book URL' }),
       description: t.arg.string({ description: 'Shared description' }),
       rawText: t.arg.string({ description: 'Shared raw text' }),
     },
     resolve: async (_, { url, description, rawText }) => {
       const allSeries = await SeriesQuery.findAll()
-      const seriesNames = allSeries.map(({ name }) => String(name))
+      const seriesNames = allSeries.map(({ name }) => name)
       const result = await ShareImporter.importFromShare(
         { url, description: description ?? undefined, rawText: rawText ?? undefined },
         seriesNames,
@@ -111,7 +108,7 @@ builder.mutationField('analyzeURL', (t) =>
         previewId,
         scanResult: result,
         importSource: 'url',
-        externalUrl: Url(url),
+        externalUrl: url,
         createdAt: new Date(),
       })
 
@@ -125,20 +122,20 @@ const ConfirmBookInput = builder.inputType('ConfirmBookInput', {
   fields: (t) => ({
     previewId: t.string({ required: true, description: 'Preview identifier' }),
     status: t.string({ required: true, description: 'Initial status (to-read or read)' }),
-    replaceBookId: t.string({ description: 'ID of the book to replace (update)' }),
-    title: t.string({ description: 'Title (override)' }),
-    authors: t.stringList({ description: 'Authors (override)' }),
-    publisher: t.string({ description: 'Publisher (override)' }),
-    pageCount: t.int({ description: 'Pages (override)' }),
-    genre: t.string({ description: 'Genre (override)' }),
+    replaceBookId: t.field({ type: 'BookId', description: 'ID of the book to replace (update)' }),
+    title: t.field({ type: 'BookTitle', description: 'Title (override)' }),
+    authors: t.field({ type: ['PersonName'], description: 'Authors (override)' }),
+    publisher: t.field({ type: 'Publisher', description: 'Publisher (override)' }),
+    pageCount: t.field({ type: 'PageCount', description: 'Pages (override)' }),
+    genre: t.field({ type: 'Genre', description: 'Genre (override)' }),
     synopsis: t.string({ description: 'Synopsis (override)' }),
-    language: t.string({ description: 'Language (override)' }),
+    language: t.field({ type: LanguageEnum, description: 'Language (override)' }),
     format: t.string({ description: 'Format (override)' }),
-    translator: t.string({ description: 'Translator (override)' }),
-    estimatedPrice: t.float({ description: 'Price (override)' }),
-    series: t.string({ description: 'Series (override)' }),
-    seriesLabel: t.string({ description: 'Series label (override)' }),
-    seriesNumber: t.float({ description: 'Series position (override)' }),
+    translator: t.field({ type: 'PersonName', description: 'Translator (override)' }),
+    estimatedPrice: t.field({ type: 'Eur', description: 'Price (override)' }),
+    series: t.field({ type: 'SeriesName', description: 'Series (override)' }),
+    seriesLabel: t.field({ type: 'SeriesLabel', description: 'Series label (override)' }),
+    seriesNumber: t.field({ type: 'SeriesPosition', description: 'Series position (override)' }),
   }),
 })
 
@@ -175,7 +172,7 @@ builder.mutationField('confirmBook', (t) =>
 
       if (input.replaceBookId) {
         const result = await BookUseCase.replaceFromScan(
-          BookId(input.replaceBookId),
+          input.replaceBookId,
           title,
           {
             ...data,

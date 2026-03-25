@@ -1,5 +1,14 @@
 import SwiftUI
 
+private func parseDuration(_ text: String) -> Int? {
+    let pattern = /(?:(\d+)h)?\s*(?:(\d+)min)?/
+    guard let match = text.firstMatch(of: pattern) else { return nil }
+    let hours = match.output.1.flatMap { Int($0) } ?? 0
+    let minutes = match.output.2.flatMap { Int($0) } ?? 0
+    let total = hours * 60 + minutes
+    return total > 0 ? total : nil
+}
+
 struct BookEditForm: View {
     let initial: Fields
     let onSave: (UpdateBookRequest) async throws -> Void
@@ -38,7 +47,7 @@ struct BookEditForm: View {
         _language = State(initialValue: BookLanguage(apiValue: initial.language))
         _format = State(initialValue: BookFormatOption(apiValue: initial.format))
         _translator = State(initialValue: initial.translator)
-        _duration = State(initialValue: initial.duration)
+        _duration = State(initialValue: initial.durationMinutes)
         _narrators = State(initialValue: initial.narrators)
         _estimatedPrice = State(initialValue: initial.estimatedPrice)
         _series = State(initialValue: initial.series)
@@ -233,7 +242,7 @@ struct BookEditForm: View {
             format: format?.rawValue,
             translator: translator.isEmpty ? nil : translator,
             estimatedPrice: Double(estimatedPrice),
-            duration: format == .audiobook && !duration.isEmpty ? duration : nil,
+            durationMinutes: format == .audiobook && !duration.isEmpty ? parseDuration(duration) : nil,
             narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
             personalNotes: personalNotes.isEmpty ? nil : personalNotes,
             series: series.isEmpty ? "" : series,
@@ -262,7 +271,7 @@ extension BookEditForm {
         var format: String
         var translator: String
         var estimatedPrice: String
-        var duration: String
+        var durationMinutes: String
         var narrators: String
         var series: String
         var seriesLabel: String
@@ -273,7 +282,7 @@ extension BookEditForm {
         init(
             title: String, authors: String, genre: String, publisher: String,
             pageCount: String, isbn: String, language: String, format: String,
-            translator: String, estimatedPrice: String, duration: String,
+            translator: String, estimatedPrice: String, durationMinutes: String,
             narrators: String, series: String, seriesLabel: String, seriesNumber: String,
             synopsis: String, personalNotes: String
         ) {
@@ -287,7 +296,7 @@ extension BookEditForm {
             self.format = format
             self.translator = translator
             self.estimatedPrice = estimatedPrice
-            self.duration = duration
+            self.durationMinutes = durationMinutes
             self.narrators = narrators
             self.series = series
             self.seriesLabel = seriesLabel
@@ -304,6 +313,12 @@ extension BookEditForm {
                     : String($0)
             } ?? ""
 
+            let durationStr: String = detail.book.durationMinutes.map { minutes in
+                let hours = minutes / 60
+                let remainingMinutes = minutes % 60
+                return "\(hours)h \(remainingMinutes)min"
+            } ?? ""
+
             self.init(
                 title: detail.book.title,
                 authors: detail.book.authors.joined(separator: ", "),
@@ -315,7 +330,7 @@ extension BookEditForm {
                 format: detail.book.format ?? "",
                 translator: detail.book.translator ?? "",
                 estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
-                duration: detail.book.duration ?? "",
+                durationMinutes: durationStr,
                 narrators: detail.book.narrators.joined(separator: ", "),
                 series: detail.series?.name ?? "",
                 seriesLabel: detail.series?.label ?? "",
@@ -337,11 +352,11 @@ extension BookEditForm {
                 publisher: "J'ai Lu",
                 pageCount: "320",
                 isbn: "978-2-290-30540-0",
-                language: "FR",
+                language: "fr",
                 format: "pocket",
                 translator: "Jean Bonnefoy",
                 estimatedPrice: "8.50",
-                duration: "",
+                durationMinutes: "",
                 narrators: "",
                 series: "Sprawl",
                 seriesLabel: "Tome 1",

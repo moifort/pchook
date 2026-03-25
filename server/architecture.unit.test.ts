@@ -9,7 +9,16 @@ import { basename, dirname, join } from 'node:path'
 const SERVER_DIR = join(import.meta.dir)
 const DOMAIN_DIR = join(SERVER_DIR, 'domain')
 
-const domains = readdirSync(DOMAIN_DIR).filter((d) => statSync(join(DOMAIN_DIR, d)).isDirectory())
+const PROVIDER_DIR = join(DOMAIN_DIR, 'provider')
+
+const domains = [
+  ...readdirSync(DOMAIN_DIR).filter(
+    (d) => d !== 'provider' && statSync(join(DOMAIN_DIR, d)).isDirectory(),
+  ),
+  ...readdirSync(PROVIDER_DIR)
+    .filter((d) => statSync(join(PROVIDER_DIR, d)).isDirectory())
+    .map((d) => `provider/${d}`),
+]
 
 const readFile = (path: string) => readFileSync(path, 'utf-8')
 
@@ -26,7 +35,10 @@ describe('architecture', () => {
   })
 
   describe('primitives.ts imports ts-brand and zod', () => {
-    const primitivesFiles = glob('server/domain/*/primitives.ts')
+    const primitivesFiles = [
+      ...glob('server/domain/*/primitives.ts'),
+      ...glob('server/domain/provider/*/primitives.ts'),
+    ]
 
     // Skip pure re-export files (e.g. files that only re-export from shared)
     const ownPrimitives = primitivesFiles.filter((f) => {
@@ -137,7 +149,10 @@ describe('architecture', () => {
   })
 
   describe('business-rules.ts is pure (no IO)', () => {
-    const businessRulesFiles = glob('server/domain/*/business-rules.ts')
+    const businessRulesFiles = [
+      ...glob('server/domain/*/business-rules.ts'),
+      ...glob('server/domain/provider/*/business-rules.ts'),
+    ]
 
     for (const file of businessRulesFiles) {
       test(basename(dirname(file)), () => {
@@ -158,7 +173,10 @@ describe('architecture', () => {
   })
 
   describe('use-case.ts does not bypass domain boundaries', () => {
-    const useCaseFiles = glob('server/domain/*/use-case.ts')
+    const useCaseFiles = [
+      ...glob('server/domain/*/use-case.ts'),
+      ...glob('server/domain/provider/*/use-case.ts'),
+    ]
 
     for (const file of useCaseFiles) {
       test(basename(dirname(file)), () => {
@@ -182,7 +200,10 @@ describe('architecture', () => {
   })
 
   describe('no throw in domain query.ts and command.ts', () => {
-    const targets = glob('server/domain/*/{query,command}.ts')
+    const targets = [
+      ...glob('server/domain/*/{query,command}.ts'),
+      ...glob('server/domain/provider/*/{query,command}.ts'),
+    ]
 
     for (const file of targets) {
       test(`${basename(dirname(file))}/${basename(file)}`, () => {
