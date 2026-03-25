@@ -76,7 +76,7 @@ builder.scalarType('PageCount', {
 })
 
 builder.scalarType('Note', {
-  description: 'Personal rating score (integer 0-10)',
+  description: 'Personal rating score (integer 0-5)',
   serialize: (value) => Number(value),
   parseValue: validatedParse('Note', Note),
 })

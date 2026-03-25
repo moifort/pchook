@@ -166,7 +166,7 @@ feature('GraphQL query: book', () => {
     })
     const review: Review = {
       bookId: book.id,
-      rating: Note(8),
+      rating: Note(4),
       readDate: new Date('2024-01-15'),
       reviewNotes: 'Excellent roman social',
       createdAt: new Date(),
@@ -194,7 +194,7 @@ feature('GraphQL query: book', () => {
 
     and('review is included')
     const reviewData = data.review as Record<string, unknown>
-    expect(reviewData.rating).toBe(8)
+    expect(reviewData.rating).toBe(4)
     expect(reviewData.reviewNotes).toBe('Excellent roman social')
 
     and('series is included')

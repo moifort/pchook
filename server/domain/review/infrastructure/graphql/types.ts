@@ -11,7 +11,7 @@ export const ReviewType = builder.objectRef<Review>('Review').implement({
     }),
     rating: t.field({
       type: 'Note',
-      description: 'Personal rating (0-10)',
+      description: 'Personal rating (0-5)',
       resolve: ({ rating }) => rating,
     }),
     readDate: t.field({
