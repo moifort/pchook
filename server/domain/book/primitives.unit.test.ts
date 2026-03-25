@@ -6,6 +6,7 @@ import {
   BookStatus,
   BookTitle,
   Genre,
+  ImportSource,
   ISBN,
   Language,
   Note,
@@ -188,6 +189,28 @@ describe('BookFormat', () => {
 
   test('rejects an invalid format', () => {
     expect(() => BookFormat('ebook')).toThrow()
+  })
+})
+
+describe('ImportSource', () => {
+  test('accepts scan', () => {
+    expect(ImportSource('scan')).toBe('scan')
+  })
+
+  test('accepts isbn', () => {
+    expect(ImportSource('isbn')).toBe('isbn')
+  })
+
+  test('accepts url', () => {
+    expect(ImportSource('url')).toBe('url')
+  })
+
+  test('accepts audible', () => {
+    expect(ImportSource('audible')).toBe('audible')
+  })
+
+  test('rejects an invalid source', () => {
+    expect(() => ImportSource('manual')).toThrow()
   })
 })
 

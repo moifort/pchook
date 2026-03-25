@@ -7,6 +7,7 @@ import type {
   BookStatus as BookStatusType,
   BookTitle as BookTitleType,
   Genre as GenreType,
+  ImportSource as ImportSourceType,
   ISBN as ISBNType,
   Note as NoteType,
   PageCount as PageCountType,
@@ -78,5 +79,8 @@ export const BookStatus = (value: unknown) =>
 
 export const BookSort = (value: unknown) =>
   z.enum(['createdAt', 'title', 'author', 'awards', 'genre']).parse(value) as BookSortType
+
+export const ImportSource = (value: unknown) =>
+  z.enum(['scan', 'isbn', 'url', 'audible']).parse(value) as ImportSourceType
 
 export const SortOrder = (value: unknown) => z.enum(['asc', 'desc']).parse(value) as SortOrderType
