@@ -1228,7 +1228,7 @@ type Mutation {
 }
 
 """
-Personal rating score (integer 0-10)
+Personal rating score (integer 0-5)
 """
 scalar Note
 
@@ -1376,7 +1376,12 @@ type Query {
   """
   List of all series
   """
-  series: [Series!]!
+  series(
+    """
+    Filter to favorite series only (rated 5)
+    """
+    isFavorite: Boolean
+  ): [Series!]!
 
   """
   Series detail by ID
@@ -1464,7 +1469,7 @@ type Review {
   createdAt: DateTime!
 
   """
-  Personal rating (0-10)
+  Personal rating (0-5)
   """
   rating: Note!
 

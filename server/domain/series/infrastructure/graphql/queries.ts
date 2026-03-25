@@ -1,3 +1,4 @@
+import { FAVORITE_RATING } from '~/domain/book/business-rules'
 import { booksInLanguage } from '~/domain/series/business-rules'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
@@ -26,7 +27,14 @@ builder.queryField('series', (t) =>
   t.field({
     type: [SeriesType],
     description: 'List of all series',
-    resolve: () => SeriesQuery.findAll(),
+    args: {
+      isFavorite: t.arg.boolean({ description: 'Filter to favorite series only (rated 5)' }),
+    },
+    resolve: async (_, { isFavorite }) => {
+      const allSeries = await SeriesQuery.findAll()
+      if (isFavorite !== true) return allSeries
+      return allSeries.filter(({ rating }) => rating === FAVORITE_RATING)
+    },
   }),
 )
 
