@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "AudibleImportStart"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AudibleImportStart { audibleImportStart { __typename id phase current total message } }"#
+        #"mutation AudibleImportStart { audibleImportStart { __typename id phase current total message startedAt completedAt } }"#
       ))
 
     public init() {}
@@ -43,6 +43,8 @@ extension PchookGraphQL {
           .field("current", Int.self),
           .field("total", Int.self),
           .field("message", String.self),
+          .field("startedAt", PchookGraphQL.DateTime?.self),
+          .field("completedAt", PchookGraphQL.DateTime?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           AudibleImportStartMutation.Data.AudibleImportStart.self
@@ -58,6 +60,10 @@ extension PchookGraphQL {
         var total: Int { __data["total"] }
         /// Progress message
         var message: String { __data["message"] }
+        /// Start date
+        var startedAt: PchookGraphQL.DateTime? { __data["startedAt"] }
+        /// Completion date
+        var completedAt: PchookGraphQL.DateTime? { __data["completedAt"] }
       }
     }
   }

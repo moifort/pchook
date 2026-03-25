@@ -21,13 +21,14 @@ import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { Minutes, PersonName, Url } from '~/domain/shared/primitives'
+import type { Url as UrlType } from '~/domain/shared/types'
 import { TaskId } from '~/domain/task/primitives'
 import type { TaskDefinition } from '~/domain/task/types'
 import { createLogger } from '~/system/logger'
 
 const log = createLogger('audible-use-case')
 
-const downloadCover = async (url: string) => {
+const downloadCover = async (url: UrlType) => {
   try {
     const arrayBuffer = await $fetch<ArrayBuffer>(url, { responseType: 'arrayBuffer' })
     return Buffer.from(arrayBuffer)

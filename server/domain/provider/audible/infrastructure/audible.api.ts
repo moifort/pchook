@@ -15,6 +15,7 @@ import type {
   AudibleItem,
   AudibleLocale,
 } from '~/domain/provider/audible/types'
+import { Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 
 const log = createLogger('audible-api')
@@ -28,7 +29,7 @@ const toDomainItem = (item: LibAudibleItem): AudibleItem => ({
   publisher: item.publisher,
   language: item.language,
   releaseDate: item.releaseDate,
-  coverUrl: item.coverUrl,
+  coverUrl: item.coverUrl ? Url(item.coverUrl) : undefined,
   series: item.series,
   finishedAt: item.listeningStatus?.finishedAt,
 })

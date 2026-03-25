@@ -1,5 +1,6 @@
 import type { Brand } from 'ts-brand'
 import type { BookId } from '~/domain/book/types'
+import type { Url } from '~/domain/shared/types'
 
 export type { AudibleCredentials, AudibleLocale, AuthSession } from 'audible-api-ts'
 export { AUDIBLE_LOCALES } from 'audible-api-ts'
@@ -15,7 +16,7 @@ export type AudibleItem = {
   publisher?: string
   language?: string
   releaseDate?: Date
-  coverUrl?: string
+  coverUrl?: Url
   series?: { name: string; position?: number }
   finishedAt?: Date
 }

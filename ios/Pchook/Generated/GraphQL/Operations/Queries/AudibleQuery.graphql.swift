@@ -95,7 +95,7 @@ extension PchookGraphQL {
               .field("durationMinutes", Int.self),
               .field("publisher", String?.self),
               .field("language", String?.self),
-              .field("coverUrl", String?.self),
+              .field("coverUrl", PchookGraphQL.Url?.self),
               .field("finishedAt", PchookGraphQL.DateTime?.self),
               .field("importedBookId", PchookGraphQL.ID?.self),
               .field("series", Series?.self),
@@ -119,7 +119,7 @@ extension PchookGraphQL {
             /// Language
             var language: String? { __data["language"] }
             /// Cover image URL
-            var coverUrl: String? { __data["coverUrl"] }
+            var coverUrl: PchookGraphQL.Url? { __data["coverUrl"] }
             /// Date the book was finished listening
             var finishedAt: PchookGraphQL.DateTime? { __data["finishedAt"] }
             /// ID of the imported book, if already imported

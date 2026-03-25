@@ -43,7 +43,7 @@ type AudibleItem {
   authors: [String!]!
 
   """Cover image URL"""
-  coverUrl: String
+  coverUrl: Url
 
   """Duration in minutes"""
   durationMinutes: Int!

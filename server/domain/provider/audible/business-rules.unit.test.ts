@@ -7,6 +7,7 @@ import {
 import { Asin } from '~/domain/provider/audible/primitives'
 import type { AudibleItem } from '~/domain/provider/audible/types'
 import type { ScanResult } from '~/domain/scan/types'
+import { Url } from '~/domain/shared/primitives'
 
 const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
   asin: Asin('B08G9PRS1K'),
@@ -17,7 +18,7 @@ const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
   publisher: 'Audible Studios',
   language: 'fr',
   releaseDate: new Date('2020-09-15'),
-  coverUrl: 'https://m.media-amazon.com/images/I/cover.jpg',
+  coverUrl: Url('https://m.media-amazon.com/images/I/cover.jpg'),
   ...overrides,
 })
 

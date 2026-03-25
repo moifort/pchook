@@ -123,7 +123,7 @@ const AudibleItemType = builder.objectRef<AudibleLibraryEntry>('AudibleItem').im
       resolve: ({ item }) => item.releaseDate ?? null,
     }),
     coverUrl: t.field({
-      type: 'String',
+      type: 'Url',
       nullable: true,
       description: 'Cover image URL',
       resolve: ({ item }) => item.coverUrl ?? null,
