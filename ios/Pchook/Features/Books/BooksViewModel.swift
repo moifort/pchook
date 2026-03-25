@@ -75,7 +75,7 @@ final class BooksViewModel {
     var displayedBooks: [BookListItem] {
         switch mode {
         case .all: books
-        case .toRead: books.filter { $0.status == "to-read" }
+        case .toRead: books.filter { $0.status == .toRead }
         case .series: books.filter { $0.seriesName != nil }
         case .favorites: books.filter { $0.rating == 5 }
         }
@@ -84,7 +84,7 @@ final class BooksViewModel {
     func count(for mode: BookListMode) -> Int {
         switch mode {
         case .all: books.count
-        case .toRead: books.filter { $0.status == "to-read" }.count
+        case .toRead: books.filter { $0.status == .toRead }.count
         case .series: Set(books.compactMap { $0.seriesName }).count
         case .favorites: books.filter { $0.rating == 5 }.count
         }

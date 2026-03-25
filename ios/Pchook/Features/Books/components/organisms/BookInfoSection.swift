@@ -4,23 +4,14 @@ struct BookInfoSection: View {
     let publisher: String?
     let pageCount: Int?
     let language: String?
-    let format: String?
+    let format: BookFormat?
     let translator: String?
     let estimatedPrice: Double?
     let publishedDate: Date?
     let duration: String?
     let narrators: [String]?
-    let importSource: String?
+    let importSource: ImportSource?
     let externalUrl: String?
-
-    private var importInfo: (icon: String, label: String)? {
-        guard let importSource else { return nil }
-        if importSource == "scan" { return ("camera", "Scan couverture") }
-        else if importSource == "isbn" { return ("barcode", "Code ISBN") }
-        else if importSource == "url" { return ("link", "Lien partagé") }
-        else if importSource == "audible" { return ("headphones", "Audible") }
-        else { return ("questionmark.circle", importSource) }
-    }
 
     var body: some View {
         if hasContent {
@@ -51,7 +42,7 @@ struct BookInfoSection: View {
                 if let format {
                     LabeledInfoRow(
                         title: "Format",
-                        value: BookFormatOption(apiValue: format)?.label ?? format,
+                        value: format.label,
                         icon: "doc"
                     )
                 }
@@ -72,13 +63,13 @@ struct BookInfoSection: View {
                         icon: "eurosign"
                     )
                 }
-                if let importInfo {
+                if let importSource {
                     if let externalUrl, let url = URL(string: externalUrl) {
                         Link(destination: url) {
-                            LabeledInfoRow(title: "Origine", value: importInfo.label, icon: importInfo.icon)
+                            LabeledInfoRow(title: "Origine", value: importSource.label, icon: importSource.icon)
                         }
                     } else {
-                        LabeledInfoRow(title: "Origine", value: importInfo.label, icon: importInfo.icon)
+                        LabeledInfoRow(title: "Origine", value: importSource.label, icon: importSource.icon)
                     }
                 }
             }
@@ -99,13 +90,13 @@ struct BookInfoSection: View {
             publisher: "Gallimard",
             pageCount: 320,
             language: "fr",
-            format: "pocket",
+            format: .pocket,
             translator: nil,
             estimatedPrice: 8.50,
             publishedDate: Date(),
             duration: nil,
             narrators: nil,
-            importSource: "scan",
+            importSource: .scan,
             externalUrl: nil
         )
     }

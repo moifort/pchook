@@ -64,7 +64,7 @@ enum GraphQLBooksAPI {
 
     static func update(id: String, _ request: UpdateBookRequest) async throws -> Book {
         let statusEnum: GraphQLNullable<GraphQLEnum<PchookGraphQL.BookStatus>> = request.status
-            .flatMap { PchookGraphQL.BookStatus(rawValue: statusToGraphQL($0)) }
+            .flatMap { PchookGraphQL.BookStatus(rawValue: $0 == "read" ? "READ" : "TO_READ") }
             .map { .some(.case($0)) } ?? .none
 
         let languageEnum: GraphQLNullable<GraphQLEnum<PchookGraphQL.Language>> = request.language
@@ -120,17 +120,23 @@ enum GraphQLBooksAPI {
 // MARK: - Type mapping
 
 private extension GraphQLBooksAPI {
-    static func mapBookStatus(_ status: GraphQLEnum<PchookGraphQL.BookStatus>?) -> String {
-        guard let status else { return "to-read" }
+    static func mapBookStatus(_ status: GraphQLEnum<PchookGraphQL.BookStatus>?) -> BookStatus {
+        guard let status else { return .toRead }
         switch status {
-        case .case(.read): return "read"
-        case .case(.toRead): return "to-read"
-        default: return "to-read"
+        case .case(.read): return .read
+        case .case(.toRead): return .toRead
+        default: return .toRead
         }
     }
 
-    static func statusToGraphQL(_ status: String) -> String {
-        status == "read" ? "READ" : "TO_READ"
+    static func mapBookFormat(_ format: GraphQLEnum<PchookGraphQL.BookFormat>?) -> BookFormat? {
+        guard let format else { return nil }
+        return BookFormat(rawValue: format.rawValue)
+    }
+
+    static func mapImportSource(_ source: GraphQLEnum<PchookGraphQL.ImportSource>?) -> ImportSource? {
+        guard let source else { return nil }
+        return ImportSource(rawValue: source.rawValue)
     }
 
     static func mapBookListItem(_ book: PchookGraphQL.BookListQuery.Data.Book) -> BookListItem {
@@ -165,7 +171,7 @@ private extension GraphQLBooksAPI {
             synopsis: book.synopsis,
             isbn: book.isbn,
             language: book.language?.rawValue,
-            format: book.format?.rawValue,
+            format: mapBookFormat(book.format),
             translator: book.translator,
             estimatedPrice: book.estimatedPrice,
             durationMinutes: book.durationMinutes,
@@ -183,7 +189,7 @@ private extension GraphQLBooksAPI {
                     url: $0.url
                 )
             },
-            importSource: book.importSource?.rawValue,
+            importSource: mapImportSource(book.importSource),
             externalUrl: book.externalUrl,
             createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date(),
             updatedAt: GraphQLHelpers.parseISO8601(book.updatedAt) ?? Date()

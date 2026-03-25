@@ -4,7 +4,7 @@ struct BookDetailHeader: View {
     let title: String
     let authors: String
     let genres: [String]
-    let status: String
+    let status: BookStatus
     let seriesLabel: String?
 
     var body: some View {
@@ -21,11 +21,7 @@ struct BookDetailHeader: View {
                     LabeledContent("Genre", value: genres.joined(separator: " \u{2022} "))
                 }
             }
-            if status == "to-read" {
-                LabeledInfoRow(title: "Statut", value: "\u{00C0} lire", icon: "bookmark")
-            } else {
-                LabeledInfoRow(title: "Statut", value: "Lu", icon: "checkmark.circle")
-            }
+            LabeledInfoRow(title: "Statut", value: status.label, icon: status == .toRead ? "bookmark" : "checkmark.circle")
         }
     }
 }
@@ -36,7 +32,7 @@ struct BookDetailHeader: View {
             title: "Neuromancien",
             authors: "William Gibson",
             genres: ["Cyberpunk", "Science-Fiction"],
-            status: "to-read",
+            status: .toRead,
             seriesLabel: "1"
         )
     }

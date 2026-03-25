@@ -31,7 +31,7 @@ final class AudibleViewModel {
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
         guard let task = importTask else { return false }
-        return task.phase == "running" || task.phase == "paused"
+        return task.phase == .running || task.phase == .paused
     }
 
     func isImported(asin: String) -> Bool { importedAsins.contains(asin) }
@@ -133,7 +133,7 @@ final class AudibleViewModel {
         isPausing = true
         do {
             let client = GraphQLClient.shared.apollo
-            if importTask?.phase == "paused" {
+            if importTask?.phase == .paused {
                 _ = try await GraphQLHelpers.perform(client, mutation: PchookGraphQL.ResumeTaskMutation(id: taskId))
             } else {
                 _ = try await GraphQLHelpers.perform(client, mutation: PchookGraphQL.PauseTaskMutation(id: taskId))
@@ -164,10 +164,8 @@ final class AudibleViewModel {
                 do {
                     await refreshImportTask(taskId: taskId)
                     if let task = importTask {
-                        if task.phase == "paused" { isPausing = false }
-                        if task.phase == "idle" || task.phase == "completed"
-                            || task.phase == "cancelled" || task.phase == "failed"
-                        {
+                        if task.phase == .paused { isPausing = false }
+                        if task.phase.isTerminal {
                             isPausing = false
                             isCancelling = false
                             await refreshStatus()
@@ -187,7 +185,7 @@ final class AudibleViewModel {
             let data = try await GraphQLHelpers.fetch(client, query: query)
             if let task = data.task {
                 importTask = ImportTaskState(
-                    phase: task.phase,
+                    phase: TaskPhase(rawValue: task.phase) ?? .idle,
                     current: task.current,
                     total: task.total,
                     message: task.message,
@@ -233,8 +231,8 @@ final class AudibleViewModel {
     // MARK: - Private
 
     private func applyStatus(_ data: AudibleData) {
-        isConnected = data.sync.status != "disconnected"
-        isFetching = data.sync.status == "fetching"
+        isConnected = data.sync.status != .disconnected
+        isFetching = data.sync.status == .fetching
 
         let libraryEntries = data.sync.entries.filter { $0.source == "library" }
         let wishlistEntries = data.sync.entries.filter { $0.source == "wishlist" }

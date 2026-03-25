@@ -1,6 +1,15 @@
 import Apollo
 import Foundation
 
+private func mapBookStatus(_ status: GraphQLEnum<PchookGraphQL.BookStatus>?) -> BookStatus {
+    guard let status else { return .toRead }
+    switch status {
+    case .case(.read): return .read
+    case .case(.toRead): return .toRead
+    default: return .toRead
+    }
+}
+
 enum GraphQLScanAPI {
     private static var client: ApolloClient { GraphQLClient.shared.apollo }
 
@@ -80,7 +89,7 @@ enum GraphQLScanAPI {
             title: result.book.title,
             authors: result.book.authors,
             narrators: [],
-            status: result.book.status.rawValue,
+            status: mapBookStatus(result.book.status),
             awards: [],
             publicRatings: [],
             createdAt: Date(),

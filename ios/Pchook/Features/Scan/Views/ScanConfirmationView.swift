@@ -13,7 +13,7 @@ struct ScanConfirmationView: View {
     @State private var publisher: String
     @State private var pageCount: String
     @State private var language: BookLanguage?
-    @State private var format: BookFormatOption?
+    @State private var format: BookFormat?
     @State private var translator: String
     @State private var estimatedPrice: String
     @State private var duration: String
@@ -36,7 +36,7 @@ struct ScanConfirmationView: View {
         _publisher = State(initialValue: preview.publisher ?? "")
         _pageCount = State(initialValue: preview.pageCount.map { String($0) } ?? "")
         _language = State(initialValue: BookLanguage(apiValue: preview.language))
-        _format = State(initialValue: BookFormatOption(apiValue: preview.format))
+        _format = State(initialValue: BookFormat(apiValue: preview.format))
         _translator = State(initialValue: preview.translator ?? "")
         _estimatedPrice = State(initialValue: preview.estimatedPrice.map { String($0) } ?? "")
         _duration = State(initialValue: preview.duration ?? "")
@@ -130,9 +130,9 @@ struct ScanConfirmationView: View {
                 }
 
                 Picker(selection: $format) {
-                    Text("Non d\u{00E9}fini").tag(nil as BookFormatOption?)
-                    ForEach(BookFormatOption.allCases) { fmt in
-                        Text(fmt.label).tag(fmt as BookFormatOption?)
+                    Text("Non d\u{00E9}fini").tag(nil as BookFormat?)
+                    ForEach(BookFormat.allCases) { fmt in
+                        Text(fmt.label).tag(fmt as BookFormat?)
                     }
                 } label: {
                     Label("Format", systemImage: "doc")

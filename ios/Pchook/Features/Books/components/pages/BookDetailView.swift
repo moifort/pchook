@@ -68,7 +68,7 @@ struct BookDetailView: View {
 
     @ToolbarContentBuilder
     private var readToolbar: some ToolbarContent {
-        if let detail, detail.book.status == "to-read" {
+        if let detail, detail.book.status == .toRead {
             ToolbarItemGroup {
                 AsyncToolbarButton(title: "Marquer comme lu", systemImage: "checkmark.circle") {
                     _ = try? await GraphQLBooksAPI.update(id: bookId, UpdateBookRequest(status: "read"))

@@ -50,7 +50,7 @@ enum GraphQLAudibleAPI {
 
         return AudibleData(
             sync: AudibleSyncData(
-                status: sync.status,
+                status: AudibleSyncStatus(rawValue: sync.status) ?? .disconnected,
                 updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 entries: sync.entries.map { entry in
                     AudibleEntryData(
@@ -73,7 +73,7 @@ enum GraphQLAudibleAPI {
                 }
             ),
             import_: AudibleImportData(
-                status: imp.status,
+                status: AudibleImportStatus(rawValue: imp.status) ?? .initial,
                 updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 taskId: imp.taskId,
                 importedCount: imp.importedCount,

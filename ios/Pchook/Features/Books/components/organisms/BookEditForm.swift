@@ -21,7 +21,7 @@ struct BookEditForm: View {
     @State private var pageCount: String
     @State private var isbn: String
     @State private var language: BookLanguage?
-    @State private var format: BookFormatOption?
+    @State private var format: BookFormat?
     @State private var translator: String
     @State private var duration: String
     @State private var narrators: String
@@ -45,7 +45,7 @@ struct BookEditForm: View {
         _pageCount = State(initialValue: initial.pageCount)
         _isbn = State(initialValue: initial.isbn)
         _language = State(initialValue: BookLanguage(apiValue: initial.language))
-        _format = State(initialValue: BookFormatOption(apiValue: initial.format))
+        _format = State(initialValue: BookFormat(apiValue: initial.format))
         _translator = State(initialValue: initial.translator)
         _duration = State(initialValue: initial.durationMinutes)
         _narrators = State(initialValue: initial.narrators)
@@ -115,9 +115,9 @@ struct BookEditForm: View {
                 }
 
                 Picker(selection: $format) {
-                    Text("Non d\u{00E9}fini").tag(nil as BookFormatOption?)
-                    ForEach(BookFormatOption.allCases) { fmt in
-                        Text(fmt.label).tag(fmt as BookFormatOption?)
+                    Text("Non d\u{00E9}fini").tag(nil as BookFormat?)
+                    ForEach(BookFormat.allCases) { fmt in
+                        Text(fmt.label).tag(fmt as BookFormat?)
                     }
                 } label: {
                     Label("Format", systemImage: "doc")
@@ -327,7 +327,7 @@ extension BookEditForm {
                 pageCount: detail.book.pageCount.map(String.init) ?? "",
                 isbn: detail.book.isbn ?? "",
                 language: detail.book.language ?? "",
-                format: detail.book.format ?? "",
+                format: detail.book.format?.rawValue ?? "",
                 translator: detail.book.translator ?? "",
                 estimatedPrice: detail.book.estimatedPrice.map { String(format: "%.2f", $0) } ?? "",
                 durationMinutes: durationStr,

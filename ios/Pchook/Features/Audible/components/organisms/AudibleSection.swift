@@ -90,7 +90,7 @@ struct AudibleSection: View {
         if viewModel.isVerifying || viewModel.isFetching {
             EmptyView()
         } else if let task = viewModel.importTask,
-            task.phase == "running" || task.phase == "paused"
+            task.phase == .running || task.phase == .paused
         {
             importProgressRow(task)
             Button {
@@ -100,12 +100,12 @@ struct AudibleSection: View {
                     HStack(spacing: 6) {
                         ProgressView()
                             .controlSize(.small)
-                        Text(task.phase == "paused" ? "Reprise..." : "Pause...")
+                        Text(task.phase == .paused ? "Reprise..." : "Pause...")
                     }
                 } else {
                     Label(
-                        task.phase == "paused" ? "Reprendre l'import" : "Mettre en pause",
-                        systemImage: task.phase == "paused" ? "play.fill" : "pause.fill"
+                        task.phase == .paused ? "Reprendre l'import" : "Mettre en pause",
+                        systemImage: task.phase == .paused ? "play.fill" : "pause.fill"
                     )
                 }
             }
@@ -124,7 +124,7 @@ struct AudibleSection: View {
                 }
             }
             .disabled(viewModel.isPausing || viewModel.isCancelling)
-        } else if let task = viewModel.importTask, task.phase == "completed" {
+        } else if let task = viewModel.importTask, task.phase == .completed {
             Label("Import terminé", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
         } else if viewModel.hasFetchedData {
@@ -140,7 +140,7 @@ struct AudibleSection: View {
     private func importProgressRow(_ task: ImportTaskState) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(task.phase == "paused" ? "En pause" : task.message)
+                Text(task.phase == .paused ? "En pause" : task.message)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if task.total > 0 {
