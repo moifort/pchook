@@ -12,7 +12,6 @@ import {
 } from '~/domain/book/primitives'
 import { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/primitives'
 import { Eur, PersonName, Url } from '~/domain/shared/primitives'
-import { TaskId } from '~/domain/task/primitives'
 import { builder } from './builder'
 
 const validatedParse =
@@ -117,13 +116,6 @@ builder.scalarType('SeriesPosition', {
   description: 'Position in series (positive number)',
   serialize: (value) => Number(value),
   parseValue: validatedParse('SeriesPosition', SeriesPosition),
-})
-
-// Task domain
-builder.scalarType('TaskId', {
-  description: 'Task unique identifier (UUID)',
-  serialize: (value) => String(value),
-  parseValue: validatedParse('TaskId', TaskId),
 })
 
 // Audible domain

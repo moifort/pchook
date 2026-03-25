@@ -19,7 +19,6 @@ import type {
 } from '~/domain/provider/audible/types'
 import type { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/types'
 import type { Eur, PersonName, Url } from '~/domain/shared/types'
-import type { TaskId } from '~/domain/task/types'
 
 export type GraphQLContext = {
   event: H3Event
@@ -51,7 +50,6 @@ export const builder = new SchemaBuilder<{
     SeriesName: { Input: SeriesName; Output: SeriesName }
     SeriesLabel: { Input: SeriesLabel; Output: SeriesLabel }
     SeriesPosition: { Input: SeriesPosition; Output: SeriesPosition }
-    TaskId: { Input: TaskId; Output: TaskId }
     Asin: { Input: Asin; Output: Asin }
     AudibleSyncStatus: { Input: AudibleSyncStatus; Output: AudibleSyncStatus }
     AudibleImportStatus: { Input: AudibleImportStatus; Output: AudibleImportStatus }

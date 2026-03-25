@@ -29,11 +29,6 @@ import '~/domain/series/infrastructure/graphql/queries'
 import '~/domain/dashboard/infrastructure/graphql/types'
 import '~/domain/dashboard/infrastructure/graphql/queries'
 
-// Task domain
-import '~/domain/task/infrastructure/graphql/types'
-import '~/domain/task/infrastructure/graphql/queries'
-import '~/domain/task/infrastructure/graphql/mutations'
-
 // Audible domain
 import '~/domain/provider/audible/infrastructure/graphql/types'
 import '~/domain/provider/audible/infrastructure/graphql/queries'
