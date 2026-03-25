@@ -84,3 +84,50 @@ struct BookDetailContent: View {
         }
     }
 }
+
+#Preview {
+    BookDetailContent(
+        detail: BookDetailData(
+            book: Book(
+                id: "1",
+                title: "Neuromancien",
+                authors: ["William Gibson"],
+                publisher: "J'ai Lu",
+                pageCount: 320,
+                genre: "Cyberpunk, Science-Fiction",
+                synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission dans le cyberespace.",
+                language: "fr",
+                format: .pocket,
+                translator: "Jean Bonnefoy",
+                estimatedPrice: 8.50,
+                narrators: [],
+                status: .read,
+                awards: [
+                    Award(name: "Prix Nebula", year: 1984),
+                    Award(name: "Prix Hugo", year: 1985),
+                ],
+                publicRatings: [
+                    PublicRating(source: "Hardcover", score: 3.82, maxScore: 5, voterCount: 12000, url: "https://hardcover.app"),
+                ],
+                importSource: .scan,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            coverImageUrl: nil,
+            series: SeriesInfo(
+                id: "s1",
+                name: "Sprawl",
+                label: "Tome 1",
+                position: 1,
+                volumes: [
+                    SeriesVolume(id: "1", title: "Neuromancien", label: "1", position: 1),
+                    SeriesVolume(id: "2", title: "Compt\u{00E9} z\u{00E9}ro", label: "2", position: 2),
+                    SeriesVolume(id: "3", title: "Mona Lisa s'\u{00E9}clate", label: "3", position: 3),
+                ]
+            ),
+            review: ReviewInfo(bookId: "1", rating: 4, readDate: Date(), createdAt: Date())
+        ),
+        onAddReview: {},
+        onSelectBook: { _ in }
+    )
+}

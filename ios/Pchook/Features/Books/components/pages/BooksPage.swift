@@ -85,7 +85,7 @@ struct BooksPage: View {
                 ),
                 onDismiss: { Task { await viewModel.load() } }
             ) { wrapper in
-                BookDetailPage(bookId: wrapper.id)
+                BookDetailCoordinator(bookId: wrapper.id)
             }
         }
     }
