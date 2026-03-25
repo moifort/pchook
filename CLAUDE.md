@@ -21,8 +21,10 @@
 2. Run `bunx nitro prepare` before `bun tsc` if routes were added/modified
 2b. Run `bun run generate:graphql` if GraphQL schema changed (Pothos types/queries/mutations), then regenerate Apollo iOS types
 3. Run tests before committing: `bun test`
-5. Run `bunx biome check --write` to auto-fix formatting and lint
-6. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
+4. Run `bunx biome check --write` to auto-fix formatting and lint
+5. Fix remaining lint errors. `biome-ignore` is exceptional — only when justified, with an explanation in the comment
+6. **After merging a worktree to main**: run `bun run generate` to keep Swift types in sync
+7. **After GraphQL schema changes**: update iOS `.graphql` operations in `Features/*/GraphQL/`, regenerate Apollo types, update Swift API clients if needed, verify iOS build
 
 ## Commit Strategy
 
@@ -38,6 +40,9 @@
 - **`use-case.ts`** (optional): multi-domain orchestrations when a route needs to coordinate several commands/queries. Names carry business intent (`addWithTasting`, `removeCompletely` — never `handleX`, `processX`). No direct storage access.
 - **Read models**: `server/read-model/{domain}/` — composite views assembling multiple domains for display needs. Mirror the `domain/` structure. Only import public Query/Command namespaces, never repositories.
 - Branded types with `ts-brand` + Zod validation constructors in `primitives.ts`
+- **Branded types are primitives at runtime** — never wrap with `String()` or `Number()`. `BookTitle` IS a `string`, `Note` IS a `number`. The brand is compile-time only.
+- **Always use branded types** for structured values (URLs, IDs, names, etc.) — never raw `string`. Make fields required when logically always present.
+- **Never add a boolean** when its truth is derivable from another field (e.g. `finishedAt` implies `isFinished`)
 - Discriminated unions for expected business outcomes only (not technical errors). `throw` for impossible states (incoherent data → 500 + alert)
 - File-based storage: `useStorage('namespace')`
 - **Naming**: function names carry the business concept, not the technical pattern. The name IS the rule or action.
@@ -64,6 +69,7 @@
 - **Enums lowercase**: GraphQL enum values match the domain in lowercase. If a domain value contains a hyphen (`to-read`), use a custom scalar with the domain primitive instead of an enum. Every domain union type must have a primitive in `primitives.ts`
 - **Errors**: `GraphQLError` avec `extensions.code` pour les erreurs métier (`NOT_FOUND`)
 - **Custom scalars**: every branded type in `primitives.ts` must have a corresponding Pothos custom scalar in `builder.ts` (`Scalars` type + `defineScalar()` in `scalars.ts`). Resolvers receive pre-validated branded args — no manual `Primitive(value)` calls needed. When adding a new branded type, also update the Apollo iOS codegen scalar mapping in `ios/Pchook/Generated/GraphQL/Schema/CustomScalars/`
+- **Domain-first changes**: GraphQL type changes must always be reflected in domain types and primitives first. The domain is the source of truth. Order: (1) `types.ts`, (2) `primitives.ts`, (3) GraphQL layer, (4) commands/queries if shape changed
 
 See [docs/architecture.md](docs/architecture.md) for full architecture overview.
 See [docs/domain-guide.md](docs/domain-guide.md) for step-by-step domain creation.
@@ -119,6 +125,9 @@ See [docs/ios-guide.md](docs/ios-guide.md) for full iOS guide.
 - **Never `switch`** — use `match()` from `ts-pattern` with `.exhaustive()`
 - **Never `for`/`while` loops** — use `map`/`filter`/`reduce`, chaining, and lodash-es utilities for readability
 - **Arrays never optional** — `[]` is the neutral state, never `null`/`undefined`/`nil`
+- **Never `String()`/`Number()` on branded types** — they ARE the underlying primitive at runtime. The brand is compile-time only.
+- **All code in English** — comments, descriptions, variable names. French only for i18n values.
+- **Always update .env.example, docker-compose, CLAUDE.md and README** when adding new env vars
 
 See [docs/code-style.md](docs/code-style.md) for full rules with examples.
 
