@@ -53,24 +53,7 @@ enum GraphQLAudibleAPI {
                 status: AudibleSyncStatus(rawValue: sync.status) ?? .disconnected,
                 updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 libraryCount: sync.libraryCount,
-                wishlistCount: sync.wishlistCount,
-                entries: sync.entries.map { entry in
-                    AudibleEntryData(
-                        asin: entry.asin,
-                        title: entry.title,
-                        authors: entry.authors,
-                        narrators: entry.narrators,
-                        durationMinutes: entry.durationMinutes,
-                        publisher: entry.publisher,
-                        language: entry.language,
-                        coverUrl: entry.coverUrl,
-                        finishedAt: entry.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
-                        seriesName: entry.seriesName,
-                        seriesPosition: entry.seriesPosition,
-                        source: entry.source,
-                        downloadedAt: GraphQLHelpers.parseISO8601(entry.downloadedAt) ?? Date()
-                    )
-                }
+                wishlistCount: sync.wishlistCount
             ),
             import_: AudibleImportData(
                 importedCount: imp.importedCount,

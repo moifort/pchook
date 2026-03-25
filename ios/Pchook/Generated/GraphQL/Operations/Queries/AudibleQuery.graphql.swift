@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Audible"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Audible { audible { __typename sync { __typename status updatedAt libraryCount wishlistCount entries { __typename asin title authors narrators durationMinutes publisher language coverUrl finishedAt seriesName seriesPosition source downloadedAt } } import { __typename status importedCount totalCount delta current total message startedAt completedAt } } }"#
+        #"query Audible { audible { __typename sync { __typename status updatedAt libraryCount wishlistCount } import { __typename status importedCount totalCount delta current total message startedAt completedAt } } }"#
       ))
 
     public init() {}
@@ -64,7 +64,6 @@ extension PchookGraphQL {
             .field("updatedAt", PchookGraphQL.DateTime?.self),
             .field("libraryCount", Int.self),
             .field("wishlistCount", Int.self),
-            .field("entries", [Entry].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             AudibleQuery.Data.Audible.Sync.self
@@ -78,64 +77,6 @@ extension PchookGraphQL {
           var libraryCount: Int { __data["libraryCount"] }
           /// Number of wishlist items
           var wishlistCount: Int { __data["wishlistCount"] }
-          /// Fetched Audible entries
-          var entries: [Entry] { __data["entries"] }
-
-          /// Audible.Sync.Entry
-          ///
-          /// Parent Type: `AudibleEntry`
-          struct Entry: PchookGraphQL.SelectionSet {
-            let __data: DataDict
-            init(_dataDict: DataDict) { __data = _dataDict }
-
-            static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleEntry }
-            static var __selections: [ApolloAPI.Selection] { [
-              .field("__typename", String.self),
-              .field("asin", PchookGraphQL.Asin.self),
-              .field("title", String.self),
-              .field("authors", [String].self),
-              .field("narrators", [String].self),
-              .field("durationMinutes", Int.self),
-              .field("publisher", String?.self),
-              .field("language", String?.self),
-              .field("coverUrl", PchookGraphQL.Url?.self),
-              .field("finishedAt", PchookGraphQL.DateTime?.self),
-              .field("seriesName", String?.self),
-              .field("seriesPosition", PchookGraphQL.SeriesPosition?.self),
-              .field("source", PchookGraphQL.AudibleSource.self),
-              .field("downloadedAt", PchookGraphQL.DateTime.self),
-            ] }
-            static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-              AudibleQuery.Data.Audible.Sync.Entry.self
-            ] }
-
-            /// Amazon Standard Identification Number
-            var asin: PchookGraphQL.Asin { __data["asin"] }
-            /// Book title
-            var title: String { __data["title"] }
-            /// Author names
-            var authors: [String] { __data["authors"] }
-            /// Narrator names
-            var narrators: [String] { __data["narrators"] }
-            /// Duration in minutes
-            var durationMinutes: Int { __data["durationMinutes"] }
-            /// Publisher name
-            var publisher: String? { __data["publisher"] }
-            /// Language
-            var language: String? { __data["language"] }
-            /// Cover image URL
-            var coverUrl: PchookGraphQL.Url? { __data["coverUrl"] }
-            /// Date the book was finished listening
-            var finishedAt: PchookGraphQL.DateTime? { __data["finishedAt"] }
-            /// Series name
-            var seriesName: String? { __data["seriesName"] }
-            /// Position in the series
-            var seriesPosition: PchookGraphQL.SeriesPosition? { __data["seriesPosition"] }
-            /// Item source
-            var source: PchookGraphQL.AudibleSource { __data["source"] }
-            /// Download timestamp
-            var downloadedAt: PchookGraphQL.DateTime { __data["downloadedAt"] }
-          }
         }
 
         /// Audible.Import

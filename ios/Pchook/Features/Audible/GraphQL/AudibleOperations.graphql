@@ -5,21 +5,6 @@ query Audible {
       updatedAt
       libraryCount
       wishlistCount
-      entries {
-        asin
-        title
-        authors
-        narrators
-        durationMinutes
-        publisher
-        language
-        coverUrl
-        finishedAt
-        seriesName
-        seriesPosition
-        source
-        downloadedAt
-      }
     }
     import {
       status
