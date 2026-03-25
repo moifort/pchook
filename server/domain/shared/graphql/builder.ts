@@ -15,9 +15,11 @@ import type {
 import type { Asin, AudibleSource, AudibleSyncStatus } from '~/domain/provider/audible/types'
 import type { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/types'
 import type { Eur, PersonName, Url } from '~/domain/shared/types'
+import type { Loaders } from './loaders'
 
 export type GraphQLContext = {
   event: H3Event
+  loaders: Loaders
 }
 
 const DateTimeScalar = new GraphQLScalarType({

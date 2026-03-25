@@ -6,11 +6,17 @@ import { BookQuery } from '~/domain/book/query'
 import { ReviewQuery } from '~/domain/review/query'
 import { SeriesName } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
+import { createLoaders } from '~/domain/shared/graphql/loaders'
 import { schema } from '~/domain/shared/graphql/schema'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 
 const execute = (query: string, variables?: Record<string, unknown>) =>
-  graphql({ schema, source: query, variableValues: variables, contextValue: {} })
+  graphql({
+    schema,
+    source: query,
+    variableValues: variables,
+    contextValue: { loaders: createLoaders() },
+  })
 
 feature('GraphQL mutation: updateBook', () => {
   scenario('updates book fields', async () => {

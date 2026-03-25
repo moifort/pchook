@@ -28,6 +28,7 @@
     "@sentry/bun": "10.45.0",
     "audible-api-ts": "0.2.0",
     "consola": "3.4.2",
+    "dataloader": "2.2.3",
     "graphql": "16.13.1",
     "lodash-es": "4.17.23",
     "ts-pattern": "5.9.0",

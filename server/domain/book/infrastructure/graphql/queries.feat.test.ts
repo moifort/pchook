@@ -6,11 +6,17 @@ import { ReviewCommand } from '~/domain/review/command'
 import type { Review } from '~/domain/review/types'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
+import { createLoaders } from '~/domain/shared/graphql/loaders'
 import { schema } from '~/domain/shared/graphql/schema'
 import { and, feature, given, scenario, then, when } from '~/test/bdd'
 
 const execute = (query: string, variables?: Record<string, unknown>) =>
-  graphql({ schema, source: query, variableValues: variables, contextValue: {} })
+  graphql({
+    schema,
+    source: query,
+    variableValues: variables,
+    contextValue: { loaders: createLoaders() },
+  })
 
 feature('GraphQL query: books', () => {
   scenario('lists all books', async () => {

@@ -1,4 +1,5 @@
 import { type ApolloServer, HeaderMap } from '@apollo/server'
+import { createLoaders } from '~/domain/shared/graphql/loaders'
 
 export default defineEventHandler(async (event) => {
   const apollo = useApollo()
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event) => {
         body: undefined,
         search: searchParams.toString(),
       },
-      context: async () => ({ event }),
+      context: async () => ({ event, loaders: createLoaders() }),
     })
 
     return sendApolloResponse(event, response)
@@ -37,7 +38,7 @@ export default defineEventHandler(async (event) => {
       body,
       search: '',
     },
-    context: async () => ({ event }),
+    context: async () => ({ event, loaders: createLoaders() }),
   })
 
   return sendApolloResponse(event, response)
