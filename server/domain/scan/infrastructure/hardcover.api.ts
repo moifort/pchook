@@ -52,13 +52,6 @@ type BookResult = {
   books: BookFields[]
 }
 
-type EditionResult = {
-  editions: {
-    book_id: number
-    book: BookFields
-  }[]
-}
-
 const query = async <T>(graphqlQuery: string, variables: Record<string, unknown> = {}) => {
   const { hardcoverApiToken } = config()
   if (!hardcoverApiToken) return undefined
@@ -112,28 +105,6 @@ const BOOK_FIELDS = `
   cached_tags
   image { url }
 `
-
-export const searchByIsbn = async (isbn: string): Promise<HardcoverBookData | undefined> => {
-  log.info('Searching by ISBN', isbn)
-
-  const data = await query<EditionResult>(
-    `query ($isbn: String!) {
-      editions(where: { isbn_13: { _eq: $isbn } }, limit: 1) {
-        book_id
-        book { ${BOOK_FIELDS} }
-      }
-    }`,
-    { isbn },
-  )
-
-  const edition = data?.editions[0]
-  if (!edition) {
-    log.info('No edition found for ISBN', isbn)
-    return undefined
-  }
-
-  return toBookData(edition.book)
-}
 
 export const searchByTitle = async (
   title: string,

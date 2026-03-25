@@ -4,11 +4,7 @@ import {
   callGemini,
   normalizeBookFormat,
 } from '~/domain/scan/infrastructure/gemini'
-import {
-  fetchCoverImage,
-  searchByIsbn,
-  searchByTitle,
-} from '~/domain/scan/infrastructure/hardcover.api'
+import { fetchCoverImage, searchByTitle } from '~/domain/scan/infrastructure/hardcover.api'
 import * as repository from '~/domain/scan/infrastructure/repository'
 import { ImageHash } from '~/domain/scan/primitives'
 import { partialScanResultSchema, scanResultSchema } from '~/domain/scan/schemas'
@@ -132,10 +128,7 @@ export type HardcoverEnrichment = {
 
 export const enrichWithHardcover = async (scanResult: ScanResult): Promise<HardcoverEnrichment> => {
   try {
-    const data = scanResult.isbn
-      ? ((await searchByIsbn(scanResult.isbn)) ??
-        (await searchByTitle(scanResult.title, scanResult.authors)))
-      : await searchByTitle(scanResult.title, scanResult.authors)
+    const data = await searchByTitle(scanResult.title, scanResult.authors)
 
     if (!data) return { result: scanResult }
 
