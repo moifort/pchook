@@ -7,7 +7,7 @@
   "packageRules": [
     {
       "description": "Automerge non-major updates in a single grouped PR",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "groupName": "non-major dependencies",
       "commitMessageTopic": "dependencies",
       "automerge": true,
