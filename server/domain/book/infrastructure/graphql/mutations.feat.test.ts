@@ -128,14 +128,14 @@ feature('GraphQL mutation: addReview', () => {
       }`,
       {
         bookId: book.id,
-        input: { rating: 9, readDate: '2024-06-15', reviewNotes: "Chef-d'œuvre du naturalisme" },
+        input: { rating: 4, readDate: '2024-06-15', reviewNotes: "Chef-d'œuvre du naturalisme" },
       },
     )
 
     then('review is created')
     expect(result.errors).toBeUndefined()
     const data = result.data?.addReview as Record<string, unknown>
-    expect(data.rating).toBe(9)
+    expect(data.rating).toBe(4)
     expect(data.reviewNotes).toBe("Chef-d'œuvre du naturalisme")
 
     and('book is marked as read')
