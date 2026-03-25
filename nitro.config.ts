@@ -32,5 +32,7 @@ export default defineNitroConfig({
     'audible-credentials': { driver: 'fs', base: './.data/db/audible-credentials' },
     'audible-mappings': { driver: 'fs', base: './.data/db/audible-mappings' },
     'audible-auth-sessions': { driver: 'fs', base: './.data/db/audible-auth-sessions' },
+    'audible-raw': { driver: 'fs', base: './.data/db/audible-raw' },
+    'audible-sync-meta': { driver: 'fs', base: './.data/db/audible-sync-meta' },
   },
 })

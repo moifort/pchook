@@ -70,5 +70,7 @@ mutation AudibleImportStart {
     current
     total
     message
+    startedAt
+    completedAt
   }
 }
