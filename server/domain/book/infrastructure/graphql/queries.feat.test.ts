@@ -18,19 +18,28 @@ const execute = (query: string, variables?: Record<string, unknown>) =>
     contextValue: { loaders: createLoaders() },
   })
 
+type BooksResult = {
+  items: { title: string; status?: string; genre?: string }[]
+  totalCount: number
+  hasMore: boolean
+}
+
 feature('GraphQL query: books', () => {
-  scenario('lists all books', async () => {
+  scenario('lists all books with pagination metadata', async () => {
     given('several books exist')
     await BookCommand.add(BookTitle('Germinal'), { genre: Genre('Roman naturaliste') })
     await BookCommand.add(BookTitle('Le Petit Prince'), { genre: Genre('Conte') })
     await BookCommand.add(BookTitle('Les Fleurs du Mal'), { genre: Genre('Poésie') })
 
     when('books query is called without filters')
-    const result = await execute('{ books { id title genre } }')
+    const result = await execute('{ books { items { title genre } totalCount hasMore } }')
 
-    then('all books are returned')
+    then('all books are returned with pagination info')
     expect(result.errors).toBeUndefined()
-    expect(result.data?.books).toHaveLength(3)
+    const books = result.data?.books as BooksResult
+    expect(books.items).toHaveLength(3)
+    expect(books.totalCount).toBe(3)
+    expect(books.hasMore).toBe(false)
   })
 
   scenario('filters books by status', async () => {
@@ -40,14 +49,17 @@ feature('GraphQL query: books', () => {
     await BookCommand.add(BookTitle('Les Fleurs du Mal'), { status: 'to-read' })
 
     when('books query is called with status filter')
-    const result = await execute('{ books(status: "to-read") { id title status } }')
+    const result = await execute(
+      '{ books(status: "to-read") { items { title status } totalCount } }',
+    )
 
     then('only to-read books are returned')
     expect(result.errors).toBeUndefined()
-    expect(result.data?.books).toHaveLength(2)
+    const books = result.data?.books as BooksResult
+    expect(books.items).toHaveLength(2)
+    expect(books.totalCount).toBe(2)
     and('all returned books have status to-read')
-    const books = result.data?.books as { status: string }[]
-    expect(books.every(({ status }) => status === 'to-read')).toBe(true)
+    expect(books.items.every(({ status }) => status === 'to-read')).toBe(true)
   })
 
   scenario('sorts books by title ascending', async () => {
@@ -57,13 +69,45 @@ feature('GraphQL query: books', () => {
     await BookCommand.add(BookTitle('Anna Karénine'), {})
 
     when('books query is called with sort and order')
-    const result = await execute('{ books(sort: title, order: asc) { title } }')
+    const result = await execute('{ books(sort: title, order: asc) { items { title } } }')
 
     then('books are sorted alphabetically')
     expect(result.errors).toBeUndefined()
-    const books = result.data?.books as { title: string }[]
-    expect(books[0].title).toBe('Anna Karénine')
-    expect(books[2].title).toBe('Les Fleurs du Mal')
+    const books = result.data?.books as BooksResult
+    expect(books.items[0].title).toBe('Anna Karénine')
+    expect(books.items[2].title).toBe('Les Fleurs du Mal')
+  })
+
+  scenario('paginates with offset and limit', async () => {
+    given('five books exist')
+    await BookCommand.add(BookTitle('Book A'), {})
+    await BookCommand.add(BookTitle('Book B'), {})
+    await BookCommand.add(BookTitle('Book C'), {})
+    await BookCommand.add(BookTitle('Book D'), {})
+    await BookCommand.add(BookTitle('Book E'), {})
+
+    when('first page is requested with limit 2')
+    const page1 = await execute(
+      '{ books(sort: title, order: asc, limit: 2) { items { title } totalCount hasMore } }',
+    )
+
+    then('2 items are returned with hasMore true')
+    expect(page1.errors).toBeUndefined()
+    const first = page1.data?.books as BooksResult
+    expect(first.items).toHaveLength(2)
+    expect(first.totalCount).toBe(5)
+    expect(first.hasMore).toBe(true)
+
+    when('last page is requested')
+    const page3 = await execute(
+      '{ books(sort: title, order: asc, offset: 4, limit: 2) { items { title } totalCount hasMore } }',
+    )
+
+    then('1 item is returned with hasMore false')
+    const last = page3.data?.books as BooksResult
+    expect(last.items).toHaveLength(1)
+    expect(last.totalCount).toBe(5)
+    expect(last.hasMore).toBe(false)
   })
 })
 

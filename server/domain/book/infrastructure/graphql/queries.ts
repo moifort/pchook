@@ -8,7 +8,7 @@ import { ReviewQuery } from '~/domain/review/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { Url } from '~/domain/shared/primitives'
 import { BookSortEnum, SortOrderEnum } from './enums'
-import { BookType } from './types'
+import { BooksType, BookType } from './types'
 
 builder.objectField(BookType, 'coverImageUrl', (t) =>
   t.field({
@@ -25,13 +25,15 @@ builder.objectField(BookType, 'coverImageUrl', (t) =>
 
 builder.queryField('books', (t) =>
   t.field({
-    type: [BookType],
-    description: 'Book list with filters and sorting',
+    type: BooksType,
+    description: 'Paginated book list with filters and sorting',
     args: {
       genre: t.arg({ type: 'Genre', description: 'Filter by literary genre' }),
       status: t.arg.string({ description: 'Filter by reading status (to-read, read)' }),
       sort: t.arg({ type: BookSortEnum, description: 'Sort field' }),
       order: t.arg({ type: SortOrderEnum, description: 'Sort order' }),
+      offset: t.arg.int({ description: 'Page offset (default 0)', defaultValue: 0 }),
+      limit: t.arg.int({ description: 'Page size (default 20)', defaultValue: 20 }),
     },
     resolve: async (_, args) => {
       const allBooks = await BookQuery.findAll()
@@ -60,7 +62,12 @@ builder.queryField('books', (t) =>
           .exhaustive(),
       )
 
-      return desc ? sorted.reverse() : sorted
+      const ordered = desc ? sorted.reverse() : sorted
+      const offset = args.offset ?? 0
+      const limit = args.limit ?? 20
+      const items = ordered.slice(offset, offset + limit)
+
+      return { items, totalCount: ordered.length, hasMore: offset + limit < ordered.length }
     },
   }),
 )

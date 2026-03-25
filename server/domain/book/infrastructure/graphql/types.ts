@@ -2,6 +2,25 @@ import type { Book, PublicRating as PublicRatingType } from '~/domain/book/types
 import { builder } from '~/domain/shared/graphql/builder'
 import { BookFormatEnum, ImportSourceEnum, LanguageEnum } from './enums'
 
+type BooksShape = { items: Book[]; totalCount: number; hasMore: boolean }
+
+export const BooksType = builder.objectRef<BooksShape>('Books').implement({
+  description: 'Paginated book list',
+  fields: (t) => ({
+    items: t.field({
+      type: [BookType],
+      description: 'Books in the current page',
+      resolve: ({ items }) => items,
+    }),
+    totalCount: t.exposeInt('totalCount', {
+      description: 'Total number of books matching the filters',
+    }),
+    hasMore: t.exposeBoolean('hasMore', {
+      description: 'Whether more books are available after this page',
+    }),
+  }),
+})
+
 export const AwardType = builder.objectRef<{ name: string; year?: number }>('Award').implement({
   description: 'Literary award received by a book',
   fields: (t) => ({
