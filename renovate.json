@@ -15,10 +15,9 @@
       "automergeStrategy": "squash"
     },
     {
-      "description": "Major updates: separate PRs with review request",
+      "description": "Major updates: separate PRs, no automerge",
       "matchUpdateTypes": ["major"],
       "labels": ["dependencies", "major"],
-      "reviewers": ["moifort"],
       "automerge": false
     }
   ],
