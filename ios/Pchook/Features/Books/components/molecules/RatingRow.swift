@@ -13,7 +13,7 @@ struct RatingRow: View {
     }
 
     private var formattedScore: String {
-        String(format: "%.2f/5", normalizedScore)
+        String(format: "%.1f/5", normalizedScore)
     }
 
     private var formattedVoterCount: String? {
