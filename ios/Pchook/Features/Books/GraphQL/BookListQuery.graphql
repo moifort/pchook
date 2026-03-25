@@ -1,27 +1,49 @@
-query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder) {
-  books(genre: $genre, status: $status, sort: $sort, order: $order) {
-    id
-    title
-    authors
-    genre
-    status
-    estimatedPrice
-    awards {
-      name
-      year
+query BookList(
+  $genre: Genre
+  $status: String
+  $sort: BookSort
+  $order: SortOrder
+  $isFavorite: Boolean
+  $hasSeries: Boolean
+  $offset: Int
+  $limit: Int
+) {
+  books(
+    genre: $genre
+    status: $status
+    sort: $sort
+    order: $order
+    isFavorite: $isFavorite
+    hasSeries: $hasSeries
+    offset: $offset
+    limit: $limit
+  ) {
+    items {
+      id
+      title
+      authors
+      genre
+      status
+      estimatedPrice
+      awards {
+        name
+        year
+      }
+      review {
+        rating
+      }
+      language
+      series {
+        name
+      }
+      seriesVolume {
+        label
+        position
+      }
+      coverImageUrl
+      createdAt
     }
-    review {
-      rating
-    }
-    language
-    series {
-      name
-    }
-    seriesVolume {
-      label
-      position
-    }
-    coverImageUrl
-    createdAt
+    totalCount
+    hasMore
   }
 }

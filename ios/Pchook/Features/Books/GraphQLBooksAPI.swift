@@ -10,17 +10,27 @@ enum GraphQLBooksAPI {
 
     static func list(
         genre: String? = nil, status: String? = nil,
-        sort: String? = nil, order: String? = nil
-    ) async throws -> [BookListItem] {
+        sort: String? = nil, order: String? = nil,
+        isFavorite: Bool? = nil, hasSeries: Bool? = nil,
+        offset: Int? = nil, limit: Int? = nil
+    ) async throws -> BookListPage {
         let query = PchookGraphQL.BookListQuery(
             genre: graphQLNullable(genre),
             status: graphQLNullable(status),
             sort: sort.flatMap { PchookGraphQL.BookSort(rawValue: $0) }.map { .some(.case($0)) } ?? .none,
-            order: order.flatMap { PchookGraphQL.SortOrder(rawValue: $0) }.map { .some(.case($0)) } ?? .none
+            order: order.flatMap { PchookGraphQL.SortOrder(rawValue: $0) }.map { .some(.case($0)) } ?? .none,
+            isFavorite: isFavorite.map { .some($0) } ?? .none,
+            hasSeries: hasSeries.map { .some($0) } ?? .none,
+            offset: offset.map { .some($0) } ?? .none,
+            limit: limit.map { .some($0) } ?? .none
         )
 
         let data = try await GraphQLHelpers.fetch(client, query: query)
-        return data.books.map { mapBookListItem($0) }
+        return BookListPage(
+            items: data.books.items.map { mapBookListItem($0) },
+            totalCount: data.books.totalCount,
+            hasMore: data.books.hasMore
+        )
     }
 
     static func getDetail(id: String) async throws -> BookDetailData {
@@ -132,7 +142,7 @@ private extension GraphQLBooksAPI {
         return ImportSource(rawValue: source.rawValue)
     }
 
-    static func mapBookListItem(_ book: PchookGraphQL.BookListQuery.Data.Book) -> BookListItem {
+    static func mapBookListItem(_ book: PchookGraphQL.BookListQuery.Data.Books.Item) -> BookListItem {
         let awards = (book.awards).map { Award(name: $0.name, year: $0.year) }
         return BookListItem(
             id: book.id,

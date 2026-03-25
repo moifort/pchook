@@ -66,29 +66,16 @@ enum BookSort: String, CaseIterable, Identifiable {
 final class BooksViewModel {
     var books: [BookListItem] = []
     var isLoading = false
+    var isLoadingMore = false
     var hasBooks = false
+    var hasMore = false
+    var totalCount = 0
     var error: String?
     var sort: BookSort = .createdAt
     var sortDescending = true
     var mode: BookListMode = .all
 
-    var displayedBooks: [BookListItem] {
-        switch mode {
-        case .all: books
-        case .toRead: books.filter { $0.status == .toRead }
-        case .series: books.filter { $0.seriesName != nil }
-        case .favorites: books.filter { $0.rating == 5 }
-        }
-    }
-
-    func count(for mode: BookListMode) -> Int {
-        switch mode {
-        case .all: books.count
-        case .toRead: books.filter { $0.status == .toRead }.count
-        case .series: Set(books.compactMap { $0.seriesName }).count
-        case .favorites: books.filter { $0.rating == 5 }.count
-        }
-    }
+    private let pageSize = 20
 
     var usesGrouping: Bool {
         sort != .title || mode == .series
@@ -96,9 +83,9 @@ final class BooksViewModel {
 
     var groupedBooks: [BookSection] {
         if mode == .series {
-            return BookGrouping.groupedBySeries(books: displayedBooks)
+            return BookGrouping.groupedBySeries(books: books)
         }
-        return BookGrouping.grouped(books: displayedBooks, sort: sort, descending: sortDescending)
+        return BookGrouping.grouped(books: books, sort: sort, descending: sortDescending)
     }
 
     func subtitle(for book: BookListItem) -> String? {
@@ -121,8 +108,7 @@ final class BooksViewModel {
     }
 
     var navigationSubtitle: String {
-        let count = displayedBooks.count
-        return "\(mode.subtitle) · \(count) \(count <= 1 ? "livre" : "livres")"
+        "\(mode.subtitle) · \(totalCount) \(totalCount <= 1 ? "livre" : "livres")"
     }
 
     var filterKey: String {
@@ -133,12 +119,10 @@ final class BooksViewModel {
         isLoading = true
         error = nil
         do {
-            let apiSort = sort == .myRating ? "createdAt" : sort.rawValue
-            books = try await GraphQLBooksAPI.list(
-                status: nil,
-                sort: apiSort,
-                order: sortDescending ? "desc" : "asc"
-            )
+            let page = try await fetchPage(offset: 0)
+            books = page.items
+            totalCount = page.totalCount
+            hasMore = page.hasMore
             if !books.isEmpty { hasBooks = true }
         } catch is CancellationError {
             // Ignored — task cancelled by SwiftUI (e.g. refreshTrigger changed)
@@ -146,5 +130,44 @@ final class BooksViewModel {
             self.error = reportError(error)
         }
         isLoading = false
+    }
+
+    func loadMore() async {
+        guard !isLoadingMore && hasMore else { return }
+        isLoadingMore = true
+        do {
+            let page = try await fetchPage(offset: books.count)
+            books.append(contentsOf: page.items)
+            totalCount = page.totalCount
+            hasMore = page.hasMore
+        } catch is CancellationError {
+            // Ignored
+        } catch {
+            self.error = reportError(error)
+        }
+        isLoadingMore = false
+    }
+
+    private func fetchPage(offset: Int) async throws -> BookListPage {
+        var status: String?
+        var isFavorite: Bool?
+        var hasSeries: Bool?
+
+        switch mode {
+        case .all: break
+        case .toRead: status = "to-read"
+        case .series: hasSeries = true
+        case .favorites: isFavorite = true
+        }
+
+        return try await GraphQLBooksAPI.list(
+            status: status,
+            sort: sort.rawValue,
+            order: sortDescending ? "desc" : "asc",
+            isFavorite: isFavorite,
+            hasSeries: hasSeries,
+            offset: offset,
+            limit: pageSize
+        )
     }
 }

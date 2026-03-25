@@ -177,6 +177,12 @@ struct BookListItem: Identifiable, Sendable {
     let createdAt: Date
 }
 
+struct BookListPage: Sendable {
+    let items: [BookListItem]
+    let totalCount: Int
+    let hasMore: Bool
+}
+
 // MARK: - Book Detail
 
 struct SeriesVolume: Identifiable, Sendable {

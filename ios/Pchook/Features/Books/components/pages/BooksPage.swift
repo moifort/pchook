@@ -15,7 +15,7 @@ struct BooksPage: View {
                     ProgressView("Chargement...")
                 } else if let error = viewModel.error {
                     ContentUnavailableView("Erreur", systemImage: "exclamationmark.triangle", description: Text(error))
-                } else if viewModel.displayedBooks.isEmpty {
+                } else if viewModel.books.isEmpty {
                     emptyState
                 } else {
                     List {
@@ -35,15 +35,22 @@ struct BooksPage: View {
                                 }
                             }
                         } else {
-                            ForEach(viewModel.displayedBooks) { book in
+                            ForEach(viewModel.books) { book in
                                 bookButton(book)
                             }
+                        }
+
+                        if viewModel.hasMore {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .listRowSeparator(.hidden)
+                                .task { await viewModel.loadMore() }
                         }
                     }
                 }
             }
-            .navigationTitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.mode.title)
-            .navigationSubtitle(viewModel.displayedBooks.isEmpty ? "" : viewModel.navigationSubtitle)
+            .navigationTitle(viewModel.books.isEmpty ? "" : viewModel.mode.title)
+            .navigationSubtitle(viewModel.books.isEmpty ? "" : viewModel.navigationSubtitle)
             .navigationBarTitleDisplayMode(.large)
             .sentryTrace("Book List", waitForFullDisplay: true)
             .refreshable { await viewModel.load() }

@@ -38,6 +38,7 @@ extension PchookGraphQL {
       case "Book": return PchookGraphQL.Objects.Book
       case "BookCount": return PchookGraphQL.Objects.BookCount
       case "BookPreview": return PchookGraphQL.Objects.BookPreview
+      case "Books": return PchookGraphQL.Objects.Books
       case "ConfirmBookResult": return PchookGraphQL.Objects.ConfirmBookResult
       case "DashboardView": return PchookGraphQL.Objects.DashboardView
       case "FavoriteBook": return PchookGraphQL.Objects.FavoriteBook
