@@ -13,13 +13,15 @@ struct BookDetailContent: View {
 
     var body: some View {
         List {
-            Section {
-                HStack {
-                    Spacer()
-                    CoverImageView(imageUrl: detail.coverImageUrl)
-                    Spacer()
+            if detail.coverImageUrl != nil {
+                Section {
+                    HStack {
+                        Spacer()
+                        CoverImageView(imageUrl: detail.coverImageUrl)
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
                 }
-                .listRowBackground(Color.clear)
             }
 
             BookDetailHeader(
