@@ -84,7 +84,8 @@ feature('GraphQL query: book', () => {
         title
         genre
         review { rating readDate reviewNotes }
-        series { id name label position volumes { title } }
+        series { id name volumes { title } }
+        seriesVolume { title label position }
       }
     }`)
 
@@ -102,8 +103,11 @@ feature('GraphQL query: book', () => {
     and('series is included')
     const seriesData = data.series as Record<string, unknown>
     expect(seriesData.name).toBe('Les Rougon-Macquart')
-    expect(seriesData.label).toBe('Tome 13')
-    expect(seriesData.position).toBe(13)
+
+    and('series volume is included')
+    const volumeData = data.seriesVolume as Record<string, unknown>
+    expect(volumeData.label).toBe('Tome 13')
+    expect(volumeData.position).toBe(13)
   })
 
   scenario('returns null for non-existent book', async () => {

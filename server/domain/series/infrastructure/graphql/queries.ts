@@ -1,3 +1,4 @@
+import { booksInLanguage } from '~/domain/series/business-rules'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { SeriesType, SeriesVolumeType } from './types'
@@ -5,12 +6,13 @@ import { SeriesType, SeriesVolumeType } from './types'
 builder.objectField(SeriesType, 'volumes', (t) =>
   t.field({
     type: [SeriesVolumeType],
-    description: 'All volumes in this series',
-    resolve: async ({ id }) => {
+    description: 'All volumes in this series (filtered by language when accessed from a book)',
+    resolve: async ({ id, filterLanguage }) => {
       const result = await SeriesQuery.getById(id)
       if (result === 'not-found') return []
 
-      return result.books.map(({ id, title, label, position }) => ({
+      const books = filterLanguage ? booksInLanguage(result.books, filterLanguage) : result.books
+      return books.map(({ id, title, label, position }) => ({
         id,
         title,
         label,

@@ -358,9 +358,14 @@ type Book {
   review: Review
 
   """
-  Series information
+  Series this book belongs to
   """
-  series: SeriesInfo
+  series: Series
+
+  """
+  This book's volume entry in its series (label and position)
+  """
+  seriesVolume: SeriesVolume
 
   """
   Reading status: TO_READ or READ
@@ -1419,37 +1424,7 @@ type Series {
   name: SeriesName!
 
   """
-  All volumes in this series
-  """
-  volumes: [SeriesVolume!]!
-}
-
-"""
-Series context for a specific book, including its position and sibling volumes
-"""
-type SeriesInfo {
-  """
-  Series ID
-  """
-  id: ID!
-
-  """
-  This book display label in the series (e.g. "Tome 3")
-  """
-  label: String!
-
-  """
-  Series name
-  """
-  name: String!
-
-  """
-  This book sort position in the series
-  """
-  position: Int!
-
-  """
-  All volumes in the series, filtered to the same language as this book
+  All volumes in this series (filtered by language when accessed from a book)
   """
   volumes: [SeriesVolume!]!
 }
