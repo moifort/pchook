@@ -13,6 +13,7 @@ builder.objectField(BookType, 'series', (t) =>
       return {
         id: entry.id,
         name: entry.name,
+        rating: entry.rating,
         createdAt: entry.createdAt,
         filterLanguage: language,
       }
