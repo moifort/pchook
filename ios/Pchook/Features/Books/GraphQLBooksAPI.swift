@@ -20,7 +20,7 @@ enum GraphQLBooksAPI {
         )
 
         let data = try await GraphQLHelpers.fetch(client, query: query)
-        return (data.books ?? []).map { mapBookListItem($0) }
+        return data.books.map { mapBookListItem($0) }
     }
 
     static func getDetail(id: String) async throws -> BookDetailData {

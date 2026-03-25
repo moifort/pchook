@@ -10,13 +10,13 @@ enum GraphQLAudibleAPI {
 
         let response = data.audibleAuthStart
         return AuthStartResponse(
-            loginUrl: response.loginUrl ?? "",
-            sessionId: response.sessionId ?? "",
-            cookies: (response.cookies ?? []).map { cookie in
+            loginUrl: response.loginUrl,
+            sessionId: response.sessionId,
+            cookies: response.cookies.map { cookie in
                 AuthCookie(
-                    name: cookie.name ?? "",
-                    value: cookie.value ?? "",
-                    domain: cookie.domain ?? ""
+                    name: cookie.name,
+                    value: cookie.value,
+                    domain: cookie.domain
                 )
             }
         )

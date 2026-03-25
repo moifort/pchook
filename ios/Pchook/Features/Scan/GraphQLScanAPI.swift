@@ -13,9 +13,9 @@ enum GraphQLScanAPI {
 
         let preview = data.analyzeBookCover
         return BookPreview(
-            previewId: preview.previewId ?? "",
-            title: preview.title ?? "",
-            authors: preview.authors ?? [],
+            previewId: preview.previewId,
+            title: preview.title,
+            authors: preview.authors,
             publisher: preview.publisher,
             publishedDate: preview.publishedDate,
             pageCount: preview.pageCount,
@@ -31,13 +31,13 @@ enum GraphQLScanAPI {
             estimatedPrice: preview.estimatedPrice,
             duration: preview.duration,
             narrators: preview.narrators,
-            awards: (preview.awards ?? []).map { Award(name: $0.name ?? "", year: $0.year) },
-            publicRatings: (preview.publicRatings ?? []).map {
+            awards: preview.awards.map { Award(name: $0.name, year: $0.year) },
+            publicRatings: preview.publicRatings.map {
                 PublicRating(
-                    source: $0.source ?? "",
-                    score: Double($0.score ?? 0),
-                    maxScore: Double($0.maxScore ?? 0),
-                    voterCount: $0.voterCount ?? 0,
+                    source: $0.source,
+                    score: Double($0.score),
+                    maxScore: Double($0.maxScore),
+                    voterCount: $0.voterCount,
                     url: $0.url
                 )
             }

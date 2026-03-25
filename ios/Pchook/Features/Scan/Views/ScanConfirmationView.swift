@@ -211,11 +211,6 @@ struct ScanConfirmationView: View {
             .filter { !$0.isEmpty }
         let editedGenre = genre.trimmingCharacters(in: .whitespaces)
         let originalGenre = preview.genres.joined(separator: ", ")
-        let editedNarrators = narrators
-            .split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty }
-
         var overrides = ConfirmBookOverrides()
         var hasChanges = false
 

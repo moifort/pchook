@@ -17,9 +17,9 @@ enum GraphQLDashboardAPI {
             ),
             favorites: dashboard.favorites.map { fav in
                 FavoriteBook(
-                    id: fav.id ?? "",
-                    title: fav.title ?? "",
-                    authors: fav.authors ?? [],
+                    id: fav.id,
+                    title: fav.title,
+                    authors: fav.authors,
                     genre: fav.genre,
                     rating: fav.rating,
                     readDate: fav.readDate.flatMap(GraphQLHelpers.parseISO8601),
@@ -28,18 +28,18 @@ enum GraphQLDashboardAPI {
             },
             recentBooks: dashboard.recentBooks.map { book in
                 RecentBook(
-                    id: book.id ?? "",
-                    title: book.title ?? "",
-                    authors: book.authors ?? [],
+                    id: book.id,
+                    title: book.title,
+                    authors: book.authors,
                     genre: book.genre,
-                    createdAt: GraphQLHelpers.parseISO8601(book.createdAt ?? "") ?? Date()
+                    createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date()
                 )
             },
             recentAwards: dashboard.recentAwards.map { award in
                 RecentAward(
-                    bookTitle: award.bookTitle ?? "",
-                    authors: award.authors ?? [],
-                    awardName: award.awardName ?? "",
+                    bookTitle: award.bookTitle,
+                    authors: award.authors,
+                    awardName: award.awardName,
                     awardYear: award.awardYear
                 )
             }
