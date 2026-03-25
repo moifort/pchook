@@ -21,15 +21,16 @@ class ShareViewController: UIViewController {
 
         if let urlProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }) {
             urlProvider.loadItem(forTypeIdentifier: UTType.url.identifier) { [weak self] item, _ in
+                guard let self else { return }
                 guard let url = item as? URL else {
-                    Task { @MainActor in self?.close() }
+                    Task { @MainActor in self.close() }
                     return
                 }
                 print("[PchookShare] URL: \(url)")
-                self?.loadRawText(from: attachments) { rawText in
+                self.loadRawText(from: attachments) { rawText in
                     print("[PchookShare] Raw text: \(rawText ?? "nil")")
                     Task { @MainActor in
-                        self?.showShareView(
+                        self.showShareView(
                             url: url,
                             description: description,
                             rawText: rawText,
@@ -40,13 +41,14 @@ class ShareViewController: UIViewController {
             }
         } else if let textProvider = attachments.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.text.identifier) }) {
             textProvider.loadItem(forTypeIdentifier: UTType.text.identifier) { [weak self] item, _ in
+                guard let self else { return }
                 guard let text = item as? String, let url = URL(string: text) else {
-                    Task { @MainActor in self?.close() }
+                    Task { @MainActor in self.close() }
                     return
                 }
                 print("[PchookShare] URL (from text): \(url)")
                 Task { @MainActor in
-                    self?.showShareView(
+                    self.showShareView(
                         url: url,
                         description: description,
                         rawText: text,
