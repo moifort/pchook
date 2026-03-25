@@ -10,7 +10,7 @@ struct SeriesSection: View {
     var onRateSeries: () -> Void = {}
 
     var body: some View {
-        Section("Série : \(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces)) {
+        Section("\(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces)) {
             ratingRow
             ForEach(items) { (book: Item) in
                 if book.id == currentBookId {

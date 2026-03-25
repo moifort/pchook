@@ -69,7 +69,7 @@ struct AudibleEntriesPage: View {
                             }
                         } header: {
                             HStack {
-                                Text(section.title == "Autres" ? section.title : "Série : \(section.title)")
+                                Text(section.title)
                                 if let flag = section.flag {
                                     Text(flag)
                                 }
@@ -93,15 +93,7 @@ struct AudibleEntriesPage: View {
     }
 
     private func entrySubtitle(_ entry: AudibleEntryData) -> String? {
-        let author = entry.authors.first
-        let flag = entry.language.flatMap { BookGrouping.flagEmoji(for: $0) }
-
-        return switch (author, flag) {
-        case let (author?, flag?): "\(author) · \(flag)"
-        case let (author?, nil): author
-        case let (nil, flag?): flag
-        case (nil, nil): nil as String?
-        }
+        entry.authors.first
     }
 }
 
