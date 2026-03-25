@@ -301,7 +301,6 @@ struct FavoriteBook: Identifiable, Sendable {
     let authors: [String]
     var genre: String?
     let rating: Int
-    var readDate: Date?
     var estimatedPrice: Double?
 }
 

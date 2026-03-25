@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Dashboard"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Dashboard { dashboard { __typename bookCount { __typename total toRead read } favorites { __typename id title authors genre rating readDate estimatedPrice } recentBooks { __typename id title authors genre createdAt } recentAwards { __typename bookTitle authors awardName awardYear } } }"#
+        #"query Dashboard { dashboard { __typename bookCount { __typename total toRead read } favorites { __typename id title authors genre rating estimatedPrice } recentBooks { __typename id title authors genre createdAt } recentAwards { __typename bookTitle authors awardName awardYear } } }"#
       ))
 
     public init() {}
@@ -97,7 +97,6 @@ extension PchookGraphQL {
             .field("authors", [PchookGraphQL.PersonName].self),
             .field("genre", PchookGraphQL.Genre?.self),
             .field("rating", PchookGraphQL.Note.self),
-            .field("readDate", PchookGraphQL.DateTime?.self),
             .field("estimatedPrice", PchookGraphQL.Eur?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -114,8 +113,6 @@ extension PchookGraphQL {
           var genre: PchookGraphQL.Genre? { __data["genre"] }
           /// Rating (0-10)
           var rating: PchookGraphQL.Note { __data["rating"] }
-          /// Read date
-          var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
           /// Estimated price in euros
           var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
         }

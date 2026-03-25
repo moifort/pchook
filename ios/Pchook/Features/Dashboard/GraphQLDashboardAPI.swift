@@ -22,7 +22,6 @@ enum GraphQLDashboardAPI {
                     authors: fav.authors,
                     genre: fav.genre,
                     rating: fav.rating,
-                    readDate: fav.readDate.flatMap(GraphQLHelpers.parseISO8601),
                     estimatedPrice: fav.estimatedPrice
                 )
             },
