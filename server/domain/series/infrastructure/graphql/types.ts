@@ -20,6 +20,12 @@ export const SeriesType = builder.objectRef<SeriesShape>('Series').implement({
       description: 'Series name (e.g. "Le Sorceleur", "Fondation")',
       resolve: ({ name }) => name,
     }),
+    rating: t.field({
+      type: 'Note',
+      nullable: true,
+      description: 'Personal rating for the series (1-10)',
+      resolve: ({ rating }) => rating ?? null,
+    }),
     createdAt: t.field({
       type: 'DateTime',
       description: 'Date the series was first added to the library',

@@ -3,12 +3,15 @@ import SwiftUI
 struct SeriesSection: View {
     let name: String
     var flag: String?
+    var rating: Int?
     let currentBookId: String
     let items: [Item]
     let onSelectBook: (String) -> Void
+    var onRateSeries: () -> Void = {}
 
     var body: some View {
         Section("Série : \(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces)) {
+            ratingRow
             ForEach(items) { (book: Item) in
                 if book.id == currentBookId {
                     seriesRow(book)
@@ -16,6 +19,29 @@ struct SeriesSection: View {
                     Button { onSelectBook(book.id) } label: { seriesRow(book) }
                         .tint(.primary)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var ratingRow: some View {
+        if let rating {
+            HStack {
+                Text("Ma note")
+                Spacer()
+                if rating == 5 {
+                    Image(systemName: "heart.fill")
+                        .foregroundStyle(.red)
+                } else {
+                    StarRatingView(rating: Double(rating))
+                }
+            }
+            .onTapGesture { onRateSeries() }
+        } else {
+            Button {
+                onRateSeries()
+            } label: {
+                Label("Noter la série", systemImage: "star")
             }
         }
     }
@@ -50,7 +76,7 @@ extension SeriesSection {
     }
 }
 
-#Preview {
+#Preview("Sans note") {
     List {
         SeriesSection(
             name: "Les Rougon-Macquart",
@@ -60,6 +86,35 @@ extension SeriesSection {
                 .init(id: "1", title: "La Fortune des Rougon", label: "1", position: 1),
                 .init(id: "2", title: "La Curée", label: "2", position: 2),
                 .init(id: "3", title: "L'Assommoir", label: "7", position: 7),
+            ],
+            onSelectBook: { _ in }
+        )
+    }
+}
+
+#Preview("Avec note") {
+    List {
+        SeriesSection(
+            name: "Fondation",
+            rating: 4,
+            currentBookId: "1",
+            items: [
+                .init(id: "1", title: "Fondation", label: "1", position: 1),
+                .init(id: "2", title: "Fondation et Empire", label: "2", position: 2),
+            ],
+            onSelectBook: { _ in }
+        )
+    }
+}
+
+#Preview("Favori") {
+    List {
+        SeriesSection(
+            name: "Le Sorceleur",
+            rating: 5,
+            currentBookId: "1",
+            items: [
+                .init(id: "1", title: "Le Dernier Voeu", label: "1", position: 1),
             ],
             onSelectBook: { _ in }
         )

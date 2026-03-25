@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name volumes { __typename id title label position } } seriesVolume { __typename id title label position } } }"#
+        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name rating volumes { __typename id title label position } } seriesVolume { __typename id title label position } } }"#
       ))
 
     public var id: BookId
@@ -233,6 +233,7 @@ extension PchookGraphQL {
             .field("__typename", String.self),
             .field("id", PchookGraphQL.ID.self),
             .field("name", PchookGraphQL.SeriesName.self),
+            .field("rating", PchookGraphQL.Note?.self),
             .field("volumes", [Volume].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -243,6 +244,8 @@ extension PchookGraphQL {
           var id: PchookGraphQL.ID { __data["id"] }
           /// Series name (e.g. "Le Sorceleur", "Fondation")
           var name: PchookGraphQL.SeriesName { __data["name"] }
+          /// Personal rating for the series (1-10)
+          var rating: PchookGraphQL.Note? { __data["rating"] }
           /// All volumes in this series (filtered by language when accessed from a book)
           var volumes: [Volume] { __data["volumes"] }
 

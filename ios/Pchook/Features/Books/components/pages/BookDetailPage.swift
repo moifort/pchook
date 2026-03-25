@@ -14,6 +14,7 @@ struct BookDetailPage: View {
     @State private var error: String?
     @State private var showDeleteConfirmation = false
     @State private var showReviewSheet = false
+    @State private var showRateSeriesSheet = false
     @State private var isDeleting = false
     @State private var isRefreshing = false
     @State private var isEditing = false
@@ -36,6 +37,7 @@ struct BookDetailPage: View {
                     BookDetailContent(
                         detail: detail,
                         onAddReview: { showReviewSheet = true },
+                        onRateSeries: { showRateSeriesSheet = true },
                         onSelectBook: onSelectBook
                     )
                     .refreshable { await loadDetail() }
@@ -60,6 +62,19 @@ struct BookDetailPage: View {
                 showReviewSheet = false
                 await loadDetail()
                 onUpdated()
+            }
+        }
+        .sheet(isPresented: $showRateSeriesSheet) {
+            if let series = detail?.series {
+                RateSeriesSheet(
+                    seriesId: series.id,
+                    seriesName: series.name,
+                    initialRating: series.rating
+                ) {
+                    showRateSeriesSheet = false
+                    await loadDetail()
+                    onUpdated()
+                }
             }
         }
     }

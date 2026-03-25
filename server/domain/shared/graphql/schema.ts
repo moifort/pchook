@@ -24,6 +24,7 @@ import '~/domain/review/infrastructure/graphql/mutations'
 import '~/domain/series/infrastructure/graphql/types'
 import '~/domain/series/infrastructure/graphql/book-fields'
 import '~/domain/series/infrastructure/graphql/queries'
+import '~/domain/series/infrastructure/graphql/mutations'
 
 // Dashboard domain
 import '~/domain/dashboard/infrastructure/graphql/types'

@@ -724,6 +724,15 @@ type Mutation {
     id: BookId!
   ): Boolean!
 
+  """Rate a series (personal rating)"""
+  rateSeries(
+    """Series ID"""
+    id: ID!
+
+    """Rating (1-10)"""
+    rating: Note!
+  ): Series!
+
   """Re-enrich a book via Gemini (updates metadata)"""
   refreshBook(
     """Book ID"""
@@ -900,6 +909,9 @@ type Series {
 
   """Series name (e.g. "Le Sorceleur", "Fondation")"""
   name: SeriesName!
+
+  """Personal rating for the series (1-10)"""
+  rating: Note
 
   """
   All volumes in this series (filtered by language when accessed from a book)

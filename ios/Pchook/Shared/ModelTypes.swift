@@ -195,6 +195,7 @@ struct SeriesVolume: Identifiable, Sendable {
 struct Series: Sendable {
     let id: String
     let name: String
+    var rating: Int?
     let volumes: [SeriesVolume]
 }
 

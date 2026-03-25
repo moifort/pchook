@@ -44,6 +44,7 @@ query BookDetail($id: BookId!) {
     series {
       id
       name
+      rating
       volumes {
         id
         title

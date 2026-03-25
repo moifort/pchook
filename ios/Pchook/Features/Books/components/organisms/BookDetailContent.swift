@@ -9,6 +9,7 @@ private func formatDuration(_ minutes: Int) -> String {
 struct BookDetailContent: View {
     let detail: BookDetailData
     let onAddReview: () -> Void
+    let onRateSeries: () -> Void
     let onSelectBook: (String) -> Void
 
     var body: some View {
@@ -46,9 +47,11 @@ struct BookDetailContent: View {
                 SeriesSection(
                     name: series.name,
                     flag: detail.book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
+                    rating: series.rating,
                     currentBookId: detail.book.id,
                     items: series.volumes.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
-                    onSelectBook: onSelectBook
+                    onSelectBook: onSelectBook,
+                    onRateSeries: onRateSeries
                 )
             }
 
@@ -130,6 +133,7 @@ struct BookDetailContent: View {
             review: ReviewInfo(bookId: "1", rating: 4, readDate: Date(), createdAt: Date())
         ),
         onAddReview: {},
+        onRateSeries: {},
         onSelectBook: { _ in }
     )
 }

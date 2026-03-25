@@ -48,6 +48,7 @@ enum GraphQLBooksAPI {
                 Series(
                     id: series.id,
                     name: series.name,
+                    rating: series.rating,
                     volumes: series.volumes.map { entry in
                         SeriesVolume(
                             id: entry.id,
@@ -125,6 +126,11 @@ enum GraphQLBooksAPI {
 
     static func refresh(id: String) async throws {
         let mutation = PchookGraphQL.RefreshBookMutation(id: id)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
+    }
+
+    static func rateSeries(id: String, rating: Int) async throws {
+        let mutation = PchookGraphQL.RateSeriesMutation(id: id, rating: rating)
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 }

@@ -1,5 +1,5 @@
 import type { Brand } from 'ts-brand'
-import type { BookId } from '~/domain/book/types'
+import type { BookId, Note } from '~/domain/book/types'
 
 export type SeriesId = Brand<string, 'SeriesId'>
 export type SeriesName = Brand<string, 'SeriesName'>
@@ -9,6 +9,7 @@ export type SeriesPosition = Brand<number, 'SeriesPosition'>
 export type Series = {
   id: SeriesId
   name: SeriesName
+  rating?: Note
   createdAt: Date
 }
 
