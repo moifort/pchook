@@ -102,7 +102,7 @@ const AudibleEntryType = builder.objectRef<RawAudibleEntry>('AudibleEntry').impl
       resolve: ({ item }) => item.series?.name ?? null,
     }),
     seriesPosition: t.field({
-      type: 'Int',
+      type: 'SeriesPosition',
       nullable: true,
       description: 'Position in the series',
       resolve: ({ item }) => item.series?.position ?? null,

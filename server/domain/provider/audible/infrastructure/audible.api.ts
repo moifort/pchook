@@ -15,6 +15,7 @@ import type {
   AudibleItem,
   AudibleLocale,
 } from '~/domain/provider/audible/types'
+import { SeriesPosition } from '~/domain/series/primitives'
 import { Url } from '~/domain/shared/primitives'
 import { createLogger } from '~/system/logger'
 
@@ -30,7 +31,12 @@ const toDomainItem = (item: LibAudibleItem): AudibleItem => ({
   language: item.language,
   releaseDate: item.releaseDate,
   coverUrl: item.coverUrl ? Url(item.coverUrl) : undefined,
-  series: item.series,
+  series: item.series
+    ? {
+        name: item.series.name,
+        position: item.series.position ? SeriesPosition(item.series.position) : undefined,
+      }
+    : undefined,
   finishedAt: item.listeningStatus?.finishedAt,
 })
 

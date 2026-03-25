@@ -46,7 +46,7 @@ type AudibleEntry {
   seriesName: String
 
   """Position in the series"""
-  seriesPosition: Int
+  seriesPosition: SeriesPosition
 
   """Item source"""
   source: AudibleSource!

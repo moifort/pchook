@@ -1,5 +1,6 @@
 import type { Brand } from 'ts-brand'
 import type { BookId } from '~/domain/book/types'
+import type { SeriesPosition } from '~/domain/series/types'
 import type { Url } from '~/domain/shared/types'
 
 export type { AudibleCredentials, AudibleLocale, AuthSession } from 'audible-api-ts'
@@ -17,7 +18,7 @@ export type AudibleItem = {
   language?: string
   releaseDate?: Date
   coverUrl?: Url
-  series?: { name: string; position?: number }
+  series?: { name: string; position?: SeriesPosition }
   finishedAt?: Date
 }
 
@@ -42,11 +43,8 @@ export type AudibleSummary = {
 
 export type AudibleSource = 'library' | 'wishlist'
 export type AudibleSyncStatus = 'disconnected' | 'connected' | 'fetching' | 'fetched'
-export type AudibleImportStatus = 'init' | 'importing' | 'imported'
 
 export type AudibleSyncState = {
   syncStatus: AudibleSyncStatus
   syncUpdatedAt?: Date
-  importStatus: AudibleImportStatus
-  importUpdatedAt?: Date
 }

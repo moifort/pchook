@@ -7,6 +7,7 @@ import {
 import { Asin } from '~/domain/provider/audible/primitives'
 import type { AudibleItem } from '~/domain/provider/audible/types'
 import type { ScanResult } from '~/domain/scan/types'
+import { SeriesPosition } from '~/domain/series/primitives'
 import { Url } from '~/domain/shared/primitives'
 
 const makeItem = (overrides: Partial<AudibleItem> = {}): AudibleItem => ({
@@ -73,7 +74,7 @@ describe('buildGeminiPrompt', () => {
 
   test('includes series hint when present', () => {
     const prompt = buildGeminiPrompt(
-      makeItem({ series: { name: 'Le Seigneur des Anneaux', position: 1 } }),
+      makeItem({ series: { name: 'Le Seigneur des Anneaux', position: SeriesPosition(1) } }),
     )
     expect(prompt).toContain('série "Le Seigneur des Anneaux"')
     expect(prompt).toContain('tome 1')
@@ -122,7 +123,7 @@ describe('mergeAudibleIntoScanResult', () => {
   test('audible series overrides gemini series', () => {
     const result = mergeAudibleIntoScanResult(
       makeGeminiResult({ series: 'Wrong Series', seriesNumber: 99 }),
-      makeItem({ series: { name: 'Correct Series', position: 3 } }),
+      makeItem({ series: { name: 'Correct Series', position: SeriesPosition(3) } }),
     )
 
     expect(result.series).toBe('Correct Series')

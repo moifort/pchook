@@ -101,7 +101,7 @@ extension PchookGraphQL {
               .field("coverUrl", PchookGraphQL.Url?.self),
               .field("finishedAt", PchookGraphQL.DateTime?.self),
               .field("seriesName", String?.self),
-              .field("seriesPosition", Int?.self),
+              .field("seriesPosition", PchookGraphQL.SeriesPosition?.self),
               .field("source", PchookGraphQL.AudibleSource.self),
               .field("downloadedAt", PchookGraphQL.DateTime.self),
             ] }
@@ -130,7 +130,7 @@ extension PchookGraphQL {
             /// Series name
             var seriesName: String? { __data["seriesName"] }
             /// Position in the series
-            var seriesPosition: Int? { __data["seriesPosition"] }
+            var seriesPosition: PchookGraphQL.SeriesPosition? { __data["seriesPosition"] }
             /// Item source
             var source: PchookGraphQL.AudibleSource { __data["source"] }
             /// Download timestamp

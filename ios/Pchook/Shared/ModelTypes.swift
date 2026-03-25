@@ -385,7 +385,7 @@ struct AudibleEntryData: Identifiable, Sendable {
     var coverUrl: String?
     var finishedAt: Date?
     var seriesName: String?
-    var seriesPosition: Int?
+    var seriesPosition: Double?
     let source: String
     let downloadedAt: Date
     var id: String { asin }
