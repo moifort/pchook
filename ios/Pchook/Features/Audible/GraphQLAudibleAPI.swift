@@ -52,6 +52,8 @@ enum GraphQLAudibleAPI {
             sync: AudibleSyncData(
                 status: AudibleSyncStatus(rawValue: sync.status) ?? .disconnected,
                 updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
+                libraryCount: sync.libraryCount,
+                wishlistCount: sync.wishlistCount,
                 entries: sync.entries.map { entry in
                     AudibleEntryData(
                         asin: entry.asin,
@@ -75,12 +77,8 @@ enum GraphQLAudibleAPI {
                 updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 taskId: imp.taskId,
                 importedCount: imp.importedCount,
-                mappings: imp.mappings.map { mapping in
-                    AsinBookMappingData(
-                        asin: mapping.asin,
-                        bookId: mapping.bookId
-                    )
-                }
+                totalCount: imp.totalCount,
+                delta: imp.delta
             )
         )
     }

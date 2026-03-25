@@ -356,6 +356,8 @@ struct AudibleData: Sendable {
 struct AudibleSyncData: Sendable {
     let status: AudibleSyncStatus
     var updatedAt: Date?
+    let libraryCount: Int
+    let wishlistCount: Int
     let entries: [AudibleEntryData]
 }
 
@@ -364,7 +366,8 @@ struct AudibleImportData: Sendable {
     var updatedAt: Date?
     let taskId: String
     let importedCount: Int
-    let mappings: [AsinBookMappingData]
+    let totalCount: Int
+    let delta: Int
 }
 
 struct AudibleEntryData: Identifiable, Sendable {
@@ -384,10 +387,6 @@ struct AudibleEntryData: Identifiable, Sendable {
     var id: String { asin }
 }
 
-struct AsinBookMappingData: Sendable {
-    let asin: String
-    let bookId: String
-}
 
 struct ImportTaskState: Sendable {
     let phase: TaskPhase

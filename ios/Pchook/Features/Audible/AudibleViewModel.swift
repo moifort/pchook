@@ -17,6 +17,7 @@ final class AudibleViewModel {
     // Section 3: Import
     private(set) var importTask: ImportTaskState?
     private(set) var importedCount = 0
+    private(set) var delta = 0
     private(set) var isPausing = false
     private(set) var isCancelling = false
 
@@ -26,15 +27,12 @@ final class AudibleViewModel {
     private var lastVerifiedAt: Date?
     private var pollingTask: Task<Void, Never>?
     private var importTaskId: String?
-    private var importedAsins: Set<String> = []
 
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
         guard let task = importTask else { return false }
         return task.phase == .running || task.phase == .paused
     }
-
-    func isImported(asin: String) -> Bool { importedAsins.contains(asin) }
 
     // MARK: - Load status on page open
 
@@ -215,7 +213,7 @@ final class AudibleViewModel {
             importTask = nil
             importTaskId = nil
             importedCount = 0
-            importedAsins = []
+            delta = 0
             lastVerifiedAt = nil
             cancelPolling()
         } catch {
@@ -233,16 +231,13 @@ final class AudibleViewModel {
     private func applyStatus(_ data: AudibleData) {
         isConnected = data.sync.status != .disconnected
         isFetching = data.sync.status == .fetching
-
-        let libraryEntries = data.sync.entries.filter { $0.source == "library" }
-        let wishlistEntries = data.sync.entries.filter { $0.source == "wishlist" }
-        libraryCount = libraryEntries.count
-        wishlistCount = wishlistEntries.count
+        libraryCount = data.sync.libraryCount
+        wishlistCount = data.sync.wishlistCount
         lastFetchedAt = data.sync.updatedAt
 
         importTaskId = data.import_.taskId
         importedCount = data.import_.importedCount
-        importedAsins = Set(data.import_.mappings.map(\.asin))
+        delta = data.import_.delta
     }
 
     private func refreshStatus() async {

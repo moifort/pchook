@@ -1,9 +1,5 @@
 import { AudibleQuery } from '~/domain/provider/audible/query'
-import type {
-  AsinBookMapping,
-  AudibleSyncState,
-  RawAudibleEntry,
-} from '~/domain/provider/audible/types'
+import type { AudibleSyncState, RawAudibleEntry } from '~/domain/provider/audible/types'
 import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
 
@@ -128,32 +124,6 @@ const AudibleEntryType = builder.objectRef<RawAudibleEntry>('AudibleEntry').impl
   }),
 })
 
-const AsinBookMappingType = builder.objectRef<AsinBookMapping>('AsinBookMapping').implement({
-  description: 'Mapping between an Audible ASIN and an imported book',
-  fields: (t) => ({
-    asin: t.field({
-      type: 'Asin',
-      description: 'Amazon Standard Identification Number',
-      resolve: ({ asin }) => asin,
-    }),
-    bookId: t.field({
-      type: 'BookId',
-      description: 'Imported book identifier',
-      resolve: ({ bookId }) => bookId,
-    }),
-    source: t.field({
-      type: 'AudibleSource',
-      description: 'Item source',
-      resolve: ({ source }) => source,
-    }),
-    syncedAt: t.field({
-      type: 'DateTime',
-      description: 'Sync timestamp',
-      resolve: ({ syncedAt }) => syncedAt,
-    }),
-  }),
-})
-
 // --- Composite types ---
 
 type AudibleSyncData = Pick<AudibleSyncState, 'syncStatus' | 'syncUpdatedAt'>
@@ -172,6 +142,24 @@ export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync')
       description: 'Last sync state update',
       resolve: ({ syncUpdatedAt }) => syncUpdatedAt ?? null,
     }),
+    libraryCount: t.field({
+      type: 'Int',
+      description: 'Number of library items',
+      resolve: async ({ syncStatus }) => {
+        if (syncStatus !== 'fetched') return 0
+        const items = await AudibleQuery.getAllRawItems()
+        return items.filter(({ source }) => source === 'library').length
+      },
+    }),
+    wishlistCount: t.field({
+      type: 'Int',
+      description: 'Number of wishlist items',
+      resolve: async ({ syncStatus }) => {
+        if (syncStatus !== 'fetched') return 0
+        const items = await AudibleQuery.getAllRawItems()
+        return items.filter(({ source }) => source === 'wishlist').length
+      },
+    }),
     entries: t.field({
       type: [AudibleEntryType],
       description: 'Fetched Audible entries',
@@ -189,7 +177,7 @@ export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync')
 
 type AudibleImportData = Pick<AudibleSyncState, 'importStatus' | 'importUpdatedAt'> & {
   importedCount: number
-  mappings: AsinBookMapping[]
+  totalCount: number
 }
 
 export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleImport').implement({
@@ -214,10 +202,13 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
     importedCount: t.exposeInt('importedCount', {
       description: 'Number of books imported so far',
     }),
-    mappings: t.field({
-      type: [AsinBookMappingType],
-      description: 'ASIN to book mappings',
-      resolve: ({ mappings }) => mappings,
+    totalCount: t.exposeInt('totalCount', {
+      description: 'Total number of library items',
+    }),
+    delta: t.field({
+      type: 'Int',
+      description: 'Items remaining to import',
+      resolve: ({ totalCount, importedCount }) => totalCount - importedCount,
     }),
   }),
 })
@@ -238,12 +229,15 @@ export const AudibleType = builder.objectRef<Record<string, never>>('Audible').i
       description: 'Import state',
       resolve: async () => {
         const state = await AudibleQuery.getSyncState()
-        const mappings = await AudibleQuery.getAllMappings()
+        const [mappings, rawItems] = await Promise.all([
+          AudibleQuery.getAllMappings(),
+          AudibleQuery.getAllRawItems(),
+        ])
         return {
           importStatus: state.importStatus,
           importUpdatedAt: state.importUpdatedAt,
           importedCount: mappings.length,
-          mappings,
+          totalCount: rawItems.length,
         }
       },
     }),

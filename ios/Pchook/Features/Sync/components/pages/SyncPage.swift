@@ -19,6 +19,8 @@ struct SyncPage: View {
                         wishlistCount: audibleViewModel.wishlistCount,
                         lastFetchedAt: audibleViewModel.lastFetchedAt,
                         importTask: audibleViewModel.importTask,
+                        importedCount: audibleViewModel.importedCount,
+                        delta: audibleViewModel.delta,
                         isImportActive: audibleViewModel.isImportActive,
                         isPausing: audibleViewModel.isPausing,
                         isCancelling: audibleViewModel.isCancelling

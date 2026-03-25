@@ -25,7 +25,7 @@ struct AudibleSection: View {
                 Button {
                     onConnect()
                 } label: {
-                    Label("Se connecter \u{00E0} Audible", systemImage: "headphones")
+                    Label("Se connecter", systemImage: "")
                 }
             }
         } header: {
@@ -63,7 +63,7 @@ struct AudibleSection: View {
             }
         } else if state.hasFetchedData {
             Label {
-                Text("\(state.libraryCount) livres \u{00B7} \(state.wishlistCount) souhaits")
+                Text("\(state.libraryCount) livres \u{00B7} \(state.wishlistCount) liste d'envies")
             } icon: {
                 Image(systemName: "books.vertical")
             }
@@ -131,13 +131,23 @@ struct AudibleSection: View {
             }
             .disabled(state.isPausing || state.isCancelling)
         } else if let task = state.importTask, task.phase == .completed {
-            Label("Import termin\u{00E9}", systemImage: "checkmark.circle.fill")
+            Label("Import terminé", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
+            if state.importedCount > 0 {
+                importSummaryRow
+            }
         } else if state.hasFetchedData {
+            if state.importedCount > 0 {
+                importSummaryRow
+            }
             Button {
                 Task { await onImport() }
             } label: {
-                Label("Importer dans la biblioth\u{00E8}que", systemImage: "square.and.arrow.down")
+                if state.delta > 0 {
+                    Label("Importer \(state.delta) livres", systemImage: "square.and.arrow.down")
+                } else {
+                    Label("Importer dans la bibliothèque", systemImage: "square.and.arrow.down")
+                }
             }
         }
     }
@@ -167,6 +177,19 @@ struct AudibleSection: View {
         }
     }
 
+    private var importSummaryRow: some View {
+        Label {
+            if state.delta > 0 {
+                Text("\(state.importedCount) importés · \(state.delta) restants")
+            } else {
+                Text("\(state.importedCount) livres importés")
+            }
+        } icon: {
+            Image(systemName: "square.and.arrow.down")
+        }
+        .foregroundStyle(.secondary)
+    }
+
     // MARK: - Disconnect
 
     @ViewBuilder
@@ -194,6 +217,8 @@ extension AudibleSection {
         let wishlistCount: Int
         let lastFetchedAt: Date?
         let importTask: ImportTaskState?
+        let importedCount: Int
+        let delta: Int
         let isImportActive: Bool
         let isPausing: Bool
         let isCancelling: Bool
@@ -209,6 +234,7 @@ extension AudibleSection {
                 isConnected: false, isCheckingStatus: false, isVerifying: false,
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
+                importedCount: 0, delta: 0,
                 isImportActive: false, isPausing: false, isCancelling: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
@@ -224,6 +250,7 @@ extension AudibleSection {
                 isConnected: false, isCheckingStatus: true, isVerifying: false,
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
+                importedCount: 0, delta: 0,
                 isImportActive: false, isPausing: false, isCancelling: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
@@ -239,7 +266,24 @@ extension AudibleSection {
                 isConnected: true, isCheckingStatus: false, isVerifying: false,
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
-                importTask: nil, isImportActive: false, isPausing: false, isCancelling: false
+                importTask: nil, importedCount: 0, delta: 142,
+                isImportActive: false, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
+    }
+}
+
+#Preview("Connected with partial import") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isFetching: false, hasFetchedData: true, libraryCount: 142,
+                wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
+                importTask: nil, importedCount: 138, delta: 4,
+                isImportActive: false, isPausing: false, isCancelling: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -258,6 +302,7 @@ extension AudibleSection {
                     phase: .running, current: 45, total: 142,
                     message: "Import en cours...", startedAt: Date()
                 ),
+                importedCount: 45, delta: 97,
                 isImportActive: true, isPausing: false, isCancelling: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
@@ -275,8 +320,9 @@ extension AudibleSection {
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: ImportTaskState(
                     phase: .completed, current: 142, total: 142,
-                    message: "Import termin\u{00E9}", completedAt: Date()
+                    message: "Import terminé", completedAt: Date()
                 ),
+                importedCount: 142, delta: 0,
                 isImportActive: false, isPausing: false, isCancelling: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},

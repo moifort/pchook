@@ -3,6 +3,8 @@ query Audible {
     sync {
       status
       updatedAt
+      libraryCount
+      wishlistCount
       entries {
         asin
         title
@@ -24,10 +26,8 @@ query Audible {
       updatedAt
       taskId
       importedCount
-      mappings {
-        asin
-        bookId
-      }
+      totalCount
+      delta
     }
   }
 }
