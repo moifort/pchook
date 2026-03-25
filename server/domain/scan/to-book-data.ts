@@ -4,9 +4,9 @@ import {
   Genre,
   ISBN,
   Language,
-  Note,
   PageCount,
   Publisher,
+  RatingScore,
 } from '~/domain/book/primitives'
 import type { Award, PublicRating } from '~/domain/book/types'
 import type { ScanResult } from '~/domain/scan/types'
@@ -55,8 +55,8 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
       )
       .map(({ source, score, maxScore, voterCount, url }) => ({
         source,
-        score: Note(score),
-        maxScore: Note(maxScore),
+        score: RatingScore(score),
+        maxScore: RatingScore(maxScore),
         voterCount: Math.round(voterCount),
         url: url ?? ratingUrl(source, scanResult.isbn ?? ''),
       }))

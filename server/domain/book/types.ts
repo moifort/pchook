@@ -9,6 +9,7 @@ export type Genre = Brand<string, 'Genre'>
 export type ISBN = Brand<string, 'ISBN'>
 export type PageCount = Brand<number, 'PageCount'>
 export type Note = Brand<number, 'Note'>
+export type RatingScore = Brand<number, 'RatingScore'>
 
 export const languageValues = [
   'fr',
@@ -57,8 +58,8 @@ export type Award = {
 
 export type PublicRating = {
   source: string
-  score: Note
-  maxScore: Note
+  score: RatingScore
+  maxScore: RatingScore
   voterCount: number
   url: Url
 }

@@ -9,6 +9,7 @@ import {
   Note,
   PageCount,
   Publisher,
+  RatingScore,
 } from '~/domain/book/primitives'
 import { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/primitives'
 import { Eur, PersonName, Url } from '~/domain/shared/primitives'
@@ -75,9 +76,15 @@ builder.scalarType('PageCount', {
 })
 
 builder.scalarType('Note', {
-  description: 'Rating score (integer 0-10)',
+  description: 'Personal rating score (integer 0-10)',
   serialize: (value) => Number(value),
   parseValue: validatedParse('Note', Note),
+})
+
+builder.scalarType('RatingScore', {
+  description: 'Community rating score (decimal 0-10)',
+  serialize: (value) => Number(value),
+  parseValue: validatedParse('RatingScore', RatingScore),
 })
 
 // Shared domain

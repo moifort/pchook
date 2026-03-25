@@ -12,6 +12,7 @@ import {
   Note,
   PageCount,
   Publisher,
+  RatingScore,
   randomBookId,
   SortOrder,
 } from '~/domain/book/primitives'
@@ -171,6 +172,37 @@ describe('Note', () => {
     expect(Note(2.5)).toBe(Note(3))
     expect(Note(4.2)).toBe(Note(4))
     expect(Note(3.7)).toBe(Note(4))
+  })
+})
+
+describe('RatingScore', () => {
+  test('accepts an integer', () => {
+    expect(RatingScore(5)).toBe(RatingScore(5))
+  })
+
+  test('preserves decimal values', () => {
+    expect(RatingScore(3.75)).toBe(RatingScore(3.75))
+    expect(RatingScore(4.18)).toBe(RatingScore(4.18))
+  })
+
+  test('accepts zero', () => {
+    expect(RatingScore(0)).toBe(RatingScore(0))
+  })
+
+  test('accepts 10', () => {
+    expect(RatingScore(10)).toBe(RatingScore(10))
+  })
+
+  test('coerces a string to number', () => {
+    expect(RatingScore('3.75')).toBe(RatingScore(3.75))
+  })
+
+  test('rejects a negative number', () => {
+    expect(() => RatingScore(-1)).toThrow()
+  })
+
+  test('rejects a number greater than 10', () => {
+    expect(() => RatingScore(10.1)).toThrow()
   })
 })
 

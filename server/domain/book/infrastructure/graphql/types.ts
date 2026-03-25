@@ -19,13 +19,13 @@ export const PublicRatingRef = builder.objectRef<PublicRatingType>('PublicRating
       description: 'Platform name (e.g. Hardcover, Goodreads)',
     }),
     score: t.field({
-      type: 'Note',
-      description: 'Score received (0-10 scale, e.g. 8)',
+      type: 'RatingScore',
+      description: 'Score received (e.g. 3.75 out of 5)',
       resolve: ({ score }) => score,
     }),
     maxScore: t.field({
-      type: 'Note',
-      description: 'Maximum possible score on this platform (e.g. 10)',
+      type: 'RatingScore',
+      description: 'Maximum possible score on this platform (e.g. 5, 10)',
       resolve: ({ maxScore }) => maxScore,
     }),
     voterCount: t.exposeInt('voterCount', {

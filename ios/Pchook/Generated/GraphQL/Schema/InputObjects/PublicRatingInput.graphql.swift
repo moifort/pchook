@@ -13,8 +13,8 @@ extension PchookGraphQL {
     }
 
     init(
-      maxScore: Note,
-      score: Note,
+      maxScore: RatingScore,
+      score: RatingScore,
       source: String,
       url: Url,
       voterCount: Int
@@ -29,13 +29,13 @@ extension PchookGraphQL {
     }
 
     /// Maximum possible score
-    var maxScore: Note {
+    var maxScore: RatingScore {
       get { __data["maxScore"] }
       set { __data["maxScore"] = newValue }
     }
 
     /// Score received
-    var score: Note {
+    var score: RatingScore {
       get { __data["score"] }
       set { __data["score"] = newValue }
     }

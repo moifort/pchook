@@ -13,8 +13,12 @@ const PublicRatingInput = builder.inputType('PublicRatingInput', {
   description: 'External community rating',
   fields: (t) => ({
     source: t.string({ required: true, description: 'Platform name' }),
-    score: t.field({ type: 'Note', required: true, description: 'Score received' }),
-    maxScore: t.field({ type: 'Note', required: true, description: 'Maximum possible score' }),
+    score: t.field({ type: 'RatingScore', required: true, description: 'Score received' }),
+    maxScore: t.field({
+      type: 'RatingScore',
+      required: true,
+      description: 'Maximum possible score',
+    }),
     voterCount: t.int({ required: true, description: 'Number of voters' }),
     url: t.field({ type: 'Url', required: true, description: 'URL of the book page' }),
   }),

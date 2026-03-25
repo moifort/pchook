@@ -127,8 +127,8 @@ extension PchookGraphQL {
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("source", String.self),
-            .field("score", PchookGraphQL.Note.self),
-            .field("maxScore", PchookGraphQL.Note.self),
+            .field("score", PchookGraphQL.RatingScore.self),
+            .field("maxScore", PchookGraphQL.RatingScore.self),
             .field("voterCount", Int.self),
             .field("url", PchookGraphQL.Url.self),
           ] }
@@ -138,10 +138,10 @@ extension PchookGraphQL {
 
           /// Platform name (e.g. Hardcover, Goodreads)
           var source: String { __data["source"] }
-          /// Score received (0-10 scale, e.g. 8)
-          var score: PchookGraphQL.Note { __data["score"] }
-          /// Maximum possible score on this platform (e.g. 10)
-          var maxScore: PchookGraphQL.Note { __data["maxScore"] }
+          /// Score received (e.g. 3.75 out of 5)
+          var score: PchookGraphQL.RatingScore { __data["score"] }
+          /// Maximum possible score on this platform (e.g. 5, 10)
+          var maxScore: PchookGraphQL.RatingScore { __data["maxScore"] }
           /// Number of voters who rated the book
           var voterCount: Int { __data["voterCount"] }
           /// Direct link to the book page on the platform

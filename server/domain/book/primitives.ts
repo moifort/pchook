@@ -12,6 +12,7 @@ import type {
   Note as NoteType,
   PageCount as PageCountType,
   Publisher as PublisherType,
+  RatingScore as RatingScoreType,
   SortOrder as SortOrderType,
 } from '~/domain/book/types'
 import { type Language as LanguageType, languageValues } from '~/domain/book/types'
@@ -67,6 +68,13 @@ export const Note = (value: unknown) => {
     }, z.number().int().min(0).max(10))
     .parse(value)
   return make<NoteType>()(v)
+}
+
+export const RatingScore = (value: unknown) => {
+  const v = z
+    .preprocess((v) => (typeof v === 'string' ? Number(v) : v), z.number().min(0).max(10))
+    .parse(value)
+  return make<RatingScoreType>()(v)
 }
 
 export const BookFormat = (value: unknown) =>

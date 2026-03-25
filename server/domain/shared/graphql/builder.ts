@@ -10,6 +10,7 @@ import type {
   Note,
   PageCount,
   Publisher,
+  RatingScore,
 } from '~/domain/book/types'
 import type { Asin, AudibleSource, AudibleSyncStatus } from '~/domain/provider/audible/types'
 import type { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/types'
@@ -39,6 +40,7 @@ export const builder = new SchemaBuilder<{
     ISBN: { Input: ISBN; Output: ISBN }
     PageCount: { Input: PageCount; Output: PageCount }
     Note: { Input: Note; Output: Note }
+    RatingScore: { Input: RatingScore; Output: RatingScore }
     Eur: { Input: Eur; Output: Eur }
     PersonName: { Input: PersonName; Output: PersonName }
     Url: { Input: Url; Output: Url }
