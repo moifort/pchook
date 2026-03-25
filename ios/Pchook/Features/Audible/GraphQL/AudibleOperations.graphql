@@ -4,21 +4,17 @@ query Audible {
       status
       updatedAt
       entries {
-        item {
-          asin
-          title
-          authors
-          narrators
-          durationMinutes
-          publisher
-          language
-          coverUrl
-          finishedAt
-          series {
-            name
-            position
-          }
-        }
+        asin
+        title
+        authors
+        narrators
+        durationMinutes
+        publisher
+        language
+        coverUrl
+        finishedAt
+        seriesName
+        seriesPosition
         source
         downloadedAt
       }

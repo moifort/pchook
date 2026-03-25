@@ -4,7 +4,7 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// A raw Audible entry with metadata
+  /// An Audible library or wishlist entry
   static let AudibleEntry = ApolloAPI.Object(
     typename: "AudibleEntry",
     implementedInterfaces: [],

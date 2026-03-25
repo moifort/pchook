@@ -1,7 +1,6 @@
 import { AudibleQuery } from '~/domain/provider/audible/query'
 import type {
   AsinBookMapping,
-  AudibleItem,
   AudibleSyncState,
   RawAudibleEntry,
 } from '~/domain/provider/audible/types'
@@ -46,87 +45,75 @@ export const AuthStartResponseType = builder
 
 // --- Domain types ---
 
-const AudibleSeriesInfoType = builder
-  .objectRef<{ name: string; position?: number }>('AudibleSeriesInfo')
-  .implement({
-    description: 'Series information for an Audible item',
-    fields: (t) => ({
-      name: t.exposeString('name', { description: 'Series name' }),
-      position: t.field({
-        type: 'Int',
-        nullable: true,
-        description: 'Position in the series',
-        resolve: ({ position }) => position ?? null,
-      }),
-    }),
-  })
-
-const AudibleItemType = builder.objectRef<AudibleItem>('AudibleItem').implement({
-  description: 'An Audible library or wishlist item',
+const AudibleEntryType = builder.objectRef<RawAudibleEntry>('AudibleEntry').implement({
+  description: 'An Audible library or wishlist entry',
   fields: (t) => ({
     asin: t.field({
       type: 'Asin',
       description: 'Amazon Standard Identification Number',
-      resolve: ({ asin }) => asin,
+      resolve: ({ item }) => item.asin,
     }),
-    title: t.exposeString('title', { description: 'Book title' }),
+    title: t.field({
+      type: 'String',
+      description: 'Book title',
+      resolve: ({ item }) => item.title,
+    }),
     authors: t.field({
       type: ['String'],
       description: 'Author names',
-      resolve: ({ authors }) => authors,
+      resolve: ({ item }) => item.authors,
     }),
     narrators: t.field({
       type: ['String'],
       description: 'Narrator names',
-      resolve: ({ narrators }) => narrators,
+      resolve: ({ item }) => item.narrators,
     }),
-    durationMinutes: t.exposeInt('durationMinutes', { description: 'Duration in minutes' }),
+    durationMinutes: t.field({
+      type: 'Int',
+      description: 'Duration in minutes',
+      resolve: ({ item }) => item.durationMinutes,
+    }),
     publisher: t.field({
       type: 'String',
       nullable: true,
       description: 'Publisher name',
-      resolve: ({ publisher }) => publisher ?? null,
+      resolve: ({ item }) => item.publisher ?? null,
     }),
     language: t.field({
       type: 'String',
       nullable: true,
       description: 'Language',
-      resolve: ({ language }) => language ?? null,
+      resolve: ({ item }) => item.language ?? null,
     }),
     releaseDate: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Release date',
-      resolve: ({ releaseDate }) => releaseDate ?? null,
+      resolve: ({ item }) => item.releaseDate ?? null,
     }),
     coverUrl: t.field({
       type: 'Url',
       nullable: true,
       description: 'Cover image URL',
-      resolve: ({ coverUrl }) => coverUrl ?? null,
+      resolve: ({ item }) => item.coverUrl ?? null,
     }),
-    series: t.field({
-      type: AudibleSeriesInfoType,
+    seriesName: t.field({
+      type: 'String',
       nullable: true,
-      description: 'Series information',
-      resolve: ({ series }) => series ?? null,
+      description: 'Series name',
+      resolve: ({ item }) => item.series?.name ?? null,
+    }),
+    seriesPosition: t.field({
+      type: 'Int',
+      nullable: true,
+      description: 'Position in the series',
+      resolve: ({ item }) => item.series?.position ?? null,
     }),
     finishedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Date the book was finished listening',
-      resolve: ({ finishedAt }) => finishedAt ?? null,
-    }),
-  }),
-})
-
-const AudibleEntryType = builder.objectRef<RawAudibleEntry>('AudibleEntry').implement({
-  description: 'A raw Audible entry with metadata',
-  fields: (t) => ({
-    item: t.field({
-      type: AudibleItemType,
-      description: 'Audible item data',
-      resolve: ({ item }) => item,
+      resolve: ({ item }) => item.finishedAt ?? null,
     }),
     source: t.field({
       type: 'AudibleSource',

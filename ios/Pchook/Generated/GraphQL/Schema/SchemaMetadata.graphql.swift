@@ -33,8 +33,6 @@ extension PchookGraphQL {
       case "Audible": return PchookGraphQL.Objects.Audible
       case "AudibleEntry": return PchookGraphQL.Objects.AudibleEntry
       case "AudibleImport": return PchookGraphQL.Objects.AudibleImport
-      case "AudibleItem": return PchookGraphQL.Objects.AudibleItem
-      case "AudibleSeriesInfo": return PchookGraphQL.Objects.AudibleSeriesInfo
       case "AudibleSync": return PchookGraphQL.Objects.AudibleSync
       case "AuthCookie": return PchookGraphQL.Objects.AuthCookie
       case "AuthStartResponse": return PchookGraphQL.Objects.AuthStartResponse

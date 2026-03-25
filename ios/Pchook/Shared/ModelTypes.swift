@@ -368,13 +368,6 @@ struct AudibleImportData: Sendable {
 }
 
 struct AudibleEntryData: Identifiable, Sendable {
-    let item: AudibleItemData
-    let source: String
-    let downloadedAt: Date
-    var id: String { item.asin }
-}
-
-struct AudibleItemData: Identifiable, Sendable {
     let asin: String
     let title: String
     let authors: [String]
@@ -386,6 +379,8 @@ struct AudibleItemData: Identifiable, Sendable {
     var finishedAt: Date?
     var seriesName: String?
     var seriesPosition: Int?
+    let source: String
+    let downloadedAt: Date
     var id: String { asin }
 }
 

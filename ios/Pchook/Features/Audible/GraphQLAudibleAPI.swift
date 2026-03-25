@@ -54,19 +54,17 @@ enum GraphQLAudibleAPI {
                 updatedAt: sync.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 entries: sync.entries.map { entry in
                     AudibleEntryData(
-                        item: AudibleItemData(
-                            asin: entry.item.asin,
-                            title: entry.item.title,
-                            authors: entry.item.authors,
-                            narrators: entry.item.narrators,
-                            durationMinutes: entry.item.durationMinutes,
-                            publisher: entry.item.publisher,
-                            language: entry.item.language,
-                            coverUrl: entry.item.coverUrl,
-                            finishedAt: entry.item.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
-                            seriesName: entry.item.series?.name,
-                            seriesPosition: entry.item.series?.position
-                        ),
+                        asin: entry.asin,
+                        title: entry.title,
+                        authors: entry.authors,
+                        narrators: entry.narrators,
+                        durationMinutes: entry.durationMinutes,
+                        publisher: entry.publisher,
+                        language: entry.language,
+                        coverUrl: entry.coverUrl,
+                        finishedAt: entry.finishedAt.flatMap(GraphQLHelpers.parseISO8601),
+                        seriesName: entry.seriesName,
+                        seriesPosition: entry.seriesPosition,
                         source: entry.source,
                         downloadedAt: GraphQLHelpers.parseISO8601(entry.downloadedAt) ?? Date()
                     )

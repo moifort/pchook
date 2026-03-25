@@ -25,16 +25,49 @@ type Audible {
   sync: AudibleSync!
 }
 
-"""A raw Audible entry with metadata"""
+"""An Audible library or wishlist entry"""
 type AudibleEntry {
+  """Amazon Standard Identification Number"""
+  asin: Asin!
+
+  """Author names"""
+  authors: [String!]!
+
+  """Cover image URL"""
+  coverUrl: Url
+
   """Download timestamp"""
   downloadedAt: DateTime!
 
-  """Audible item data"""
-  item: AudibleItem!
+  """Duration in minutes"""
+  durationMinutes: Int!
+
+  """Date the book was finished listening"""
+  finishedAt: DateTime
+
+  """Language"""
+  language: String
+
+  """Narrator names"""
+  narrators: [String!]!
+
+  """Publisher name"""
+  publisher: String
+
+  """Release date"""
+  releaseDate: DateTime
+
+  """Series name"""
+  seriesName: String
+
+  """Position in the series"""
+  seriesPosition: Int
 
   """Item source"""
   source: AudibleSource!
+
+  """Book title"""
+  title: String!
 }
 
 """Audible import state"""
@@ -57,51 +90,6 @@ type AudibleImport {
 
 """Audible import status (init | importing | imported)"""
 scalar AudibleImportStatus
-
-"""An Audible library or wishlist item"""
-type AudibleItem {
-  """Amazon Standard Identification Number"""
-  asin: Asin!
-
-  """Author names"""
-  authors: [String!]!
-
-  """Cover image URL"""
-  coverUrl: Url
-
-  """Duration in minutes"""
-  durationMinutes: Int!
-
-  """Date the book was finished listening"""
-  finishedAt: DateTime
-
-  """Language"""
-  language: String
-
-  """Narrator names"""
-  narrators: [String!]!
-
-  """Publisher name"""
-  publisher: String
-
-  """Release date"""
-  releaseDate: DateTime
-
-  """Series information"""
-  series: AudibleSeriesInfo
-
-  """Book title"""
-  title: String!
-}
-
-"""Series information for an Audible item"""
-type AudibleSeriesInfo {
-  """Series name"""
-  name: String!
-
-  """Position in the series"""
-  position: Int
-}
 
 """Audible item source (library | wishlist)"""
 scalar AudibleSource
