@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/username/pchook:main
+    image: ghcr.io/moifort/pchook:main
     container_name: pchook-server
     restart: unless-stopped
     environment:
