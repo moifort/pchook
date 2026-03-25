@@ -284,14 +284,14 @@ struct AudibleData: Sendable {
 }
 
 struct AudibleSyncData: Sendable {
-    let syncStatus: String
-    var syncUpdatedAt: Date?
+    let status: String
+    var updatedAt: Date?
     let entries: [AudibleEntryData]
 }
 
 struct AudibleImportData: Sendable {
-    let importStatus: String
-    var importUpdatedAt: Date?
+    let status: String
+    var updatedAt: Date?
     let taskId: String
     let importedCount: Int
     let mappings: [AsinBookMappingData]

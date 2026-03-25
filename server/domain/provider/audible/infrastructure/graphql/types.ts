@@ -174,12 +174,12 @@ type AudibleSyncData = Pick<AudibleSyncState, 'syncStatus' | 'syncUpdatedAt'>
 export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync').implement({
   description: 'Audible synchronization state',
   fields: (t) => ({
-    syncStatus: t.field({
+    status: t.field({
       type: 'AudibleSyncStatus',
       description: 'Current sync status',
       resolve: ({ syncStatus }) => syncStatus,
     }),
-    syncUpdatedAt: t.field({
+    updatedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Last sync state update',
@@ -208,12 +208,12 @@ type AudibleImportData = Pick<AudibleSyncState, 'importStatus' | 'importUpdatedA
 export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleImport').implement({
   description: 'Audible import state',
   fields: (t) => ({
-    importStatus: t.field({
+    status: t.field({
       type: 'AudibleImportStatus',
       description: 'Current import status',
       resolve: ({ importStatus }) => importStatus,
     }),
-    importUpdatedAt: t.field({
+    updatedAt: t.field({
       type: 'DateTime',
       nullable: true,
       description: 'Last import state update',

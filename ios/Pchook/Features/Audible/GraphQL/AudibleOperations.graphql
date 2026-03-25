@@ -1,8 +1,8 @@
 query Audible {
   audible {
     sync {
-      syncStatus
-      syncUpdatedAt
+      status
+      updatedAt
       entries {
         item {
           asin
@@ -24,8 +24,8 @@ query Audible {
       }
     }
     import {
-      importStatus
-      importUpdatedAt
+      status
+      updatedAt
       taskId
       importedCount
       mappings {

@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Audible"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Audible { audible { __typename sync { __typename syncStatus syncUpdatedAt entries { __typename item { __typename asin title authors narrators durationMinutes publisher language coverUrl finishedAt series { __typename name position } } source downloadedAt } } import { __typename importStatus importUpdatedAt taskId importedCount mappings { __typename asin bookId } } } }"#
+        #"query Audible { audible { __typename sync { __typename status updatedAt entries { __typename item { __typename asin title authors narrators durationMinutes publisher language coverUrl finishedAt series { __typename name position } } source downloadedAt } } import { __typename status updatedAt taskId importedCount mappings { __typename asin bookId } } } }"#
       ))
 
     public init() {}
@@ -60,8 +60,8 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleSync }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("syncStatus", PchookGraphQL.AudibleSyncStatus.self),
-            .field("syncUpdatedAt", PchookGraphQL.DateTime?.self),
+            .field("status", PchookGraphQL.AudibleSyncStatus.self),
+            .field("updatedAt", PchookGraphQL.DateTime?.self),
             .field("entries", [Entry].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -69,9 +69,9 @@ extension PchookGraphQL {
           ] }
 
           /// Current sync status
-          var syncStatus: PchookGraphQL.AudibleSyncStatus { __data["syncStatus"] }
+          var status: PchookGraphQL.AudibleSyncStatus { __data["status"] }
           /// Last sync state update
-          var syncUpdatedAt: PchookGraphQL.DateTime? { __data["syncUpdatedAt"] }
+          var updatedAt: PchookGraphQL.DateTime? { __data["updatedAt"] }
           /// Fetched Audible entries
           var entries: [Entry] { __data["entries"] }
 
@@ -182,8 +182,8 @@ extension PchookGraphQL {
           static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("importStatus", PchookGraphQL.AudibleImportStatus.self),
-            .field("importUpdatedAt", PchookGraphQL.DateTime?.self),
+            .field("status", PchookGraphQL.AudibleImportStatus.self),
+            .field("updatedAt", PchookGraphQL.DateTime?.self),
             .field("taskId", PchookGraphQL.TaskId.self),
             .field("importedCount", Int.self),
             .field("mappings", [Mapping].self),
@@ -193,9 +193,9 @@ extension PchookGraphQL {
           ] }
 
           /// Current import status
-          var importStatus: PchookGraphQL.AudibleImportStatus { __data["importStatus"] }
+          var status: PchookGraphQL.AudibleImportStatus { __data["status"] }
           /// Last import state update
-          var importUpdatedAt: PchookGraphQL.DateTime? { __data["importUpdatedAt"] }
+          var updatedAt: PchookGraphQL.DateTime? { __data["updatedAt"] }
           /// Background task identifier
           var taskId: PchookGraphQL.TaskId { __data["taskId"] }
           /// Number of books imported so far

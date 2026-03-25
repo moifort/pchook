@@ -39,20 +39,20 @@ type AudibleEntry {
 
 """Audible import state"""
 type AudibleImport {
-  """Current import status"""
-  importStatus: AudibleImportStatus!
-
-  """Last import state update"""
-  importUpdatedAt: DateTime
-
   """Number of books imported so far"""
   importedCount: Int!
 
   """ASIN to book mappings"""
   mappings: [AsinBookMapping!]!
 
+  """Current import status"""
+  status: AudibleImportStatus!
+
   """Background task identifier"""
   taskId: TaskId!
+
+  """Last import state update"""
+  updatedAt: DateTime
 }
 
 """Audible import status (init | importing | imported)"""
@@ -115,10 +115,10 @@ type AudibleSync {
   ): [AudibleEntry!]!
 
   """Current sync status"""
-  syncStatus: AudibleSyncStatus!
+  status: AudibleSyncStatus!
 
   """Last sync state update"""
-  syncUpdatedAt: DateTime
+  updatedAt: DateTime
 }
 
 """Audible sync status (disconnected | connected | fetching | fetched)"""

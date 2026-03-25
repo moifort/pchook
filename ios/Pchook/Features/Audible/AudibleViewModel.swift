@@ -233,15 +233,14 @@ final class AudibleViewModel {
     // MARK: - Private
 
     private func applyStatus(_ data: AudibleData) {
-        let syncStatus = data.sync.syncStatus
-        isConnected = syncStatus != "disconnected"
-        isFetching = syncStatus == "fetching"
+        isConnected = data.sync.status != "disconnected"
+        isFetching = data.sync.status == "fetching"
 
         let libraryEntries = data.sync.entries.filter { $0.source == "library" }
         let wishlistEntries = data.sync.entries.filter { $0.source == "wishlist" }
         libraryCount = libraryEntries.count
         wishlistCount = wishlistEntries.count
-        lastFetchedAt = data.sync.syncUpdatedAt
+        lastFetchedAt = data.sync.updatedAt
 
         importTaskId = data.import_.taskId
         importedCount = data.import_.importedCount
