@@ -9,7 +9,7 @@ import { BookType } from './types'
 builder.objectField(BookType, 'coverImageUrl', (t) =>
   t.string({
     nullable: true,
-    description: 'Cover image URL',
+    description: 'Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover',
     resolve: ({ coverImageId }) => (coverImageId ? `/images/${coverImageId}` : null),
   }),
 )
