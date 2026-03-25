@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  unit:
+  integration:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
