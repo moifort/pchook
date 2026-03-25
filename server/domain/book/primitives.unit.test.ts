@@ -96,8 +96,18 @@ describe('ISBN', () => {
 })
 
 describe('Language', () => {
-  test('accepts a valid language', () => {
-    expect(Language('French')).toBe(Language('French'))
+  test('accepts a lowercase ISO 639-1 code', () => {
+    expect(Language('fr')).toBe('fr')
+    expect(Language('en')).toBe('en')
+  })
+
+  test('normalizes uppercase to lowercase', () => {
+    expect(Language('FR')).toBe('fr')
+    expect(Language('EN')).toBe('en')
+  })
+
+  test('rejects an unknown language code', () => {
+    expect(() => Language('xx')).toThrow()
   })
 
   test('rejects an empty string', () => {

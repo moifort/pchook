@@ -70,7 +70,7 @@ export namespace BookUseCase {
       format: data.format,
       translator: data.translator,
       estimatedPrice: data.estimatedPrice,
-      duration: data.duration,
+      durationMinutes: data.durationMinutes,
       narrators: data.narrators,
       awards: data.awards,
       publicRatings: data.publicRatings,

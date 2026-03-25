@@ -108,7 +108,11 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       description: 'Estimated price in euros',
       resolve: ({ estimatedPrice }) => estimatedPrice ?? null,
     }),
-    duration: t.exposeString('duration', { nullable: true, description: 'Duration (audiobook)' }),
+    durationMinutes: t.int({
+      nullable: true,
+      description: 'Duration in minutes (audiobook)',
+      resolve: ({ durationMinutes }) => durationMinutes ?? null,
+    }),
     narrators: t.field({
       type: ['PersonName'],
       description: 'Narrators (audiobook)',

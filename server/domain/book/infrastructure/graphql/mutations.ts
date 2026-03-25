@@ -4,6 +4,7 @@ import { BookFormat, BookStatus } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import type { Book, PublicRating } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
+import { formatDuration } from '~/domain/provider/audible/business-rules'
 import { enrichWithGemini } from '~/domain/scan/scanner'
 import { scanResultToBookData } from '~/domain/scan/to-book-data'
 import type { ScanResult } from '~/domain/scan/types'
@@ -11,6 +12,7 @@ import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
+import { Minutes } from '~/domain/shared/primitives'
 import { UpdateBookInput } from './inputs'
 import { BookType } from './types'
 
@@ -47,7 +49,9 @@ const toBookUpdate = (input: Record<string, unknown>) => ({
   ...(input.estimatedPrice !== undefined && {
     estimatedPrice: (input.estimatedPrice as Book['estimatedPrice']) ?? undefined,
   }),
-  ...(input.duration !== undefined && { duration: (input.duration as string) ?? undefined }),
+  ...(input.durationMinutes !== undefined && {
+    durationMinutes: input.durationMinutes != null ? Minutes(input.durationMinutes) : undefined,
+  }),
   ...(input.narrators !== undefined && {
     narrators: (input.narrators as Book['narrators']) ?? undefined,
   }),
@@ -129,7 +133,7 @@ const bookToScanResult = (book: Book, seriesName?: string): ScanResult => ({
   seriesNumber: undefined,
   translator: book.translator ?? undefined,
   estimatedPrice: book.estimatedPrice ?? undefined,
-  duration: book.duration,
+  duration: book.durationMinutes ? formatDuration(book.durationMinutes) : undefined,
   narrators: book.narrators.length > 0 ? [...book.narrators] : undefined,
   awards: book.awards,
   publicRatings: book.publicRatings.map(({ source, score, maxScore, voterCount }) => ({

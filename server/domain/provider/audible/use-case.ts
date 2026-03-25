@@ -3,7 +3,6 @@ import type { Book } from '~/domain/book/types'
 import { BookUseCase } from '~/domain/book/use-case'
 import {
   buildGeminiPrompt,
-  formatDuration,
   mergeAudibleIntoScanResult,
 } from '~/domain/provider/audible/business-rules'
 import { AudibleCommand } from '~/domain/provider/audible/command'
@@ -21,7 +20,7 @@ import { scanResultToBookData } from '~/domain/scan/to-book-data'
 import { SeriesCommand } from '~/domain/series/command'
 import { SeriesLabel, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
-import { PersonName, Url } from '~/domain/shared/primitives'
+import { Minutes, PersonName, Url } from '~/domain/shared/primitives'
 import { TaskId } from '~/domain/task/primitives'
 import type { TaskDefinition } from '~/domain/task/types'
 import { createLogger } from '~/system/logger'
@@ -41,8 +40,8 @@ const downloadCover = async (url: string) => {
 const mergeAudibleDataIntoDuplicate = async (book: Book, item: AudibleItem) => {
   const updates: Partial<Book> = {}
   if (!book.format) updates.format = 'audiobook'
-  if (!book.duration && item.durationMinutes > 0) {
-    updates.duration = formatDuration(item.durationMinutes)
+  if (!book.durationMinutes && item.durationMinutes > 0) {
+    updates.durationMinutes = Minutes(item.durationMinutes)
   }
   if (book.narrators.length === 0 && item.narrators.length > 0) {
     updates.narrators = item.narrators.map((name) => PersonName(name))

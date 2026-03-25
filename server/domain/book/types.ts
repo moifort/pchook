@@ -1,15 +1,48 @@
 import type { Brand } from 'ts-brand'
 import type { ImageId } from '~/domain/image/types'
-import type { Eur, PersonName, Url } from '~/domain/shared/types'
+import type { Eur, Minutes, PersonName, Url } from '~/domain/shared/types'
 
 export type BookId = Brand<string, 'BookId'>
 export type BookTitle = Brand<string, 'BookTitle'>
 export type Publisher = Brand<string, 'Publisher'>
 export type Genre = Brand<string, 'Genre'>
 export type ISBN = Brand<string, 'ISBN'>
-export type Language = Brand<string, 'Language'>
 export type PageCount = Brand<number, 'PageCount'>
 export type Note = Brand<number, 'Note'>
+
+export const languageValues = [
+  'fr',
+  'en',
+  'es',
+  'de',
+  'it',
+  'pt',
+  'ja',
+  'zh',
+  'ko',
+  'ru',
+  'nl',
+  'pl',
+  'sv',
+  'ar',
+  'cs',
+  'da',
+  'fi',
+  'el',
+  'hu',
+  'no',
+  'ro',
+  'tr',
+  'uk',
+  'he',
+  'hi',
+  'th',
+  'vi',
+  'id',
+  'ca',
+  'la',
+] as const
+export type Language = (typeof languageValues)[number]
 
 export type BookFormat = 'pocket' | 'paperback' | 'hardcover' | 'audiobook' | 'digital'
 export type BookStatus = 'to-read' | 'read'
@@ -45,7 +78,7 @@ export type Book = {
   format?: BookFormat
   translator?: PersonName
   estimatedPrice?: Eur
-  duration?: string
+  durationMinutes?: Minutes
   narrators: PersonName[]
   personalNotes?: string
   status: BookStatus

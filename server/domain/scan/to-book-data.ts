@@ -10,7 +10,15 @@ import {
 } from '~/domain/book/primitives'
 import type { Award, PublicRating } from '~/domain/book/types'
 import type { ScanResult } from '~/domain/scan/types'
-import { Eur, PersonName, Url } from '~/domain/shared/primitives'
+import { Eur, PersonName, parseDuration, Url } from '~/domain/shared/primitives'
+
+const safeLanguage = (value: string) => {
+  try {
+    return Language(value)
+  } catch {
+    return undefined
+  }
+}
 
 const ratingUrl = (source: string, isbn: string) => {
   const s = source.toLowerCase()
@@ -33,11 +41,11 @@ export const scanResultToBookData = (scanResult: ScanResult) => {
     genre: scanResult.genre ? Genre(scanResult.genre) : undefined,
     synopsis: scanResult.synopsis,
     isbn: scanResult.isbn ? ISBN(scanResult.isbn) : undefined,
-    language: scanResult.language ? Language(scanResult.language) : undefined,
+    language: scanResult.language ? safeLanguage(scanResult.language) : undefined,
     format: scanResult.format ? BookFormat(scanResult.format) : undefined,
     translator: scanResult.translator ? PersonName(scanResult.translator) : undefined,
     estimatedPrice: scanResult.estimatedPrice ? Eur(scanResult.estimatedPrice) : undefined,
-    duration: scanResult.duration,
+    durationMinutes: scanResult.duration ? parseDuration(scanResult.duration) : undefined,
     narrators: (scanResult.narrators ?? []).map((n) => PersonName(n)),
     awards: scanResult.awards as Award[],
     publicRatings: scanResult.publicRatings

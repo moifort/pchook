@@ -38,7 +38,7 @@ export const UpdateBookInput = builder.inputType('UpdateBookInput', {
       type: 'Eur',
       description: 'Estimated price in euros (null to remove)',
     }),
-    duration: t.string({ description: 'Duration (audiobook)' }),
+    durationMinutes: t.int({ description: 'Duration in minutes (audiobook)' }),
     narrators: t.field({ type: ['PersonName'], description: 'Narrators (audiobook)' }),
     personalNotes: t.string({ description: 'Personal notes' }),
     status: t.field({ type: BookStatusEnum, description: 'Reading status' }),

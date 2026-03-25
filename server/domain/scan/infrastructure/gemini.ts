@@ -51,7 +51,7 @@ ${identificationFields}  "publisher": string ou null (maison d'édition),
   "genre": string ou null (sous-genres séparés par des virgules, ex: "LitRPG, Science Fantasy" ou "Thriller, Policier" — sois précis et spécifique),
   "synopsis": string ou null (résumé de 3-5 phrases en français, pas la 4ème de couverture mais un vrai résumé du contenu),
   "isbn": string ou null (ISBN-13 de préférence),
-  "language": string ou null (code ISO 639-1 en majuscules — ex: "FR", "EN", "ES"),
+  "language": string ou null (code ISO 639-1 en minuscules — ex: "fr", "en", "es"),
   "format": string ou null ("pocket", "paperback", "hardcover" ou "audiobook"),
   "series": string ou null (nom de la série, du cycle, de la trilogie ou de la saga — recherche activement si ce livre fait partie d'une série même si ce n'est pas explicitement marqué),${existingSeriesNames.length > 0 ? `\n  IMPORTANT : si ce livre fait partie d'une série, vérifie d'abord si elle correspond à une de ces séries existantes : ${existingSeriesNames.map((name) => `"${name}"`).join(', ')}. Utilise le nom existant exact si c'est la même série, même si tu trouves une variante différente.` : ''}
   "seriesLabel": string ou null (libellé du tome tel qu'affiché : "1", "1.5", "Hors-série", "Préquelle", "Extra" — texte libre),
