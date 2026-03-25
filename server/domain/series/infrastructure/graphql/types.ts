@@ -39,8 +39,10 @@ export const SeriesVolumeType = builder.objectRef<SeriesVolumeShape>('SeriesVolu
     label: t.exposeString('label', {
       description: 'Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")',
     }),
-    position: t.exposeInt('position', {
+    position: t.field({
+      type: 'SeriesPosition',
       description: 'Sort position in series (e.g. 1, 2, 99 for hors-série)',
+      resolve: ({ position }) => position,
     }),
   }),
 })

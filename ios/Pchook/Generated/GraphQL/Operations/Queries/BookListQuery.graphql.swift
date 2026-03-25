@@ -184,7 +184,7 @@ extension PchookGraphQL {
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
             .field("label", String.self),
-            .field("position", Int.self),
+            .field("position", PchookGraphQL.SeriesPosition.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             BookListQuery.Data.Book.SeriesVolume.self
@@ -193,7 +193,7 @@ extension PchookGraphQL {
           /// Display label in series (e.g. "1", "1.5", "Hors-série", "Préquelle")
           var label: String { __data["label"] }
           /// Sort position in series (e.g. 1, 2, 99 for hors-série)
-          var position: Int { __data["position"] }
+          var position: PchookGraphQL.SeriesPosition { __data["position"] }
         }
       }
     }
