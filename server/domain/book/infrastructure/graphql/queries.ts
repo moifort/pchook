@@ -1,9 +1,10 @@
 import { getRequestURL } from 'h3'
-import { sortBy } from 'lodash-es'
+import { keyBy, sortBy } from 'lodash-es'
 import { match } from 'ts-pattern'
 import { awardsCount } from '~/domain/book/business-rules'
 import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
+import { ReviewQuery } from '~/domain/review/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { Url } from '~/domain/shared/primitives'
 import { BookSortEnum, SortOrderEnum } from './enums'
@@ -37,12 +38,16 @@ builder.queryField('books', (t) =>
 
       const genre = args.genre ?? undefined
       const status = args.status ? BookStatus(args.status) : undefined
-      const sort = args.sort ? BookSort(args.sort) : 'createdAt'
+      const sortField = args.sort ?? 'createdAt'
+      const sort = sortField === 'myRating' ? ('myRating' as const) : BookSort(sortField)
       const desc = (args.order ? SortOrder(args.order) : 'desc') === 'desc'
 
       const filtered = allBooks
         .filter((book) => (genre ? book.genre === genre : true))
         .filter((book) => (status ? book.status === status : true))
+
+      const ratingByBookId =
+        sort === 'myRating' ? keyBy(await ReviewQuery.getAll(), ({ bookId }) => bookId) : undefined
 
       const sorted = sortBy(filtered, (book) =>
         match(sort)
@@ -50,6 +55,7 @@ builder.queryField('books', (t) =>
           .with('author', () => (book.authors[0] ?? '').toLowerCase())
           .with('awards', () => awardsCount(book.awards))
           .with('genre', () => (book.genre ?? '').toLowerCase())
+          .with('myRating', () => ratingByBookId?.[book.id]?.rating ?? -1)
           .with('createdAt', () => book.createdAt.getTime())
           .exhaustive(),
       )

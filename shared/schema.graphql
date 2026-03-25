@@ -382,6 +382,9 @@ enum BookSort {
   """Literary genre"""
   genre
 
+  """Personal rating"""
+  myRating
+
   """Alphabetical title"""
   title
 }
