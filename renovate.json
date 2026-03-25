@@ -2,8 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
   "gitAuthor": "Renovate Bot <moifort@users.noreply.github.com>",
-  "schedule": ["after 10pm and before 5am"],
-  "timezone": "Europe/Paris",
   "labels": ["dependencies"],
   "packageRules": [
     {
