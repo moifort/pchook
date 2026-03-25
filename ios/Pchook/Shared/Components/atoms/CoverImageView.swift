@@ -18,10 +18,8 @@ struct CoverImageView: View {
                 case .failure:
                     placeholder
                 default:
-                    placeholder
-                        .overlay {
-                            ProgressView()
-                        }
+                    ProgressView()
+                        .frame(maxHeight: maxHeight)
                 }
             }
         } else {
