@@ -50,6 +50,7 @@ query BookDetail($id: BookId!) {
         title
         label
         position
+        rating
       }
     }
     seriesVolume {

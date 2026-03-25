@@ -8,6 +8,7 @@ query FavoriteSeries {
       title
       label
       position
+      rating
     }
   }
 }

@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name rating volumes { __typename id title label position } } seriesVolume { __typename id title label position } } }"#
+        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name rating volumes { __typename id title label position rating } } seriesVolume { __typename id title label position } } }"#
       ))
 
     public var id: BookId
@@ -263,6 +263,7 @@ extension PchookGraphQL {
               .field("title", String.self),
               .field("label", String.self),
               .field("position", PchookGraphQL.SeriesPosition.self),
+              .field("rating", PchookGraphQL.Note?.self),
             ] }
             static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               BookDetailQuery.Data.Book.Series.Volume.self
@@ -276,6 +277,8 @@ extension PchookGraphQL {
             var label: String { __data["label"] }
             /// Sort position in series (e.g. 1, 2, 99 for hors-série)
             var position: PchookGraphQL.SeriesPosition { __data["position"] }
+            /// Personal rating of this volume (null if not reviewed)
+            var rating: PchookGraphQL.Note? { __data["rating"] }
           }
         }
 

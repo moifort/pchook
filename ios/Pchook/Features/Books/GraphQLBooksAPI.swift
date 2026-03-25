@@ -54,7 +54,8 @@ enum GraphQLBooksAPI {
                             id: entry.id,
                             title: entry.title,
                             label: entry.label,
-                            position: Double(entry.position)
+                            position: Double(entry.position),
+                            rating: entry.rating
                         )
                     }
                 )

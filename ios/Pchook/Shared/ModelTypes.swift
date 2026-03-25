@@ -199,6 +199,7 @@ struct SeriesVolume: Identifiable, Sendable {
     let title: String
     let label: String
     let position: Double
+    var rating: Int?
 }
 
 struct Series: Sendable {

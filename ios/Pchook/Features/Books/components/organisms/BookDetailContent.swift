@@ -49,7 +49,7 @@ struct BookDetailContent: View {
                     flag: detail.book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
                     rating: series.rating,
                     currentBookId: detail.book.id,
-                    items: series.volumes.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position) },
+                    items: series.volumes.map { .init(id: $0.id, title: $0.title, label: $0.label, position: $0.position, rating: $0.rating) },
                     onSelectBook: onSelectBook,
                     onRateSeries: onRateSeries
                 )
