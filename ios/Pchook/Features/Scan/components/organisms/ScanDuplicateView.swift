@@ -20,7 +20,7 @@ struct ScanDuplicateView: View {
                 .scaleEffect(scale)
                 .opacity(opacity)
 
-            Text("Livre d\u{00E9}j\u{00E0} ajout\u{00E9}")
+            Text("Livre déjà ajouté")
                 .font(.title)
                 .fontWeight(.bold)
 
@@ -81,7 +81,7 @@ struct ScanDuplicateView: View {
 #Preview {
     NavigationStack {
         ScanDuplicateView(
-            title: "L'\u{00C9}tranger",
+            title: "L'Étranger",
             authors: "Albert Camus",
             onReplace: {},
             onScanAnother: {},

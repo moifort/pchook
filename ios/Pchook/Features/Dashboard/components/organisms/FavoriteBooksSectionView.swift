@@ -42,7 +42,7 @@ struct FavoriteBooksSectionView: View {
                             Spacer()
                             StarRatingView(rating: Double(item.rating))
                             if let price = item.estimatedPrice {
-                                Text(String(format: "%.0f \u{20AC}", price))
+                                Text(String(format: "%.0f €", price))
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
@@ -73,8 +73,8 @@ extension FavoriteBooksSectionView {
 #Preview("Avec favoris") {
     FavoriteBooksSectionView(
         items: [
-            .init(id: "1", title: "L'\u{00C9}tranger", authors: "Albert Camus", genre: "Roman", rating: 5, estimatedPrice: 7.50),
-            .init(id: "2", title: "Le Petit Prince", authors: "Antoine de Saint-Exup\u{00E9}ry", genre: "Conte", rating: 5, estimatedPrice: nil),
+            .init(id: "1", title: "L'Étranger", authors: "Albert Camus", genre: "Roman", rating: 5, estimatedPrice: 7.50),
+            .init(id: "2", title: "Le Petit Prince", authors: "Antoine de Saint-Exupéry", genre: "Conte", rating: 5, estimatedPrice: nil),
         ]
     )
     .padding()

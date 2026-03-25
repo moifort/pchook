@@ -19,7 +19,7 @@ struct BookSynopsisSection: View {
 #Preview {
     List {
         BookSynopsisSection(
-            synopsis: "Dans un futur proche, un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission dans le cyberespace."
+            synopsis: "Dans un futur proche, un hacker déchu est recruté pour une dernière mission dans le cyberespace."
         )
     }
 }

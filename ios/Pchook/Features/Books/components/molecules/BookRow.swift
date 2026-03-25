@@ -45,20 +45,20 @@ struct BookRow: View {
 #Preview {
     List {
         BookRow(
-            title: "L'\u{00C9}tranger",
-            subtitle: "Albert Camus \u{2022} Roman \u{2022} 1 prix",
+            title: "L'Étranger",
+            subtitle: "Albert Camus • Roman • 1 prix",
             rating: 4,
             status: .read
         )
         BookRow(
             title: "Le Petit Prince",
-            subtitle: "Antoine de Saint-Exup\u{00E9}ry \u{2022} Conte",
+            subtitle: "Antoine de Saint-Exupéry • Conte",
             rating: nil,
             status: .toRead
         )
         BookRow(
             title: "Neuromancien",
-            subtitle: "William Gibson \u{2022} Cyberpunk \u{2022} 2 prix",
+            subtitle: "William Gibson • Cyberpunk • 2 prix",
             rating: 5,
             status: .read
         )

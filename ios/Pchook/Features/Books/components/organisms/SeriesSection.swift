@@ -7,7 +7,7 @@ struct SeriesSection: View {
     let onSelectBook: (String) -> Void
 
     var body: some View {
-        Section("S\u{00E9}rie : \(name)") {
+        Section("Série : \(name)") {
             ForEach(items) { (book: Item) in
                 if book.id == currentBookId {
                     seriesRow(book)
@@ -56,7 +56,7 @@ extension SeriesSection {
             currentBookId: "3",
             items: [
                 .init(id: "1", title: "La Fortune des Rougon", label: "1", position: 1),
-                .init(id: "2", title: "La Cur\u{00E9}e", label: "2", position: 2),
+                .init(id: "2", title: "La Curée", label: "2", position: 2),
                 .init(id: "3", title: "L'Assommoir", label: "7", position: 7),
             ],
             onSelectBook: { _ in }

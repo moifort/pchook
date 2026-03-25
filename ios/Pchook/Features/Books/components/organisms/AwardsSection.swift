@@ -4,7 +4,7 @@ struct AwardsSection: View {
     let awards: [Item]
 
     var body: some View {
-        Section("Prix litt\u{00E9}raires") {
+        Section("Prix littéraires") {
             ForEach(awards) { award in
                 HStack {
                     Image(systemName: "trophy").foregroundStyle(.secondary)
@@ -35,7 +35,7 @@ extension AwardsSection {
         AwardsSection(
             awards: [
                 .init(name: "Prix Goncourt", year: 1957),
-                .init(name: "Prix Nobel de Litt\u{00E9}rature", year: 1957),
+                .init(name: "Prix Nobel de Littérature", year: 1957),
             ]
         )
     }

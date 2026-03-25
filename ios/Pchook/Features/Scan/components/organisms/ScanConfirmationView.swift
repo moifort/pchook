@@ -69,12 +69,12 @@ struct ScanConfirmationView: View {
                 }
             }
 
-            Section("S\u{00E9}rie") {
+            Section("Série") {
                 LabeledContent {
-                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                    TextField("Nom de la série", text: $series)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("S\u{00E9}rie", systemImage: "books.vertical")
+                    Label("Série", systemImage: "books.vertical")
                 }
 
                 LabeledContent {
@@ -104,12 +104,12 @@ struct ScanConfirmationView: View {
                 }
             }
 
-            Section("D\u{00E9}tails") {
+            Section("Détails") {
                 LabeledContent {
-                    TextField("\u{00C9}diteur", text: $publisher)
+                    TextField("Éditeur", text: $publisher)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("\u{00C9}diteur", systemImage: "building.2")
+                    Label("Éditeur", systemImage: "building.2")
                 }
 
                 LabeledContent {
@@ -121,7 +121,7 @@ struct ScanConfirmationView: View {
                 }
 
                 Picker(selection: $language) {
-                    Text("Non d\u{00E9}finie").tag(nil as BookLanguage?)
+                    Text("Non définie").tag(nil as BookLanguage?)
                     ForEach(BookLanguage.allCases) { lang in
                         Text(lang.label).tag(lang as BookLanguage?)
                     }
@@ -130,7 +130,7 @@ struct ScanConfirmationView: View {
                 }
 
                 Picker(selection: $format) {
-                    Text("Non d\u{00E9}fini").tag(nil as BookFormat?)
+                    Text("Non défini").tag(nil as BookFormat?)
                     ForEach(BookFormat.allCases) { fmt in
                         Text(fmt.label).tag(fmt as BookFormat?)
                     }
@@ -140,10 +140,10 @@ struct ScanConfirmationView: View {
 
                 if format == .audiobook {
                     LabeledContent {
-                        TextField("Dur\u{00E9}e", text: $duration)
+                        TextField("Durée", text: $duration)
                             .multilineTextAlignment(.trailing)
                     } label: {
-                        Label("Dur\u{00E9}e", systemImage: "clock")
+                        Label("Durée", systemImage: "clock")
                     }
 
                     LabeledContent {
@@ -166,7 +166,7 @@ struct ScanConfirmationView: View {
                         TextField("0", text: $estimatedPrice)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
-                        Text("\u{20AC}")
+                        Text("€")
                             .foregroundStyle(.secondary)
                     }
                 } label: {
@@ -179,7 +179,7 @@ struct ScanConfirmationView: View {
                     .lineLimit(3...8)
             }
         }
-        .navigationTitle("V\u{00E9}rifier le livre")
+        .navigationTitle("Vérifier le livre")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
@@ -191,7 +191,7 @@ struct ScanConfirmationView: View {
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
-                AsyncToolbarButton(title: "\u{00C0} lire", systemImage: "bookmark.fill") {
+                AsyncToolbarButton(title: "À lire", systemImage: "bookmark.fill") {
                     await onConfirm("to-read", buildOverrides())
                 }
                 .accessibilityIdentifier("status-to-read-button")
@@ -268,12 +268,12 @@ extension ScanConfirmationView {
         ScanConfirmationView(
             preview: .init(
                 previewId: "preview-1",
-                title: "L'\u{00C9}tranger",
+                title: "L'Étranger",
                 authors: "Albert Camus",
                 genres: ["Roman", "Philosophie"],
-                synopsis: "Meursault, un employ\u{00E9} de bureau \u{00E0} Alger.",
+                synopsis: "Meursault, un employé de bureau à Alger.",
                 pageCount: 185,
-                language: "Fran\u{00E7}ais",
+                language: "Français",
                 format: "pocket",
                 publisher: "Gallimard",
                 translator: nil,

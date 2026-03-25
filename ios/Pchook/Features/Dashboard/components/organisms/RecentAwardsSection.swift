@@ -6,14 +6,14 @@ struct RecentAwardsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("Prix r\u{00E9}cents", systemImage: "trophy")
+                Label("Prix récents", systemImage: "trophy")
                     .font(.headline)
                     .foregroundStyle(.primary)
                 Spacer()
             }
 
             if items.isEmpty {
-                Text("Aucun prix r\u{00E9}cent")
+                Text("Aucun prix récent")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -73,8 +73,8 @@ extension RecentAwardsSection {
 #Preview("Avec prix") {
     RecentAwardsSection(
         items: [
-            .init(bookTitle: "L'\u{00C9}tranger", authors: "Albert Camus", awardName: "Prix Nobel", awardYear: 1957),
-            .init(bookTitle: "Les Mis\u{00E9}rables", authors: "Victor Hugo", awardName: "Prix Goncourt", awardYear: 2024),
+            .init(bookTitle: "L'Étranger", authors: "Albert Camus", awardName: "Prix Nobel", awardYear: 1957),
+            .init(bookTitle: "Les Misérables", authors: "Victor Hugo", awardName: "Prix Goncourt", awardYear: 2024),
         ]
     )
     .padding()

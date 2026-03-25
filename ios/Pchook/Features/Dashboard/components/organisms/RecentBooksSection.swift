@@ -6,7 +6,7 @@ struct RecentBooksSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("Ajout\u{00E9}s r\u{00E9}cemment", systemImage: "clock")
+                Label("Ajoutés récemment", systemImage: "clock")
                     .font(.headline)
                     .foregroundStyle(.primary)
                 Spacer()
@@ -18,7 +18,7 @@ struct RecentBooksSection: View {
             }
 
             if items.isEmpty {
-                Text("Aucun livre r\u{00E9}cent")
+                Text("Aucun livre récent")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -74,8 +74,8 @@ extension RecentBooksSection {
 #Preview("Avec livres") {
     RecentBooksSection(
         items: [
-            .init(id: "1", title: "L'\u{00C9}tranger", authors: "Albert Camus", genre: "Roman", createdAt: Date()),
-            .init(id: "2", title: "Le Petit Prince", authors: "Antoine de Saint-Exup\u{00E9}ry", genre: "Conte", createdAt: Date().addingTimeInterval(-86400)),
+            .init(id: "1", title: "L'Étranger", authors: "Albert Camus", genre: "Roman", createdAt: Date()),
+            .init(id: "2", title: "Le Petit Prince", authors: "Antoine de Saint-Exupéry", genre: "Conte", createdAt: Date().addingTimeInterval(-86400)),
         ]
     )
     .padding()

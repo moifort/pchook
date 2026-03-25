@@ -103,6 +103,7 @@ See [docs/migrations.md](docs/migrations.md) for full guide.
 - **GraphQL client**: Apollo iOS via SPM — `GraphQLClient.swift` (singleton with Bearer auth), `GraphQLBooksAPI.swift` (même interface que `BooksAPI.swift`)
 - **Apollo codegen**: `.graphql` operation files dans `Features/{Feature}/GraphQL/`, types générés dans `Generated/GraphQL/`
 - **Codegen config**: `ios/apollo-codegen-config.json` — namespace `PchookGraphQL`, schema from `shared/schema.graphql`
+- **No Unicode escapes**: write actual UTF-8 characters in Swift strings (`"Série"`, not `"S\u{00E9}rie"`)
 
 See [docs/ios-guide.md](docs/ios-guide.md) for full iOS guide.
 

@@ -39,7 +39,7 @@ enum ShareBookLanguage: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .fr: "Fran\u{00E7}ais"
+        case .fr: "Français"
         case .en: "English"
         }
     }
@@ -61,8 +61,8 @@ enum ShareBookFormat: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .pocket: "Poche"
-        case .paperback: "Broch\u{00E9}"
-        case .hardcover: "Reli\u{00E9}"
+        case .paperback: "Broché"
+        case .hardcover: "Relié"
         case .audiobook: "Livre audio"
         }
     }

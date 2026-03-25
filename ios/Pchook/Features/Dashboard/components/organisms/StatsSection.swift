@@ -18,7 +18,7 @@ struct StatsSection: View {
                 .accessibilityIdentifier("stat-total")
 
                 GradientWidget(
-                    title: "\u{00C0} lire",
+                    title: "À lire",
                     value: "\(toRead)",
                     subtitle: "Livres",
                     icon: "bookmark",
@@ -30,7 +30,7 @@ struct StatsSection: View {
             GradientWidget(
                 title: "Lus",
                 value: "\(read)",
-                subtitle: "Livres termin\u{00E9}s",
+                subtitle: "Livres terminés",
                 icon: "checkmark.circle",
                 gradient: [Color(red: 0.15, green: 0.65, blue: 0.45), Color(red: 0.3, green: 0.8, blue: 0.55)]
             )

@@ -79,7 +79,7 @@ struct ShareView: View {
                 Button {
                     viewModel.retry()
                 } label: {
-                    Label("R\u{00E9}essayer", systemImage: "arrow.clockwise")
+                    Label("Réessayer", systemImage: "arrow.clockwise")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -174,12 +174,12 @@ private struct SharePreviewForm: View {
                 }
             }
 
-            Section("S\u{00E9}rie") {
+            Section("Série") {
                 LabeledContent {
-                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                    TextField("Nom de la série", text: $series)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("S\u{00E9}rie", systemImage: "books.vertical")
+                    Label("Série", systemImage: "books.vertical")
                 }
 
                 LabeledContent {
@@ -192,7 +192,7 @@ private struct SharePreviewForm: View {
             }
 
             if !preview.awards.isEmpty {
-                Section("Prix litt\u{00E9}raires") {
+                Section("Prix littéraires") {
                     ForEach(preview.awards) { award in
                         HStack {
                             Image(systemName: "trophy.fill")
@@ -209,12 +209,12 @@ private struct SharePreviewForm: View {
                 }
             }
 
-            Section("D\u{00E9}tails") {
+            Section("Détails") {
                 LabeledContent {
-                    TextField("\u{00C9}diteur", text: $publisher)
+                    TextField("Éditeur", text: $publisher)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("\u{00C9}diteur", systemImage: "building.2")
+                    Label("Éditeur", systemImage: "building.2")
                 }
 
                 LabeledContent {
@@ -226,7 +226,7 @@ private struct SharePreviewForm: View {
                 }
 
                 Picker(selection: $language) {
-                    Text("Non d\u{00E9}finie").tag(nil as ShareBookLanguage?)
+                    Text("Non définie").tag(nil as ShareBookLanguage?)
                     ForEach(ShareBookLanguage.allCases) { lang in
                         Text(lang.label).tag(lang as ShareBookLanguage?)
                     }
@@ -235,7 +235,7 @@ private struct SharePreviewForm: View {
                 }
 
                 Picker(selection: $format) {
-                    Text("Non d\u{00E9}fini").tag(nil as ShareBookFormat?)
+                    Text("Non défini").tag(nil as ShareBookFormat?)
                     ForEach(ShareBookFormat.allCases) { fmt in
                         Text(fmt.label).tag(fmt as ShareBookFormat?)
                     }
@@ -245,10 +245,10 @@ private struct SharePreviewForm: View {
 
                 if format == .audiobook {
                     LabeledContent {
-                        TextField("Dur\u{00E9}e", text: $duration)
+                        TextField("Durée", text: $duration)
                             .multilineTextAlignment(.trailing)
                     } label: {
-                        Label("Dur\u{00E9}e", systemImage: "clock")
+                        Label("Durée", systemImage: "clock")
                     }
 
                     LabeledContent {
@@ -271,7 +271,7 @@ private struct SharePreviewForm: View {
                         TextField("0", text: $estimatedPrice)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
-                        Text("\u{20AC}")
+                        Text("€")
                             .foregroundStyle(.secondary)
                     }
                 } label: {
@@ -284,7 +284,7 @@ private struct SharePreviewForm: View {
                     .lineLimit(3...8)
             }
         }
-        .navigationTitle("V\u{00E9}rifier le livre")
+        .navigationTitle("Vérifier le livre")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -300,7 +300,7 @@ private struct SharePreviewForm: View {
                     if isConfirming {
                         ProgressView()
                     } else {
-                        Label("\u{00C0} lire", systemImage: "bookmark.fill")
+                        Label("À lire", systemImage: "bookmark.fill")
                     }
                 }
                 .disabled(isConfirming)

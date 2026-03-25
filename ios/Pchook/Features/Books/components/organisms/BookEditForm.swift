@@ -82,12 +82,12 @@ struct BookEditForm: View {
                 }
             }
 
-            Section("D\u{00E9}tails") {
+            Section("Détails") {
                 LabeledContent {
-                    TextField("\u{00C9}diteur", text: $publisher)
+                    TextField("Éditeur", text: $publisher)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("\u{00C9}diteur", systemImage: "building.2")
+                    Label("Éditeur", systemImage: "building.2")
                 }
 
                 LabeledContent {
@@ -106,7 +106,7 @@ struct BookEditForm: View {
                 }
 
                 Picker(selection: $language) {
-                    Text("Non d\u{00E9}finie").tag(nil as BookLanguage?)
+                    Text("Non définie").tag(nil as BookLanguage?)
                     ForEach(BookLanguage.allCases) { lang in
                         Text(lang.label).tag(lang as BookLanguage?)
                     }
@@ -115,7 +115,7 @@ struct BookEditForm: View {
                 }
 
                 Picker(selection: $format) {
-                    Text("Non d\u{00E9}fini").tag(nil as BookFormat?)
+                    Text("Non défini").tag(nil as BookFormat?)
                     ForEach(BookFormat.allCases) { fmt in
                         Text(fmt.label).tag(fmt as BookFormat?)
                     }
@@ -125,10 +125,10 @@ struct BookEditForm: View {
 
                 if format == .audiobook {
                     LabeledContent {
-                        TextField("Dur\u{00E9}e", text: $duration)
+                        TextField("Durée", text: $duration)
                             .multilineTextAlignment(.trailing)
                     } label: {
-                        Label("Dur\u{00E9}e", systemImage: "clock")
+                        Label("Durée", systemImage: "clock")
                     }
 
                     LabeledContent {
@@ -151,7 +151,7 @@ struct BookEditForm: View {
                         TextField("0", text: $estimatedPrice)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
-                        Text("\u{20AC}")
+                        Text("€")
                             .foregroundStyle(.secondary)
                     }
                 } label: {
@@ -159,12 +159,12 @@ struct BookEditForm: View {
                 }
             }
 
-            Section("S\u{00E9}rie") {
+            Section("Série") {
                 LabeledContent {
-                    TextField("Nom de la s\u{00E9}rie", text: $series)
+                    TextField("Nom de la série", text: $series)
                         .multilineTextAlignment(.trailing)
                 } label: {
-                    Label("S\u{00E9}rie", systemImage: "list.number")
+                    Label("Série", systemImage: "list.number")
                 }
 
                 LabeledContent {
@@ -361,7 +361,7 @@ extension BookEditForm {
                 series: "Sprawl",
                 seriesLabel: "Tome 1",
                 seriesNumber: "1",
-                synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission.",
+                synopsis: "Un hacker déchu est recruté pour une dernière mission.",
                 personalNotes: "Excellent"
             ),
             onSave: { _ in },

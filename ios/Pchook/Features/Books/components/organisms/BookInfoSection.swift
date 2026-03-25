@@ -17,13 +17,13 @@ struct BookInfoSection: View {
         if hasContent {
             Section("Informations") {
                 if let publisher {
-                    LabeledInfoRow(title: "\u{00C9}diteur", value: publisher, icon: "building.2")
+                    LabeledInfoRow(title: "Éditeur", value: publisher, icon: "building.2")
                 }
                 if let pageCount {
                     LabeledInfoRow(title: "Pages", value: "\(pageCount)", icon: "doc.text")
                 }
                 if let duration {
-                    LabeledInfoRow(title: "Dur\u{00E9}e", value: duration, icon: "clock")
+                    LabeledInfoRow(title: "Durée", value: duration, icon: "clock")
                 }
                 if let narrators, !narrators.isEmpty {
                     LabeledInfoRow(
@@ -58,8 +58,8 @@ struct BookInfoSection: View {
                 }
                 if let estimatedPrice {
                     LabeledInfoRow(
-                        title: "Prix estim\u{00E9}",
-                        value: String(format: "%.2f \u{20AC}", estimatedPrice),
+                        title: "Prix estimé",
+                        value: String(format: "%.2f €", estimatedPrice),
                         icon: "eurosign"
                     )
                 }

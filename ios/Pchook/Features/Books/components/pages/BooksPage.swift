@@ -71,7 +71,7 @@ struct BooksPage: View {
                                 Label(sort.label, systemImage: sort.icon).tag(sort)
                             }
                         }
-                        Toggle(viewModel.sortDescending ? "D\u{00E9}croissant" : "Croissant", isOn: $viewModel.sortDescending)
+                        Toggle(viewModel.sortDescending ? "Décroissant" : "Croissant", isOn: $viewModel.sortDescending)
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                     }
@@ -101,21 +101,21 @@ struct BooksPage: View {
             )
         case .toRead:
             ContentUnavailableView(
-                "Aucun livre \u{00E0} lire",
+                "Aucun livre à lire",
                 systemImage: "bookmark",
-                description: Text("Les livres \u{00E0} lire appara\u{00EE}tront ici")
+                description: Text("Les livres à lire apparaîtront ici")
             )
         case .series:
             ContentUnavailableView(
-                "Aucune s\u{00E9}rie",
+                "Aucune série",
                 systemImage: "list.number",
-                description: Text("Les livres dans une s\u{00E9}rie appara\u{00EE}tront ici")
+                description: Text("Les livres dans une série apparaîtront ici")
             )
         case .favorites:
             ContentUnavailableView(
                 "Aucun favori",
                 systemImage: "heart",
-                description: Text("Les livres not\u{00E9}s 5 \u{00E9}toiles appara\u{00EE}tront ici")
+                description: Text("Les livres notés 5 étoiles apparaîtront ici")
             )
         }
     }

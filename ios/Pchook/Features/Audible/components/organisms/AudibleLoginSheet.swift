@@ -21,7 +21,7 @@ struct AudibleLoginSheet: View {
             Group {
                 switch step {
                 case .loading:
-                    ProgressView("Pr\u{00E9}paration...")
+                    ProgressView("Préparation...")
                 case .openSafari:
                     safariInstructions
                 case .waitingForUrl:
@@ -50,7 +50,7 @@ struct AudibleLoginSheet: View {
         ContentUnavailableView {
             Label("Connexion Amazon", systemImage: "safari")
         } description: {
-            Text("Safari va s'ouvrir pour vous connecter \u{00E0} Amazon. Apr\u{00E8}s la connexion, vous arriverez sur une page d'erreur \u{2014} c'est normal.\n\nCopiez l'URL de la barre d'adresse, puis revenez ici.")
+            Text("Safari va s'ouvrir pour vous connecter à Amazon. Après la connexion, vous arriverez sur une page d'erreur — c'est normal.\n\nCopiez l'URL de la barre d'adresse, puis revenez ici.")
         } actions: {
             Button("Ouvrir Safari") {
                 step = .waitingForUrl
@@ -63,9 +63,9 @@ struct AudibleLoginSheet: View {
         ContentUnavailableView {
             Label("Coller l'URL", systemImage: "doc.on.clipboard")
         } description: {
-            Text("Connectez-vous \u{00E0} Amazon dans Safari, puis copiez l'URL de la page d'erreur et revenez ici.")
+            Text("Connectez-vous à Amazon dans Safari, puis copiez l'URL de la page d'erreur et revenez ici.")
         } actions: {
-            Button("Coller l'URL copi\u{00E9}e") {
+            Button("Coller l'URL copiée") {
                 Task { await handlePaste() }
             }
             .buttonStyle(.borderedProminent)
@@ -91,7 +91,7 @@ struct AudibleLoginSheet: View {
     private func handlePaste() async {
         guard let sessionId else { return }
         guard let pastedUrl = UIPasteboard.general.string, pastedUrl.contains("maplanding") else {
-            error = "L'URL copi\u{00E9}e ne semble pas \u{00EA}tre la bonne. Copiez l'URL compl\u{00E8}te de la barre d'adresse Safari apr\u{00E8}s la connexion."
+            error = "L'URL copiée ne semble pas être la bonne. Copiez l'URL complète de la barre d'adresse Safari après la connexion."
             return
         }
 

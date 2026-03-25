@@ -95,7 +95,7 @@ struct BookDetailContent: View {
                 publisher: "J'ai Lu",
                 pageCount: 320,
                 genre: "Cyberpunk, Science-Fiction",
-                synopsis: "Un hacker d\u{00E9}chu est recrut\u{00E9} pour une derni\u{00E8}re mission dans le cyberespace.",
+                synopsis: "Un hacker déchu est recruté pour une dernière mission dans le cyberespace.",
                 language: "fr",
                 format: .pocket,
                 translator: "Jean Bonnefoy",
@@ -121,8 +121,8 @@ struct BookDetailContent: View {
                 position: 1,
                 volumes: [
                     SeriesVolume(id: "1", title: "Neuromancien", label: "1", position: 1),
-                    SeriesVolume(id: "2", title: "Compt\u{00E9} z\u{00E9}ro", label: "2", position: 2),
-                    SeriesVolume(id: "3", title: "Mona Lisa s'\u{00E9}clate", label: "3", position: 3),
+                    SeriesVolume(id: "2", title: "Compté zéro", label: "2", position: 2),
+                    SeriesVolume(id: "3", title: "Mona Lisa s'éclate", label: "3", position: 3),
                 ]
             ),
             review: ReviewInfo(bookId: "1", rating: 4, readDate: Date(), createdAt: Date())

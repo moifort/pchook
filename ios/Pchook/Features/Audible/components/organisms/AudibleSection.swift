@@ -40,11 +40,11 @@ struct AudibleSection: View {
         if state.isVerifying {
             HStack(spacing: 8) {
                 ProgressView()
-                Text("V\u{00E9}rification de la connexion...")
+                Text("Vérification de la connexion...")
                     .foregroundStyle(.secondary)
             }
         } else {
-            Label("Connect\u{00E9}", systemImage: "checkmark.circle.fill")
+            Label("Connecté", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
         }
     }
@@ -58,18 +58,18 @@ struct AudibleSection: View {
         } else if state.isFetching {
             HStack(spacing: 8) {
                 ProgressView()
-                Text("R\u{00E9}cup\u{00E9}ration des donn\u{00E9}es...")
+                Text("Récupération des données...")
                     .foregroundStyle(.secondary)
             }
         } else if state.hasFetchedData {
             Label {
-                Text("\(state.libraryCount) livres \u{00B7} \(state.wishlistCount) liste d'envies")
+                Text("\(state.libraryCount) livres · \(state.wishlistCount) liste d'envies")
             } icon: {
                 Image(systemName: "books.vertical")
             }
             if let lastFetched = state.lastFetchedAt {
                 HStack {
-                    Label("Derni\u{00E8}re mise \u{00E0} jour", systemImage: "clock")
+                    Label("Dernière mise à jour", systemImage: "clock")
                     Spacer()
                     Text(lastFetched, style: .relative)
                         .foregroundStyle(.secondary)
@@ -78,13 +78,13 @@ struct AudibleSection: View {
             Button {
                 Task { await onFetch() }
             } label: {
-                Label("Actualiser les donn\u{00E9}es", systemImage: "arrow.triangle.2.circlepath")
+                Label("Actualiser les données", systemImage: "arrow.triangle.2.circlepath")
             }
         } else if !state.isImportActive {
             Button {
                 Task { await onFetch() }
             } label: {
-                Label("R\u{00E9}cup\u{00E9}rer les donn\u{00E9}es Audible", systemImage: "arrow.triangle.2.circlepath")
+                Label("Récupérer les données Audible", systemImage: "arrow.triangle.2.circlepath")
             }
         }
     }
@@ -198,7 +198,7 @@ struct AudibleSection: View {
             Button(role: .destructive) {
                 Task { await onDisconnect() }
             } label: {
-                Label("Se d\u{00E9}connecter", systemImage: "person.slash")
+                Label("Se déconnecter", systemImage: "person.slash")
             }
         }
     }

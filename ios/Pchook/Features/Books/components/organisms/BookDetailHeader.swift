@@ -18,7 +18,7 @@ struct BookDetailHeader: View {
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "tag")
                         .foregroundStyle(.secondary)
-                    LabeledContent("Genre", value: genres.joined(separator: " \u{2022} "))
+                    LabeledContent("Genre", value: genres.joined(separator: " • "))
                 }
             }
             LabeledInfoRow(title: "Statut", value: status.label, icon: status == .toRead ? "bookmark" : "checkmark.circle")
