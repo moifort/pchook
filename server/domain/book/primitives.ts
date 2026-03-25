@@ -44,11 +44,47 @@ export const ISBN = (value: unknown) => {
   return make<ISBNType>()(v)
 }
 
+const languageNameToCode: Record<string, string> = {
+  french: 'fr',
+  english: 'en',
+  spanish: 'es',
+  german: 'de',
+  italian: 'it',
+  portuguese: 'pt',
+  japanese: 'ja',
+  chinese: 'zh',
+  korean: 'ko',
+  russian: 'ru',
+  dutch: 'nl',
+  polish: 'pl',
+  swedish: 'sv',
+  arabic: 'ar',
+  czech: 'cs',
+  danish: 'da',
+  finnish: 'fi',
+  greek: 'el',
+  hungarian: 'hu',
+  norwegian: 'no',
+  romanian: 'ro',
+  turkish: 'tr',
+  ukrainian: 'uk',
+  hebrew: 'he',
+  hindi: 'hi',
+  thai: 'th',
+  vietnamese: 'vi',
+  indonesian: 'id',
+  catalan: 'ca',
+  latin: 'la',
+}
+
 export const Language = (value: unknown) => {
   const normalized = z
     .string()
     .min(1)
-    .transform((v) => v.toLowerCase())
+    .transform((v) => {
+      const lower = v.toLowerCase()
+      return languageNameToCode[lower] ?? lower
+    })
     .parse(value)
   return z.enum(languageValues).parse(normalized) as LanguageType
 }
