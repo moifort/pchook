@@ -2,6 +2,7 @@ import type { Book, BookId } from '~/domain/book/types'
 import type { Review } from '~/domain/review/types'
 
 export type SeriesInfo = {
+  id: string
   name: string
   label: string
   position: number

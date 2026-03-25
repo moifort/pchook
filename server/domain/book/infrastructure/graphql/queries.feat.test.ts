@@ -84,7 +84,7 @@ feature('GraphQL query: book', () => {
         title
         genre
         review { rating readDate reviewNotes }
-        series { name label position books { title } }
+        series { id name label position volumes { title } }
       }
     }`)
 

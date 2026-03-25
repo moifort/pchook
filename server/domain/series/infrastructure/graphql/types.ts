@@ -19,10 +19,10 @@ export const SeriesType = builder.objectRef<Series>('Series').implement({
   }),
 })
 
-export const SeriesBookEntryType = builder
-  .objectRef<SeriesInfo['books'][number]>('SeriesBookEntry')
+export const SeriesVolumeType = builder
+  .objectRef<SeriesInfo['books'][number]>('SeriesVolume')
   .implement({
-    description: 'A book entry within a series',
+    description: 'A volume within a series',
     fields: (t) => ({
       id: t.id({ description: 'Book ID', resolve: ({ id }) => id }),
       title: t.exposeString('title', { description: 'Book title' }),
@@ -34,12 +34,13 @@ export const SeriesBookEntryType = builder
 export const SeriesInfoType = builder.objectRef<SeriesInfo>('SeriesInfo').implement({
   description: 'Information about the series a book belongs to',
   fields: (t) => ({
+    id: t.id({ description: 'Series ID', resolve: ({ id }) => id }),
     name: t.exposeString('name', { description: 'Series name' }),
-    label: t.exposeString('label', { description: 'Book label in series' }),
-    position: t.exposeInt('position', { description: 'Book position in series' }),
-    books: t.field({
-      type: [SeriesBookEntryType],
-      description: 'All books in the series (same language)',
+    label: t.exposeString('label', { description: 'This book label in series' }),
+    position: t.exposeInt('position', { description: 'This book position in series' }),
+    volumes: t.field({
+      type: [SeriesVolumeType],
+      description: 'All volumes in the series (same language)',
       resolve: ({ books }) => books,
     }),
   }),

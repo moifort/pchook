@@ -1,11 +1,11 @@
 import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
-import { SeriesBookEntryType, SeriesType } from './types'
+import { SeriesType, SeriesVolumeType } from './types'
 
-builder.objectField(SeriesType, 'books', (t) =>
+builder.objectField(SeriesType, 'volumes', (t) =>
   t.field({
-    type: [SeriesBookEntryType],
-    description: 'All books in this series',
+    type: [SeriesVolumeType],
+    description: 'All volumes in this series',
     resolve: async ({ id }) => {
       const result = await SeriesQuery.getById(id)
       if (result === 'not-found') return []

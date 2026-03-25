@@ -18,6 +18,7 @@ builder.objectField(BookType, 'series', (t) =>
       if (fullSeries === 'not-found') return null
 
       return {
+        id: fullSeries.id,
         name: fullSeries.name,
         label: seriesInfo.label,
         position: seriesInfo.position,

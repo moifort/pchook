@@ -20,6 +20,7 @@ export namespace BookDetailReadModel {
       const fullSeries = await SeriesQuery.getById(seriesInfo.id)
       if (fullSeries !== 'not-found') {
         series = {
+          id: fullSeries.id,
           name: fullSeries.name,
           label: seriesInfo.label,
           position: seriesInfo.position,
