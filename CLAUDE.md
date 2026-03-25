@@ -136,9 +136,18 @@ See [docs/code-style.md](docs/code-style.md) for full rules with examples.
 The API token is used for authentication when `NITRO_API_TOKEN` is set. To rotate the token, update it in:
 - `.env` (`NITRO_API_TOKEN=...`)
 - `ios/Pchook/Shared/Secrets.swift` (gitignored)
+- `ios/PchookShare/Secrets.swift` (gitignored)
 - `ios/PchookUITests/Support/TestSecrets.swift` (gitignored)
 
 See `.example` files next to the Secrets files for the expected format.
+
+**Worktree secrets**: when working in a git worktree, copy these gitignored files into the worktree:
+```
+.env
+ios/Pchook/Shared/Secrets.swift
+ios/PchookShare/Secrets.swift
+ios/PchookUITests/Support/TestSecrets.swift
+```
 
 External API keys required for book scanning and suggestion generation:
 - `NITRO_ANTHROPIC_API_KEY` — Claude API key for cover image analysis (vision)
