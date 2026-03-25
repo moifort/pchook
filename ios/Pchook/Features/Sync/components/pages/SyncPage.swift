@@ -8,7 +8,28 @@ struct SyncPage: View {
     var body: some View {
         NavigationStack {
             List {
-                AudibleSection(viewModel: audibleViewModel)
+                AudibleSection(
+                    state: .init(
+                        isConnected: audibleViewModel.isConnected,
+                        isCheckingStatus: audibleViewModel.isCheckingStatus,
+                        isVerifying: audibleViewModel.isVerifying,
+                        isFetching: audibleViewModel.isFetching,
+                        hasFetchedData: audibleViewModel.hasFetchedData,
+                        libraryCount: audibleViewModel.libraryCount,
+                        wishlistCount: audibleViewModel.wishlistCount,
+                        lastFetchedAt: audibleViewModel.lastFetchedAt,
+                        importTask: audibleViewModel.importTask,
+                        isImportActive: audibleViewModel.isImportActive,
+                        isPausing: audibleViewModel.isPausing,
+                        isCancelling: audibleViewModel.isCancelling
+                    ),
+                    onConnect: { audibleViewModel.showLogin = true },
+                    onFetch: { await audibleViewModel.fetchLibrary() },
+                    onImport: { await audibleViewModel.startImport() },
+                    onTogglePause: { await audibleViewModel.toggleImportPause() },
+                    onCancelImport: { await audibleViewModel.cancelImport() },
+                    onDisconnect: { await audibleViewModel.disconnect() }
+                )
             }
             .navigationTitle("Synchronisation")
             .toolbar {

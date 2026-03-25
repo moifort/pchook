@@ -1,25 +1,31 @@
 import SwiftUI
 
 struct AudibleSection: View {
-    @Bindable var viewModel: AudibleViewModel
+    let state: State
+    let onConnect: () -> Void
+    let onFetch: () async -> Void
+    let onImport: () async -> Void
+    let onTogglePause: () async -> Void
+    let onCancelImport: () async -> Void
+    let onDisconnect: () async -> Void
 
     var body: some View {
         Section {
-            if viewModel.isConnected || viewModel.isVerifying {
+            if state.isConnected || state.isVerifying {
                 connectionRow
                 fetchRow
                 importRow
                 disconnectButton
-            } else if viewModel.isCheckingStatus {
+            } else if state.isCheckingStatus {
                 HStack {
                     ProgressView()
                     Text("Chargement...")
                 }
             } else {
                 Button {
-                    viewModel.showLogin = true
+                    onConnect()
                 } label: {
-                    Label("Se connecter à Audible", systemImage: "headphones")
+                    Label("Se connecter \u{00E0} Audible", systemImage: "headphones")
                 }
             }
         } header: {
@@ -31,14 +37,14 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var connectionRow: some View {
-        if viewModel.isVerifying {
+        if state.isVerifying {
             HStack(spacing: 8) {
                 ProgressView()
-                Text("Vérification de la connexion...")
+                Text("V\u{00E9}rification de la connexion...")
                     .foregroundStyle(.secondary)
             }
         } else {
-            Label("Connecté", systemImage: "checkmark.circle.fill")
+            Label("Connect\u{00E9}", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
         }
     }
@@ -47,38 +53,38 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var fetchRow: some View {
-        if viewModel.isVerifying {
+        if state.isVerifying {
             EmptyView()
-        } else if viewModel.isFetching {
+        } else if state.isFetching {
             HStack(spacing: 8) {
                 ProgressView()
-                Text("Récupération des données...")
+                Text("R\u{00E9}cup\u{00E9}ration des donn\u{00E9}es...")
                     .foregroundStyle(.secondary)
             }
-        } else if viewModel.hasFetchedData {
+        } else if state.hasFetchedData {
             Label {
-                Text("\(viewModel.libraryCount) livres · \(viewModel.wishlistCount) souhaits")
+                Text("\(state.libraryCount) livres \u{00B7} \(state.wishlistCount) souhaits")
             } icon: {
                 Image(systemName: "books.vertical")
             }
-            if let lastFetched = viewModel.lastFetchedAt {
+            if let lastFetched = state.lastFetchedAt {
                 HStack {
-                    Label("Dernière mise à jour", systemImage: "clock")
+                    Label("Derni\u{00E8}re mise \u{00E0} jour", systemImage: "clock")
                     Spacer()
                     Text(lastFetched, style: .relative)
                         .foregroundStyle(.secondary)
                 }
             }
             Button {
-                Task { await viewModel.fetchLibrary() }
+                Task { await onFetch() }
             } label: {
-                Label("Actualiser les données", systemImage: "arrow.triangle.2.circlepath")
+                Label("Actualiser les donn\u{00E9}es", systemImage: "arrow.triangle.2.circlepath")
             }
-        } else if !viewModel.isImportActive {
+        } else if !state.isImportActive {
             Button {
-                Task { await viewModel.fetchLibrary() }
+                Task { await onFetch() }
             } label: {
-                Label("Récupérer les données Audible", systemImage: "arrow.triangle.2.circlepath")
+                Label("R\u{00E9}cup\u{00E9}rer les donn\u{00E9}es Audible", systemImage: "arrow.triangle.2.circlepath")
             }
         }
     }
@@ -87,16 +93,16 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var importRow: some View {
-        if viewModel.isVerifying || viewModel.isFetching {
+        if state.isVerifying || state.isFetching {
             EmptyView()
-        } else if let task = viewModel.importTask,
+        } else if let task = state.importTask,
             task.phase == .running || task.phase == .paused
         {
             importProgressRow(task)
             Button {
-                Task { await viewModel.toggleImportPause() }
+                Task { await onTogglePause() }
             } label: {
-                if viewModel.isPausing {
+                if state.isPausing {
                     HStack(spacing: 6) {
                         ProgressView()
                             .controlSize(.small)
@@ -109,11 +115,11 @@ struct AudibleSection: View {
                     )
                 }
             }
-            .disabled(viewModel.isPausing || viewModel.isCancelling)
+            .disabled(state.isPausing || state.isCancelling)
             Button(role: .destructive) {
-                Task { await viewModel.cancelImport() }
+                Task { await onCancelImport() }
             } label: {
-                if viewModel.isCancelling {
+                if state.isCancelling {
                     HStack(spacing: 6) {
                         ProgressView()
                             .controlSize(.small)
@@ -123,15 +129,15 @@ struct AudibleSection: View {
                     Label("Annuler l'import", systemImage: "xmark.circle")
                 }
             }
-            .disabled(viewModel.isPausing || viewModel.isCancelling)
-        } else if let task = viewModel.importTask, task.phase == .completed {
-            Label("Import terminé", systemImage: "checkmark.circle.fill")
+            .disabled(state.isPausing || state.isCancelling)
+        } else if let task = state.importTask, task.phase == .completed {
+            Label("Import termin\u{00E9}", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
-        } else if viewModel.hasFetchedData {
+        } else if state.hasFetchedData {
             Button {
-                Task { await viewModel.startImport() }
+                Task { await onImport() }
             } label: {
-                Label("Importer dans la bibliothèque", systemImage: "square.and.arrow.down")
+                Label("Importer dans la biblioth\u{00E8}que", systemImage: "square.and.arrow.down")
             }
         }
     }
@@ -165,12 +171,116 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var disconnectButton: some View {
-        if !viewModel.isVerifying, !viewModel.isFetching, !viewModel.isImportActive {
+        if !state.isVerifying, !state.isFetching, !state.isImportActive {
             Button(role: .destructive) {
-                Task { await viewModel.disconnect() }
+                Task { await onDisconnect() }
             } label: {
-                Label("Se déconnecter", systemImage: "person.slash")
+                Label("Se d\u{00E9}connecter", systemImage: "person.slash")
             }
         }
+    }
+}
+
+// MARK: - State
+
+extension AudibleSection {
+    struct State {
+        let isConnected: Bool
+        let isCheckingStatus: Bool
+        let isVerifying: Bool
+        let isFetching: Bool
+        let hasFetchedData: Bool
+        let libraryCount: Int
+        let wishlistCount: Int
+        let lastFetchedAt: Date?
+        let importTask: ImportTaskState?
+        let isImportActive: Bool
+        let isPausing: Bool
+        let isCancelling: Bool
+    }
+}
+
+// MARK: - Previews
+
+#Preview("Disconnected") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: false, isCheckingStatus: false, isVerifying: false,
+                isFetching: false, hasFetchedData: false, libraryCount: 0,
+                wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
+                isImportActive: false, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
+    }
+}
+
+#Preview("Checking status") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: false, isCheckingStatus: true, isVerifying: false,
+                isFetching: false, hasFetchedData: false, libraryCount: 0,
+                wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
+                isImportActive: false, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
+    }
+}
+
+#Preview("Connected with data") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isFetching: false, hasFetchedData: true, libraryCount: 142,
+                wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
+                importTask: nil, isImportActive: false, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
+    }
+}
+
+#Preview("Importing") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isFetching: false, hasFetchedData: true, libraryCount: 142,
+                wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
+                importTask: ImportTaskState(
+                    phase: .running, current: 45, total: 142,
+                    message: "Import en cours...", startedAt: Date()
+                ),
+                isImportActive: true, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
+    }
+}
+
+#Preview("Import complete") {
+    List {
+        AudibleSection(
+            state: .init(
+                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isFetching: false, hasFetchedData: true, libraryCount: 142,
+                wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
+                importTask: ImportTaskState(
+                    phase: .completed, current: 142, total: 142,
+                    message: "Import termin\u{00E9}", completedAt: Date()
+                ),
+                isImportActive: false, isPausing: false, isCancelling: false
+            ),
+            onConnect: {}, onFetch: {}, onImport: {},
+            onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
+        )
     }
 }
