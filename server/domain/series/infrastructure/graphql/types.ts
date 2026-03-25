@@ -50,5 +50,14 @@ export const SeriesVolumeType = builder.objectRef<SeriesVolumeShape>('SeriesVolu
       description: 'Sort position in series (e.g. 1, 2, 99 for hors-série)',
       resolve: ({ position }) => position,
     }),
+    rating: t.field({
+      type: 'Note',
+      nullable: true,
+      description: 'Personal rating of this volume (null if not reviewed)',
+      resolve: async ({ id }, _, { loaders }) => {
+        const review = await loaders.review.load(id)
+        return review?.rating ?? null
+      },
+    }),
   }),
 })

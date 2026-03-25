@@ -1549,6 +1549,11 @@ type SeriesVolume {
   position: SeriesPosition!
 
   """
+  Personal rating of this volume (null if not reviewed)
+  """
+  rating: Note
+
+  """
   Book title
   """
   title: String!
