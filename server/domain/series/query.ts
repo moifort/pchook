@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash-es'
+import { sortBy, uniq } from 'lodash-es'
 import { BookQuery } from '~/domain/book/query'
 import type { BookId } from '~/domain/book/types'
 import * as repository from '~/domain/series/infrastructure/repository'
@@ -9,6 +9,11 @@ const log = createLogger('series-query')
 
 export namespace SeriesQuery {
   export const findAll = () => repository.findAllSeries()
+
+  export const allBookIds = async () => {
+    const entries = await repository.findAllSeriesBooks()
+    return new Set(uniq(entries.map(({ bookId }) => bookId)))
+  }
 
   export const getById = async (id: SeriesId) => {
     const series = await repository.findSeriesBy(id)

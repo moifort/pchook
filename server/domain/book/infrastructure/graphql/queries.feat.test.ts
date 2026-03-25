@@ -78,6 +78,53 @@ feature('GraphQL query: books', () => {
     expect(books.items[2].title).toBe('Les Fleurs du Mal')
   })
 
+  scenario('filters favorite books', async () => {
+    given('books with different ratings exist')
+    const bookA = await BookCommand.add(BookTitle('Favorite Book'), {})
+    const bookB = await BookCommand.add(BookTitle('Normal Book'), {})
+    await BookCommand.add(BookTitle('Unrated Book'), {})
+    const favoriteReview: Review = {
+      bookId: bookA.id,
+      rating: Note(5),
+      createdAt: new Date(),
+    }
+    const normalReview: Review = {
+      bookId: bookB.id,
+      rating: Note(3),
+      createdAt: new Date(),
+    }
+    await ReviewCommand.create(favoriteReview)
+    await ReviewCommand.create(normalReview)
+
+    when('books query is called with isFavorite filter')
+    const result = await execute('{ books(isFavorite: true) { items { title } totalCount } }')
+
+    then('only favorite books are returned')
+    expect(result.errors).toBeUndefined()
+    const books = result.data?.books as BooksResult
+    expect(books.items).toHaveLength(1)
+    expect(books.items[0].title).toBe('Favorite Book')
+    expect(books.totalCount).toBe(1)
+  })
+
+  scenario('filters books with series', async () => {
+    given('books with and without series exist')
+    const bookA = await BookCommand.add(BookTitle('Series Book'), {})
+    await BookCommand.add(BookTitle('Standalone Book'), {})
+    const series = await SeriesCommand.findOrCreate('Test Series')
+    await SeriesCommand.addBook(series.id, bookA.id, SeriesLabel('Tome 1'), SeriesPosition(1))
+
+    when('books query is called with hasSeries filter')
+    const result = await execute('{ books(hasSeries: true) { items { title } totalCount } }')
+
+    then('only books with series are returned')
+    expect(result.errors).toBeUndefined()
+    const books = result.data?.books as BooksResult
+    expect(books.items).toHaveLength(1)
+    expect(books.items[0].title).toBe('Series Book')
+    expect(books.totalCount).toBe(1)
+  })
+
   scenario('paginates with offset and limit', async () => {
     given('five books exist')
     await BookCommand.add(BookTitle('Book A'), {})

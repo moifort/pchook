@@ -5,6 +5,7 @@ import { awardsCount } from '~/domain/book/business-rules'
 import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { ReviewQuery } from '~/domain/review/query'
+import { SeriesQuery } from '~/domain/series/query'
 import { builder } from '~/domain/shared/graphql/builder'
 import { Url } from '~/domain/shared/primitives'
 import { BookSortEnum, SortOrderEnum } from './enums'
@@ -32,24 +33,39 @@ builder.queryField('books', (t) =>
       status: t.arg.string({ description: 'Filter by reading status (to-read, read)' }),
       sort: t.arg({ type: BookSortEnum, description: 'Sort field' }),
       order: t.arg({ type: SortOrderEnum, description: 'Sort order' }),
+      isFavorite: t.arg.boolean({ description: 'Filter to favorite books only (rated 5 stars)' }),
+      hasSeries: t.arg.boolean({ description: 'Filter to books that belong to a series' }),
       offset: t.arg.int({ description: 'Page offset (default 0)', defaultValue: 0 }),
       limit: t.arg.int({ description: 'Page size (default 20)', defaultValue: 20 }),
     },
     resolve: async (_, args) => {
-      const allBooks = await BookQuery.findAll()
+      const sortField = args.sort ?? 'createdAt'
+      const needsReviews = sortField === 'myRating' || args.isFavorite === true
+
+      const [allBooks, favoriteBookIds, seriesBookIds, allReviews] = await Promise.all([
+        BookQuery.findAll(),
+        args.isFavorite === true
+          ? ReviewQuery.getFavorites().then(
+              (reviews) => new Set(reviews.map(({ bookId }) => bookId)),
+            )
+          : undefined,
+        args.hasSeries === true ? SeriesQuery.allBookIds() : undefined,
+        needsReviews ? ReviewQuery.getAll() : undefined,
+      ])
 
       const genre = args.genre ?? undefined
       const status = args.status ? BookStatus(args.status) : undefined
-      const sortField = args.sort ?? 'createdAt'
       const sort = sortField === 'myRating' ? ('myRating' as const) : BookSort(sortField)
       const desc = (args.order ? SortOrder(args.order) : 'desc') === 'desc'
 
       const filtered = allBooks
         .filter((book) => (genre ? book.genre === genre : true))
         .filter((book) => (status ? book.status === status : true))
+        .filter((book) => (favoriteBookIds ? favoriteBookIds.has(book.id) : true))
+        .filter((book) => (seriesBookIds ? seriesBookIds.has(book.id) : true))
 
       const ratingByBookId =
-        sort === 'myRating' ? keyBy(await ReviewQuery.getAll(), ({ bookId }) => bookId) : undefined
+        sort === 'myRating' && allReviews ? keyBy(allReviews, ({ bookId }) => bookId) : undefined
 
       const sorted = sortBy(filtered, (book) =>
         match(sort)

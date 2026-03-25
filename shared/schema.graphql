@@ -1318,6 +1318,16 @@ type Query {
     genre: Genre
 
     """
+    Filter to books that belong to a series
+    """
+    hasSeries: Boolean
+
+    """
+    Filter to favorite books only (rated 5 stars)
+    """
+    isFavorite: Boolean
+
+    """
     Page size (default 20)
     """
     limit: Int = 20
