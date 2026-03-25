@@ -3,6 +3,7 @@ import Foundation
 struct BookSection: Identifiable {
     let title: String
     var flag: String?
+    var rating: Int?
     let items: [SectionedBook]
     var id: String { title + (flag ?? "") }
 }
@@ -120,6 +121,7 @@ enum BookGrouping {
             return BookSection(
                 title: sectionTitle,
                 flag: entry.flag,
+                rating: sorted.first?.seriesRating,
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
             )
         }

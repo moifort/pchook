@@ -31,6 +31,15 @@ struct BooksPage: View {
                                         if let flag = section.flag {
                                             Text(flag)
                                         }
+                                        Spacer()
+                                        if let rating = section.rating {
+                                            if rating == 5 {
+                                                Image(systemName: "heart.fill")
+                                                    .foregroundStyle(.red)
+                                            } else {
+                                                StarRatingView(rating: Double(rating))
+                                            }
+                                        }
                                     }
                                 }
                             }

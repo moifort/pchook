@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookList"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder, $isFavorite: Boolean, $hasSeries: Boolean, $offset: Int, $limit: Int) { books( genre: $genre status: $status sort: $sort order: $order isFavorite: $isFavorite hasSeries: $hasSeries offset: $offset limit: $limit ) { __typename items { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name } seriesVolume { __typename label position } coverImageUrl createdAt } totalCount hasMore } }"#
+        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder, $isFavorite: Boolean, $hasSeries: Boolean, $offset: Int, $limit: Int) { books( genre: $genre status: $status sort: $sort order: $order isFavorite: $isFavorite hasSeries: $hasSeries offset: $offset limit: $limit ) { __typename items { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name rating } seriesVolume { __typename label position } coverImageUrl createdAt } totalCount hasMore } }"#
       ))
 
     public var genre: GraphQLNullable<Genre>
@@ -209,6 +209,7 @@ extension PchookGraphQL {
             static var __selections: [ApolloAPI.Selection] { [
               .field("__typename", String.self),
               .field("name", PchookGraphQL.SeriesName.self),
+              .field("rating", PchookGraphQL.Note?.self),
             ] }
             static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
               BookListQuery.Data.Books.Item.Series.self
@@ -216,6 +217,8 @@ extension PchookGraphQL {
 
             /// Series name (e.g. "Le Sorceleur", "Fondation")
             var name: PchookGraphQL.SeriesName { __data["name"] }
+            /// Personal rating for the series (1-10)
+            var rating: PchookGraphQL.Note? { __data["rating"] }
           }
 
           /// Books.Item.SeriesVolume

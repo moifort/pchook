@@ -10,8 +10,10 @@ struct SeriesSection: View {
     var onRateSeries: () -> Void = {}
 
     var body: some View {
-        Section("\(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces)) {
-            ratingRow
+        Section {
+            Button { onRateSeries() } label: {
+                Label("Noter la série", systemImage: "star")
+            }
             ForEach(items) { (book: Item) in
                 if book.id == currentBookId {
                     seriesRow(book)
@@ -20,28 +22,18 @@ struct SeriesSection: View {
                         .tint(.primary)
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private var ratingRow: some View {
-        if let rating {
+        } header: {
             HStack {
-                Text("Ma note")
+                Text("\(name) \(flag ?? "")".trimmingCharacters(in: .whitespaces))
                 Spacer()
-                if rating == 5 {
-                    Image(systemName: "heart.fill")
-                        .foregroundStyle(.red)
-                } else {
-                    StarRatingView(rating: Double(rating))
+                if let rating {
+                    if rating == 5 {
+                        Image(systemName: "heart.fill")
+                            .foregroundStyle(.red)
+                    } else {
+                        StarRatingView(rating: Double(rating))
+                    }
                 }
-            }
-            .onTapGesture { onRateSeries() }
-        } else {
-            Button {
-                onRateSeries()
-            } label: {
-                Label("Noter la série", systemImage: "star")
             }
         }
     }
