@@ -372,6 +372,17 @@ struct AudibleImportData: Sendable {
 
 
 
+struct AudibleEntryData: Identifiable, Sendable {
+    let title: String
+    let authors: [String]
+    var language: String?
+    var seriesName: String?
+    var seriesPosition: Double?
+    let source: String
+
+    var id: String { "\(source)-\(title)" }
+}
+
 struct ImportTaskState: Sendable {
     let status: TaskPhase
     let current: Int

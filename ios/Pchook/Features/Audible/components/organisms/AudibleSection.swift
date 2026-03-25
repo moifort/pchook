@@ -51,10 +51,14 @@ struct AudibleSection: View {
                     .foregroundStyle(.secondary)
             }
         } else if state.hasFetchedData {
-            Label {
-                Text("\(state.libraryCount) livres · \(state.wishlistCount) liste d'envies")
-            } icon: {
-                Image(systemName: "books.vertical")
+            NavigationLink {
+                AudibleEntriesPage()
+            } label: {
+                Label {
+                    Text("\(state.libraryCount) livres · \(state.wishlistCount) liste d'envies")
+                } icon: {
+                    Image(systemName: "books.vertical")
+                }
             }
             if let lastFetched = state.lastFetchedAt {
                 LabeledInfoRow(

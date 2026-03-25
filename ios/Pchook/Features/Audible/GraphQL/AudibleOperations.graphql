@@ -20,6 +20,21 @@ query Audible {
   }
 }
 
+query AudibleEntries {
+  audible {
+    sync {
+      entries {
+        title
+        authors
+        language
+        seriesName
+        seriesPosition
+        source
+      }
+    }
+  }
+}
+
 mutation AudibleAuthStart($locale: String) {
   audibleAuthStart(locale: $locale) {
     loginUrl

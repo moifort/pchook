@@ -69,6 +69,21 @@ enum GraphQLAudibleAPI {
         )
     }
 
+    static func entries() async throws -> [AudibleEntryData] {
+        let query = PchookGraphQL.AudibleEntriesQuery()
+        let data = try await GraphQLHelpers.fetch(client, query: query)
+        return data.audible.sync.entries.map { entry in
+            AudibleEntryData(
+                title: entry.title,
+                authors: entry.authors,
+                language: entry.language,
+                seriesName: entry.seriesName,
+                seriesPosition: entry.seriesPosition,
+                source: entry.source
+            )
+        }
+    }
+
     static func importStart() async throws {
         let mutation = PchookGraphQL.AudibleImportStartMutation()
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
