@@ -11,7 +11,7 @@ struct AudibleSection: View {
 
     var body: some View {
         Section {
-            if state.isConnected || state.isVerifying {
+            if state.isConnected {
                 connectionRow
                 fetchRow
                 importRow
@@ -35,27 +35,16 @@ struct AudibleSection: View {
 
     // MARK: - Connection
 
-    @ViewBuilder
     private var connectionRow: some View {
-        if state.isVerifying {
-            HStack(spacing: 8) {
-                ProgressView()
-                Text("Vérification de la connexion...")
-                    .foregroundStyle(.secondary)
-            }
-        } else {
-            Label("Connecté", systemImage: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-        }
+        Label("Connecté", systemImage: "checkmark.circle.fill")
+            .foregroundStyle(.green)
     }
 
     // MARK: - Fetch
 
     @ViewBuilder
     private var fetchRow: some View {
-        if state.isVerifying {
-            EmptyView()
-        } else if state.isFetching {
+        if state.isFetching {
             HStack(spacing: 8) {
                 ProgressView()
                 Text("Récupération des données...")
@@ -92,7 +81,7 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var importRow: some View {
-        if state.isVerifying || state.isFetching {
+        if state.isFetching {
             EmptyView()
         } else if let task = state.importTask,
             task.status == .running || task.status == .paused
@@ -193,7 +182,7 @@ struct AudibleSection: View {
 
     @ViewBuilder
     private var disconnectButton: some View {
-        if !state.isVerifying, !state.isFetching, !state.isImportActive {
+        if !state.isFetching, !state.isImportActive {
             Button(role: .destructive) {
                 Task { await onDisconnect() }
             } label: {
@@ -209,7 +198,6 @@ extension AudibleSection {
     struct State {
         let isConnected: Bool
         let isCheckingStatus: Bool
-        let isVerifying: Bool
         let isFetching: Bool
         let hasFetchedData: Bool
         let libraryCount: Int
@@ -230,7 +218,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: false, isCheckingStatus: false, isVerifying: false,
+                isConnected: false, isCheckingStatus: false,
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
                 importedCount: 0, delta: 0,
@@ -246,7 +234,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: false, isCheckingStatus: true, isVerifying: false,
+                isConnected: false, isCheckingStatus: true,
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
                 importedCount: 0, delta: 0,
@@ -262,7 +250,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isConnected: true, isCheckingStatus: false,
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: nil, importedCount: 0, delta: 142,
@@ -278,7 +266,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isConnected: true, isCheckingStatus: false,
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: nil, importedCount: 138, delta: 4,
@@ -294,7 +282,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isConnected: true, isCheckingStatus: false,
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: ImportTaskState(
@@ -314,7 +302,7 @@ extension AudibleSection {
     List {
         AudibleSection(
             state: .init(
-                isConnected: true, isCheckingStatus: false, isVerifying: false,
+                isConnected: true, isCheckingStatus: false,
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: ImportTaskState(

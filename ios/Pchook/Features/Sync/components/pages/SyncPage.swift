@@ -12,7 +12,6 @@ struct SyncPage: View {
                     state: .init(
                         isConnected: audibleViewModel.isConnected,
                         isCheckingStatus: audibleViewModel.isCheckingStatus,
-                        isVerifying: audibleViewModel.isVerifying,
                         isFetching: audibleViewModel.isFetching,
                         hasFetchedData: audibleViewModel.hasFetchedData,
                         libraryCount: audibleViewModel.libraryCount,
@@ -39,7 +38,7 @@ struct SyncPage: View {
                     Button("Fermer", systemImage: "xmark") { dismiss() }
                 }
             }
-            .task(id: refreshTrigger) { await audibleViewModel.checkStatusAndVerify() }
+            .task(id: refreshTrigger) { await audibleViewModel.checkStatus() }
             .onDisappear { audibleViewModel.cancelPolling() }
             .sheet(isPresented: $audibleViewModel.showLogin) {
                 AudibleLoginSheet {

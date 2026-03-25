@@ -5,7 +5,6 @@ final class AudibleViewModel {
     // Section 1: Connection
     private(set) var isConnected = false
     private(set) var isCheckingStatus = false
-    private(set) var isVerifying = false
 
     // Section 2: Fetch
     private(set) var isFetching = false
@@ -23,7 +22,6 @@ final class AudibleViewModel {
     var error: String?
     var showLogin = false
 
-    private var lastVerifiedAt: Date?
     private var pollingTask: Task<Void, Never>?
 
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
@@ -34,16 +32,12 @@ final class AudibleViewModel {
 
     // MARK: - Load status on page open
 
-    func checkStatusAndVerify() async {
+    func checkStatus() async {
         isCheckingStatus = true
         defer { isCheckingStatus = false }
         do {
             let data = try await GraphQLAudibleAPI.status()
             applyStatus(data)
-
-            if isConnected, shouldVerify, !isFetching, !isImportActive {
-                await verify()
-            }
 
             if isFetching {
                 startFetchPolling()
@@ -57,27 +51,21 @@ final class AudibleViewModel {
         }
     }
 
-    private var shouldVerify: Bool {
-        guard let lastVerifiedAt else { return true }
-        return Date().timeIntervalSince(lastVerifiedAt) > 3600
-    }
-
     // MARK: - Verify
 
     private func verify() async {
-        isVerifying = true
-        defer { isVerifying = false }
         do {
             try await GraphQLAudibleAPI.syncVerify()
-            lastVerifiedAt = Date()
         } catch {
-            // Silently ignore verification errors
+            await refreshStatus()
         }
     }
 
     // MARK: - Fetch
 
     func fetchLibrary() async {
+        await verify()
+        if !isConnected { return }
         do {
             try await GraphQLAudibleAPI.syncFetch()
             isFetching = true
@@ -106,6 +94,8 @@ final class AudibleViewModel {
     // MARK: - Import
 
     func startImport() async {
+        await verify()
+        if !isConnected { return }
         do {
             try await GraphQLAudibleAPI.importStart()
             let data = try await GraphQLAudibleAPI.status()
@@ -167,8 +157,7 @@ final class AudibleViewModel {
 
     func onLoginComplete() async {
         showLogin = false
-        lastVerifiedAt = nil
-        await checkStatusAndVerify()
+        await checkStatus()
     }
 
     func disconnect() async {
@@ -182,7 +171,6 @@ final class AudibleViewModel {
             importTask = nil
             importedCount = 0
             delta = 0
-            lastVerifiedAt = nil
             cancelPolling()
         } catch {
             self.error = reportError(error)
