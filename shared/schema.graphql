@@ -263,9 +263,9 @@ type Book {
   awards: [Award!]!
 
   """
-  Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover
+  Absolute URL to the cover image. Null if no cover
   """
-  coverImageUrl: String
+  coverImageUrl: Url
 
   """
   Date the book was added to the library

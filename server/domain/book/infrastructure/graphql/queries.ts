@@ -1,16 +1,23 @@
+import { getRequestURL } from 'h3'
 import { sortBy } from 'lodash-es'
 import { awardsCount } from '~/domain/book/business-rules'
 import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
 import { builder } from '~/domain/shared/graphql/builder'
+import { Url } from '~/domain/shared/primitives'
 import { BookSortEnum, SortOrderEnum } from './enums'
 import { BookType } from './types'
 
 builder.objectField(BookType, 'coverImageUrl', (t) =>
-  t.string({
+  t.field({
+    type: 'Url',
     nullable: true,
-    description: 'Relative URL to the cover image (e.g. "/images/abc123"). Null if no cover',
-    resolve: ({ coverImageId }) => (coverImageId ? `/images/${coverImageId}` : null),
+    description: 'Absolute URL to the cover image. Null if no cover',
+    resolve: ({ coverImageId }, _, { event }) => {
+      if (!coverImageId) return null
+      const origin = getRequestURL(event).origin
+      return Url(`${origin}/images/${coverImageId}`)
+    },
   }),
 )
 
