@@ -29,7 +29,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BFA9B6DE2F69FC8D00289366"
+               BlueprintIdentifier = "BF4DE0B62F6A062C00ACC8D6"
                BuildableName = "PchookShare.appex"
                BlueprintName = "PchookShare"
                ReferencedContainer = "container:Pchook.xcodeproj">
