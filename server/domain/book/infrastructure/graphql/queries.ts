@@ -1,5 +1,6 @@
 import { getRequestURL } from 'h3'
 import { sortBy } from 'lodash-es'
+import { match } from 'ts-pattern'
 import { awardsCount } from '~/domain/book/business-rules'
 import { BookSort, BookStatus, SortOrder } from '~/domain/book/primitives'
 import { BookQuery } from '~/domain/book/query'
@@ -43,13 +44,15 @@ builder.queryField('books', (t) =>
         .filter((book) => (genre ? book.genre === genre : true))
         .filter((book) => (status ? book.status === status : true))
 
-      const sorted = sortBy(filtered, (book) => {
-        if (sort === 'title') return book.title.toLowerCase()
-        if (sort === 'author') return book.authors[0] ? book.authors[0].toLowerCase() : ''
-        if (sort === 'awards') return awardsCount(book.awards)
-        if (sort === 'genre') return (book.genre ?? '').toLowerCase()
-        return book.createdAt.getTime()
-      })
+      const sorted = sortBy(filtered, (book) =>
+        match(sort)
+          .with('title', () => book.title.toLowerCase())
+          .with('author', () => (book.authors[0] ?? '').toLowerCase())
+          .with('awards', () => awardsCount(book.awards))
+          .with('genre', () => (book.genre ?? '').toLowerCase())
+          .with('createdAt', () => book.createdAt.getTime())
+          .exhaustive(),
+      )
 
       return desc ? sorted.reverse() : sorted
     },
