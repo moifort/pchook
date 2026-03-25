@@ -13,11 +13,10 @@ import {
   importTaskDefinition,
 } from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
-import { TaskType } from '~/domain/task/infrastructure/graphql/types'
 import { TaskQuery } from '~/domain/task/query'
 import { TaskRunner } from '~/domain/task/runner'
 import { createLogger } from '~/system/logger'
-import { AuthStartResponseType } from './types'
+import { AudibleImportType, AuthStartResponseType, resolveAudibleImport } from './types'
 
 const log = createLogger('audible-graphql')
 
@@ -134,7 +133,7 @@ builder.mutationField('audibleSyncVerify', (t) =>
 
 builder.mutationField('audibleImportStart', (t) =>
   t.field({
-    type: TaskType,
+    type: AudibleImportType,
     description: 'Start importing Audible books (background task)',
     resolve: async () => {
       const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
@@ -151,9 +150,54 @@ builder.mutationField('audibleImportStart', (t) =>
 
       // Wait a tick for the task state to be initialized
       await new Promise((resolve) => setTimeout(resolve, 10))
-      const taskState = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
-      if (taskState === 'not-found') throw new Error('Task state not initialized')
-      return taskState
+      return resolveAudibleImport()
+    },
+  }),
+)
+
+builder.mutationField('audibleImportPause', (t) =>
+  t.field({
+    type: AudibleImportType,
+    description: 'Pause the running Audible import',
+    resolve: async () => {
+      const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
+      if (state === 'not-found' || state.phase !== 'running') {
+        throw new GraphQLError('Import is not running', { extensions: { code: 'CONFLICT' } })
+      }
+      TaskRunner.pause(AUDIBLE_IMPORT_TASK_ID)
+      return resolveAudibleImport()
+    },
+  }),
+)
+
+builder.mutationField('audibleImportResume', (t) =>
+  t.field({
+    type: AudibleImportType,
+    description: 'Resume a paused Audible import',
+    resolve: async () => {
+      const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
+      if (state === 'not-found' || state.phase !== 'paused') {
+        throw new GraphQLError('Import is not paused', { extensions: { code: 'CONFLICT' } })
+      }
+      TaskRunner.resume(AUDIBLE_IMPORT_TASK_ID)
+      return resolveAudibleImport()
+    },
+  }),
+)
+
+builder.mutationField('audibleImportCancel', (t) =>
+  t.field({
+    type: AudibleImportType,
+    description: 'Cancel the running or paused Audible import',
+    resolve: async () => {
+      const state = await TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID)
+      if (state === 'not-found' || (state.phase !== 'running' && state.phase !== 'paused')) {
+        throw new GraphQLError('No import in progress to cancel', {
+          extensions: { code: 'CONFLICT' },
+        })
+      }
+      TaskRunner.cancel(AUDIBLE_IMPORT_TASK_ID)
+      return resolveAudibleImport()
     },
   }),
 )

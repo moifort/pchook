@@ -2,6 +2,8 @@ import { AudibleQuery } from '~/domain/provider/audible/query'
 import type { AudibleSyncState, RawAudibleEntry } from '~/domain/provider/audible/types'
 import { AUDIBLE_IMPORT_TASK_ID } from '~/domain/provider/audible/use-case'
 import { builder } from '~/domain/shared/graphql/builder'
+import { TaskQuery } from '~/domain/task/query'
+import type { TaskPhase } from '~/domain/task/types'
 
 // --- Auth (infrastructure only, not domain) ---
 
@@ -178,6 +180,12 @@ export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync')
 type AudibleImportData = Pick<AudibleSyncState, 'importStatus' | 'importUpdatedAt'> & {
   importedCount: number
   totalCount: number
+  phase: TaskPhase
+  current: number
+  total: number
+  message: string
+  startedAt: Date | null
+  completedAt: Date | null
 }
 
 export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleImport').implement({
@@ -194,11 +202,6 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
       description: 'Last import state update',
       resolve: ({ importUpdatedAt }) => importUpdatedAt ?? null,
     }),
-    taskId: t.field({
-      type: 'TaskId',
-      description: 'Background task identifier',
-      resolve: () => AUDIBLE_IMPORT_TASK_ID,
-    }),
     importedCount: t.exposeInt('importedCount', {
       description: 'Number of books imported so far',
     }),
@@ -210,8 +213,58 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
       description: 'Items remaining to import',
       resolve: ({ totalCount, importedCount }) => totalCount - importedCount,
     }),
+    phase: t.exposeString('phase', {
+      description: 'Current task phase (idle, running, paused, cancelled, completed, failed)',
+    }),
+    current: t.exposeInt('current', { description: 'Number of items processed in current run' }),
+    total: t.exposeInt('total', { description: 'Total items to process in current run' }),
+    message: t.exposeString('message', { description: 'Current progress message' }),
+    startedAt: t.field({
+      type: 'DateTime',
+      nullable: true,
+      description: 'Import task start date',
+      resolve: ({ startedAt }) => startedAt ?? null,
+    }),
+    completedAt: t.field({
+      type: 'DateTime',
+      nullable: true,
+      description: 'Import task completion date',
+      resolve: ({ completedAt }) => completedAt ?? null,
+    }),
   }),
 })
+
+export async function resolveAudibleImport(): Promise<AudibleImportData> {
+  const [syncState, mappings, rawItems, taskResult] = await Promise.all([
+    AudibleQuery.getSyncState(),
+    AudibleQuery.getAllMappings(),
+    AudibleQuery.getAllRawItems(),
+    TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID),
+  ])
+  const task =
+    taskResult === 'not-found'
+      ? {
+          phase: 'idle' as const,
+          current: 0,
+          total: 0,
+          message: '',
+          startedAt: null,
+          completedAt: null,
+        }
+      : taskResult
+  return {
+    importStatus: syncState.importStatus,
+    importUpdatedAt: syncState.importUpdatedAt,
+    importedCount: mappings.length,
+    totalCount: rawItems.length,
+    phase: task.phase,
+    current: task.current,
+    total: task.total,
+    message: task.message,
+    startedAt: task.startedAt,
+    completedAt: task.completedAt,
+  }
+}
 
 export const AudibleType = builder.objectRef<Record<string, never>>('Audible').implement({
   description: 'Audible integration',
@@ -227,19 +280,7 @@ export const AudibleType = builder.objectRef<Record<string, never>>('Audible').i
     import: t.field({
       type: AudibleImportType,
       description: 'Import state',
-      resolve: async () => {
-        const state = await AudibleQuery.getSyncState()
-        const [mappings, rawItems] = await Promise.all([
-          AudibleQuery.getAllMappings(),
-          AudibleQuery.getAllRawItems(),
-        ])
-        return {
-          importStatus: state.importStatus,
-          importUpdatedAt: state.importUpdatedAt,
-          importedCount: mappings.length,
-          totalCount: rawItems.length,
-        }
-      },
+      resolve: () => resolveAudibleImport(),
     }),
   }),
 })
