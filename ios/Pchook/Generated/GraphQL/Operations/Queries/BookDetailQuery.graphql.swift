@@ -60,7 +60,7 @@ extension PchookGraphQL {
           .field("durationMinutes", Int?.self),
           .field("narrators", [PchookGraphQL.PersonName].self),
           .field("personalNotes", String?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("status", PchookGraphQL.BookStatus.self),
           .field("readDate", PchookGraphQL.DateTime?.self),
           .field("awards", [Award].self),
           .field("publicRatings", [PublicRating].self),
@@ -109,8 +109,8 @@ extension PchookGraphQL {
         var narrators: [PchookGraphQL.PersonName] { __data["narrators"] }
         /// Free-form personal notes about the book
         var personalNotes: String? { __data["personalNotes"] }
-        /// Reading status: TO_READ or READ
-        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Reading status (to-read | read)
+        var status: PchookGraphQL.BookStatus { __data["status"] }
         /// Date the book was finished reading. Null if not read yet
         var readDate: PchookGraphQL.DateTime? { __data["readDate"] }
         /// Literary awards received. Empty array if none

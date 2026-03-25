@@ -69,7 +69,7 @@ extension PchookGraphQL {
             .field("id", PchookGraphQL.BookId.self),
             .field("title", PchookGraphQL.BookTitle.self),
             .field("authors", [PchookGraphQL.PersonName].self),
-            .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+            .field("status", PchookGraphQL.BookStatus.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             ConfirmBookMutation.Data.ConfirmBook.Book.self
@@ -81,8 +81,8 @@ extension PchookGraphQL {
           var title: PchookGraphQL.BookTitle { __data["title"] }
           /// Book authors
           var authors: [PchookGraphQL.PersonName] { __data["authors"] }
-          /// Reading status: TO_READ or READ
-          var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+          /// Reading status (to-read | read)
+          var status: PchookGraphQL.BookStatus { __data["status"] }
         }
       }
     }

@@ -69,12 +69,8 @@ enum GraphQLBooksAPI {
     }
 
     static func update(id: String, _ request: UpdateBookRequest) async throws -> Book {
-        let statusEnum: GraphQLNullable<GraphQLEnum<PchookGraphQL.BookStatus>> = request.status
-            .flatMap { PchookGraphQL.BookStatus(rawValue: $0 == "read" ? "READ" : "TO_READ") }
-            .map { .some(.case($0)) } ?? .none
-
         let languageEnum: GraphQLNullable<GraphQLEnum<PchookGraphQL.Language>> = request.language
-            .flatMap { PchookGraphQL.Language(rawValue: $0.uppercased()) }
+            .flatMap { PchookGraphQL.Language(rawValue: $0) }
             .map { .some(.case($0)) } ?? .none
 
         let input = PchookGraphQL.UpdateBookInput(
@@ -87,7 +83,7 @@ enum GraphQLBooksAPI {
             series: graphQLNullable(request.series),
             seriesLabel: graphQLNullable(request.seriesLabel),
             seriesNumber: request.seriesNumber.map { .some(Double($0)) } ?? .none,
-            status: statusEnum,
+            status: graphQLNullable(request.status),
             title: graphQLNullable(request.title)
         )
 
@@ -144,7 +140,7 @@ private extension GraphQLBooksAPI {
             coverImageUrl: book.coverImageUrl,
             authors: book.authors,
             genre: book.genre,
-            status: GraphQLHelpers.mapBookStatus(book.status),
+            status: BookStatus(rawValue: book.status) ?? .toRead,
             estimatedPrice: book.estimatedPrice,
             awards: awards,
             rating: book.review?.rating,
@@ -174,7 +170,7 @@ private extension GraphQLBooksAPI {
             durationMinutes: book.durationMinutes,
             narrators: book.narrators,
             personalNotes: book.personalNotes,
-            status: GraphQLHelpers.mapBookStatus(book.status),
+            status: BookStatus(rawValue: book.status) ?? .toRead,
             readDate: book.readDate.flatMap(GraphQLHelpers.parseISO8601),
             awards: book.awards.map { Award(name: $0.name, year: $0.year) },
             publicRatings: book.publicRatings.map {

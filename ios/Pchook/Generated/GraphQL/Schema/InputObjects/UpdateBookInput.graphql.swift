@@ -31,7 +31,7 @@ extension PchookGraphQL {
       series: GraphQLNullable<SeriesName> = nil,
       seriesLabel: GraphQLNullable<SeriesLabel> = nil,
       seriesNumber: GraphQLNullable<SeriesPosition> = nil,
-      status: GraphQLNullable<GraphQLEnum<BookStatus>> = nil,
+      status: GraphQLNullable<BookStatus> = nil,
       synopsis: GraphQLNullable<String> = nil,
       title: GraphQLNullable<BookTitle> = nil,
       translator: GraphQLNullable<PersonName> = nil
@@ -171,7 +171,7 @@ extension PchookGraphQL {
     }
 
     /// Reading status
-    var status: GraphQLNullable<GraphQLEnum<BookStatus>> {
+    var status: GraphQLNullable<BookStatus> {
       get { __data["status"] }
       set { __data["status"] = newValue }
     }

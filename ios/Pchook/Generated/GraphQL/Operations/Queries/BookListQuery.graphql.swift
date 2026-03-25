@@ -69,7 +69,7 @@ extension PchookGraphQL {
           .field("title", PchookGraphQL.BookTitle.self),
           .field("authors", [PchookGraphQL.PersonName].self),
           .field("genre", PchookGraphQL.Genre?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("status", PchookGraphQL.BookStatus.self),
           .field("estimatedPrice", PchookGraphQL.Eur?.self),
           .field("awards", [Award].self),
           .field("review", Review?.self),
@@ -91,8 +91,8 @@ extension PchookGraphQL {
         var authors: [PchookGraphQL.PersonName] { __data["authors"] }
         /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
         var genre: PchookGraphQL.Genre? { __data["genre"] }
-        /// Reading status: TO_READ or READ
-        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Reading status (to-read | read)
+        var status: PchookGraphQL.BookStatus { __data["status"] }
         /// Estimated retail price in euros. Null if unknown
         var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
         /// Literary awards received. Empty array if none

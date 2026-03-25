@@ -56,7 +56,7 @@ enum GraphQLScanAPI {
             format: overrides?.format.map { .some($0) } ?? .none,
             genre: overrides?.genre.map { .some($0) } ?? .none,
             language: overrides?.language
-                .flatMap { PchookGraphQL.Language(rawValue: $0.uppercased()) }
+                .flatMap { PchookGraphQL.Language(rawValue: $0) }
                 .map { .some(.case($0)) } ?? .none,
             pageCount: overrides?.pageCount.map { .some($0) } ?? .none,
             previewId: previewId,
@@ -80,7 +80,7 @@ enum GraphQLScanAPI {
             title: result.book.title,
             authors: result.book.authors,
             narrators: [],
-            status: GraphQLHelpers.mapBookStatus(result.book.status),
+            status: BookStatus(rawValue: result.book.status) ?? .toRead,
             awards: [],
             publicRatings: [],
             createdAt: Date(),

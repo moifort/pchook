@@ -7,65 +7,65 @@ extension PchookGraphQL {
   /// ISO 639-1 language code
   enum Language: String, EnumType {
     /// Arabic
-    case ar = "AR"
+    case ar = "ar"
     /// Catalan
-    case ca = "CA"
+    case ca = "ca"
     /// Czech
-    case cs = "CS"
+    case cs = "cs"
     /// Danish
-    case da = "DA"
+    case da = "da"
     /// German
-    case de = "DE"
+    case de = "de"
     /// Greek
-    case el = "EL"
+    case el = "el"
     /// English
-    case en = "EN"
+    case en = "en"
     /// Spanish
-    case es = "ES"
+    case es = "es"
     /// Finnish
-    case fi = "FI"
+    case fi = "fi"
     /// French
-    case fr = "FR"
+    case fr = "fr"
     /// Hebrew
-    case he = "HE"
+    case he = "he"
     /// Hindi
-    case hi = "HI"
+    case hi = "hi"
     /// Hungarian
-    case hu = "HU"
+    case hu = "hu"
     /// Indonesian
-    case id = "ID"
+    case id = "id"
     /// Italian
-    case it = "IT"
+    case it = "it"
     /// Japanese
-    case ja = "JA"
+    case ja = "ja"
     /// Korean
-    case ko = "KO"
+    case ko = "ko"
     /// Latin
-    case la = "LA"
+    case la = "la"
     /// Dutch
-    case nl = "NL"
+    case nl = "nl"
     /// Norwegian
-    case no = "NO"
+    case no = "no"
     /// Polish
-    case pl = "PL"
+    case pl = "pl"
     /// Portuguese
-    case pt = "PT"
+    case pt = "pt"
     /// Romanian
-    case ro = "RO"
+    case ro = "ro"
     /// Russian
-    case ru = "RU"
+    case ru = "ru"
     /// Swedish
-    case sv = "SV"
+    case sv = "sv"
     /// Thai
-    case th = "TH"
+    case th = "th"
     /// Turkish
-    case tr = "TR"
+    case tr = "tr"
     /// Ukrainian
-    case uk = "UK"
+    case uk = "uk"
     /// Vietnamese
-    case vi = "VI"
+    case vi = "vi"
     /// Chinese
-    case zh = "ZH"
+    case zh = "zh"
   }
 
 }

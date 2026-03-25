@@ -60,7 +60,7 @@ extension PchookGraphQL {
           .field("authors", [PchookGraphQL.PersonName].self),
           .field("publisher", PchookGraphQL.Publisher?.self),
           .field("genre", PchookGraphQL.Genre?.self),
-          .field("status", GraphQLEnum<PchookGraphQL.BookStatus>.self),
+          .field("status", PchookGraphQL.BookStatus.self),
           .field("updatedAt", PchookGraphQL.DateTime.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -77,8 +77,8 @@ extension PchookGraphQL {
         var publisher: PchookGraphQL.Publisher? { __data["publisher"] }
         /// Literary genre, comma-separated if multiple (e.g. "LitRPG, Science Fantasy")
         var genre: PchookGraphQL.Genre? { __data["genre"] }
-        /// Reading status: TO_READ or READ
-        var status: GraphQLEnum<PchookGraphQL.BookStatus> { __data["status"] }
+        /// Reading status (to-read | read)
+        var status: PchookGraphQL.BookStatus { __data["status"] }
         /// Date of last modification
         var updatedAt: PchookGraphQL.DateTime { __data["updatedAt"] }
       }

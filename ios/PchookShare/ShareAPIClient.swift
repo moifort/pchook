@@ -32,8 +32,8 @@ struct ShareAward: Codable, Sendable, Identifiable {
 // MARK: - Enums
 
 enum ShareBookLanguage: String, CaseIterable, Identifiable {
-    case fr = "FR"
-    case en = "EN"
+    case fr
+    case en
 
     var id: String { rawValue }
 
@@ -45,7 +45,7 @@ enum ShareBookLanguage: String, CaseIterable, Identifiable {
     }
 
     init?(apiValue: String?) {
-        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).uppercased() else { return nil }
+        guard let value = apiValue?.trimmingCharacters(in: .whitespaces).lowercased() else { return nil }
         self.init(rawValue: value)
     }
 }
