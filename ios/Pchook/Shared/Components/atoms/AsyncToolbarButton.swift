@@ -26,3 +26,17 @@ struct AsyncToolbarButton: View {
         .disabled(isInProgress)
     }
 }
+
+#Preview {
+    NavigationStack {
+        Text("Content")
+            .toolbar {
+                AsyncToolbarButton(title: "Save", systemImage: "checkmark") {
+                    try? await Task.sleep(for: .seconds(2))
+                }
+                AsyncToolbarButton(title: "Delete", systemImage: "trash", role: .destructive) {
+                    try? await Task.sleep(for: .seconds(2))
+                }
+            }
+    }
+}
