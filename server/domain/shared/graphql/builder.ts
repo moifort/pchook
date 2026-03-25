@@ -6,7 +6,6 @@ import type {
   BookTitle,
   Genre,
   ISBN,
-  Language,
   Note,
   PageCount,
   Publisher,
@@ -36,7 +35,6 @@ export const builder = new SchemaBuilder<{
     Publisher: { Input: Publisher; Output: Publisher }
     Genre: { Input: Genre; Output: Genre }
     ISBN: { Input: ISBN; Output: ISBN }
-    Language: { Input: Language; Output: Language }
     PageCount: { Input: PageCount; Output: PageCount }
     Note: { Input: Note; Output: Note }
     Eur: { Input: Eur; Output: Eur }

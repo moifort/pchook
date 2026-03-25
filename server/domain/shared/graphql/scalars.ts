@@ -5,7 +5,6 @@ import {
   BookTitle,
   Genre,
   ISBN,
-  Language,
   Note,
   PageCount,
   Publisher,
@@ -60,12 +59,6 @@ builder.scalarType('ISBN', {
   description: 'ISBN number (10-17 characters)',
   serialize: (value) => String(value),
   parseValue: validatedParse('ISBN', ISBN),
-})
-
-builder.scalarType('Language', {
-  description: 'Language code (e.g. fr, en)',
-  serialize: (value) => String(value),
-  parseValue: validatedParse('Language', Language),
 })
 
 // Book domain — number-based

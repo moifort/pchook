@@ -1,5 +1,5 @@
 import { builder } from '~/domain/shared/graphql/builder'
-import { BookFormatEnum, BookStatusEnum } from './enums'
+import { BookFormatEnum, BookStatusEnum, LanguageEnum } from './enums'
 
 const AwardInput = builder.inputType('AwardInput', {
   description: 'Literary award',
@@ -31,7 +31,7 @@ export const UpdateBookInput = builder.inputType('UpdateBookInput', {
     genre: t.field({ type: 'Genre', description: 'Literary genre (null to remove)' }),
     synopsis: t.string({ description: 'Synopsis' }),
     isbn: t.field({ type: 'ISBN', description: 'ISBN number (null to remove)' }),
-    language: t.field({ type: 'Language', description: 'Language (e.g. fr, en)' }),
+    language: t.field({ type: LanguageEnum, description: 'Language (ISO 639-1)' }),
     format: t.field({ type: BookFormatEnum, description: 'Book format' }),
     translator: t.field({ type: 'PersonName', description: 'Translator (null to remove)' }),
     estimatedPrice: t.field({

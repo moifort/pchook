@@ -1,6 +1,6 @@
 import type { Book, PublicRating as PublicRatingType } from '~/domain/book/types'
 import { builder } from '~/domain/shared/graphql/builder'
-import { BookFormatEnum, BookStatusEnum, ImportSourceEnum } from './enums'
+import { BookFormatEnum, BookStatusEnum, ImportSourceEnum, LanguageEnum } from './enums'
 
 export const AwardType = builder.objectRef<{ name: string; year?: number }>('Award').implement({
   description: 'Literary award received by a book',
@@ -85,9 +85,9 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       resolve: ({ isbn }) => isbn ?? null,
     }),
     language: t.field({
-      type: 'Language',
+      type: LanguageEnum,
       nullable: true,
-      description: 'Book language (e.g. fr, en)',
+      description: 'Book language (ISO 639-1)',
       resolve: ({ language }) => language ?? null,
     }),
     format: t.field({

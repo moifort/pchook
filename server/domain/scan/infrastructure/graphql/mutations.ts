@@ -1,5 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { match } from 'ts-pattern'
+import { LanguageEnum } from '~/domain/book/infrastructure/graphql/enums'
 import { BookQuery } from '~/domain/book/query'
 import { BookUseCase } from '~/domain/book/use-case'
 import * as previewRepository from '~/domain/scan/infrastructure/preview-repository'
@@ -128,7 +129,7 @@ const ConfirmBookInput = builder.inputType('ConfirmBookInput', {
     pageCount: t.field({ type: 'PageCount', description: 'Pages (override)' }),
     genre: t.field({ type: 'Genre', description: 'Genre (override)' }),
     synopsis: t.string({ description: 'Synopsis (override)' }),
-    language: t.field({ type: 'Language', description: 'Language (override)' }),
+    language: t.field({ type: LanguageEnum, description: 'Language (override)' }),
     format: t.string({ description: 'Format (override)' }),
     translator: t.field({ type: 'PersonName', description: 'Translator (override)' }),
     estimatedPrice: t.field({ type: 'Eur', description: 'Price (override)' }),
