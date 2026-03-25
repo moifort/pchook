@@ -23,11 +23,9 @@ query Audible {
     }
     import {
       status
-      updatedAt
       importedCount
       totalCount
       delta
-      phase
       current
       total
       message
@@ -71,7 +69,6 @@ mutation AudibleImportStart {
     importedCount
     totalCount
     delta
-    phase
     current
     total
     message
@@ -82,7 +79,7 @@ mutation AudibleImportStart {
 
 mutation AudibleImportPause {
   audibleImportPause {
-    phase
+    status
     current
     total
     message
@@ -91,7 +88,7 @@ mutation AudibleImportPause {
 
 mutation AudibleImportResume {
   audibleImportResume {
-    phase
+    status
     current
     total
     message
@@ -100,6 +97,6 @@ mutation AudibleImportResume {
 
 mutation AudibleImportCancel {
   audibleImportCancel {
-    phase
+    status
   }
 }

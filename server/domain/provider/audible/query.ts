@@ -3,7 +3,6 @@ import type { Asin, AudibleSyncState } from '~/domain/provider/audible/types'
 
 const DEFAULT_SYNC_STATE: AudibleSyncState = {
   syncStatus: 'disconnected',
-  importStatus: 'init',
 }
 
 export namespace AudibleQuery {

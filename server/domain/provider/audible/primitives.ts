@@ -2,7 +2,6 @@ import { make } from 'ts-brand'
 import { z } from 'zod'
 import type {
   Asin as AsinType,
-  AudibleImportStatus as AudibleImportStatusType,
   AudibleLocale as AudibleLocaleType,
   AudibleSource as AudibleSourceType,
   AudibleSyncStatus as AudibleSyncStatusType,
@@ -37,6 +36,3 @@ export const AudibleSource = (value: unknown) =>
 
 export const AudibleSyncStatus = (value: unknown) =>
   z.enum(['disconnected', 'connected', 'fetching', 'fetched']).parse(value) as AudibleSyncStatusType
-
-export const AudibleImportStatus = (value: unknown) =>
-  z.enum(['init', 'importing', 'imported']).parse(value) as AudibleImportStatusType

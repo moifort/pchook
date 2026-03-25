@@ -10,7 +10,6 @@ import type {
 
 const DEFAULT_SYNC_STATE: AudibleSyncState = {
   syncStatus: 'disconnected',
-  importStatus: 'init',
 }
 
 const updateSyncState = async (patch: Partial<AudibleSyncState>) => {
@@ -77,16 +76,6 @@ export namespace AudibleCommand {
     await updateSyncState({
       syncStatus: 'disconnected',
       syncUpdatedAt: new Date(),
-      importStatus: 'init',
-      importUpdatedAt: new Date(),
     })
-  }
-
-  export const startImport = async () => {
-    await updateSyncState({ importStatus: 'importing', importUpdatedAt: new Date() })
-  }
-
-  export const completeImport = async () => {
-    await updateSyncState({ importStatus: 'imported', importUpdatedAt: new Date() })
   }
 }

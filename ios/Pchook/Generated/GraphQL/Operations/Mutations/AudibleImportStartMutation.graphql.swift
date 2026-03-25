@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "AudibleImportStart"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AudibleImportStart { audibleImportStart { __typename status importedCount totalCount delta phase current total message startedAt completedAt } }"#
+        #"mutation AudibleImportStart { audibleImportStart { __typename status importedCount totalCount delta current total message startedAt completedAt } }"#
       ))
 
     public init() {}
@@ -38,11 +38,10 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("status", PchookGraphQL.AudibleImportStatus.self),
+          .field("status", GraphQLEnum<PchookGraphQL.AudibleImportStatus>.self),
           .field("importedCount", Int.self),
           .field("totalCount", Int.self),
           .field("delta", Int.self),
-          .field("phase", String.self),
           .field("current", Int.self),
           .field("total", Int.self),
           .field("message", String.self),
@@ -54,15 +53,13 @@ extension PchookGraphQL {
         ] }
 
         /// Current import status
-        var status: PchookGraphQL.AudibleImportStatus { __data["status"] }
+        var status: GraphQLEnum<PchookGraphQL.AudibleImportStatus> { __data["status"] }
         /// Number of books imported so far
         var importedCount: Int { __data["importedCount"] }
         /// Total number of library items
         var totalCount: Int { __data["totalCount"] }
         /// Items remaining to import
         var delta: Int { __data["delta"] }
-        /// Current task phase (idle, running, paused, cancelled, completed, failed)
-        var phase: String { __data["phase"] }
         /// Number of items processed in current run
         var current: Int { __data["current"] }
         /// Total items to process in current run

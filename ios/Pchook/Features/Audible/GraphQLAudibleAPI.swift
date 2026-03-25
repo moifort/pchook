@@ -73,12 +73,10 @@ enum GraphQLAudibleAPI {
                 }
             ),
             import_: AudibleImportData(
-                status: AudibleImportStatus(rawValue: imp.status) ?? .initial,
-                updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
                 importedCount: imp.importedCount,
                 totalCount: imp.totalCount,
                 delta: imp.delta,
-                phase: TaskPhase(rawValue: imp.phase) ?? .idle,
+                status: TaskPhase(rawValue: imp.status.rawValue) ?? .idle,
                 current: imp.current,
                 total: imp.total,
                 message: imp.message,

@@ -29,7 +29,7 @@ final class AudibleViewModel {
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
         guard let task = importTask else { return false }
-        return task.phase == .running || task.phase == .paused
+        return task.status == .running || task.status == .paused
     }
 
     // MARK: - Load status on page open
@@ -119,7 +119,7 @@ final class AudibleViewModel {
     func toggleImportPause() async {
         isPausing = true
         do {
-            if importTask?.phase == .paused {
+            if importTask?.status == .paused {
                 try await GraphQLAudibleAPI.importResume()
             } else {
                 try await GraphQLAudibleAPI.importPause()
@@ -148,8 +148,8 @@ final class AudibleViewModel {
                     let data = try await GraphQLAudibleAPI.status()
                     applyStatus(data)
                     if let task = importTask {
-                        if task.phase == .paused { isPausing = false }
-                        if task.phase.isTerminal {
+                        if task.status == .paused { isPausing = false }
+                        if task.status.isTerminal {
                             isPausing = false
                             isCancelling = false
                             return
@@ -207,11 +207,11 @@ final class AudibleViewModel {
         delta = data.import_.delta
 
         let imp = data.import_
-        if imp.phase == .idle, imp.current == 0 {
+        if imp.status == .idle, imp.current == 0 {
             importTask = nil
         } else {
             importTask = ImportTaskState(
-                phase: imp.phase,
+                status: imp.status,
                 current: imp.current,
                 total: imp.total,
                 message: imp.message,

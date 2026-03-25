@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "AudibleImportPause"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AudibleImportPause { audibleImportPause { __typename phase current total message } }"#
+        #"mutation AudibleImportPause { audibleImportPause { __typename status current total message } }"#
       ))
 
     public init() {}
@@ -38,7 +38,7 @@ extension PchookGraphQL {
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("phase", String.self),
+          .field("status", GraphQLEnum<PchookGraphQL.AudibleImportStatus>.self),
           .field("current", Int.self),
           .field("total", Int.self),
           .field("message", String.self),
@@ -47,8 +47,8 @@ extension PchookGraphQL {
           AudibleImportPauseMutation.Data.AudibleImportPause.self
         ] }
 
-        /// Current task phase (idle, running, paused, cancelled, completed, failed)
-        var phase: String { __data["phase"] }
+        /// Current import status
+        var status: GraphQLEnum<PchookGraphQL.AudibleImportStatus> { __data["status"] }
         /// Number of items processed in current run
         var current: Int { __data["current"] }
         /// Total items to process in current run

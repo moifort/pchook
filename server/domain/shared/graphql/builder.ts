@@ -11,12 +11,7 @@ import type {
   PageCount,
   Publisher,
 } from '~/domain/book/types'
-import type {
-  Asin,
-  AudibleImportStatus,
-  AudibleSource,
-  AudibleSyncStatus,
-} from '~/domain/provider/audible/types'
+import type { Asin, AudibleSource, AudibleSyncStatus } from '~/domain/provider/audible/types'
 import type { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/types'
 import type { Eur, PersonName, Url } from '~/domain/shared/types'
 
@@ -52,7 +47,6 @@ export const builder = new SchemaBuilder<{
     SeriesPosition: { Input: SeriesPosition; Output: SeriesPosition }
     Asin: { Input: Asin; Output: Asin }
     AudibleSyncStatus: { Input: AudibleSyncStatus; Output: AudibleSyncStatus }
-    AudibleImportStatus: { Input: AudibleImportStatus; Output: AudibleImportStatus }
     AudibleSource: { Input: AudibleSource; Output: AudibleSource }
   }
 }>({

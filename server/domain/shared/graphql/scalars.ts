@@ -119,12 +119,7 @@ builder.scalarType('SeriesPosition', {
 })
 
 // Audible domain
-import {
-  Asin,
-  AudibleImportStatus,
-  AudibleSource,
-  AudibleSyncStatus,
-} from '~/domain/provider/audible/primitives'
+import { Asin, AudibleSource, AudibleSyncStatus } from '~/domain/provider/audible/primitives'
 
 builder.scalarType('Asin', {
   description: 'Amazon Standard Identification Number (10 alphanumeric characters)',
@@ -136,12 +131,6 @@ builder.scalarType('AudibleSyncStatus', {
   description: 'Audible sync status (disconnected | connected | fetching | fetched)',
   serialize: (value) => String(value),
   parseValue: validatedParse('AudibleSyncStatus', AudibleSyncStatus),
-})
-
-builder.scalarType('AudibleImportStatus', {
-  description: 'Audible import status (init | importing | imported)',
-  serialize: (value) => String(value),
-  parseValue: validatedParse('AudibleImportStatus', AudibleImportStatus),
 })
 
 builder.scalarType('AudibleSource', {

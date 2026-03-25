@@ -73,12 +73,6 @@ enum AudibleSyncStatus: String, Sendable {
     case fetched
 }
 
-enum AudibleImportStatus: String, Sendable {
-    case initial = "init"
-    case importing
-    case imported
-}
-
 enum TaskPhase: String, Sendable {
     case idle
     case running
@@ -361,12 +355,10 @@ struct AudibleSyncData: Sendable {
 }
 
 struct AudibleImportData: Sendable {
-    let status: AudibleImportStatus
-    var updatedAt: Date?
     let importedCount: Int
     let totalCount: Int
     let delta: Int
-    let phase: TaskPhase
+    let status: TaskPhase
     let current: Int
     let total: Int
     let message: String
@@ -393,7 +385,7 @@ struct AudibleEntryData: Identifiable, Sendable {
 
 
 struct ImportTaskState: Sendable {
-    let phase: TaskPhase
+    let status: TaskPhase
     let current: Int
     let total: Int
     let message: String

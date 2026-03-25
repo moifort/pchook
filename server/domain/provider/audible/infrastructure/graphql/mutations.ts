@@ -143,7 +143,6 @@ builder.mutationField('audibleImportStart', (t) =>
         })
       }
 
-      await AudibleCommand.startImport()
       TaskRunner.start(AUDIBLE_IMPORT_TASK_ID, importTaskDefinition).catch((error) => {
         log.error('Background import failed', { error: String(error) })
       })

@@ -96,7 +96,7 @@ struct AudibleSection: View {
         if state.isVerifying || state.isFetching {
             EmptyView()
         } else if let task = state.importTask,
-            task.phase == .running || task.phase == .paused
+            task.status == .running || task.status == .paused
         {
             importProgressRow(task)
             Button {
@@ -106,12 +106,12 @@ struct AudibleSection: View {
                     HStack(spacing: 6) {
                         ProgressView()
                             .controlSize(.small)
-                        Text(task.phase == .paused ? "Reprise..." : "Pause...")
+                        Text(task.status == .paused ? "Reprise..." : "Pause...")
                     }
                 } else {
                     Label(
-                        task.phase == .paused ? "Reprendre l'import" : "Mettre en pause",
-                        systemImage: task.phase == .paused ? "play.fill" : "pause.fill"
+                        task.status == .paused ? "Reprendre l'import" : "Mettre en pause",
+                        systemImage: task.status == .paused ? "play.fill" : "pause.fill"
                     )
                 }
             }
@@ -130,7 +130,7 @@ struct AudibleSection: View {
                 }
             }
             .disabled(state.isPausing || state.isCancelling)
-        } else if let task = state.importTask, task.phase == .completed {
+        } else if let task = state.importTask, task.status == .completed {
             Label("Import terminé", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
             if state.importedCount > 0 {
@@ -156,7 +156,7 @@ struct AudibleSection: View {
     private func importProgressRow(_ task: ImportTaskState) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(task.phase == .paused ? "En pause" : task.message)
+                Text(task.status == .paused ? "En pause" : task.message)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if task.total > 0 {
@@ -299,7 +299,7 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: ImportTaskState(
-                    phase: .running, current: 45, total: 142,
+                    status: .running, current: 45, total: 142,
                     message: "Import en cours...", startedAt: Date()
                 ),
                 importedCount: 45, delta: 97,
@@ -319,7 +319,7 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: ImportTaskState(
-                    phase: .completed, current: 142, total: 142,
+                    status: .completed, current: 142, total: 142,
                     message: "Import terminé", completedAt: Date()
                 ),
                 importedCount: 142, delta: 0,

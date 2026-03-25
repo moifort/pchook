@@ -5,6 +5,18 @@ import { builder } from '~/domain/shared/graphql/builder'
 import { TaskQuery } from '~/domain/task/query'
 import type { TaskPhase } from '~/domain/task/types'
 
+const AudibleImportStatusEnum = builder.enumType('AudibleImportStatus', {
+  description: 'Audible import task status',
+  values: {
+    idle: { description: 'Awaiting start' },
+    running: { description: 'Import in progress' },
+    paused: { description: 'Import paused' },
+    cancelled: { description: 'Import cancelled' },
+    completed: { description: 'Import completed' },
+    failed: { description: 'Import failed' },
+  } as const,
+})
+
 // --- Auth (infrastructure only, not domain) ---
 
 type AuthStartData = {
@@ -177,10 +189,10 @@ export const AudibleSyncType = builder.objectRef<AudibleSyncData>('AudibleSync')
   }),
 })
 
-type AudibleImportData = Pick<AudibleSyncState, 'importStatus' | 'importUpdatedAt'> & {
+type AudibleImportData = {
   importedCount: number
   totalCount: number
-  phase: TaskPhase
+  status: TaskPhase
   current: number
   total: number
   message: string
@@ -192,15 +204,9 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
   description: 'Audible import state',
   fields: (t) => ({
     status: t.field({
-      type: 'AudibleImportStatus',
+      type: AudibleImportStatusEnum,
       description: 'Current import status',
-      resolve: ({ importStatus }) => importStatus,
-    }),
-    updatedAt: t.field({
-      type: 'DateTime',
-      nullable: true,
-      description: 'Last import state update',
-      resolve: ({ importUpdatedAt }) => importUpdatedAt ?? null,
+      resolve: ({ status }) => status,
     }),
     importedCount: t.exposeInt('importedCount', {
       description: 'Number of books imported so far',
@@ -212,9 +218,6 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
       type: 'Int',
       description: 'Items remaining to import',
       resolve: ({ totalCount, importedCount }) => totalCount - importedCount,
-    }),
-    phase: t.exposeString('phase', {
-      description: 'Current task phase (idle, running, paused, cancelled, completed, failed)',
     }),
     current: t.exposeInt('current', { description: 'Number of items processed in current run' }),
     total: t.exposeInt('total', { description: 'Total items to process in current run' }),
@@ -235,8 +238,7 @@ export const AudibleImportType = builder.objectRef<AudibleImportData>('AudibleIm
 })
 
 export async function resolveAudibleImport(): Promise<AudibleImportData> {
-  const [syncState, mappings, rawItems, taskResult] = await Promise.all([
-    AudibleQuery.getSyncState(),
+  const [mappings, rawItems, taskResult] = await Promise.all([
     AudibleQuery.getAllMappings(),
     AudibleQuery.getAllRawItems(),
     TaskQuery.getById(AUDIBLE_IMPORT_TASK_ID),
@@ -253,11 +255,9 @@ export async function resolveAudibleImport(): Promise<AudibleImportData> {
         }
       : taskResult
   return {
-    importStatus: syncState.importStatus,
-    importUpdatedAt: syncState.importUpdatedAt,
     importedCount: mappings.length,
     totalCount: rawItems.length,
-    phase: task.phase,
+    status: task.phase,
     current: task.current,
     total: task.total,
     message: task.message,
