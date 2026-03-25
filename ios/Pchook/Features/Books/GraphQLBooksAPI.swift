@@ -120,15 +120,6 @@ enum GraphQLBooksAPI {
 // MARK: - Type mapping
 
 private extension GraphQLBooksAPI {
-    static func mapBookStatus(_ status: GraphQLEnum<PchookGraphQL.BookStatus>?) -> BookStatus {
-        guard let status else { return .toRead }
-        switch status {
-        case .case(.read): return .read
-        case .case(.toRead): return .toRead
-        default: return .toRead
-        }
-    }
-
     static func mapBookFormat(_ format: GraphQLEnum<PchookGraphQL.BookFormat>?) -> BookFormat? {
         guard let format else { return nil }
         return BookFormat(rawValue: format.rawValue)
@@ -147,7 +138,7 @@ private extension GraphQLBooksAPI {
             coverImageUrl: book.coverImageUrl,
             authors: book.authors,
             genre: book.genre,
-            status: mapBookStatus(book.status),
+            status: GraphQLHelpers.mapBookStatus(book.status),
             estimatedPrice: book.estimatedPrice,
             awards: awards,
             rating: book.review?.rating,
@@ -177,7 +168,7 @@ private extension GraphQLBooksAPI {
             durationMinutes: book.durationMinutes,
             narrators: book.narrators,
             personalNotes: book.personalNotes,
-            status: mapBookStatus(book.status),
+            status: GraphQLHelpers.mapBookStatus(book.status),
             readDate: book.readDate.flatMap(GraphQLHelpers.parseISO8601),
             awards: book.awards.map { Award(name: $0.name, year: $0.year) },
             publicRatings: book.publicRatings.map {

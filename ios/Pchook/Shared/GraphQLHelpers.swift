@@ -46,6 +46,14 @@ enum GraphQLHelpers {
         }
     }
 
+    static func mapBookStatus(_ status: GraphQLEnum<PchookGraphQL.BookStatus>?) -> BookStatus {
+        guard case .case(let value) = status else { return .toRead }
+        switch value {
+        case .read: return .read
+        case .toRead: return .toRead
+        }
+    }
+
     static func parseISO8601(_ string: String) -> Date? {
         let withFraction = ISO8601DateFormatter()
         withFraction.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
