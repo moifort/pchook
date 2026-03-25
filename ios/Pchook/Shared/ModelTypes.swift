@@ -363,10 +363,15 @@ struct AudibleSyncData: Sendable {
 struct AudibleImportData: Sendable {
     let status: AudibleImportStatus
     var updatedAt: Date?
-    let taskId: String
     let importedCount: Int
     let totalCount: Int
     let delta: Int
+    let phase: TaskPhase
+    let current: Int
+    let total: Int
+    let message: String
+    var startedAt: Date?
+    var completedAt: Date?
 }
 
 struct AudibleEntryData: Identifiable, Sendable {

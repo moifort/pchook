@@ -1,4 +1,3 @@
-import Apollo
 import Foundation
 
 @MainActor @Observable
@@ -26,7 +25,6 @@ final class AudibleViewModel {
 
     private var lastVerifiedAt: Date?
     private var pollingTask: Task<Void, Never>?
-    private var importTaskId: String?
 
     var hasFetchedData: Bool { libraryCount > 0 || wishlistCount > 0 }
     var isImportActive: Bool {
@@ -42,10 +40,6 @@ final class AudibleViewModel {
         do {
             let data = try await GraphQLAudibleAPI.status()
             applyStatus(data)
-
-            if let taskId = importTaskId {
-                await refreshImportTask(taskId: taskId)
-            }
 
             if isConnected, shouldVerify, !isFetching, !isImportActive {
                 await verify()
@@ -114,12 +108,8 @@ final class AudibleViewModel {
     func startImport() async {
         do {
             try await GraphQLAudibleAPI.importStart()
-            // Refresh to get the new taskId
             let data = try await GraphQLAudibleAPI.status()
             applyStatus(data)
-            if let taskId = importTaskId {
-                await refreshImportTask(taskId: taskId)
-            }
             startImportPolling()
         } catch {
             self.error = reportError(error)
@@ -127,14 +117,12 @@ final class AudibleViewModel {
     }
 
     func toggleImportPause() async {
-        guard let taskId = importTaskId else { return }
         isPausing = true
         do {
-            let client = GraphQLClient.shared.apollo
             if importTask?.phase == .paused {
-                _ = try await GraphQLHelpers.perform(client, mutation: PchookGraphQL.ResumeTaskMutation(id: taskId))
+                try await GraphQLAudibleAPI.importResume()
             } else {
-                _ = try await GraphQLHelpers.perform(client, mutation: PchookGraphQL.PauseTaskMutation(id: taskId))
+                try await GraphQLAudibleAPI.importPause()
             }
         } catch {
             isPausing = false
@@ -143,11 +131,9 @@ final class AudibleViewModel {
     }
 
     func cancelImport() async {
-        guard let taskId = importTaskId else { return }
         isCancelling = true
         do {
-            let client = GraphQLClient.shared.apollo
-            _ = try await GraphQLHelpers.perform(client, mutation: PchookGraphQL.CancelTaskMutation(id: taskId))
+            try await GraphQLAudibleAPI.importCancel()
         } catch {
             isCancelling = false
             self.error = reportError(error)
@@ -156,42 +142,25 @@ final class AudibleViewModel {
 
     private func startImportPolling() {
         cancelPolling()
-        guard let taskId = importTaskId else { return }
         pollingTask = Task {
             while !Task.isCancelled {
                 do {
-                    await refreshImportTask(taskId: taskId)
+                    let data = try await GraphQLAudibleAPI.status()
+                    applyStatus(data)
                     if let task = importTask {
                         if task.phase == .paused { isPausing = false }
                         if task.phase.isTerminal {
                             isPausing = false
                             isCancelling = false
-                            await refreshStatus()
                             return
                         }
                     }
+                } catch {
+                    break
                 }
                 try? await Task.sleep(for: .seconds(2))
             }
         }
-    }
-
-    private func refreshImportTask(taskId: String) async {
-        let client = GraphQLClient.shared.apollo
-        do {
-            let query = PchookGraphQL.TaskByIdQuery(id: taskId)
-            let data = try await GraphQLHelpers.fetch(client, query: query)
-            if let task = data.task {
-                importTask = ImportTaskState(
-                    phase: TaskPhase(rawValue: task.phase) ?? .idle,
-                    current: task.current,
-                    total: task.total,
-                    message: task.message,
-                    startedAt: task.startedAt.flatMap(GraphQLHelpers.parseISO8601),
-                    completedAt: task.completedAt.flatMap(GraphQLHelpers.parseISO8601)
-                )
-            }
-        } catch {}
     }
 
     // MARK: - Auth
@@ -211,7 +180,6 @@ final class AudibleViewModel {
             wishlistCount = 0
             lastFetchedAt = nil
             importTask = nil
-            importTaskId = nil
             importedCount = 0
             delta = 0
             lastVerifiedAt = nil
@@ -235,9 +203,22 @@ final class AudibleViewModel {
         wishlistCount = data.sync.wishlistCount
         lastFetchedAt = data.sync.updatedAt
 
-        importTaskId = data.import_.taskId
         importedCount = data.import_.importedCount
         delta = data.import_.delta
+
+        let imp = data.import_
+        if imp.phase == .idle, imp.current == 0 {
+            importTask = nil
+        } else {
+            importTask = ImportTaskState(
+                phase: imp.phase,
+                current: imp.current,
+                total: imp.total,
+                message: imp.message,
+                startedAt: imp.startedAt,
+                completedAt: imp.completedAt
+            )
+        }
     }
 
     private func refreshStatus() async {

@@ -4,11 +4,11 @@
 @_exported import ApolloAPI
 
 extension PchookGraphQL {
-  class AudibleImportStartMutation: GraphQLMutation {
-    static let operationName: String = "AudibleImportStart"
+  class AudibleImportResumeMutation: GraphQLMutation {
+    static let operationName: String = "AudibleImportResume"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation AudibleImportStart { audibleImportStart { __typename status importedCount totalCount delta phase current total message startedAt completedAt } }"#
+        #"mutation AudibleImportResume { audibleImportResume { __typename phase current total message } }"#
       ))
 
     public init() {}
@@ -19,48 +19,34 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("audibleImportStart", AudibleImportStart.self),
+        .field("audibleImportResume", AudibleImportResume.self),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-        AudibleImportStartMutation.Data.self
+        AudibleImportResumeMutation.Data.self
       ] }
 
-      /// Start importing Audible books (background task)
-      var audibleImportStart: AudibleImportStart { __data["audibleImportStart"] }
+      /// Resume a paused Audible import
+      var audibleImportResume: AudibleImportResume { __data["audibleImportResume"] }
 
-      /// AudibleImportStart
+      /// AudibleImportResume
       ///
       /// Parent Type: `AudibleImport`
-      struct AudibleImportStart: PchookGraphQL.SelectionSet {
+      struct AudibleImportResume: PchookGraphQL.SelectionSet {
         let __data: DataDict
         init(_dataDict: DataDict) { __data = _dataDict }
 
         static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("status", PchookGraphQL.AudibleImportStatus.self),
-          .field("importedCount", Int.self),
-          .field("totalCount", Int.self),
-          .field("delta", Int.self),
           .field("phase", String.self),
           .field("current", Int.self),
           .field("total", Int.self),
           .field("message", String.self),
-          .field("startedAt", PchookGraphQL.DateTime?.self),
-          .field("completedAt", PchookGraphQL.DateTime?.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          AudibleImportStartMutation.Data.AudibleImportStart.self
+          AudibleImportResumeMutation.Data.AudibleImportResume.self
         ] }
 
-        /// Current import status
-        var status: PchookGraphQL.AudibleImportStatus { __data["status"] }
-        /// Number of books imported so far
-        var importedCount: Int { __data["importedCount"] }
-        /// Total number of library items
-        var totalCount: Int { __data["totalCount"] }
-        /// Items remaining to import
-        var delta: Int { __data["delta"] }
         /// Current task phase (idle, running, paused, cancelled, completed, failed)
         var phase: String { __data["phase"] }
         /// Number of items processed in current run
@@ -69,10 +55,6 @@ extension PchookGraphQL {
         var total: Int { __data["total"] }
         /// Current progress message
         var message: String { __data["message"] }
-        /// Import task start date
-        var startedAt: PchookGraphQL.DateTime? { __data["startedAt"] }
-        /// Import task completion date
-        var completedAt: PchookGraphQL.DateTime? { __data["completedAt"] }
       }
     }
   }

@@ -50,7 +50,6 @@ extension PchookGraphQL {
       case "Review": return PchookGraphQL.Objects.Review
       case "Series": return PchookGraphQL.Objects.Series
       case "SeriesVolume": return PchookGraphQL.Objects.SeriesVolume
-      case "Task": return PchookGraphQL.Objects.Task
       default: return nil
       }
     }

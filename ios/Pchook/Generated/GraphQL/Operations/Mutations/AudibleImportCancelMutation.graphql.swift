@@ -4,20 +4,14 @@
 @_exported import ApolloAPI
 
 extension PchookGraphQL {
-  class ResumeTaskMutation: GraphQLMutation {
-    static let operationName: String = "ResumeTask"
+  class AudibleImportCancelMutation: GraphQLMutation {
+    static let operationName: String = "AudibleImportCancel"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"mutation ResumeTask($id: TaskId!) { resumeTask(id: $id) { __typename id phase } }"#
+        #"mutation AudibleImportCancel { audibleImportCancel { __typename phase } }"#
       ))
 
-    public var id: TaskId
-
-    public init(id: TaskId) {
-      self.id = id
-    }
-
-    public var __variables: Variables? { ["id": id] }
+    public init() {}
 
     struct Data: PchookGraphQL.SelectionSet {
       let __data: DataDict
@@ -25,35 +19,32 @@ extension PchookGraphQL {
 
       static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Mutation }
       static var __selections: [ApolloAPI.Selection] { [
-        .field("resumeTask", ResumeTask.self, arguments: ["id": .variable("id")]),
+        .field("audibleImportCancel", AudibleImportCancel.self),
       ] }
       static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-        ResumeTaskMutation.Data.self
+        AudibleImportCancelMutation.Data.self
       ] }
 
-      /// Resume a paused task
-      var resumeTask: ResumeTask { __data["resumeTask"] }
+      /// Cancel the running or paused Audible import
+      var audibleImportCancel: AudibleImportCancel { __data["audibleImportCancel"] }
 
-      /// ResumeTask
+      /// AudibleImportCancel
       ///
-      /// Parent Type: `Task`
-      struct ResumeTask: PchookGraphQL.SelectionSet {
+      /// Parent Type: `AudibleImport`
+      struct AudibleImportCancel: PchookGraphQL.SelectionSet {
         let __data: DataDict
         init(_dataDict: DataDict) { __data = _dataDict }
 
-        static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.Task }
+        static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.AudibleImport }
         static var __selections: [ApolloAPI.Selection] { [
           .field("__typename", String.self),
-          .field("id", PchookGraphQL.TaskId.self),
           .field("phase", String.self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-          ResumeTaskMutation.Data.ResumeTask.self
+          AudibleImportCancelMutation.Data.AudibleImportCancel.self
         ] }
 
-        /// Unique task identifier
-        var id: PchookGraphQL.TaskId { __data["id"] }
-        /// Current phase (idle, running, paused, cancelled, completed, failed)
+        /// Current task phase (idle, running, paused, cancelled, completed, failed)
         var phase: String { __data["phase"] }
       }
     }

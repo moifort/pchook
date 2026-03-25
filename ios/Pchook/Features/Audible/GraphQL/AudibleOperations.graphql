@@ -24,10 +24,15 @@ query Audible {
     import {
       status
       updatedAt
-      taskId
       importedCount
       totalCount
       delta
+      phase
+      current
+      total
+      message
+      startedAt
+      completedAt
     }
   }
 }
@@ -62,12 +67,39 @@ mutation AudibleSyncVerify {
 
 mutation AudibleImportStart {
   audibleImportStart {
-    id
+    status
+    importedCount
+    totalCount
+    delta
     phase
     current
     total
     message
     startedAt
     completedAt
+  }
+}
+
+mutation AudibleImportPause {
+  audibleImportPause {
+    phase
+    current
+    total
+    message
+  }
+}
+
+mutation AudibleImportResume {
+  audibleImportResume {
+    phase
+    current
+    total
+    message
+  }
+}
+
+mutation AudibleImportCancel {
+  audibleImportCancel {
+    phase
   }
 }

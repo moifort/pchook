@@ -75,16 +75,36 @@ enum GraphQLAudibleAPI {
             import_: AudibleImportData(
                 status: AudibleImportStatus(rawValue: imp.status) ?? .initial,
                 updatedAt: imp.updatedAt.flatMap(GraphQLHelpers.parseISO8601),
-                taskId: imp.taskId,
                 importedCount: imp.importedCount,
                 totalCount: imp.totalCount,
-                delta: imp.delta
+                delta: imp.delta,
+                phase: TaskPhase(rawValue: imp.phase) ?? .idle,
+                current: imp.current,
+                total: imp.total,
+                message: imp.message,
+                startedAt: imp.startedAt.flatMap(GraphQLHelpers.parseISO8601),
+                completedAt: imp.completedAt.flatMap(GraphQLHelpers.parseISO8601)
             )
         )
     }
 
     static func importStart() async throws {
         let mutation = PchookGraphQL.AudibleImportStartMutation()
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
+    }
+
+    static func importPause() async throws {
+        let mutation = PchookGraphQL.AudibleImportPauseMutation()
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
+    }
+
+    static func importResume() async throws {
+        let mutation = PchookGraphQL.AudibleImportResumeMutation()
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
+    }
+
+    static func importCancel() async throws {
+        let mutation = PchookGraphQL.AudibleImportCancelMutation()
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
