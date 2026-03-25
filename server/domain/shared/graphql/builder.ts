@@ -3,6 +3,7 @@ import { GraphQLScalarType } from 'graphql'
 import type { H3Event } from 'h3'
 import type {
   BookId,
+  BookStatus,
   BookTitle,
   Genre,
   ISBN,
@@ -37,6 +38,7 @@ export const builder = new SchemaBuilder<{
   Scalars: {
     DateTime: { Input: Date; Output: Date }
     BookId: { Input: BookId; Output: BookId }
+    BookStatus: { Input: BookStatus; Output: BookStatus }
     BookTitle: { Input: BookTitle; Output: BookTitle }
     Publisher: { Input: Publisher; Output: Publisher }
     Genre: { Input: Genre; Output: Genre }

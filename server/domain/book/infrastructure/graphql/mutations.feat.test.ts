@@ -99,7 +99,7 @@ feature('GraphQL mutation: addToFavorites', () => {
     then('book is marked as read')
     expect(result.errors).toBeUndefined()
     const data = result.data?.addToFavorites as Record<string, unknown>
-    expect(data.status).toBe('READ')
+    expect(data.status).toBe('read')
 
     and('a review with favorite rating is created')
     const review = await ReviewQuery.getByBookId(book.id)

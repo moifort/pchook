@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql'
 import { ZodError } from 'zod'
 import {
   BookId,
+  BookStatus,
   BookTitle,
   Genre,
   ISBN,
@@ -35,6 +36,12 @@ builder.scalarType('BookId', {
   description: 'Book unique identifier (UUID)',
   serialize: (value) => String(value),
   parseValue: validatedParse('BookId', BookId),
+})
+
+builder.scalarType('BookStatus', {
+  description: 'Reading status (to-read | read)',
+  serialize: (value) => value as string,
+  parseValue: validatedParse('BookStatus', BookStatus),
 })
 
 builder.scalarType('BookTitle', {

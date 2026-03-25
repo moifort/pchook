@@ -39,9 +39,9 @@ feature('GraphQL query: books', () => {
     then('only to-read books are returned')
     expect(result.errors).toBeUndefined()
     expect(result.data?.books).toHaveLength(2)
-    and('all returned books have status TO_READ')
+    and('all returned books have status to-read')
     const books = result.data?.books as { status: string }[]
-    expect(books.every(({ status }) => status === 'TO_READ')).toBe(true)
+    expect(books.every(({ status }) => status === 'to-read')).toBe(true)
   })
 
   scenario('sorts books by title ascending', async () => {
