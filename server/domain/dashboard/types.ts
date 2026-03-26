@@ -1,14 +1,13 @@
-import type { BookId, Genre, Note } from '~/domain/book/types'
-import type { Eur, PersonName } from '~/domain/shared/types'
+import type { BookId, Genre, Language } from '~/domain/book/types'
+import type { SeriesId, SeriesName } from '~/domain/series/types'
+import type { PersonName } from '~/domain/shared/types'
 
 export type FavoriteBook = {
   id: BookId
   title: string
   authors: PersonName[]
   genre?: Genre
-  rating: Note
-  readDate?: Date
-  estimatedPrice?: Eur
+  language?: Language
 }
 
 export type RecentBook = {
@@ -16,14 +15,25 @@ export type RecentBook = {
   title: string
   authors: PersonName[]
   genre?: Genre
-  createdAt: Date
+  language?: Language
 }
 
-export type RecentAward = {
-  bookTitle: string
+export type RecommendedBook = {
+  id: BookId
+  title: string
   authors: PersonName[]
-  awardName: string
-  awardYear: number
+  genre?: Genre
+  language?: Language
+  recommendedBy: PersonName
+}
+
+export type FavoriteSeries = {
+  id: SeriesId
+  name: SeriesName
+  volumeCount: number
+  authors: PersonName[]
+  language: Language | undefined
+  firstBookId: BookId | undefined
 }
 
 export type DashboardView = {
@@ -31,8 +41,10 @@ export type DashboardView = {
     total: number
     toRead: number
     read: number
+    totalAudioMinutes: number
   }
   favorites: FavoriteBook[]
   recentBooks: RecentBook[]
-  recentAwards: RecentAward[]
+  recommendedBooks: RecommendedBook[]
+  favoriteSeries: FavoriteSeries[]
 }

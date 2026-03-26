@@ -297,6 +297,9 @@ type BookCount {
 
   """Total number of books"""
   total: Int!
+
+  """Total audiobook duration in minutes"""
+  totalAudioMinutes: Int!
 }
 
 """Physical or digital book format"""
@@ -523,14 +526,17 @@ type DashboardView {
   """Book count"""
   bookCount: BookCount!
 
+  """Favorite series"""
+  favoriteSeries: [FavoriteSeries!]!
+
   """Favorite books"""
   favorites: [FavoriteBook!]!
 
-  """Recent literary awards"""
-  recentAwards: [RecentAward!]!
-
   """Recently added books"""
   recentBooks: [RecentBook!]!
+
+  """Books recommended by others"""
+  recommendedBooks: [RecommendedBook!]!
 }
 
 """ISO 8601 date-time string"""
@@ -539,13 +545,10 @@ scalar DateTime
 """Price in euros (non-negative number)"""
 scalar Eur
 
-"""Favorite book (top-rated)"""
+"""Favorite book (rated 5)"""
 type FavoriteBook {
   """Authors"""
   authors: [PersonName!]!
-
-  """Estimated price in euros"""
-  estimatedPrice: Eur
 
   """Genre"""
   genre: Genre
@@ -553,14 +556,32 @@ type FavoriteBook {
   """Book ID"""
   id: BookId!
 
-  """Rating (0-10)"""
-  rating: Note!
-
-  """Read date"""
-  readDate: DateTime
+  """Language"""
+  language: Language
 
   """Title"""
   title: String!
+}
+
+"""Favorite series (rated 5)"""
+type FavoriteSeries {
+  """Authors"""
+  authors: [PersonName!]!
+
+  """First volume book ID for navigation"""
+  firstBookId: BookId
+
+  """Series ID"""
+  id: ID!
+
+  """Language"""
+  language: Language
+
+  """Series name"""
+  name: String!
+
+  """Number of volumes"""
+  volumeCount: Int!
 }
 
 """Literary genre (non-empty)"""
@@ -899,34 +920,40 @@ type Query {
 """Community rating score (decimal 0-10)"""
 scalar RatingScore
 
-"""Recent literary award"""
-type RecentAward {
-  """Authors"""
-  authors: [PersonName!]!
-
-  """Award name"""
-  awardName: String!
-
-  """Award year"""
-  awardYear: Int!
-
-  """Book title"""
-  bookTitle: String!
-}
-
 """Recently added book"""
 type RecentBook {
   """Authors"""
   authors: [PersonName!]!
-
-  """Date added"""
-  createdAt: DateTime!
 
   """Genre"""
   genre: Genre
 
   """Book ID"""
   id: BookId!
+
+  """Language"""
+  language: Language
+
+  """Title"""
+  title: String!
+}
+
+"""Book recommended by someone"""
+type RecommendedBook {
+  """Authors"""
+  authors: [PersonName!]!
+
+  """Genre"""
+  genre: Genre
+
+  """Book ID"""
+  id: BookId!
+
+  """Language"""
+  language: Language
+
+  """Name of recommender"""
+  recommendedBy: PersonName!
 
   """Title"""
   title: String!
