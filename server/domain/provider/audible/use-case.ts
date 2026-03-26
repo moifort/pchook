@@ -141,7 +141,15 @@ export const AUDIBLE_IMPORT_TASK_ID = TaskId('00000000-0000-4000-a000-0000000000
 export const importTaskDefinition: TaskDefinition<RawAudibleEntry> = {
   items: () => AudibleQuery.getAllRawItems(),
   execute: async ({ item, source }) => {
-    await importItem(item, source)
+    try {
+      await importItem(item, source)
+    } catch (error) {
+      log.error('Failed to import item, skipping', {
+        asin: item.asin,
+        title: item.title,
+        error: String(error),
+      })
+    }
   },
   label: ({ item }) => `Import de "${item.title}"...`,
 }
