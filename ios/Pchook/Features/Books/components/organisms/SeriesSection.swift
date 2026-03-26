@@ -63,9 +63,9 @@ struct SeriesSection: View {
                         .font(.caption)
                 }
             }
-            if book.id == currentBookId {
-                Image(systemName: "checkmark")
-                    .foregroundStyle(Color.accentColor)
+            if book.id != currentBookId {
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
                     .font(.caption)
             }
         }
