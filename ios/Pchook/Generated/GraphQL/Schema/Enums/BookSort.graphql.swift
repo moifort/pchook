@@ -16,6 +16,8 @@ extension PchookGraphQL {
     case genre = "genre"
     /// Personal rating
     case myRating = "myRating"
+    /// Publication date
+    case publishedDate = "publishedDate"
     /// Alphabetical title
     case title = "title"
   }

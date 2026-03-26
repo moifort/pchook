@@ -176,6 +176,7 @@ struct BookListItem: Identifiable, Sendable {
     var seriesRating: Int?
     var seriesLabel: String?
     var seriesPosition: Double?
+    var publishedDate: Date?
     let createdAt: Date
 }
 

@@ -99,6 +99,23 @@ enum BookGrouping {
                 )
             }
 
+        case .publishedDate:
+            var dict: [String: [BookListItem]] = [:]
+            var order: [String] = []
+            for book in books {
+                let key = book.publishedDate.map {
+                    String(Calendar.current.component(.year, from: $0))
+                } ?? "Date inconnue"
+                if dict[key] == nil { order.append(key) }
+                dict[key, default: []].append(book)
+            }
+            return order.map { key in
+                BookSection(
+                    title: key,
+                    items: dict[key]!.map { SectionedBook(sectionTitle: key, book: $0) }
+                )
+            }
+
         case .title:
             return []
         }
@@ -134,6 +151,7 @@ enum BookGrouping {
             case .genre: (bookA.genre ?? "").localizedCaseInsensitiveCompare(bookB.genre ?? "")
             case .myRating: (a.rating ?? 0) < (b.rating ?? 0) ? .orderedAscending : (a.rating ?? 0) > (b.rating ?? 0) ? .orderedDescending : .orderedSame
             case .awards: bookA.awards.count < bookB.awards.count ? .orderedAscending : bookA.awards.count > bookB.awards.count ? .orderedDescending : .orderedSame
+            case .publishedDate: (bookA.publishedDate ?? .distantPast) < (bookB.publishedDate ?? .distantPast) ? .orderedAscending : (bookA.publishedDate ?? .distantPast) > (bookB.publishedDate ?? .distantPast) ? .orderedDescending : .orderedSame
             }
             if cmp != .orderedSame {
                 return descending ? cmp == .orderedDescending : cmp == .orderedAscending
@@ -206,6 +224,10 @@ enum BookGrouping {
             return rating == 0 ? "Aucune note" : String(repeating: "★", count: rating)
         case .awards:
             return book.awards.first?.name ?? "Aucun prix"
+        case .publishedDate:
+            return book.publishedDate.map {
+                String(Calendar.current.component(.year, from: $0))
+            } ?? "Date inconnue"
         case .title:
             return ""
         }

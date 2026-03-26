@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookList"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder, $isFavorite: Boolean, $hasSeries: Boolean, $offset: Int, $limit: Int) { books( genre: $genre status: $status sort: $sort order: $order isFavorite: $isFavorite hasSeries: $hasSeries offset: $offset limit: $limit ) { __typename items { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name rating } seriesVolume { __typename label position } coverImageUrl createdAt } totalCount hasMore } }"#
+        #"query BookList($genre: Genre, $status: String, $sort: BookSort, $order: SortOrder, $isFavorite: Boolean, $hasSeries: Boolean, $offset: Int, $limit: Int) { books( genre: $genre status: $status sort: $sort order: $order isFavorite: $isFavorite hasSeries: $hasSeries offset: $offset limit: $limit ) { __typename items { __typename id title authors genre status estimatedPrice awards { __typename name year } review { __typename rating } language series { __typename name rating } seriesVolume { __typename label position } coverImageUrl publishedDate createdAt } totalCount hasMore } }"#
       ))
 
     public var genre: GraphQLNullable<Genre>
@@ -122,6 +122,7 @@ extension PchookGraphQL {
             .field("series", Series?.self),
             .field("seriesVolume", SeriesVolume?.self),
             .field("coverImageUrl", PchookGraphQL.Url?.self),
+            .field("publishedDate", PchookGraphQL.DateTime?.self),
             .field("createdAt", PchookGraphQL.DateTime.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -152,6 +153,8 @@ extension PchookGraphQL {
           var seriesVolume: SeriesVolume? { __data["seriesVolume"] }
           /// Absolute URL to the cover image. Null if no cover
           var coverImageUrl: PchookGraphQL.Url? { __data["coverImageUrl"] }
+          /// First publication date. Null if unknown
+          var publishedDate: PchookGraphQL.DateTime? { __data["publishedDate"] }
           /// Date the book was added to the library
           var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
 

@@ -38,7 +38,7 @@ enum BookListMode: String, CaseIterable, Identifiable {
 }
 
 enum BookSort: String, CaseIterable, Identifiable {
-    case createdAt, title, author, genre, myRating, awards
+    case createdAt, title, author, genre, myRating, awards, publishedDate
     var id: String { rawValue }
     var label: String {
         switch self {
@@ -48,6 +48,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .genre: "Genre"
         case .myRating: "Ma note"
         case .awards: "Prix littéraires"
+        case .publishedDate: "Date de parution"
         }
     }
     var icon: String {
@@ -58,6 +59,7 @@ enum BookSort: String, CaseIterable, Identifiable {
         case .genre: "tag"
         case .myRating: "star"
         case .awards: "trophy"
+        case .publishedDate: "calendar"
         }
     }
 }

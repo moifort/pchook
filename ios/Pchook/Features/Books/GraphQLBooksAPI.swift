@@ -188,6 +188,7 @@ private extension GraphQLBooksAPI {
             seriesRating: book.series?.rating,
             seriesLabel: book.seriesVolume?.label,
             seriesPosition: book.seriesVolume.map { Double($0.position) },
+            publishedDate: book.publishedDate.flatMap(GraphQLHelpers.parseISO8601),
             createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date()
         )
     }
