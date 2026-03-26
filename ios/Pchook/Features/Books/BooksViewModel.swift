@@ -186,6 +186,40 @@ final class BooksViewModel {
         isLoadingMore = false
     }
 
+    func updateItem(id: String) async {
+        do {
+            let detail = try await GraphQLBooksAPI.getDetail(id: id)
+            guard let index = books.firstIndex(where: { $0.id == id }) else { return }
+            books[index] = BookListItem(
+                id: detail.book.id,
+                title: detail.book.title,
+                coverImageUrl: detail.coverImageUrl,
+                authors: detail.book.authors,
+                genre: detail.book.genre,
+                status: detail.book.status,
+                estimatedPrice: detail.book.estimatedPrice,
+                awards: detail.book.awards,
+                rating: detail.review?.rating,
+                language: detail.book.language,
+                seriesName: detail.series?.name,
+                seriesRating: detail.series?.rating,
+                seriesLabel: detail.seriesVolume?.label,
+                seriesPosition: detail.seriesVolume.map { $0.position },
+                publishedDate: detail.book.publishedDate,
+                createdAt: detail.book.createdAt
+            )
+            if usesGrouping { rebuildGroupedBooks() }
+        } catch {
+            // Silent — worst case the item has stale data until next refresh
+        }
+    }
+
+    func removeItem(id: String) {
+        books.removeAll { $0.id == id }
+        totalCount = max(0, totalCount - 1)
+        if usesGrouping { rebuildGroupedBooks() }
+    }
+
     private func fetchPage(offset: Int) async throws -> BookListPage {
         var status: String?
         var isFavorite: Bool?

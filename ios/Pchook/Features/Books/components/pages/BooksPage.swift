@@ -8,6 +8,9 @@ struct BooksPage: View {
     @State private var viewModel = BooksViewModel()
     @State private var selectedBookId: String?
     @State private var scrollPosition: String?
+    @State private var lastViewedBookId: String?
+    @State private var itemChanged = false
+    @State private var itemDeleted = false
 
     var body: some View {
         NavigationStack {
@@ -103,9 +106,14 @@ struct BooksPage: View {
                     get: { selectedBookId.map { BookIdWrapper(id: $0) } },
                     set: { selectedBookId = $0?.id }
                 ),
-                onDismiss: { Task { await viewModel.load() } }
+                onDismiss: { handleDetailDismiss() }
             ) { wrapper in
-                BookDetailCoordinator(bookId: wrapper.id)
+                BookDetailCoordinator(
+                    bookId: wrapper.id,
+                    onDeleted: { itemDeleted = true },
+                    onUpdated: { itemChanged = true }
+                )
+                .onAppear { lastViewedBookId = wrapper.id }
             }
         }
     }
@@ -171,6 +179,18 @@ struct BooksPage: View {
                 description: Text("Notez des livres ou séries 5 étoiles")
             )
         }
+    }
+
+    private func handleDetailDismiss() {
+        guard let bookId = lastViewedBookId else { return }
+        if itemDeleted {
+            viewModel.removeItem(id: bookId)
+        } else if itemChanged {
+            Task { await viewModel.updateItem(id: bookId) }
+        }
+        itemChanged = false
+        itemDeleted = false
+        lastViewedBookId = nil
     }
 
     @ViewBuilder
