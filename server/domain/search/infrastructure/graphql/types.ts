@@ -1,3 +1,4 @@
+import { getRequestURL } from 'h3'
 import type {
   AuthorSearchResult,
   BookSearchResult,
@@ -29,7 +30,6 @@ export const BookSearchResultType = builder
         description: 'Cover image URL',
         resolve: ({ coverImageId }, _, { event }) => {
           if (!coverImageId) return null
-          const { getRequestURL } = require('h3')
           const origin = getRequestURL(event).origin
           return `${origin}/images/${coverImageId}` as never
         },
