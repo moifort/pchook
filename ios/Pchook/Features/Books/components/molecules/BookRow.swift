@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BookRow: View {
     let title: String
+    let flag: String?
     let subtitle: String?
     let rating: Int?
     let status: BookStatus
@@ -18,9 +19,15 @@ struct BookRow: View {
                     .foregroundStyle(.green)
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                    .lineLimit(2)
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(.headline)
+                        .lineLimit(2)
+                    if let flag {
+                        Text(flag)
+                            .font(.subheadline)
+                    }
+                }
                 if let subtitle {
                     Text(subtitle)
                         .font(.subheadline)
@@ -46,18 +53,21 @@ struct BookRow: View {
     List {
         BookRow(
             title: "L'Étranger",
+            flag: "🇫🇷",
             subtitle: "Albert Camus • Roman • 1 prix",
             rating: 4,
             status: .read
         )
         BookRow(
             title: "Le Petit Prince",
+            flag: nil,
             subtitle: "Antoine de Saint-Exupéry • Conte",
             rating: nil,
             status: .toRead
         )
         BookRow(
             title: "Neuromancien",
+            flag: "🇬🇧",
             subtitle: "William Gibson • Cyberpunk • 2 prix",
             rating: 5,
             status: .read
