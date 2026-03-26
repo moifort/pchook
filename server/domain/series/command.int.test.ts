@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { randomBookId } from '~/domain/book/primitives'
 import { SeriesCommand } from '~/domain/series/command'
-import { SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/primitives'
+import { randomSeriesId, SeriesLabel, SeriesName, SeriesPosition } from '~/domain/series/primitives'
 import { SeriesQuery } from '~/domain/series/query'
 
 describe('SeriesCommand.findOrCreate', () => {
@@ -107,5 +107,57 @@ describe('SeriesCommand.removeBook', () => {
 
     const result = await SeriesQuery.getByBookId(bookId)
     expect(result).toBeNull()
+  })
+})
+
+describe('SeriesCommand.renameSeries', () => {
+  test('renames a series', async () => {
+    const series = await SeriesCommand.findOrCreate('Old Name')
+    const result = await SeriesCommand.renameSeries(series.id, SeriesName('New Name'))
+
+    expect(result).not.toBe('not-found')
+    expect(result).not.toBe('name-taken')
+    if (result === 'not-found' || result === 'name-taken') return
+    expect(result.name).toBe(SeriesName('New Name'))
+    expect(result.id).toBe(series.id)
+  })
+
+  test('returns not-found for unknown ID', async () => {
+    const result = await SeriesCommand.renameSeries(randomSeriesId(), SeriesName('Whatever'))
+    expect(result).toBe('not-found')
+  })
+
+  test('returns name-taken when another series has the target name', async () => {
+    await SeriesCommand.findOrCreate('Existing Series')
+    const other = await SeriesCommand.findOrCreate('Other Series')
+
+    const result = await SeriesCommand.renameSeries(other.id, SeriesName('Existing Series'))
+    expect(result).toBe('name-taken')
+  })
+
+  test('is case-insensitive for conflict detection', async () => {
+    await SeriesCommand.findOrCreate('Conflict Test')
+    const other = await SeriesCommand.findOrCreate('Another Series')
+
+    const result = await SeriesCommand.renameSeries(other.id, SeriesName('conflict test'))
+    expect(result).toBe('name-taken')
+  })
+
+  test('allows renaming to a different case of the same name', async () => {
+    const series = await SeriesCommand.findOrCreate('lowercase name')
+    const result = await SeriesCommand.renameSeries(series.id, SeriesName('Lowercase Name'))
+
+    expect(result).not.toBe('not-found')
+    expect(result).not.toBe('name-taken')
+    if (result === 'not-found' || result === 'name-taken') return
+    expect(result.name).toBe(SeriesName('Lowercase Name'))
+  })
+
+  test('cleans up old name from index after rename', async () => {
+    const series = await SeriesCommand.findOrCreate('Before Rename')
+    await SeriesCommand.renameSeries(series.id, SeriesName('After Rename'))
+
+    const newSeries = await SeriesCommand.findOrCreate('Before Rename')
+    expect(newSeries.id).not.toBe(series.id)
   })
 })
