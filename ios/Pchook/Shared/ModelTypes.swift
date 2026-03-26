@@ -187,6 +187,7 @@ struct BookListPage: Sendable {
 struct FavoriteSeriesItem: Identifiable, Sendable {
     let id: String
     let name: String
+    let flag: String?
     let rating: Int
     let volumeCount: Int
     var firstBookId: String?

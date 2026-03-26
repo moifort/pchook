@@ -138,15 +138,20 @@ enum GraphQLBooksAPI {
     static func favoriteSeries() async throws -> [FavoriteSeriesItem] {
         let query = PchookGraphQL.FavoriteSeriesQuery()
         let data = try await GraphQLHelpers.fetch(client, query: query)
-        return data.series.map { series in
+        return data.series.flatMap { series in
             let volumes = series.volumes.sorted { $0.position < $1.position }
-            return FavoriteSeriesItem(
-                id: series.id,
-                name: series.name,
-                rating: series.rating ?? 0,
-                volumeCount: volumes.count,
-                firstBookId: volumes.first?.id
-            )
+            let byLanguage = Dictionary(grouping: volumes) { $0.language?.rawValue ?? "" }
+            return byLanguage.map { language, languageVolumes in
+                let flag = language.isEmpty ? nil : BookGrouping.flagEmoji(for: language)
+                return FavoriteSeriesItem(
+                    id: "\(series.id)-\(language)",
+                    name: series.name,
+                    flag: flag,
+                    rating: series.rating ?? 0,
+                    volumeCount: languageVolumes.count,
+                    firstBookId: languageVolumes.first?.id
+                )
+            }
         }
     }
 }

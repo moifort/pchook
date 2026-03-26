@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "FavoriteSeries"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query FavoriteSeries { series(isFavorite: true) { __typename id name rating volumes { __typename id title label position rating } } }"#
+        #"query FavoriteSeries { series(isFavorite: true) { __typename id name rating volumes { __typename id title label position language rating } } }"#
       ))
 
     public init() {}
@@ -70,6 +70,7 @@ extension PchookGraphQL {
             .field("title", String.self),
             .field("label", String.self),
             .field("position", PchookGraphQL.SeriesPosition.self),
+            .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
             .field("rating", PchookGraphQL.Note?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
@@ -84,6 +85,8 @@ extension PchookGraphQL {
           var label: String { __data["label"] }
           /// Sort position in series (e.g. 1, 2, 99 for hors-série)
           var position: PchookGraphQL.SeriesPosition { __data["position"] }
+          /// Book language as ISO 639-1 code
+          var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
           /// Personal rating of this volume (null if not reviewed)
           var rating: PchookGraphQL.Note? { __data["rating"] }
         }
