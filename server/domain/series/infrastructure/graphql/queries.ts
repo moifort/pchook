@@ -13,11 +13,12 @@ builder.objectField(SeriesType, 'volumes', (t) =>
       if (result === 'not-found') return []
 
       const books = filterLanguage ? booksInLanguage(result.books, filterLanguage) : result.books
-      return books.map(({ id, title, label, position }) => ({
+      return books.map(({ id, title, label, position, language }) => ({
         id,
         title,
         label,
         position,
+        language,
       }))
     },
   }),

@@ -1,3 +1,4 @@
+import { LanguageEnum } from '~/domain/book/infrastructure/graphql/enums'
 import type { BookId, BookTitle, Language } from '~/domain/book/types'
 import type { Series, SeriesLabel, SeriesPosition } from '~/domain/series/types'
 import { builder } from '~/domain/shared/graphql/builder'
@@ -9,6 +10,7 @@ type SeriesVolumeShape = {
   title: BookTitle
   label: SeriesLabel
   position: SeriesPosition
+  language?: Language
 }
 
 export const SeriesType = builder.objectRef<SeriesShape>('Series').implement({
@@ -49,6 +51,12 @@ export const SeriesVolumeType = builder.objectRef<SeriesVolumeShape>('SeriesVolu
       type: 'SeriesPosition',
       description: 'Sort position in series (e.g. 1, 2, 99 for hors-série)',
       resolve: ({ position }) => position,
+    }),
+    language: t.field({
+      type: LanguageEnum,
+      nullable: true,
+      description: 'Book language as ISO 639-1 code',
+      resolve: ({ language }) => language ?? null,
     }),
     rating: t.field({
       type: 'Note',
