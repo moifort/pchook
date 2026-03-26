@@ -137,6 +137,37 @@ enum GraphQLBooksAPI {
         _ = try await GraphQLHelpers.perform(client, mutation: mutation)
     }
 
+    static func getSeriesDetail(id: String) async throws -> SeriesDetailData {
+        let query = PchookGraphQL.SeriesDetailQuery(id: id)
+        let data = try await GraphQLHelpers.fetch(client, query: query)
+
+        guard let series = data.seriesById else {
+            throw APIError.httpError(404)
+        }
+
+        return SeriesDetailData(
+            id: series.id,
+            name: series.name,
+            rating: series.rating,
+            createdAt: GraphQLHelpers.parseISO8601(series.createdAt) ?? Date(),
+            volumes: series.volumes.sorted { $0.position < $1.position }.map { volume in
+                SeriesDetailVolume(
+                    id: volume.id,
+                    title: volume.title,
+                    label: volume.label,
+                    position: Double(volume.position),
+                    language: volume.language?.rawValue,
+                    rating: volume.rating
+                )
+            }
+        )
+    }
+
+    static func renameSeries(id: String, name: String) async throws {
+        let mutation = PchookGraphQL.RenameSeriesMutation(id: id, name: name)
+        _ = try await GraphQLHelpers.perform(client, mutation: mutation)
+    }
+
     static func favoriteSeries() async throws -> [FavoriteSeriesItem] {
         let query = PchookGraphQL.FavoriteSeriesQuery()
         let data = try await GraphQLHelpers.fetch(client, query: query)
@@ -147,6 +178,7 @@ enum GraphQLBooksAPI {
                 let flag = language.isEmpty ? nil : BookGrouping.flagEmoji(for: language)
                 return FavoriteSeriesItem(
                     id: "\(series.id)-\(language)",
+                    seriesId: series.id,
                     name: series.name,
                     flag: flag,
                     rating: series.rating ?? 0,

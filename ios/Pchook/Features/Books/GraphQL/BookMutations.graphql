@@ -42,3 +42,11 @@ mutation RateSeries($id: ID!, $rating: Note!) {
     rating
   }
 }
+
+mutation RenameSeries($id: ID!, $name: SeriesName!) {
+  renameSeries(id: $id, name: $name) {
+    id
+    name
+    rating
+  }
+}

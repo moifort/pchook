@@ -1,0 +1,16 @@
+query SeriesDetail($id: ID!) {
+  seriesById(id: $id) {
+    id
+    name
+    rating
+    createdAt
+    volumes {
+      id
+      title
+      label
+      position
+      language
+      rating
+    }
+  }
+}

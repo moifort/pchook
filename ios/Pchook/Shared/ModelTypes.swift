@@ -188,6 +188,7 @@ struct BookListPage: Sendable {
 
 struct FavoriteSeriesItem: Identifiable, Sendable {
     let id: String
+    let seriesId: String
     let name: String
     let flag: String?
     let rating: Int
@@ -260,6 +261,25 @@ struct BookDetailData: Sendable {
     var series: Series?
     var seriesVolume: SeriesVolume?
     var review: ReviewInfo?
+}
+
+// MARK: - Series Detail
+
+struct SeriesDetailVolume: Identifiable, Sendable {
+    let id: String
+    let title: String
+    let label: String
+    let position: Double
+    var language: String?
+    var rating: Int?
+}
+
+struct SeriesDetailData: Sendable {
+    let id: String
+    let name: String
+    var rating: Int?
+    let createdAt: Date
+    let volumes: [SeriesDetailVolume]
 }
 
 // MARK: - Book Preview / Scan
