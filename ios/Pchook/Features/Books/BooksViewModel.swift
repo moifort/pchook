@@ -86,11 +86,14 @@ final class BooksViewModel {
         sort != .title || mode == .series
     }
 
-    var groupedBooks: [BookSection] {
+    private(set) var groupedBooks: [BookSection] = []
+
+    private func rebuildGroupedBooks() {
         if mode == .series {
-            return BookGrouping.groupedBySeries(books: books, sort: sort, descending: sortDescending)
+            groupedBooks = BookGrouping.groupedBySeries(books: books, sort: sort, descending: sortDescending)
+        } else {
+            groupedBooks = BookGrouping.grouped(books: books, sort: sort, descending: sortDescending)
         }
-        return BookGrouping.grouped(books: books, sort: sort, descending: sortDescending)
     }
 
     func subtitle(for book: BookListItem) -> String? {
@@ -146,6 +149,7 @@ final class BooksViewModel {
                 totalCount = page.totalCount
                 hasMore = page.hasMore
             }
+            rebuildGroupedBooks()
             if !books.isEmpty || !favoriteSeries.isEmpty { hasBooks = true }
         } catch is CancellationError {
             // Ignored — task cancelled by SwiftUI (e.g. refreshTrigger changed)
@@ -163,6 +167,15 @@ final class BooksViewModel {
             books.append(contentsOf: page.items)
             totalCount = page.totalCount
             hasMore = page.hasMore
+            if usesGrouping {
+                groupedBooks = BookGrouping.mergeIntoSections(
+                    existing: groupedBooks,
+                    newBooks: page.items,
+                    mode: mode,
+                    sort: sort,
+                    descending: sortDescending
+                )
+            }
         } catch is CancellationError {
             // Ignored
         } catch {
