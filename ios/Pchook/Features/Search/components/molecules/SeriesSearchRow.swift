@@ -4,6 +4,11 @@ struct SeriesSearchRow: View {
     let name: String
     let volumeCount: Int
     let rating: Int?
+    let languages: [String]
+
+    private var flags: String {
+        languages.compactMap { BookGrouping.flagEmoji(for: $0) }.joined()
+    }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -11,9 +16,14 @@ struct SeriesSearchRow: View {
                 .font(.caption2)
                 .foregroundStyle(.blue)
             VStack(alignment: .leading, spacing: 4) {
-                Text(name)
-                    .font(.headline)
-                    .lineLimit(2)
+                HStack(spacing: 4) {
+                    Text(name)
+                        .font(.headline)
+                        .lineLimit(2)
+                    if !flags.isEmpty {
+                        Text(flags)
+                    }
+                }
                 Text("\(volumeCount) \(volumeCount <= 1 ? "tome" : "tomes")")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -34,8 +44,8 @@ struct SeriesSearchRow: View {
 
 #Preview {
     List {
-        SeriesSearchRow(name: "Fondation", volumeCount: 7, rating: 5)
-        SeriesSearchRow(name: "Le Sorceleur", volumeCount: 8, rating: 4)
-        SeriesSearchRow(name: "Dune", volumeCount: 3, rating: nil)
+        SeriesSearchRow(name: "Fondation", volumeCount: 7, rating: 5, languages: ["fr"])
+        SeriesSearchRow(name: "Le Sorceleur", volumeCount: 8, rating: 4, languages: ["fr", "en"])
+        SeriesSearchRow(name: "Dune", volumeCount: 3, rating: nil, languages: ["en"])
     }
 }

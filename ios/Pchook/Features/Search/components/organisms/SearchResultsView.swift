@@ -6,17 +6,15 @@ struct SearchResultsView: View {
 
     var body: some View {
         List {
-            if !results.books.isEmpty {
-                Section("Livres") {
-                    ForEach(results.books) { book in
+            if !results.authors.isEmpty {
+                Section("Auteurs") {
+                    ForEach(results.authors) { author in
                         Button {
-                            onSelectBook(book.id)
+                            onSelectBook(author.firstBookId)
                         } label: {
-                            BookSearchRow(
-                                title: book.title,
-                                authors: book.authors.joined(separator: ", "),
-                                flag: book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
-                                status: book.status
+                            AuthorSearchRow(
+                                name: author.name,
+                                bookCount: author.bookCount
                             )
                         }
                         .tint(.primary)
@@ -30,21 +28,24 @@ struct SearchResultsView: View {
                         SeriesSearchRow(
                             name: series.name,
                             volumeCount: series.volumeCount,
-                            rating: series.rating
+                            rating: series.rating,
+                            languages: series.languages
                         )
                     }
                 }
             }
 
-            if !results.authors.isEmpty {
-                Section("Auteurs") {
-                    ForEach(results.authors) { author in
+            if !results.books.isEmpty {
+                Section("Livres") {
+                    ForEach(results.books) { book in
                         Button {
-                            onSelectBook(author.firstBookId)
+                            onSelectBook(book.id)
                         } label: {
-                            AuthorSearchRow(
-                                name: author.name,
-                                bookCount: author.bookCount
+                            BookSearchRow(
+                                title: book.title,
+                                authors: book.authors.joined(separator: ", "),
+                                flag: book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
+                                status: book.status
                             )
                         }
                         .tint(.primary)
@@ -68,7 +69,8 @@ struct SearchResultsView: View {
             series: [
                 SeriesSearchResultItem(
                     id: "2", name: "Fondation",
-                    volumeCount: 7, rating: 5
+                    volumeCount: 7, rating: 5,
+                    languages: ["fr", "en"]
                 ),
             ],
             authors: [

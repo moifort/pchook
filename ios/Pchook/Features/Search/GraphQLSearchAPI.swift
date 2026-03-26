@@ -23,7 +23,8 @@ enum GraphQLSearchAPI {
                     id: $0.id,
                     name: $0.name,
                     volumeCount: $0.volumeCount,
-                    rating: $0.rating
+                    rating: $0.rating,
+                    languages: $0.languages
                 )
             },
             authors: data.search.authors.map {

@@ -219,6 +219,7 @@ struct SeriesSearchResultItem: Identifiable, Sendable {
     let name: String
     let volumeCount: Int
     let rating: Int?
+    let languages: [String]
 }
 
 struct AuthorSearchResultItem: Identifiable, Sendable {

@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Search"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Search($query: String!, $limit: Int) { search(query: $query, limit: $limit) { __typename books { __typename id title authors language status coverImageUrl } series { __typename id name volumeCount rating } authors { __typename name bookCount firstBookId } } }"#
+        #"query Search($query: String!, $limit: Int) { search(query: $query, limit: $limit) { __typename books { __typename id title authors language status coverImageUrl } series { __typename id name volumeCount rating languages } authors { __typename name bookCount firstBookId } } }"#
       ))
 
     public var query: String
@@ -119,6 +119,7 @@ extension PchookGraphQL {
             .field("name", PchookGraphQL.SeriesName.self),
             .field("volumeCount", Int.self),
             .field("rating", PchookGraphQL.Note?.self),
+            .field("languages", [String].self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             SearchQuery.Data.Search.Series.self
@@ -132,6 +133,8 @@ extension PchookGraphQL {
           var volumeCount: Int { __data["volumeCount"] }
           /// Personal series rating
           var rating: PchookGraphQL.Note? { __data["rating"] }
+          /// Languages of books in the series (ISO 639-1)
+          var languages: [String] { __data["languages"] }
         }
 
         /// Search.Author
