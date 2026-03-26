@@ -153,7 +153,7 @@ enum BookGrouping {
         case "ru", "russian", "russe": "RU"
         default: nil
         }
-        guard let code = countryCode else { return nil }
+        guard let code = countryCode, code != "FR" else { return nil }
         return code.unicodeScalars.map { String(UnicodeScalar(127397 + $0.value)!) }.joined()
     }
 }
