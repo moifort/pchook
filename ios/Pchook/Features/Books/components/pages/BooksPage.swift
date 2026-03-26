@@ -107,9 +107,17 @@ struct BooksPage: View {
                 if searchViewModel.isActive {
                     if searchViewModel.isSearching {
                         ProgressView("Recherche...")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.regularMaterial)
                     } else if let results = searchViewModel.results {
                         if results.isEmpty {
-                            ContentUnavailableView.search(text: searchViewModel.searchText)
+                            ContentUnavailableView(
+                                "Aucun résultat",
+                                systemImage: "magnifyingglass",
+                                description: Text("Aucun résultat pour « \(searchViewModel.searchText) »")
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.regularMaterial)
                         } else {
                             SearchResultsView(results: results) { bookId in
                                 selectedBookId = bookId
