@@ -18,6 +18,8 @@ final class AudibleViewModel {
     private(set) var delta = 0
     private(set) var isPausing = false
     private(set) var isCancelling = false
+    private(set) var isStartingImport = false
+    private(set) var isDisconnecting = false
 
     var error: String?
     var showLogin = false
@@ -64,13 +66,14 @@ final class AudibleViewModel {
     // MARK: - Fetch
 
     func fetchLibrary() async {
+        isFetching = true
         await verify()
-        if !isConnected { return }
+        if !isConnected { isFetching = false; return }
         do {
             try await GraphQLAudibleAPI.syncFetch()
-            isFetching = true
             startFetchPolling()
         } catch {
+            isFetching = false
             self.error = reportError(error)
         }
     }
@@ -94,14 +97,17 @@ final class AudibleViewModel {
     // MARK: - Import
 
     func startImport() async {
+        isStartingImport = true
         await verify()
-        if !isConnected { return }
+        if !isConnected { isStartingImport = false; return }
         do {
             try await GraphQLAudibleAPI.importStart()
             let data = try await GraphQLAudibleAPI.status()
             applyStatus(data)
+            isStartingImport = false
             startImportPolling()
         } catch {
+            isStartingImport = false
             self.error = reportError(error)
         }
     }
@@ -161,6 +167,7 @@ final class AudibleViewModel {
     }
 
     func disconnect() async {
+        isDisconnecting = true
         do {
             try await GraphQLAudibleAPI.disconnect()
             isConnected = false
@@ -171,8 +178,10 @@ final class AudibleViewModel {
             importTask = nil
             importedCount = 0
             delta = 0
+            isDisconnecting = false
             cancelPolling()
         } catch {
+            isDisconnecting = false
             self.error = reportError(error)
         }
     }

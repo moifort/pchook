@@ -22,7 +22,9 @@ struct SyncPage: View {
                         delta: audibleViewModel.delta,
                         isImportActive: audibleViewModel.isImportActive,
                         isPausing: audibleViewModel.isPausing,
-                        isCancelling: audibleViewModel.isCancelling
+                        isCancelling: audibleViewModel.isCancelling,
+                        isStartingImport: audibleViewModel.isStartingImport,
+                        isDisconnecting: audibleViewModel.isDisconnecting
                     ),
                     onConnect: { audibleViewModel.showLogin = true },
                     onFetch: { await audibleViewModel.fetchLibrary() },

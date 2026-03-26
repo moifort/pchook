@@ -72,12 +72,14 @@ struct AudibleSection: View {
             } label: {
                 Label("Actualiser les données", systemImage: "arrow.triangle.2.circlepath")
             }
+            .disabled(state.isFetching)
         } else if !state.isImportActive {
             Button {
                 Task { await onFetch() }
             } label: {
                 Label("Récupérer les données Audible", systemImage: "arrow.triangle.2.circlepath")
             }
+            .disabled(state.isFetching)
         }
     }
 
@@ -135,12 +137,19 @@ struct AudibleSection: View {
             Button {
                 Task { await onImport() }
             } label: {
-                if state.delta > 0 {
+                if state.isStartingImport {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Lancement de l'import...")
+                    }
+                } else if state.delta > 0 {
                     Label("Importer \(state.delta) livres", systemImage: "square.and.arrow.down")
                 } else {
                     Label("Importer dans la bibliothèque", systemImage: "square.and.arrow.down")
                 }
             }
+            .disabled(state.isStartingImport)
         }
     }
 
@@ -190,8 +199,17 @@ struct AudibleSection: View {
             Button(role: .destructive) {
                 Task { await onDisconnect() }
             } label: {
-                Label("Se déconnecter", systemImage: "person.slash")
+                if state.isDisconnecting {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Déconnexion...")
+                    }
+                } else {
+                    Label("Se déconnecter", systemImage: "person.slash")
+                }
             }
+            .disabled(state.isDisconnecting)
         }
     }
 }
@@ -213,6 +231,8 @@ extension AudibleSection {
         let isImportActive: Bool
         let isPausing: Bool
         let isCancelling: Bool
+        let isStartingImport: Bool
+        let isDisconnecting: Bool
     }
 }
 
@@ -226,7 +246,8 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
                 importedCount: 0, delta: 0,
-                isImportActive: false, isPausing: false, isCancelling: false
+                isImportActive: false, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -242,7 +263,8 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: false, libraryCount: 0,
                 wishlistCount: 0, lastFetchedAt: nil, importTask: nil,
                 importedCount: 0, delta: 0,
-                isImportActive: false, isPausing: false, isCancelling: false
+                isImportActive: false, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -258,7 +280,8 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: nil, importedCount: 0, delta: 142,
-                isImportActive: false, isPausing: false, isCancelling: false
+                isImportActive: false, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -274,7 +297,8 @@ extension AudibleSection {
                 isFetching: false, hasFetchedData: true, libraryCount: 142,
                 wishlistCount: 8, lastFetchedAt: Date().addingTimeInterval(-3600),
                 importTask: nil, importedCount: 138, delta: 4,
-                isImportActive: false, isPausing: false, isCancelling: false
+                isImportActive: false, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -294,7 +318,8 @@ extension AudibleSection {
                     message: "Import en cours...", startedAt: Date()
                 ),
                 importedCount: 45, delta: 97,
-                isImportActive: true, isPausing: false, isCancelling: false
+                isImportActive: true, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
@@ -314,7 +339,8 @@ extension AudibleSection {
                     message: "Import terminé", completedAt: Date()
                 ),
                 importedCount: 142, delta: 0,
-                isImportActive: false, isPausing: false, isCancelling: false
+                isImportActive: false, isPausing: false, isCancelling: false,
+                isStartingImport: false, isDisconnecting: false
             ),
             onConnect: {}, onFetch: {}, onImport: {},
             onTogglePause: {}, onCancelImport: {}, onDisconnect: {}
