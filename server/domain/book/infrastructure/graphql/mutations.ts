@@ -58,6 +58,9 @@ const toBookUpdate = (input: Record<string, unknown>) => ({
   ...(input.personalNotes !== undefined && {
     personalNotes: (input.personalNotes as string) ?? undefined,
   }),
+  ...(input.recommendedBy !== undefined && {
+    recommendedBy: (input.recommendedBy as Book['recommendedBy']) ?? undefined,
+  }),
   ...(input.status !== undefined && { status: BookStatus(input.status) }),
   ...(input.readDate !== undefined && {
     readDate: input.readDate ? new Date(input.readDate as string) : undefined,

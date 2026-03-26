@@ -45,6 +45,7 @@ export const UpdateBookInput = builder.inputType('UpdateBookInput', {
     durationMinutes: t.int({ description: 'Duration in minutes (audiobook)' }),
     narrators: t.field({ type: ['PersonName'], description: 'Narrators (audiobook)' }),
     personalNotes: t.string({ description: 'Personal notes' }),
+    recommendedBy: t.field({ type: 'PersonName', description: 'Recommended by (null to remove)' }),
     status: t.field({ type: 'BookStatus', description: 'Reading status' }),
     readDate: t.string({ description: 'Read date (ISO 8601)' }),
     awards: t.field({ type: [AwardInput], description: 'Literary awards' }),

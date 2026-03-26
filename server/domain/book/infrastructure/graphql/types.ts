@@ -148,6 +148,12 @@ export const BookType = builder.objectRef<Book>('Book').implement({
       nullable: true,
       description: 'Free-form personal notes about the book',
     }),
+    recommendedBy: t.field({
+      type: 'PersonName',
+      nullable: true,
+      description: 'Name of the person who recommended this book',
+      resolve: ({ recommendedBy }) => recommendedBy ?? null,
+    }),
     status: t.field({
       type: 'BookStatus',
       description: 'Reading status (to-read | read)',

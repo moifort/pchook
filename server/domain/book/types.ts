@@ -82,6 +82,7 @@ export type Book = {
   durationMinutes?: Minutes
   narrators: PersonName[]
   personalNotes?: string
+  recommendedBy?: PersonName
   status: BookStatus
   readDate?: Date
   awards: Award[]
