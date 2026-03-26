@@ -799,6 +799,15 @@ type Mutation {
     id: BookId!
   ): Boolean!
 
+  """Rename a series"""
+  renameSeries(
+    """Series ID"""
+    id: ID!
+
+    """New series name"""
+    name: SeriesName!
+  ): Series!
+
   """Update an existing book"""
   updateBook(
     """Book ID"""
