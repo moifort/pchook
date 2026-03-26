@@ -4,7 +4,7 @@ struct BookSection: Identifiable {
     let title: String
     var flag: String?
     var rating: Int?
-    let items: [SectionedBook]
+    var items: [SectionedBook]
     var id: String { title + (flag ?? "") }
 }
 
@@ -127,15 +127,87 @@ enum BookGrouping {
         return sections.sorted { a, b in
             let bookA = a.items.first!.book
             let bookB = b.items.first!.book
-            let result = switch sort {
-            case .title: a.title.localizedCaseInsensitiveCompare(b.title) == .orderedAscending
-            case .createdAt: bookA.createdAt < bookB.createdAt
-            case .author: (bookA.authors.first ?? "").localizedCaseInsensitiveCompare(bookB.authors.first ?? "") == .orderedAscending
-            case .genre: (bookA.genre ?? "").localizedCaseInsensitiveCompare(bookB.genre ?? "") == .orderedAscending
-            case .myRating: (a.rating ?? 0) < (b.rating ?? 0)
-            case .awards: bookA.awards.count < bookB.awards.count
+            let cmp: ComparisonResult = switch sort {
+            case .title: a.title.localizedCaseInsensitiveCompare(b.title)
+            case .createdAt: bookA.createdAt < bookB.createdAt ? .orderedAscending : bookA.createdAt > bookB.createdAt ? .orderedDescending : .orderedSame
+            case .author: (bookA.authors.first ?? "").localizedCaseInsensitiveCompare(bookB.authors.first ?? "")
+            case .genre: (bookA.genre ?? "").localizedCaseInsensitiveCompare(bookB.genre ?? "")
+            case .myRating: (a.rating ?? 0) < (b.rating ?? 0) ? .orderedAscending : (a.rating ?? 0) > (b.rating ?? 0) ? .orderedDescending : .orderedSame
+            case .awards: bookA.awards.count < bookB.awards.count ? .orderedAscending : bookA.awards.count > bookB.awards.count ? .orderedDescending : .orderedSame
             }
-            return descending ? !result : result
+            if cmp != .orderedSame {
+                return descending ? cmp == .orderedDescending : cmp == .orderedAscending
+            }
+            return (a.flag ?? "") < (b.flag ?? "")
+        }
+    }
+
+    static func mergeIntoSections(
+        existing: [BookSection],
+        newBooks: [BookListItem],
+        mode: BookListMode,
+        sort: BookSort,
+        descending: Bool
+    ) -> [BookSection] {
+        var sections = existing
+
+        for book in newBooks {
+            let sectionTitle: String
+            var flag: String?
+
+            if mode == .series {
+                sectionTitle = book.seriesName ?? ""
+                flag = book.language.flatMap { flagEmoji(for: $0) }
+            } else {
+                sectionTitle = sectionTitleForSort(book: book, sort: sort)
+            }
+
+            let sectionId = sectionTitle + (flag ?? "")
+
+            if let idx = sections.firstIndex(where: { $0.id == sectionId }) {
+                let newItem = SectionedBook(sectionTitle: sectionTitle, book: book)
+                if mode == .series {
+                    let insertIdx = sections[idx].items.firstIndex {
+                        ($0.book.seriesPosition ?? 0) > (book.seriesPosition ?? 0)
+                    } ?? sections[idx].items.endIndex
+                    sections[idx].items.insert(newItem, at: insertIdx)
+                } else {
+                    sections[idx].items.append(newItem)
+                }
+            } else {
+                sections.append(BookSection(
+                    title: sectionTitle,
+                    flag: flag,
+                    rating: mode == .series ? book.seriesRating : nil,
+                    items: [SectionedBook(sectionTitle: sectionTitle, book: book)]
+                ))
+            }
+        }
+
+        return sections
+    }
+
+    private static func sectionTitleForSort(book: BookListItem, sort: BookSort) -> String {
+        switch sort {
+        case .createdAt:
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMMM yyyy"
+            formatter.locale = Locale(identifier: "fr_FR")
+            return formatter.string(from: book.createdAt).capitalized
+        case .author:
+            return book.authors.first ?? "Auteur inconnu"
+        case .genre:
+            return book.genre?
+                .split(separator: ",")
+                .first
+                .map { $0.trimmingCharacters(in: .whitespaces) } ?? "Sans genre"
+        case .myRating:
+            let rating = book.rating ?? 0
+            return rating == 0 ? "Aucune note" : String(repeating: "★", count: rating)
+        case .awards:
+            return book.awards.first?.name ?? "Aucun prix"
+        case .title:
+            return ""
         }
     }
 
