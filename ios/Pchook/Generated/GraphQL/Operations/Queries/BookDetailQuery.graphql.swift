@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "BookDetail"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name rating volumes { __typename id title label position rating } } seriesVolume { __typename id title label position } } }"#
+        #"query BookDetail($id: BookId!) { book(id: $id) { __typename id title authors publisher publishedDate pageCount genre synopsis isbn language format translator estimatedPrice durationMinutes narrators personalNotes recommendedBy status readDate awards { __typename name year } publicRatings { __typename source score maxScore voterCount url } importSource externalUrl createdAt updatedAt coverImageUrl review { __typename bookId rating readDate reviewNotes createdAt } series { __typename id name rating volumes { __typename id title label position rating } } seriesVolume { __typename id title label position } } }"#
       ))
 
     public var id: BookId
@@ -60,6 +60,7 @@ extension PchookGraphQL {
           .field("durationMinutes", Int?.self),
           .field("narrators", [PchookGraphQL.PersonName].self),
           .field("personalNotes", String?.self),
+          .field("recommendedBy", PchookGraphQL.PersonName?.self),
           .field("status", PchookGraphQL.BookStatus.self),
           .field("readDate", PchookGraphQL.DateTime?.self),
           .field("awards", [Award].self),
@@ -109,6 +110,8 @@ extension PchookGraphQL {
         var narrators: [PchookGraphQL.PersonName] { __data["narrators"] }
         /// Free-form personal notes about the book
         var personalNotes: String? { __data["personalNotes"] }
+        /// Name of the person who recommended this book
+        var recommendedBy: PchookGraphQL.PersonName? { __data["recommendedBy"] }
         /// Reading status (to-read | read)
         var status: PchookGraphQL.BookStatus { __data["status"] }
         /// Date the book was finished reading. Null if not read yet

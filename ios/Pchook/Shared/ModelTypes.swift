@@ -150,6 +150,7 @@ struct Book: Identifiable, Sendable {
     var durationMinutes: Int?
     let narrators: [String]
     var personalNotes: String?
+    var recommendedBy: String?
     let status: BookStatus
     var readDate: Date?
     let awards: [Award]
@@ -276,6 +277,7 @@ struct UpdateBookRequest: Encodable, Sendable {
     var durationMinutes: Int?
     var narrators: [String]?
     var personalNotes: String?
+    var recommendedBy: String?
     var status: String?
     var readDate: String?
     var series: String?

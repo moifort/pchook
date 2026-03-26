@@ -28,6 +28,7 @@ extension PchookGraphQL {
       publishedDate: GraphQLNullable<String> = nil,
       publisher: GraphQLNullable<Publisher> = nil,
       readDate: GraphQLNullable<String> = nil,
+      recommendedBy: GraphQLNullable<PersonName> = nil,
       series: GraphQLNullable<SeriesName> = nil,
       seriesLabel: GraphQLNullable<SeriesLabel> = nil,
       seriesNumber: GraphQLNullable<SeriesPosition> = nil,
@@ -52,6 +53,7 @@ extension PchookGraphQL {
         "publishedDate": publishedDate,
         "publisher": publisher,
         "readDate": readDate,
+        "recommendedBy": recommendedBy,
         "series": series,
         "seriesLabel": seriesLabel,
         "seriesNumber": seriesNumber,
@@ -150,6 +152,12 @@ extension PchookGraphQL {
     var readDate: GraphQLNullable<String> {
       get { __data["readDate"] }
       set { __data["readDate"] = newValue }
+    }
+
+    /// Recommended by (null to remove)
+    var recommendedBy: GraphQLNullable<PersonName> {
+      get { __data["recommendedBy"] }
+      set { __data["recommendedBy"] = newValue }
     }
 
     /// Series name (null to remove from series)

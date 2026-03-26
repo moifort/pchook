@@ -35,6 +35,8 @@ struct BookEditForm: View {
     @State private var seriesNumber: String
     @State private var synopsis: String
     @State private var personalNotes: String
+    @State private var recommendedBy: String
+    @State private var showContactPicker = false
     @State private var isSaving = false
     @State private var saveError: String?
 
@@ -71,6 +73,7 @@ struct BookEditForm: View {
         _seriesNumber = State(initialValue: initial.seriesNumber)
         _synopsis = State(initialValue: initial.synopsis)
         _personalNotes = State(initialValue: initial.personalNotes)
+        _recommendedBy = State(initialValue: initial.recommendedBy)
     }
 
     var body: some View {
@@ -235,6 +238,22 @@ struct BookEditForm: View {
                 }
             }
 
+            Section("Conseillé par") {
+                HStack {
+                    TextField("Nom", text: $recommendedBy)
+                    if !recommendedBy.isEmpty {
+                        Button { recommendedBy = "" } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    Button { showContactPicker = true } label: {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                    }
+                }
+            }
+
             Section("Synopsis & Notes") {
                 TextField("Synopsis", text: $synopsis, axis: .vertical)
                     .lineLimit(3...8)
@@ -258,6 +277,11 @@ struct BookEditForm: View {
                     }
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
+            }
+        }
+        .sheet(isPresented: $showContactPicker) {
+            ContactPicker { name in
+                recommendedBy = name
             }
         }
         .alert("Erreur", isPresented: Binding(
@@ -297,6 +321,7 @@ struct BookEditForm: View {
             durationMinutes: format == .audiobook && !duration.isEmpty ? parseDuration(duration) : nil,
             narrators: format == .audiobook && !narratorsList.isEmpty ? narratorsList : nil,
             personalNotes: personalNotes.isEmpty ? nil : personalNotes,
+            recommendedBy: recommendedBy.isEmpty ? nil : recommendedBy,
             series: series.isEmpty ? "" : series,
             seriesLabel: seriesLabel.isEmpty ? nil : seriesLabel,
             seriesNumber: Int(seriesNumber)
@@ -330,13 +355,14 @@ extension BookEditForm {
         var seriesNumber: String
         var synopsis: String
         var personalNotes: String
+        var recommendedBy: String
 
         init(
             title: String, authors: String, genre: String, publisher: String,
             pageCount: String, isbn: String, language: String, format: String,
             translator: String, estimatedPrice: String, durationMinutes: String,
             narrators: String, series: String, seriesLabel: String, seriesNumber: String,
-            synopsis: String, personalNotes: String
+            synopsis: String, personalNotes: String, recommendedBy: String = ""
         ) {
             self.title = title
             self.authors = authors
@@ -355,6 +381,7 @@ extension BookEditForm {
             self.seriesNumber = seriesNumber
             self.synopsis = synopsis
             self.personalNotes = personalNotes
+            self.recommendedBy = recommendedBy
         }
 
         init(from detail: BookDetailData) {
@@ -388,7 +415,8 @@ extension BookEditForm {
                 seriesLabel: detail.seriesVolume?.label ?? "",
                 seriesNumber: positionString,
                 synopsis: detail.book.synopsis ?? "",
-                personalNotes: detail.book.personalNotes ?? ""
+                personalNotes: detail.book.personalNotes ?? "",
+                recommendedBy: detail.book.recommendedBy ?? ""
             )
         }
     }

@@ -16,6 +16,7 @@ query BookDetail($id: BookId!) {
     durationMinutes
     narrators
     personalNotes
+    recommendedBy
     status
     readDate
     awards {

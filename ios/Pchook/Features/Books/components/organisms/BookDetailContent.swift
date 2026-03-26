@@ -79,6 +79,14 @@ struct BookDetailContent: View {
                 synopsis: detail.book.synopsis
             )
 
+            if let recommendedBy = detail.book.recommendedBy {
+                Section {
+                    Label(recommendedBy, systemImage: "person.badge.star")
+                } header: {
+                    Text("Conseillé par")
+                }
+            }
+
             ReviewSection(
                 review: detail.review.map {
                     .init(rating: $0.rating, readDate: $0.readDate)
