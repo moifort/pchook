@@ -7,6 +7,7 @@ struct BooksPage: View {
 
     @State private var viewModel = BooksViewModel()
     @State private var selectedBookId: String?
+    @State private var scrollPosition: String?
 
     var body: some View {
         NavigationStack {
@@ -58,6 +59,7 @@ struct BooksPage: View {
                                 .task { await viewModel.loadMore() }
                         }
                     }
+                    .scrollPosition(id: $scrollPosition)
                 }
             }
             .navigationTitle(viewModel.isEmpty ? "" : viewModel.mode.title)
@@ -118,7 +120,12 @@ struct BooksPage: View {
                     } label: {
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(series.name)
+                                HStack(spacing: 6) {
+                                    Text(series.name)
+                                    if let flag = series.flag {
+                                        Text(flag)
+                                    }
+                                }
                                 Text("\(series.volumeCount) \(series.volumeCount <= 1 ? "tome" : "tomes")")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
