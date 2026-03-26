@@ -58,6 +58,10 @@ export const SeriesSearchResultType = builder
         description: 'Personal series rating',
         resolve: ({ rating }) => (rating as never) ?? null,
       }),
+      languages: t.stringList({
+        description: 'Languages of books in the series (ISO 639-1)',
+        resolve: ({ languages }) => languages,
+      }),
     }),
   })
 

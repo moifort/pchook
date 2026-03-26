@@ -996,6 +996,9 @@ type SeriesSearchResult {
   """Series ID"""
   id: ID!
 
+  """Languages of books in the series (ISO 639-1)"""
+  languages: [String!]!
+
   """Series name"""
   name: SeriesName!
 

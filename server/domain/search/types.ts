@@ -24,6 +24,7 @@ export type SeriesSearchResult = {
   name: string
   volumeCount: number
   rating?: number
+  languages: Language[]
 }
 
 export type AuthorSearchResult = {

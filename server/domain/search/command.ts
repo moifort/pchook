@@ -1,5 +1,6 @@
+import { uniq } from 'lodash-es'
 import { BookQuery } from '~/domain/book/query'
-import type { Book, BookId } from '~/domain/book/types'
+import type { Book, BookId, Language } from '~/domain/book/types'
 import * as index from '~/domain/search/index'
 import type {
   AuthorSearchResult,
@@ -34,12 +35,17 @@ export namespace SearchCommand {
     await Promise.all(
       allSeries.map(async (series) => {
         const detail = await SeriesQuery.getById(series.id)
-        const volumeCount = detail === 'not-found' ? 0 : detail.books.length
+        const books = detail === 'not-found' ? [] : detail.books
         const result: SeriesSearchResult = {
           id: series.id,
           name: series.name,
-          volumeCount,
+          volumeCount: books.length,
           rating: series.rating,
+          languages: uniq(
+            books
+              .map(({ language }) => language)
+              .filter((language): language is Language => !!language),
+          ),
         }
         index.indexSeries(result)
       }),
@@ -92,8 +98,18 @@ export namespace SearchCommand {
     await Promise.all(
       allSeries.map(async (series) => {
         const detail = await SeriesQuery.getById(series.id)
-        const volumeCount = detail === 'not-found' ? 0 : detail.books.length
-        index.indexSeries({ id: series.id, name: series.name, volumeCount, rating: series.rating })
+        const books = detail === 'not-found' ? [] : detail.books
+        index.indexSeries({
+          id: series.id,
+          name: series.name,
+          volumeCount: books.length,
+          rating: series.rating,
+          languages: uniq(
+            books
+              .map(({ language }) => language)
+              .filter((language): language is Language => !!language),
+          ),
+        })
       }),
     )
   }
