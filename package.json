@@ -20,7 +20,7 @@
     "h3": "1.15.10",
     "nitropack": "2.13.2",
     "ts-brand": "0.2.0",
-    "typescript": "5.9.3"
+    "typescript": "6.0.2"
   },
   "dependencies": {
     "@apollo/server": "5.4.0",
