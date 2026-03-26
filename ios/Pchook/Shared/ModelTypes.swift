@@ -195,6 +195,39 @@ struct FavoriteSeriesItem: Identifiable, Sendable {
     var firstBookId: String?
 }
 
+// MARK: - Search
+
+struct SearchResultsData: Sendable {
+    let books: [BookSearchResultItem]
+    let series: [SeriesSearchResultItem]
+    let authors: [AuthorSearchResultItem]
+
+    var isEmpty: Bool { books.isEmpty && series.isEmpty && authors.isEmpty }
+}
+
+struct BookSearchResultItem: Identifiable, Sendable {
+    let id: String
+    let title: String
+    let authors: [String]
+    let language: String?
+    let status: String
+    let coverImageUrl: String?
+}
+
+struct SeriesSearchResultItem: Identifiable, Sendable {
+    let id: String
+    let name: String
+    let volumeCount: Int
+    let rating: Int?
+}
+
+struct AuthorSearchResultItem: Identifiable, Sendable {
+    let name: String
+    let bookCount: Int
+    let firstBookId: String
+    var id: String { name }
+}
+
 // MARK: - Book Detail
 
 struct SeriesVolume: Identifiable, Sendable {

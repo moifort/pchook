@@ -1,0 +1,23 @@
+query Search($query: String!, $limit: Int) {
+  search(query: $query, limit: $limit) {
+    books {
+      id
+      title
+      authors
+      language
+      status
+      coverImageUrl
+    }
+    series {
+      id
+      name
+      volumeCount
+      rating
+    }
+    authors {
+      name
+      bookCount
+      firstBookId
+    }
+  }
+}

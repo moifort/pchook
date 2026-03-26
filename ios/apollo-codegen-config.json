@@ -6,7 +6,8 @@
       "Pchook/Features/Books/GraphQL/*.graphql",
       "Pchook/Features/Dashboard/GraphQL/*.graphql",
       "Pchook/Features/Audible/GraphQL/*.graphql",
-      "Pchook/Features/Scan/GraphQL/*.graphql"
+      "Pchook/Features/Scan/GraphQL/*.graphql",
+      "Pchook/Features/Search/GraphQL/*.graphql"
     ]
   },
   "output": {

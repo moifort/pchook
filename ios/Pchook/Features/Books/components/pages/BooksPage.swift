@@ -6,6 +6,7 @@ struct BooksPage: View {
     @Binding var refreshTrigger: Int
 
     @State private var viewModel = BooksViewModel()
+    @State private var searchViewModel = SearchViewModel()
     @State private var selectedBookId: String?
     @State private var scrollPosition: String?
     @State private var lastViewedBookId: String?
@@ -100,6 +101,25 @@ struct BooksPage: View {
                     }
                     .accessibilityIdentifier("booklist-sort-menu")
                 }
+            }
+            .searchable(text: $searchViewModel.searchText, prompt: "Chercher un livre, une série, un auteur...")
+            .overlay {
+                if searchViewModel.isActive {
+                    if searchViewModel.isSearching {
+                        ProgressView("Recherche...")
+                    } else if let results = searchViewModel.results {
+                        if results.isEmpty {
+                            ContentUnavailableView.search(text: searchViewModel.searchText)
+                        } else {
+                            SearchResultsView(results: results) { bookId in
+                                selectedBookId = bookId
+                            }
+                        }
+                    }
+                }
+            }
+            .onChange(of: searchViewModel.searchText) {
+                searchViewModel.onSearchTextChanged()
             }
             .sheet(
                 item: Binding(

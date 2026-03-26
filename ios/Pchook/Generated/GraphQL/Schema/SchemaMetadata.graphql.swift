@@ -35,10 +35,12 @@ extension PchookGraphQL {
       case "AudibleSync": return PchookGraphQL.Objects.AudibleSync
       case "AuthCookie": return PchookGraphQL.Objects.AuthCookie
       case "AuthStartResponse": return PchookGraphQL.Objects.AuthStartResponse
+      case "AuthorSearchResult": return PchookGraphQL.Objects.AuthorSearchResult
       case "Award": return PchookGraphQL.Objects.Award
       case "Book": return PchookGraphQL.Objects.Book
       case "BookCount": return PchookGraphQL.Objects.BookCount
       case "BookPreview": return PchookGraphQL.Objects.BookPreview
+      case "BookSearchResult": return PchookGraphQL.Objects.BookSearchResult
       case "Books": return PchookGraphQL.Objects.Books
       case "ConfirmBookResult": return PchookGraphQL.Objects.ConfirmBookResult
       case "DashboardView": return PchookGraphQL.Objects.DashboardView
@@ -49,7 +51,9 @@ extension PchookGraphQL {
       case "RecentAward": return PchookGraphQL.Objects.RecentAward
       case "RecentBook": return PchookGraphQL.Objects.RecentBook
       case "Review": return PchookGraphQL.Objects.Review
+      case "SearchResults": return PchookGraphQL.Objects.SearchResults
       case "Series": return PchookGraphQL.Objects.Series
+      case "SeriesSearchResult": return PchookGraphQL.Objects.SeriesSearchResult
       case "SeriesVolume": return PchookGraphQL.Objects.SeriesVolume
       default: return nil
       }
