@@ -25,12 +25,17 @@ const coreTitle = (title: string) =>
     .replace(/[''""«»]/g, '')
     .replace(/\s+/g, ' ')
 
-export const findByTitleAndAuthors = async (title: string, authors: string[]) => {
+export const findByTitleAndAuthors = async (
+  title: string,
+  authors: string[],
+  language?: string,
+) => {
   const normalizedTitle = normalizeForMatch(title)
   const normalizedCore = normalizeForMatch(coreTitle(title))
   const normalizedAuthors = authors.map(normalizeForMatch).sort()
   const books = await findAll()
   return books.find((book) => {
+    if (language && book.language && book.language !== language) return false
     const bookAuthors = book.authors.map((a) => normalizeForMatch(a)).sort()
     if (bookAuthors.length !== normalizedAuthors.length) return false
     if (!bookAuthors.every((a, i) => a === normalizedAuthors[i])) return false

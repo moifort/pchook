@@ -12,6 +12,6 @@ export namespace BookQuery {
 
   export const findByISBN = (isbn: ISBN) => repository.findByISBN(isbn)
 
-  export const findByTitleAndAuthors = (title: string, authors: string[]) =>
-    repository.findByTitleAndAuthors(title, authors)
+  export const findByTitleAndAuthors = (title: string, authors: string[], language?: string) =>
+    repository.findByTitleAndAuthors(title, authors, language)
 }
