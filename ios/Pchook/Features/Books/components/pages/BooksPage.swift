@@ -8,10 +8,12 @@ struct BooksPage: View {
     @State private var viewModel = BooksViewModel()
     @State private var searchViewModel = SearchViewModel()
     @State private var selectedBookId: String?
+    @State private var selectedSeriesId: String?
     @State private var scrollPosition: String?
     @State private var lastViewedBookId: String?
     @State private var itemChanged = false
     @State private var itemDeleted = false
+    @State private var seriesChanged = false
 
     var body: some View {
         NavigationStack {
@@ -119,9 +121,11 @@ struct BooksPage: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(.regularMaterial)
                         } else {
-                            SearchResultsView(results: results) { bookId in
-                                selectedBookId = bookId
-                            }
+                            SearchResultsView(
+                                results: results,
+                                onSelectBook: { selectedBookId = $0 },
+                                onSelectSeries: { selectedSeriesId = $0 }
+                            )
                         }
                     }
                 }
@@ -143,6 +147,18 @@ struct BooksPage: View {
                 )
                 .onAppear { lastViewedBookId = wrapper.id }
             }
+            .sheet(
+                item: Binding(
+                    get: { selectedSeriesId.map { SeriesIdWrapper(id: $0) } },
+                    set: { selectedSeriesId = $0?.id }
+                ),
+                onDismiss: { handleSeriesDetailDismiss() }
+            ) { wrapper in
+                SeriesDetailCoordinator(
+                    seriesId: wrapper.id,
+                    onUpdated: { seriesChanged = true }
+                )
+            }
         }
     }
 
@@ -152,7 +168,7 @@ struct BooksPage: View {
             Section {
                 ForEach(viewModel.favoriteSeries) { series in
                     Button {
-                        selectedBookId = series.firstBookId
+                        selectedSeriesId = series.seriesId
                     } label: {
                         HStack {
                             VStack(alignment: .leading) {
@@ -225,6 +241,13 @@ struct BooksPage: View {
         lastViewedBookId = nil
     }
 
+    private func handleSeriesDetailDismiss() {
+        if seriesChanged {
+            Task { await viewModel.load() }
+        }
+        seriesChanged = false
+    }
+
     @ViewBuilder
     private func bookButton(_ book: BookListItem) -> some View {
         Button {
@@ -245,6 +268,10 @@ struct BooksPage: View {
 }
 
 struct BookIdWrapper: Identifiable {
+    let id: String
+}
+
+struct SeriesIdWrapper: Identifiable {
     let id: String
 }
 

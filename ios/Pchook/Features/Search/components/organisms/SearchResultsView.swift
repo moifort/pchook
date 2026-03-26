@@ -3,6 +3,7 @@ import SwiftUI
 struct SearchResultsView: View {
     let results: SearchResultsData
     let onSelectBook: (String) -> Void
+    var onSelectSeries: (String) -> Void = { _ in }
 
     var body: some View {
         List {
@@ -25,12 +26,17 @@ struct SearchResultsView: View {
             if !results.series.isEmpty {
                 Section("Séries") {
                     ForEach(results.series) { series in
-                        SeriesSearchRow(
-                            name: series.name,
-                            volumeCount: series.volumeCount,
-                            rating: series.rating,
-                            languages: series.languages
-                        )
+                        Button {
+                            onSelectSeries(series.id)
+                        } label: {
+                            SeriesSearchRow(
+                                name: series.name,
+                                volumeCount: series.volumeCount,
+                                rating: series.rating,
+                                languages: series.languages
+                            )
+                        }
+                        .tint(.primary)
                     }
                 }
             }
