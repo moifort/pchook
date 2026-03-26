@@ -220,12 +220,14 @@ struct BooksPage: View {
         } label: {
             BookRow(
                 title: book.title,
+                flag: book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
                 subtitle: viewModel.subtitle(for: book),
                 rating: book.rating,
                 status: book.status
             )
         }
         .tint(.primary)
+        .onAppear { viewModel.prefetchIfNeeded(for: book.id) }
     }
 
 }

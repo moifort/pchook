@@ -78,7 +78,8 @@ final class BooksViewModel {
     var sortDescending = true
     var mode: BookListMode = .all
 
-    private let pageSize = 20
+    private let pageSize = 40
+    private let prefetchThreshold = 10
 
     var isEmpty: Bool {
         books.isEmpty && favoriteSeries.isEmpty
@@ -184,6 +185,14 @@ final class BooksViewModel {
             self.error = reportError(error)
         }
         isLoadingMore = false
+    }
+
+    func prefetchIfNeeded(for bookId: String) {
+        guard hasMore, !isLoadingMore else { return }
+        guard let index = books.firstIndex(where: { $0.id == bookId }) else { return }
+        if books.count - index <= prefetchThreshold {
+            Task { await loadMore() }
+        }
     }
 
     func updateItem(id: String) async {
