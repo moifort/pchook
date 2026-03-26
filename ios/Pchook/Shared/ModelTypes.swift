@@ -348,37 +348,33 @@ struct BookCount: Sendable {
     let total: Int
     let toRead: Int
     let read: Int
+    let totalAudioMinutes: Int
 }
 
-struct FavoriteBook: Identifiable, Sendable {
+struct DashboardBook: Identifiable, Sendable {
     let id: String
     let title: String
     let authors: [String]
     var genre: String?
-    let rating: Int
-    var estimatedPrice: Double?
+    var language: String?
+    var recommendedBy: String?
 }
 
-struct RecentBook: Identifiable, Sendable {
+struct DashboardSeries: Identifiable, Sendable {
     let id: String
-    let title: String
+    let name: String
+    let volumeCount: Int
     let authors: [String]
-    var genre: String?
-    let createdAt: Date
-}
-
-struct RecentAward: Sendable {
-    let bookTitle: String
-    let authors: [String]
-    let awardName: String
-    let awardYear: Int
+    var language: String?
+    var firstBookId: String?
 }
 
 struct DashboardData: Sendable {
     let bookCount: BookCount
-    let favorites: [FavoriteBook]
-    let recentBooks: [RecentBook]
-    let recentAwards: [RecentAward]
+    let favorites: [DashboardBook]
+    let recentBooks: [DashboardBook]
+    let recommendedBooks: [DashboardBook]
+    let favoriteSeries: [DashboardSeries]
 }
 
 // MARK: - Audible

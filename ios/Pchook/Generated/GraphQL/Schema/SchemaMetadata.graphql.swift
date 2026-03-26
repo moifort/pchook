@@ -45,11 +45,12 @@ extension PchookGraphQL {
       case "ConfirmBookResult": return PchookGraphQL.Objects.ConfirmBookResult
       case "DashboardView": return PchookGraphQL.Objects.DashboardView
       case "FavoriteBook": return PchookGraphQL.Objects.FavoriteBook
+      case "FavoriteSeries": return PchookGraphQL.Objects.FavoriteSeries
       case "Mutation": return PchookGraphQL.Objects.Mutation
       case "PublicRating": return PchookGraphQL.Objects.PublicRating
       case "Query": return PchookGraphQL.Objects.Query
-      case "RecentAward": return PchookGraphQL.Objects.RecentAward
       case "RecentBook": return PchookGraphQL.Objects.RecentBook
+      case "RecommendedBook": return PchookGraphQL.Objects.RecommendedBook
       case "Review": return PchookGraphQL.Objects.Review
       case "SearchResults": return PchookGraphQL.Objects.SearchResults
       case "Series": return PchookGraphQL.Objects.Series

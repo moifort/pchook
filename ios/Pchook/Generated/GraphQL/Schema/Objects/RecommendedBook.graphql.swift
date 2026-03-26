@@ -4,9 +4,9 @@
 import ApolloAPI
 
 extension PchookGraphQL.Objects {
-  /// Recent literary award
-  static let RecentAward = ApolloAPI.Object(
-    typename: "RecentAward",
+  /// Book recommended by someone
+  static let RecommendedBook = ApolloAPI.Object(
+    typename: "RecommendedBook",
     implementedInterfaces: [],
     keyFields: nil
   )

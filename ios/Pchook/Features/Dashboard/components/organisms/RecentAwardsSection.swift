@@ -1,86 +1,25 @@
 import SwiftUI
 
-struct RecentAwardsSection: View {
-    let items: [Item]
+struct RecommendedBooksSection: View {
+    let items: [DashboardBook]
+    let onSelect: (String) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("Prix récents", systemImage: "trophy")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                Spacer()
-            }
-
-            if items.isEmpty {
-                Text("Aucun prix récent")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 14)
-                    .background(Color(.systemGray6))
-                    .clipShape(.rect(cornerRadius: 12))
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(items) { item in
-                        HStack(spacing: 10) {
-                            Image(systemName: "trophy.fill")
-                                .foregroundStyle(.orange)
-                                .font(.caption)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.bookTitle)
-                                    .font(.subheadline)
-                                    .lineLimit(1)
-                                Text(item.authors)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                            Spacer()
-                            VStack(alignment: .trailing, spacing: 2) {
-                                Text(item.awardName)
-                                    .font(.caption)
-                                    .lineLimit(1)
-                                Text(verbatim: String(item.awardYear))
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 14)
+        if !items.isEmpty {
+            Section {
+                ForEach(items) { book in
+                    Button { onSelect(book.id) } label: {
+                        DashboardBookRow(
+                            title: book.title,
+                            flag: book.language.flatMap { BookGrouping.flagEmoji(for: $0) },
+                            subtitle: [book.authors.first, book.genre, book.recommendedBy.map { "par \($0)" }].compactMap { $0 }.joined(separator: " · ")
+                        )
                     }
+                    .tint(.primary)
                 }
-                .background(Color(.systemGray6))
-                .clipShape(.rect(cornerRadius: 12))
+            } header: {
+                Label("Conseillé", systemImage: "person.badge.star")
             }
         }
-        .accessibilityIdentifier("dashboard-awards-section")
     }
-}
-
-extension RecentAwardsSection {
-    struct Item: Identifiable {
-        let bookTitle: String
-        let authors: String
-        let awardName: String
-        let awardYear: Int
-
-        var id: String { "\(bookTitle)-\(awardName)-\(awardYear)" }
-    }
-}
-
-#Preview("Avec prix") {
-    RecentAwardsSection(
-        items: [
-            .init(bookTitle: "L'Étranger", authors: "Albert Camus", awardName: "Prix Nobel", awardYear: 1957),
-            .init(bookTitle: "Les Misérables", authors: "Victor Hugo", awardName: "Prix Goncourt", awardYear: 2024),
-        ]
-    )
-    .padding()
-}
-
-#Preview("Vide") {
-    RecentAwardsSection(items: [])
-        .padding()
 }

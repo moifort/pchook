@@ -4,43 +4,27 @@ struct StatsSection: View {
     let total: Int
     let toRead: Int
     let read: Int
+    let totalAudioMinutes: Int
+
+    private var audioLabel: String {
+        let hours = totalAudioMinutes / 60
+        return "\(hours)h"
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                GradientWidget(
-                    title: "Total",
-                    value: "\(total)",
-                    subtitle: "Livres",
-                    icon: "books.vertical",
-                    gradient: [Color(red: 0.2, green: 0.4, blue: 0.7), Color(red: 0.4, green: 0.6, blue: 0.9)]
-                )
-                .accessibilityIdentifier("stat-total")
-
-                GradientWidget(
-                    title: "À lire",
-                    value: "\(toRead)",
-                    subtitle: "Livres",
-                    icon: "bookmark",
-                    gradient: [Color(red: 0.8, green: 0.5, blue: 0.2), Color(red: 0.95, green: 0.7, blue: 0.3)]
-                )
-                .accessibilityIdentifier("stat-to-read")
-            }
-
-            GradientWidget(
-                title: "Lus",
-                value: "\(read)",
-                subtitle: "Livres terminés",
-                icon: "checkmark.circle",
-                gradient: [Color(red: 0.15, green: 0.65, blue: 0.45), Color(red: 0.3, green: 0.8, blue: 0.55)]
-            )
-            .frame(height: 100)
-            .accessibilityIdentifier("stat-read")
+        LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 10) {
+            StatCard(icon: "books.vertical", value: "\(total)", label: "Total", color: .blue)
+            StatCard(icon: "bookmark", value: "\(toRead)", label: "Non lu", color: .orange)
+            StatCard(icon: "headphones", value: audioLabel, label: "Audio", color: .purple)
+            StatCard(icon: "checkmark.circle", value: "\(read)", label: "Lu", color: .green)
         }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
     }
 }
 
 #Preview {
-    StatsSection(total: 42, toRead: 14, read: 28)
-        .padding()
+    List {
+        StatsSection(total: 152, toRead: 23, read: 129, totalAudioMinutes: 2880)
+    }
 }

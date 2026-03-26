@@ -4,27 +4,37 @@ query Dashboard {
       total
       toRead
       read
+      totalAudioMinutes
     }
     favorites {
       id
       title
       authors
       genre
-      rating
-      estimatedPrice
+      language
     }
     recentBooks {
       id
       title
       authors
       genre
-      createdAt
+      language
     }
-    recentAwards {
-      bookTitle
+    recommendedBooks {
+      id
+      title
       authors
-      awardName
-      awardYear
+      genre
+      language
+      recommendedBy
+    }
+    favoriteSeries {
+      id
+      name
+      volumeCount
+      authors
+      language
+      firstBookId
     }
   }
 }

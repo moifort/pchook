@@ -13,33 +13,45 @@ enum GraphQLDashboardAPI {
             bookCount: BookCount(
                 total: dashboard.bookCount.total,
                 toRead: dashboard.bookCount.toRead,
-                read: dashboard.bookCount.read
+                read: dashboard.bookCount.read,
+                totalAudioMinutes: dashboard.bookCount.totalAudioMinutes
             ),
             favorites: dashboard.favorites.map { fav in
-                FavoriteBook(
+                DashboardBook(
                     id: fav.id,
                     title: fav.title,
                     authors: fav.authors,
                     genre: fav.genre,
-                    rating: fav.rating,
-                    estimatedPrice: fav.estimatedPrice
+                    language: fav.language?.rawValue
                 )
             },
             recentBooks: dashboard.recentBooks.map { book in
-                RecentBook(
+                DashboardBook(
                     id: book.id,
                     title: book.title,
                     authors: book.authors,
                     genre: book.genre,
-                    createdAt: GraphQLHelpers.parseISO8601(book.createdAt) ?? Date()
+                    language: book.language?.rawValue
                 )
             },
-            recentAwards: dashboard.recentAwards.map { award in
-                RecentAward(
-                    bookTitle: award.bookTitle,
-                    authors: award.authors,
-                    awardName: award.awardName,
-                    awardYear: award.awardYear
+            recommendedBooks: dashboard.recommendedBooks.map { book in
+                DashboardBook(
+                    id: book.id,
+                    title: book.title,
+                    authors: book.authors,
+                    genre: book.genre,
+                    language: book.language?.rawValue,
+                    recommendedBy: book.recommendedBy
+                )
+            },
+            favoriteSeries: dashboard.favoriteSeries.map { series in
+                DashboardSeries(
+                    id: series.id,
+                    name: series.name,
+                    volumeCount: series.volumeCount,
+                    authors: series.authors,
+                    language: series.language?.rawValue,
+                    firstBookId: series.firstBookId
                 )
             }
         )

@@ -8,7 +8,7 @@ extension PchookGraphQL {
     static let operationName: String = "Dashboard"
     static let operationDocument: ApolloAPI.OperationDocument = .init(
       definition: .init(
-        #"query Dashboard { dashboard { __typename bookCount { __typename total toRead read } favorites { __typename id title authors genre rating estimatedPrice } recentBooks { __typename id title authors genre createdAt } recentAwards { __typename bookTitle authors awardName awardYear } } }"#
+        #"query Dashboard { dashboard { __typename bookCount { __typename total toRead read totalAudioMinutes } favorites { __typename id title authors genre language } recentBooks { __typename id title authors genre language } recommendedBooks { __typename id title authors genre language recommendedBy } favoriteSeries { __typename id name volumeCount authors language firstBookId } } }"#
       ))
 
     public init() {}
@@ -41,7 +41,8 @@ extension PchookGraphQL {
           .field("bookCount", BookCount.self),
           .field("favorites", [Favorite].self),
           .field("recentBooks", [RecentBook].self),
-          .field("recentAwards", [RecentAward].self),
+          .field("recommendedBooks", [RecommendedBook].self),
+          .field("favoriteSeries", [FavoriteSeries].self),
         ] }
         static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
           DashboardQuery.Data.Dashboard.self
@@ -53,8 +54,10 @@ extension PchookGraphQL {
         var favorites: [Favorite] { __data["favorites"] }
         /// Recently added books
         var recentBooks: [RecentBook] { __data["recentBooks"] }
-        /// Recent literary awards
-        var recentAwards: [RecentAward] { __data["recentAwards"] }
+        /// Books recommended by others
+        var recommendedBooks: [RecommendedBook] { __data["recommendedBooks"] }
+        /// Favorite series
+        var favoriteSeries: [FavoriteSeries] { __data["favoriteSeries"] }
 
         /// Dashboard.BookCount
         ///
@@ -69,6 +72,7 @@ extension PchookGraphQL {
             .field("total", Int.self),
             .field("toRead", Int.self),
             .field("read", Int.self),
+            .field("totalAudioMinutes", Int.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             DashboardQuery.Data.Dashboard.BookCount.self
@@ -80,6 +84,8 @@ extension PchookGraphQL {
           var toRead: Int { __data["toRead"] }
           /// Books read
           var read: Int { __data["read"] }
+          /// Total audiobook duration in minutes
+          var totalAudioMinutes: Int { __data["totalAudioMinutes"] }
         }
 
         /// Dashboard.Favorite
@@ -96,8 +102,7 @@ extension PchookGraphQL {
             .field("title", String.self),
             .field("authors", [PchookGraphQL.PersonName].self),
             .field("genre", PchookGraphQL.Genre?.self),
-            .field("rating", PchookGraphQL.Note.self),
-            .field("estimatedPrice", PchookGraphQL.Eur?.self),
+            .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             DashboardQuery.Data.Dashboard.Favorite.self
@@ -111,10 +116,8 @@ extension PchookGraphQL {
           var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Genre
           var genre: PchookGraphQL.Genre? { __data["genre"] }
-          /// Rating (0-10)
-          var rating: PchookGraphQL.Note { __data["rating"] }
-          /// Estimated price in euros
-          var estimatedPrice: PchookGraphQL.Eur? { __data["estimatedPrice"] }
+          /// Language
+          var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
         }
 
         /// Dashboard.RecentBook
@@ -131,7 +134,7 @@ extension PchookGraphQL {
             .field("title", String.self),
             .field("authors", [PchookGraphQL.PersonName].self),
             .field("genre", PchookGraphQL.Genre?.self),
-            .field("createdAt", PchookGraphQL.DateTime.self),
+            .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
             DashboardQuery.Data.Dashboard.RecentBook.self
@@ -145,37 +148,78 @@ extension PchookGraphQL {
           var authors: [PchookGraphQL.PersonName] { __data["authors"] }
           /// Genre
           var genre: PchookGraphQL.Genre? { __data["genre"] }
-          /// Date added
-          var createdAt: PchookGraphQL.DateTime { __data["createdAt"] }
+          /// Language
+          var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
         }
 
-        /// Dashboard.RecentAward
+        /// Dashboard.RecommendedBook
         ///
-        /// Parent Type: `RecentAward`
-        struct RecentAward: PchookGraphQL.SelectionSet {
+        /// Parent Type: `RecommendedBook`
+        struct RecommendedBook: PchookGraphQL.SelectionSet {
           let __data: DataDict
           init(_dataDict: DataDict) { __data = _dataDict }
 
-          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.RecentAward }
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.RecommendedBook }
           static var __selections: [ApolloAPI.Selection] { [
             .field("__typename", String.self),
-            .field("bookTitle", String.self),
+            .field("id", PchookGraphQL.BookId.self),
+            .field("title", String.self),
             .field("authors", [PchookGraphQL.PersonName].self),
-            .field("awardName", String.self),
-            .field("awardYear", Int.self),
+            .field("genre", PchookGraphQL.Genre?.self),
+            .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
+            .field("recommendedBy", PchookGraphQL.PersonName.self),
           ] }
           static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
-            DashboardQuery.Data.Dashboard.RecentAward.self
+            DashboardQuery.Data.Dashboard.RecommendedBook.self
           ] }
 
-          /// Book title
-          var bookTitle: String { __data["bookTitle"] }
+          /// Book ID
+          var id: PchookGraphQL.BookId { __data["id"] }
+          /// Title
+          var title: String { __data["title"] }
           /// Authors
           var authors: [PchookGraphQL.PersonName] { __data["authors"] }
-          /// Award name
-          var awardName: String { __data["awardName"] }
-          /// Award year
-          var awardYear: Int { __data["awardYear"] }
+          /// Genre
+          var genre: PchookGraphQL.Genre? { __data["genre"] }
+          /// Language
+          var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
+          /// Name of recommender
+          var recommendedBy: PchookGraphQL.PersonName { __data["recommendedBy"] }
+        }
+
+        /// Dashboard.FavoriteSeries
+        ///
+        /// Parent Type: `FavoriteSeries`
+        struct FavoriteSeries: PchookGraphQL.SelectionSet {
+          let __data: DataDict
+          init(_dataDict: DataDict) { __data = _dataDict }
+
+          static var __parentType: any ApolloAPI.ParentType { PchookGraphQL.Objects.FavoriteSeries }
+          static var __selections: [ApolloAPI.Selection] { [
+            .field("__typename", String.self),
+            .field("id", PchookGraphQL.ID.self),
+            .field("name", String.self),
+            .field("volumeCount", Int.self),
+            .field("authors", [PchookGraphQL.PersonName].self),
+            .field("language", GraphQLEnum<PchookGraphQL.Language>?.self),
+            .field("firstBookId", PchookGraphQL.BookId?.self),
+          ] }
+          static var __fulfilledFragments: [any ApolloAPI.SelectionSet.Type] { [
+            DashboardQuery.Data.Dashboard.FavoriteSeries.self
+          ] }
+
+          /// Series ID
+          var id: PchookGraphQL.ID { __data["id"] }
+          /// Series name
+          var name: String { __data["name"] }
+          /// Number of volumes
+          var volumeCount: Int { __data["volumeCount"] }
+          /// Authors
+          var authors: [PchookGraphQL.PersonName] { __data["authors"] }
+          /// Language
+          var language: GraphQLEnum<PchookGraphQL.Language>? { __data["language"] }
+          /// First volume book ID for navigation
+          var firstBookId: PchookGraphQL.BookId? { __data["firstBookId"] }
         }
       }
     }
