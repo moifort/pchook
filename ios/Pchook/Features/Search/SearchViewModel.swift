@@ -34,6 +34,31 @@ final class SearchViewModel {
         }
     }
 
+    func updateItem(id: String) async {
+        guard var data = results,
+              let index = data.books.firstIndex(where: { $0.id == id }) else { return }
+        do {
+            let detail = try await GraphQLBooksAPI.getDetail(id: id)
+            data.books[index] = BookSearchResultItem(
+                id: detail.book.id,
+                title: detail.book.title,
+                authors: detail.book.authors,
+                language: detail.book.language,
+                status: detail.book.status.rawValue,
+                coverImageUrl: detail.coverImageUrl
+            )
+            results = data
+        } catch {
+            // Silent — worst case stale data until next search
+        }
+    }
+
+    func removeItem(id: String) {
+        guard var data = results else { return }
+        data.books.removeAll { $0.id == id }
+        results = data
+    }
+
     private func performSearch() async {
         let query = searchText.trimmingCharacters(in: .whitespaces)
         guard !query.isEmpty else {

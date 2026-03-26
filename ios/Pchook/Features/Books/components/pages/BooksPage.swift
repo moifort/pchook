@@ -213,8 +213,12 @@ struct BooksPage: View {
         guard let bookId = lastViewedBookId else { return }
         if itemDeleted {
             viewModel.removeItem(id: bookId)
+            searchViewModel.removeItem(id: bookId)
         } else if itemChanged {
-            Task { await viewModel.updateItem(id: bookId) }
+            Task {
+                await viewModel.updateItem(id: bookId)
+                await searchViewModel.updateItem(id: bookId)
+            }
         }
         itemChanged = false
         itemDeleted = false

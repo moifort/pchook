@@ -198,7 +198,7 @@ struct FavoriteSeriesItem: Identifiable, Sendable {
 // MARK: - Search
 
 struct SearchResultsData: Sendable {
-    let books: [BookSearchResultItem]
+    var books: [BookSearchResultItem]
     let series: [SeriesSearchResultItem]
     let authors: [AuthorSearchResultItem]
 
