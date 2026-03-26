@@ -30,6 +30,7 @@ export const BookSortEnum = builder.enumType('BookSort', {
     awards: { description: 'Number of literary awards' },
     genre: { description: 'Literary genre' },
     myRating: { description: 'Personal rating' },
+    publishedDate: { description: 'Publication date' },
   } as const,
 })
 

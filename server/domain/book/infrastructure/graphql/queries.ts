@@ -75,6 +75,7 @@ builder.queryField('books', (t) =>
           .with('genre', () => (book.genre ?? '').toLowerCase())
           .with('myRating', () => ratingByBookId?.[book.id]?.rating ?? -1)
           .with('createdAt', () => book.createdAt.getTime())
+          .with('publishedDate', () => book.publishedDate?.getTime() ?? -Infinity)
           .exhaustive(),
       )
 

@@ -48,7 +48,7 @@ export type Language = (typeof languageValues)[number]
 export type BookFormat = 'pocket' | 'paperback' | 'hardcover' | 'audiobook' | 'digital'
 export type BookStatus = 'to-read' | 'read'
 export type ImportSource = 'scan' | 'isbn' | 'url' | 'audible'
-export type BookSort = 'createdAt' | 'title' | 'author' | 'awards' | 'genre'
+export type BookSort = 'createdAt' | 'title' | 'author' | 'awards' | 'genre' | 'publishedDate'
 export type SortOrder = 'asc' | 'desc'
 
 export type Award = {

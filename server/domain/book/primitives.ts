@@ -122,7 +122,9 @@ export const BookStatus = (value: unknown) =>
   z.enum(['to-read', 'read']).parse(value) as BookStatusType
 
 export const BookSort = (value: unknown) =>
-  z.enum(['createdAt', 'title', 'author', 'awards', 'genre']).parse(value) as BookSortType
+  z
+    .enum(['createdAt', 'title', 'author', 'awards', 'genre', 'publishedDate'])
+    .parse(value) as BookSortType
 
 export const ImportSource = (value: unknown) =>
   z.enum(['scan', 'isbn', 'url', 'audible']).parse(value) as ImportSourceType

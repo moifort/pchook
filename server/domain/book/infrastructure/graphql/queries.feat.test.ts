@@ -78,6 +78,23 @@ feature('GraphQL query: books', () => {
     expect(books.items[2].title).toBe('Les Fleurs du Mal')
   })
 
+  scenario('sorts books by published date descending', async () => {
+    given('books with different publication dates exist')
+    await BookCommand.add(BookTitle('Old Book'), { publishedDate: new Date('1950-01-01') })
+    await BookCommand.add(BookTitle('Recent Book'), { publishedDate: new Date('2023-06-15') })
+    await BookCommand.add(BookTitle('No Date Book'), {})
+
+    when('books query is called with publishedDate sort descending')
+    const result = await execute('{ books(sort: publishedDate, order: desc) { items { title } } }')
+
+    then('books are sorted by publication date, most recent first, unknown last')
+    expect(result.errors).toBeUndefined()
+    const books = result.data?.books as BooksResult
+    expect(books.items[0].title).toBe('Recent Book')
+    expect(books.items[1].title).toBe('Old Book')
+    expect(books.items[2].title).toBe('No Date Book')
+  })
+
   scenario('filters favorite books', async () => {
     given('books with different ratings exist')
     const bookA = await BookCommand.add(BookTitle('Favorite Book'), {})
