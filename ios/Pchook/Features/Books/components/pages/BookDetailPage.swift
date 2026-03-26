@@ -53,6 +53,7 @@ struct BookDetailPage: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(isEditing)
         .sentryTrace("Book Detail")
         .toolbar {
             if !isEditing {
