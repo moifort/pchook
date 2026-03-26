@@ -157,6 +157,18 @@ type AuthStartResponse {
   sessionId: String!
 }
 
+"""An author matching a search query"""
+type AuthorSearchResult {
+  """Number of books by this author"""
+  bookCount: Int!
+
+  """ID of the first book by this author"""
+  firstBookId: ID!
+
+  """Author name"""
+  name: PersonName!
+}
+
 """Literary award received by a book"""
 type Award {
   """Short award name (e.g. "Prix Hugo", "Prix Goncourt")"""
@@ -369,6 +381,27 @@ type BookPreview {
 
   """Translator"""
   translator: String
+}
+
+"""A book matching a search query"""
+type BookSearchResult {
+  """Book authors"""
+  authors: [String!]!
+
+  """Cover image URL"""
+  coverImageUrl: Url
+
+  """Book ID"""
+  id: ID!
+
+  """Book language (ISO 639-1)"""
+  language: String
+
+  """Reading status"""
+  status: String!
+
+  """Book title"""
+  title: String!
 }
 
 """Sort field for the book list"""
@@ -841,6 +874,15 @@ type Query {
   """Dashboard with reading statistics"""
   dashboard: DashboardView!
 
+  """Search across books, series, and authors"""
+  search(
+    """Max results per category (default 10)"""
+    limit: Int = 10
+
+    """Search query text"""
+    query: String!
+  ): SearchResults!
+
   """List of all series"""
   series(
     """Filter to favorite series only (rated 5)"""
@@ -908,6 +950,18 @@ type Review {
   reviewNotes: String
 }
 
+"""Grouped search results across all domains"""
+type SearchResults {
+  """Matching authors"""
+  authors: [AuthorSearchResult!]!
+
+  """Matching books"""
+  books: [BookSearchResult!]!
+
+  """Matching series"""
+  series: [SeriesSearchResult!]!
+}
+
 """A book series, saga, or cycle (e.g. "Les Rougon-Macquart")"""
 type Series {
   """Date the series was first added to the library"""
@@ -936,6 +990,21 @@ scalar SeriesName
 
 """Position in series (positive number)"""
 scalar SeriesPosition
+
+"""A series matching a search query"""
+type SeriesSearchResult {
+  """Series ID"""
+  id: ID!
+
+  """Series name"""
+  name: SeriesName!
+
+  """Personal series rating"""
+  rating: Note
+
+  """Number of volumes in the series"""
+  volumeCount: Int!
+}
 
 """A volume within a series, representing a single book"""
 type SeriesVolume {

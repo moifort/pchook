@@ -26,6 +26,10 @@ import '~/domain/series/infrastructure/graphql/book-fields'
 import '~/domain/series/infrastructure/graphql/queries'
 import '~/domain/series/infrastructure/graphql/mutations'
 
+// Search domain
+import '~/domain/search/infrastructure/graphql/types'
+import '~/domain/search/infrastructure/graphql/queries'
+
 // Dashboard domain
 import '~/domain/dashboard/infrastructure/graphql/types'
 import '~/domain/dashboard/infrastructure/graphql/queries'
