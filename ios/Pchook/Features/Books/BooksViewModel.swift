@@ -88,7 +88,7 @@ final class BooksViewModel {
 
     var groupedBooks: [BookSection] {
         if mode == .series {
-            return BookGrouping.groupedBySeries(books: books)
+            return BookGrouping.groupedBySeries(books: books, sort: sort, descending: sortDescending)
         }
         return BookGrouping.grouped(books: books, sort: sort, descending: sortDescending)
     }

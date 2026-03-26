@@ -104,7 +104,7 @@ enum BookGrouping {
         }
     }
 
-    static func groupedBySeries(books: [BookListItem]) -> [BookSection] {
+    static func groupedBySeries(books: [BookListItem], sort: BookSort, descending: Bool) -> [BookSection] {
         var dict: [String: (seriesName: String, flag: String?, books: [BookListItem])] = [:]
         for book in books {
             let seriesName = book.seriesName ?? ""
@@ -114,8 +114,7 @@ enum BookGrouping {
             entry.books.append(book)
             dict[key] = entry
         }
-        return dict.keys.sorted().map { key in
-            let entry = dict[key]!
+        let sections = dict.values.map { entry in
             let sorted = entry.books.sorted { ($0.seriesPosition ?? 0) < ($1.seriesPosition ?? 0) }
             let sectionTitle = entry.seriesName
             return BookSection(
@@ -124,6 +123,19 @@ enum BookGrouping {
                 rating: sorted.first?.seriesRating,
                 items: sorted.map { SectionedBook(sectionTitle: sectionTitle, book: $0) }
             )
+        }
+        return sections.sorted { a, b in
+            let bookA = a.items.first!.book
+            let bookB = b.items.first!.book
+            let result = switch sort {
+            case .title: a.title.localizedCaseInsensitiveCompare(b.title) == .orderedAscending
+            case .createdAt: bookA.createdAt < bookB.createdAt
+            case .author: (bookA.authors.first ?? "").localizedCaseInsensitiveCompare(bookB.authors.first ?? "") == .orderedAscending
+            case .genre: (bookA.genre ?? "").localizedCaseInsensitiveCompare(bookB.genre ?? "") == .orderedAscending
+            case .myRating: (a.rating ?? 0) < (b.rating ?? 0)
+            case .awards: bookA.awards.count < bookB.awards.count
+            }
+            return descending ? !result : result
         }
     }
 
