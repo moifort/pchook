@@ -11,8 +11,12 @@ private func parseDuration(_ text: String) -> Int? {
 
 struct BookEditForm: View {
     let initial: Fields
+    var bookRating: Int?
+    var seriesRating: Int?
     let onSave: (UpdateBookRequest) async throws -> Void
     let onCancel: () -> Void
+    var onRateBook: () -> Void = {}
+    var onRateSeries: () -> Void = {}
 
     @State private var title: String
     @State private var authors: String
@@ -34,10 +38,22 @@ struct BookEditForm: View {
     @State private var isSaving = false
     @State private var saveError: String?
 
-    init(initial: Fields, onSave: @escaping (UpdateBookRequest) async throws -> Void, onCancel: @escaping () -> Void) {
+    init(
+        initial: Fields,
+        bookRating: Int? = nil,
+        seriesRating: Int? = nil,
+        onSave: @escaping (UpdateBookRequest) async throws -> Void,
+        onCancel: @escaping () -> Void,
+        onRateBook: @escaping () -> Void = {},
+        onRateSeries: @escaping () -> Void = {}
+    ) {
         self.initial = initial
+        self.bookRating = bookRating
+        self.seriesRating = seriesRating
         self.onSave = onSave
         self.onCancel = onCancel
+        self.onRateBook = onRateBook
+        self.onRateSeries = onRateSeries
         _title = State(initialValue: initial.title)
         _authors = State(initialValue: initial.authors)
         _genre = State(initialValue: initial.genre)
@@ -180,6 +196,42 @@ struct BookEditForm: View {
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Label("Position", systemImage: "number")
+                }
+            }
+
+            Section("Notes") {
+                Button { onRateBook() } label: {
+                    HStack {
+                        Label("Noter le livre", systemImage: "star")
+                        Spacer()
+                        if let bookRating {
+                            if bookRating == 5 {
+                                Image(systemName: "heart.fill")
+                                    .foregroundStyle(.red)
+                            } else {
+                                StarRatingView(rating: Double(bookRating))
+                            }
+                        }
+                    }
+                }
+                .tint(.primary)
+
+                if !series.isEmpty {
+                    Button { onRateSeries() } label: {
+                        HStack {
+                            Label("Noter la série", systemImage: "star")
+                            Spacer()
+                            if let seriesRating {
+                                if seriesRating == 5 {
+                                    Image(systemName: "heart.fill")
+                                        .foregroundStyle(.red)
+                                } else {
+                                    StarRatingView(rating: Double(seriesRating))
+                                }
+                            }
+                        }
+                    }
+                    .tint(.primary)
                 }
             }
 

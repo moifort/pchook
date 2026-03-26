@@ -25,13 +25,17 @@ struct BookDetailPage: View {
                 if isEditing {
                     BookEditForm(
                         initial: BookEditForm.Fields(from: detail),
+                        bookRating: detail.review?.rating,
+                        seriesRating: detail.series?.rating,
                         onSave: { request in
                             _ = try await GraphQLBooksAPI.update(id: bookId, request)
                             self.detail = try await GraphQLBooksAPI.getDetail(id: bookId)
                             isEditing = false
                             onUpdated()
                         },
-                        onCancel: { isEditing = false }
+                        onCancel: { isEditing = false },
+                        onRateBook: { showReviewSheet = true },
+                        onRateSeries: { showRateSeriesSheet = true }
                     )
                 } else {
                     BookDetailContent(
