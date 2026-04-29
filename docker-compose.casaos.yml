@@ -1,7 +1,7 @@
 name: pchook
 services:
   server:
-    image: ghcr.io/moifort/pchook:main
+    image: ghcr.io/moifort/pchook:main@sha256:ecac3c07a82452ca9167aea8eb46ad469844908da1e3c9415995ea5ae1e9c9a4
     container_name: pchook-server
     restart: unless-stopped
     cpu_shares: 50
