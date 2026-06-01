@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/moifort/pchook:main
+    image: ghcr.io/moifort/pchook:main@sha256:100a3512e662201a0de19ca8dedd082cf67876220a3a06151fb7b7aca4ea341b
     container_name: pchook-server
     restart: unless-stopped
     environment:
